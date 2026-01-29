@@ -36,9 +36,8 @@ export const calculateBonusPoints = (score, average, isAbsent) => {
   // If player is absent, they use average - 10
   if (isAbsent && average !== '') {
     const absenceScore = parseInt(average) - 10;
-    const scoreToUse = score === '' ? absenceScore : Math.max(absenceScore, parseInt(score));
-    if (scoreToUse >= parseInt(average) + 70) return 2;
-    if (scoreToUse >= parseInt(average) + 50) return 1;
+    if (absenceScore >= parseInt(average) + 70) return 2;
+    if (absenceScore >= parseInt(average) + 50) return 1;
     return 0;
   }
   

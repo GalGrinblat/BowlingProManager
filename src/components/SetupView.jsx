@@ -83,6 +83,7 @@ export function SetupView({ game, onTeamNameChange, onPlayerNameChange, onPlayer
                       type="number"
                       value={player.average}
                       onChange={(e) => onPlayerAverageChange('team1', idx, e.target.value)}
+                      onKeyDown={(e) => ['-', '+', 'e', 'E'].includes(e.key) && e.preventDefault()}
                       placeholder="0-300"
                       min="0"
                       max="300"
@@ -137,6 +138,7 @@ export function SetupView({ game, onTeamNameChange, onPlayerNameChange, onPlayer
                       type="number"
                       value={player.average}
                       onChange={(e) => onPlayerAverageChange('team2', idx, e.target.value)}
+                      onKeyDown={(e) => ['-', '+', 'e', 'E'].includes(e.key) && e.preventDefault()}
                       placeholder="0-300"
                       min="0"
                       max="300"

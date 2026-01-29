@@ -75,6 +75,7 @@ export function MatchView({ matchNumber, game, onUpdateScore, onNavigate, onCanc
                             type="number"
                             value={match.team1.players[idx].pins}
                             onChange={(e) => onUpdateScore(matchIndex, 'team1', idx, e.target.value)}
+                            onKeyDown={(e) => ['-', '+', 'e', 'E'].includes(e.key) && e.preventDefault()}
                             placeholder="0-300"
                             min="0"
                             max="300"
@@ -162,6 +163,7 @@ export function MatchView({ matchNumber, game, onUpdateScore, onNavigate, onCanc
                             type="number"
                             value={match.team2.players[idx].pins}
                             onChange={(e) => onUpdateScore(matchIndex, 'team2', idx, e.target.value)}
+                            onKeyDown={(e) => ['-', '+', 'e', 'E'].includes(e.key) && e.preventDefault()}
                             placeholder="0-300"
                             min="0"
                             max="300"
