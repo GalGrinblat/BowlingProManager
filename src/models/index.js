@@ -24,12 +24,14 @@ export const createLeague = ({
   description = '',
   defaultHandicapBasis = 160,
   defaultPlayersPerTeam = 4,
+  dayOfWeek = '',
   active = true
 }) => ({
   name,
   description,
   defaultHandicapBasis: parseInt(defaultHandicapBasis) || 160,
   defaultPlayersPerTeam: parseInt(defaultPlayersPerTeam) || 4,
+  dayOfWeek,
   active
 });
 

@@ -1,16 +1,45 @@
 /**
- * Schedule Generator - Creates round-robin tournament schedules
+ * Schedule Generator - Creates round-robin tournament schedules with dates
  */
 
 /**
- * Generate a round-robin schedule for all teams split into match days
+ * Calculate the next occurrence of a specific day of week from a start date
+ * @param {Date} startDate - Starting date
+ * @param {String} dayOfWeek - Day of week (Sunday, Monday, etc.)
+ * @param {Number} weeksToAdd - Number of weeks to add (0 for first occurrence)
+ * @returns {Date} The calculated date
+ */
+const getNextDayOfWeek = (startDate, dayOfWeek, weeksToAdd = 0) => {
+  const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const targetDay = daysOfWeek.indexOf(dayOfWeek);
+  
+  if (targetDay === -1) return new Date(startDate);
+  
+  const date = new Date(startDate);
+  const currentDay = date.getDay();
+  
+  // Calculate days until target day
+  let daysUntilTarget = targetDay - currentDay;
+  if (daysUntilTarget < 0) {
+    daysUntilTarget += 7;
+  }
+  
+  // Add the days plus any additional weeks
+  date.setDate(date.getDate() + daysUntilTarget + (weeksToAdd * 7));
+  return date;
+};
+
+/**
+ * Generate a round-robin schedule for all teams split into match days with dates
  * Each team plays every other team once per round
  * Match days ensure no team plays twice on the same day
  * @param {Array} teamIds - Array of team IDs
  * @param {Number} numberOfRounds - Number of complete rounds
- * @returns {Array} Schedule array with match day number and matchups
+ * @param {String} startDate - ISO date string for season start
+ * @param {String} dayOfWeek - Day of week for games (e.g., 'Monday')
+ * @returns {Array} Schedule array with match day number, dates, and matchups
  */
-export const generateRoundRobinSchedule = (teamIds, numberOfRounds = 1) => {
+export const generateRoundRobinSchedule = (teamIds, numberOfRounds = 1, startDate = null, dayOfWeek = null) => {
   if (!teamIds || teamIds.length < 2) {
     throw new Error('At least 2 teams are required');
   }
@@ -49,10 +78,18 @@ export const generateRoundRobinSchedule = (teamIds, numberOfRounds = 1) => {
       
       // Add this match day to schedule
       if (dayMatches.length > 0) {
+        // Calculate date for this match day if start date and day of week provided
+        let matchDate = null;
+        if (startDate && dayOfWeek) {
+          matchDate = getNextDayOfWeek(new Date(startDate), dayOfWeek, matchDayCounter - 1);
+        }
+        
         schedule.push({
           round: round + 1,
           matchDay: matchDayCounter++,
-          matches: dayMatches
+          date: matchDate ? matchDate.toISOString() : null,
+          matches: dayMatches,
+          postponed: false
         });
       }
       
@@ -146,6 +183,7 @@ export const getTeamSchedule = (schedule, teamId) => {
       teamGames.push({
         round: daySchedule.round,
         matchDay: daySchedule.matchDay,
+        date: daySchedule.date,
         opponentId: teamMatch.team1Id === teamId ? teamMatch.team2Id : teamMatch.team1Id,
         isHome: teamMatch.team1Id === teamId
       });
@@ -153,4 +191,60 @@ export const getTeamSchedule = (schedule, teamId) => {
   });
   
   return teamGames;
+};
+
+/**
+ * Postpone a match day and shift all subsequent match days
+ * @param {Array} schedule - Current schedule array
+ * @param {Number} matchDayToPostpone - Match day number to postpone
+ * @param {Number} weeksToDelay - Number of weeks to delay (default 1)
+ * @param {String} dayOfWeek - Day of week for rescheduling
+ * @returns {Array} Updated schedule with new dates
+ */
+export const postponeMatchDay = (schedule, matchDayToPostpone, weeksToDelay = 1, dayOfWeek) => {
+  const updatedSchedule = [...schedule];
+  
+  // Find the match day to postpone
+  const matchDayIndex = updatedSchedule.findIndex(s => s.matchDay === matchDayToPostpone);
+  if (matchDayIndex === -1) return schedule;
+  
+  const matchDayEntry = updatedSchedule[matchDayIndex];
+  
+  // Mark as postponed
+  matchDayEntry.postponed = true;
+  matchDayEntry.originalDate = matchDayEntry.date;
+  
+  // Calculate new date for postponed match day
+  if (matchDayEntry.date && dayOfWeek) {
+    const currentDate = new Date(matchDayEntry.date);
+    const newDate = getNextDayOfWeek(currentDate, dayOfWeek, weeksToDelay);
+    matchDayEntry.date = newDate.toISOString();
+  }
+  
+  // Shift all subsequent match days by the same delay
+  for (let i = matchDayIndex + 1; i < updatedSchedule.length; i++) {
+    if (updatedSchedule[i].date && dayOfWeek) {
+      const currentDate = new Date(updatedSchedule[i].date);
+      const newDate = getNextDayOfWeek(currentDate, dayOfWeek, weeksToDelay);
+      updatedSchedule[i].date = newDate.toISOString();
+    }
+  }
+  
+  return updatedSchedule;
+};
+
+/**
+ * Format date for display
+ * @param {String} isoDate - ISO date string
+ * @returns {String} Formatted date string
+ */
+export const formatMatchDate = (isoDate) => {
+  if (!isoDate) return 'TBD';
+  const date = new Date(isoDate);
+  return date.toLocaleDateString('en-US', { 
+    weekday: 'short', 
+    year: 'numeric', 
+    month: 'short', 
+    day: 'numeric' 
+  });
 };

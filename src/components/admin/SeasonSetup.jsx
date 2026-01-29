@@ -42,7 +42,12 @@ export const SeasonSetup = ({ seasonId, onBack }) => {
     if (confirm('Start this season? Teams cannot be changed after starting.')) {
       // Generate schedule with actual team IDs
       const teamIds = teams.map(t => t.id);
-      const schedule = generateRoundRobinSchedule(teamIds, season.numberOfRounds);
+      const schedule = generateRoundRobinSchedule(
+        teamIds, 
+        season.numberOfRounds,
+        season.startDate,
+        league.dayOfWeek
+      );
 
       seasonsApi.update(seasonId, {
         status: 'active',

@@ -108,20 +108,20 @@ export function SetupView({ game, onTeamNameChange, onPlayerNameChange, onPlayer
         </div>
 
         {/* Team 2 Players */}
-        <div className="border-2 border-blue-300 rounded-lg p-4 bg-blue-50">
-          <h3 className="bowling-title text-xl text-blue-800 mb-4">
+        <div className="border-2 border-blue-300 rounded-lg p-3 sm:p-4 bg-blue-50">
+          <h3 className="bowling-title text-lg sm:text-xl text-blue-800 mb-3 sm:mb-4">
             {game.team2.name || 'TEAM 2'} PLAYERS
           </h3>
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             {[...game.team2.players].sort((a, b) => {
               if (a.average === '' && b.average === '') return 0;
               if (a.average === '') return 1;
               if (b.average === '') return -1;
               return parseInt(b.average) - parseInt(a.average);
             }).map((player) => (
-              <div key={player.rank} className={`bg-white rounded-lg p-3 shadow-sm ${player.absent ? 'opacity-60 bg-gray-100' : ''}`}>
+              <div key={player.rank} className={`bg-white rounded-lg p-2 sm:p-3 shadow-sm ${player.absent ? 'opacity-60 bg-gray-100' : ''}`}>
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">
+                  <div className="bg-blue-600 text-white w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm flex-shrink-0">
                     {player.rank}
                   </div>
                   <input
@@ -129,16 +129,16 @@ export function SetupView({ game, onTeamNameChange, onPlayerNameChange, onPlayer
                     value={player.name}
                     onChange={(e) => onPlayerNameChange('team2', game.team2.players.indexOf(player), e.target.value)}
                     placeholder="Player name"
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded focus:border-blue-500 focus:outline-none font-semibold"
+                    className="flex-1 px-2 sm:px-3 py-2 sm:py-3 border border-gray-300 rounded focus:border-blue-500 focus:outline-none font-semibold text-sm sm:text-base touch-manipulation"
                   />
-                  <label className="flex items-center gap-1 cursor-pointer">
+                  <label className="flex items-center gap-1 cursor-pointer flex-shrink-0">
                     <input
                       type="checkbox"
                       checked={player.absent}
                       onChange={() => onToggleAbsent('team2', game.team2.players.indexOf(player))}
-                      className="w-4 h-4 text-blue-600 border-gray-300 rounded"
+                      className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 border-gray-300 rounded"
                     />
-                    <span className="text-xs font-semibold text-gray-600">Absent</span>
+                    <span className="text-xs font-semibold text-gray-600 hidden sm:inline">Absent</span>
                   </label>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
@@ -152,12 +152,12 @@ export function SetupView({ game, onTeamNameChange, onPlayerNameChange, onPlayer
                       placeholder="0-300"
                       min="0"
                       max="300"
-                      className="w-full px-2 py-1 border border-gray-300 rounded focus:border-blue-500 focus:outline-none text-center font-semibold"
+                      className="w-full px-2 py-2 sm:py-3 border border-gray-300 rounded focus:border-blue-500 focus:outline-none text-center font-semibold text-sm sm:text-base touch-manipulation"
                     />
                   </div>
                   <div>
                     <label className="text-xs font-semibold text-gray-600 block mb-1">Handicap</label>
-                    <div className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded font-bold text-center border border-yellow-300">
+                    <div className="px-2 py-2 sm:py-3 bg-yellow-100 text-yellow-800 rounded font-bold text-center border border-yellow-300 text-sm sm:text-base">
                       {player.handicap}
                     </div>
                   </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { seasonsApi, teamsApi, gamesApi, leaguesApi } from '../../services/api';
 import { calculateTeamStandings, calculatePlayerSeasonStats } from '../../utils/standingsUtils';
 import { createEmptyMatch } from '../../utils/matchUtils';
+import { postponeMatchDay, formatMatchDate } from '../../utils/scheduleUtils';
 import { 
   exportStandingsCSV, 
   exportPlayerStatsCSV, 
@@ -18,6 +19,8 @@ export const SeasonDashboard = ({ seasonId, onBack, onPlayGame, onViewGame, onMa
   const [view, setView] = useState('schedule'); // schedule, standings, players
   const [selectedRound, setSelectedRound] = useState(1);
   const [selectedMatchDay, setSelectedMatchDay] = useState(null);
+  const [showPostponeModal, setShowPostponeModal] = useState(false);
+  const [postponeWeeks, setPostponeWeeks] = useState(1);
 
   useEffect(() => {
     loadSeasonData();
@@ -61,6 +64,50 @@ export const SeasonDashboard = ({ seasonId, onBack, onPlayGame, onViewGame, onMa
 
     if (confirm('Complete this season? This will finalize all results and standings.')) {
       seasonsApi.update(seasonId, { status: 'completed' });
+      loadSeasonData();
+    }
+  };
+
+  const handlePostponeMatchDay = () => {
+    if (!league.dayOfWeek) {
+      alert('Cannot postpone: League has no day of week configured.');
+      return;
+    }
+
+    // Check if any games in this match day are already completed
+    const matchDayGamesToCheck = games.filter(g => g.matchDay === selectedMatchDay);
+    const hasCompletedGames = matchDayGamesToCheck.some(g => g.status === 'completed');
+    
+    if (hasCompletedGames) {
+      alert('Cannot postpone: Some games in this match day are already completed.');
+      return;
+    }
+
+    if (confirm(`Postpone Match Day ${selectedMatchDay} by ${postponeWeeks} week(s)? All subsequent match days will also shift.`)) {
+      const updatedSchedule = postponeMatchDay(
+        season.schedule,
+        selectedMatchDay,
+        postponeWeeks,
+        league.dayOfWeek
+      );
+
+      // Update season with new schedule
+      seasonsApi.update(seasonId, { schedule: updatedSchedule });
+
+      // Update all games with new dates from schedule
+      updatedSchedule.forEach(daySchedule => {
+        const gamesToUpdate = games.filter(g => g.matchDay === daySchedule.matchDay);
+        gamesToUpdate.forEach(game => {
+          gamesApi.update(game.id, { 
+            scheduledDate: daySchedule.date,
+            postponed: daySchedule.postponed,
+            originalDate: daySchedule.originalDate
+          });
+        });
+      });
+
+      setShowPostponeModal(false);
+      setPostponeWeeks(1);
       loadSeasonData();
     }
   };
@@ -300,11 +347,24 @@ export const SeasonDashboard = ({ seasonId, onBack, onPlayGame, onViewGame, onMa
           {/* Match Day Selector */}
           {matchDaysInRound.length > 0 && (
             <div className="bg-white rounded-xl shadow-lg p-4">
-              <h3 className="text-sm font-semibold text-gray-600 mb-2">Select Match Day</h3>
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="text-sm font-semibold text-gray-600">Select Match Day</h3>
+                {season.status === 'active' && selectedMatchDay && (
+                  <button
+                    onClick={() => setShowPostponeModal(true)}
+                    className="px-3 py-1 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 font-semibold text-xs"
+                  >
+                    📅 Postpone
+                  </button>
+                )}
+              </div>
               <div className="flex gap-2 flex-wrap">
                 {matchDaysInRound.map(matchDay => {
                   const matchDayGamesForDay = roundGames.filter(g => g.matchDay === matchDay);
                   const completedInMatchDay = matchDayGamesForDay.filter(g => g.status === 'completed').length;
+                  const scheduleEntry = season.schedule?.find(s => s.matchDay === matchDay);
+                  const dateDisplay = scheduleEntry?.date ? formatMatchDate(scheduleEntry.date) : null;
+                  const isPostponed = scheduleEntry?.postponed;
                   
                   return (
                     <button
@@ -316,9 +376,15 @@ export const SeasonDashboard = ({ seasonId, onBack, onPlayGame, onViewGame, onMa
                           : completedInMatchDay === matchDayGamesForDay.length
                           ? 'bg-green-100 text-green-700 hover:bg-green-200'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
+                      } ${isPostponed ? 'ring-2 ring-orange-400' : ''}`}
                     >
-                      Match Day {matchDay} ({completedInMatchDay}/{matchDayGamesForDay.length})
+                      <div>Match Day {matchDay}</div>
+                      {dateDisplay && (
+                        <div className="text-xs mt-1 opacity-90">
+                          {isPostponed && '⚠️ '}{dateDisplay}
+                        </div>
+                      )}
+                      <div className="text-xs mt-1">({completedInMatchDay}/{matchDayGamesForDay.length})</div>
                     </button>
                   );
                 })}
@@ -445,6 +511,61 @@ export const SeasonDashboard = ({ seasonId, onBack, onPlayGame, onViewGame, onMa
           </div>
         </div>
       )}
+
+      {/* Postpone Modal */}
+      {showPostponeModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full">
+            <h3 className="text-xl font-bold text-gray-800 mb-4">Postpone Match Day {selectedMatchDay}</h3>
+            
+            <div className="mb-4">
+              <p className="text-sm text-gray-600 mb-2">
+                Current date: {season.schedule?.find(s => s.matchDay === selectedMatchDay)?.date 
+                  ? formatMatchDate(season.schedule.find(s => s.matchDay === selectedMatchDay).date)
+                  : 'Not scheduled'}
+              </p>
+              <p className="text-sm text-gray-600 mb-4">
+                All subsequent match days will also be delayed by the same amount.
+              </p>
+              
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Postpone by how many weeks?
+              </label>
+              <input
+                type="number"
+                min="1"
+                max="10"
+                value={postponeWeeks}
+                onChange={(e) => setPostponeWeeks(parseInt(e.target.value) || 1)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+              />
+              
+              {postponeWeeks > 0 && season.schedule?.find(s => s.matchDay === selectedMatchDay)?.date && (
+                <p className="text-sm text-green-600 mt-2">
+                  New date: {formatMatchDate(
+                    new Date(new Date(season.schedule.find(s => s.matchDay === selectedMatchDay).date).getTime() + postponeWeeks * 7 * 24 * 60 * 60 * 1000).toISOString()
+                  )}
+                </p>
+              )}
+            </div>
+            
+            <div className="flex gap-3">
+              <button
+                onClick={handlePostponeMatchDay}
+                className="flex-1 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 font-semibold"
+              >
+                Postpone
+              </button>
+              <button
+                onClick={() => {
+                  setShowPostponeModal(false);
+                  setPostponeWeeks(1);
+                }}
+                className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-semibold"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -11,6 +11,7 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
     description: '',
     defaultHandicapBasis: 160,
     defaultPlayersPerTeam: 4,
+    dayOfWeek: '',
     active: true
   });
 
@@ -45,6 +46,7 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
       description: '',
       defaultHandicapBasis: 160,
       defaultPlayersPerTeam: 4,
+      dayOfWeek: '',
       active: true
     });
     setIsAdding(false);
@@ -57,6 +59,7 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
       description: league.description || '',
       defaultHandicapBasis: league.defaultHandicapBasis,
       defaultPlayersPerTeam: league.defaultPlayersPerTeam,
+      dayOfWeek: league.dayOfWeek || '',
       active: league.active
     });
     setEditingId(league.id);
@@ -175,6 +178,26 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
                 />
                 <p className="text-xs text-gray-500 mt-1">Can be changed per season</p>
               </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  League Day
+                </label>
+                <select
+                  value={formData.dayOfWeek}
+                  onChange={(e) => setFormData({ ...formData, dayOfWeek: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="">Select day (optional)</option>
+                  <option value="Sunday">Sunday</option>
+                  <option value="Monday">Monday</option>
+                  <option value="Tuesday">Tuesday</option>
+                  <option value="Wednesday">Wednesday</option>
+                  <option value="Thursday">Thursday</option>
+                  <option value="Friday">Friday</option>
+                  <option value="Saturday">Saturday</option>
+                </select>
+                <p className="text-xs text-gray-500 mt-1">Day of the week games are played</p>
+              </div>
             </div>
             <div className="flex items-center">
               <input
@@ -241,9 +264,10 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
                         <p className="text-sm text-gray-600 mt-1">{league.description}</p>
                       )}
                       <div className="flex gap-4 mt-2 text-sm text-gray-500">
+                        {league.dayOfWeek && <span>📅 {league.dayOfWeek}s</span>}
                         <span>📊 Handicap: {league.defaultHandicapBasis}</span>
                         <span>👥 {league.defaultPlayersPerTeam} players/team</span>
-                        <span>📅 {seasons.length} season{seasons.length !== 1 ? 's' : ''}</span>
+                        <span>🎳 {seasons.length} season{seasons.length !== 1 ? 's' : ''}</span>
                       </div>
                       {activeSeason && (
                         <div className="mt-2 inline-block px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">
@@ -305,9 +329,10 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
                   <div className="flex justify-between items-start">
                     <div>
                       <h3 className="font-semibold text-gray-600">{league.name}</h3>
-                      <p className="text-sm text-gray-500 mt-1">
+                      <div className="text-sm text-gray-500 mt-1">
+                        {league.dayOfWeek && <span>{league.dayOfWeek}s • </span>}
                         {seasons.length} season{seasons.length !== 1 ? 's' : ''}
-                      </p>
+                      </div>
                     </div>
                     <div className="flex gap-2">
                       <button

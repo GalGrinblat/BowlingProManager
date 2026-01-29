@@ -63,6 +63,7 @@ export const LeagueDetail = ({ leagueId, onBack, onViewSeason }) => {
           <p className="text-gray-600">{league.description}</p>
         )}
         <div className="flex gap-4 mt-4 text-sm text-gray-600">
+          {league.dayOfWeek && <span>📅 {league.dayOfWeek}s</span>}
           <span>📊 Handicap Basis: {league.defaultHandicapBasis}</span>
           <span>👥 Default: {league.defaultPlayersPerTeam} players/team</span>
         </div>

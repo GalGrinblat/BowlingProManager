@@ -90,6 +90,7 @@ export const AdminDashboard = ({ onNavigate }) => {
                     <div className="text-right text-sm text-gray-500">
                       <div>{seasons.length} season{seasons.length !== 1 ? 's' : ''}</div>
                       <div className="text-xs mt-1">
+                        {league.dayOfWeek && <div>{league.dayOfWeek}s</div>}
                         {league.defaultPlayersPerTeam} players/team
                       </div>
                     </div>
