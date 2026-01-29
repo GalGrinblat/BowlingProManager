@@ -15,6 +15,9 @@ export const LeagueDetail = ({ leagueId, onBack, onViewSeason }) => {
 
   const loadLeagueData = () => {
     const leagueData = leaguesApi.getById(leagueId);
+    if (!leagueData) {
+      return;
+    }
     setLeague(leagueData);
     const seasonsData = seasonsApi.getByLeague(leagueId);
     setSeasons(seasonsData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
@@ -46,7 +49,23 @@ export const LeagueDetail = ({ leagueId, onBack, onViewSeason }) => {
   const completedSeasons = seasons.filter(s => s.status === 'completed');
   const setupSeasons = seasons.filter(s => s.status === 'setup');
 
-  if (!league) return <div>Loading...</div>;
+  if (!league) {
+    return (
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="flex items-center gap-4 mb-6">
+          <button
+            onClick={onBack}
+            className="px-4 py-2 text-gray-600 hover:text-gray-800"
+          >
+            ← Back to Leagues
+          </button>
+        </div>
+        <div className="text-center py-12">
+          <p className="text-gray-500">League not found. It may have been deleted.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

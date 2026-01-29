@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { organizationApi, leaguesApi, seasonsApi } from '../../services/api';
+import { organizationApi, leaguesApi, seasonsApi, gamesApi } from '../../services/api';
+import { formatMatchDate } from '../../utils/scheduleUtils';
 
 export const AdminDashboard = ({ onNavigate }) => {
   const [org, setOrg] = useState(null);
@@ -69,6 +70,27 @@ export const AdminDashboard = ({ onNavigate }) => {
               const seasons = seasonsApi.getByLeague(league.id);
               const activeSeason = seasons.find(s => s.status === 'active');
               
+              // Find next matchday date
+              let nextMatchDay = null;
+              if (activeSeason && activeSeason.schedule) {
+                const games = gamesApi.getBySeason(activeSeason.id);
+                const now = new Date();
+                
+                // Find the next incomplete match day
+                const incompleteMatchDays = activeSeason.schedule.filter(day => {
+                  const dayGames = games.filter(g => g.matchDay === day.matchDay);
+                  const hasIncomplete = dayGames.some(g => g.status !== 'completed');
+                  const dayDate = day.date ? new Date(day.date) : null;
+                  return hasIncomplete && dayDate;
+                });
+                
+                // Sort by date and get the next one
+                if (incompleteMatchDays.length > 0) {
+                  incompleteMatchDays.sort((a, b) => new Date(a.date) - new Date(b.date));
+                  nextMatchDay = incompleteMatchDays[0];
+                }
+              }
+              
               return (
                 <div
                   key={league.id}
@@ -82,9 +104,17 @@ export const AdminDashboard = ({ onNavigate }) => {
                         <p className="text-sm text-gray-600 mt-1">{league.description}</p>
                       )}
                       {activeSeason && (
-                        <p className="text-sm text-green-600 mt-2">
-                          Active Season: {activeSeason.name}
-                        </p>
+                        <div className="mt-2 space-y-1">
+                          <p className="text-sm text-green-600">
+                            Active Season: {activeSeason.name}
+                          </p>
+                          {nextMatchDay && (
+                            <p className="text-sm text-blue-600 font-medium">
+                              📅 Next: {formatMatchDate(nextMatchDay.date)}
+                              {nextMatchDay.postponed && <span className="text-orange-600 ml-1">(Postponed)</span>}
+                            </p>
+                          )}
+                        </div>
                       )}
                     </div>
                     <div className="text-right text-sm text-gray-500">

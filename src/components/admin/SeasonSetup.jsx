@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { seasonsApi, teamsApi, playersApi, gamesApi, leaguesApi } from '../../services/api';
 import { validateTeam } from '../../models';
 import { generateRoundRobinSchedule } from '../../utils/scheduleUtils';
+import { createEmptyMatch } from '../../utils/matchUtils';
 
 export const SeasonSetup = ({ seasonId, onBack }) => {
   const [season, setSeason] = useState(null);
