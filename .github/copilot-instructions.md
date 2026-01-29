@@ -14,7 +14,7 @@ This is a **3-match bowling league scoring React app** with handicap calculation
 ### Handicap Calculation
 - **Rule**: 160-pin standard → `handicap = Math.max(0, 160 - average)`
 - **Applied to**: Both individual game comparisons AND match totals with handicap
-- **Location**: [App.jsx](App.jsx#L39-L45) (setup), [matchUtils.js](src/utils/matchUtils.js) (calculations)
+- **Location**: [App.jsx](../src/App.jsx#L39-L45) (setup), [matchUtils.js](../src/utils/matchUtils.js) (calculations)
 
 ### Scoring System (Complex Multi-Layer)
 1. **Individual Game Points**: Compare player1 vs player1 (with handicap) across all 4 player pairs
@@ -23,22 +23,22 @@ This is a **3-match bowling league scoring React app** with handicap calculation
    - +1 bonus if score ≥ average + 50 pins
    - +2 bonus if score ≥ average + 70 pins
    - Applied to match score calculation
-3. **Match Winner Bonus**: +1 point if team wins match (has higher total with handicap)
-4. **Grand Total Bonus**: +2 points to team with highest combined pins across all 3 matches (only if all matches complete)
+3. **Match Winner Point**: +1 point if team wins match (has higher total with handicap)
+4. **Grand Total Points**: +2 points to team with highest combined pins across all 3 matches (only if all matches complete)
 - **Key insight**: Game points + bonus points + match winner = match score
-- **Location**: [matchUtils.js](src/utils/matchUtils.js#L27-L85)
+- **Location**: [matchUtils.js](../src/utils/matchUtils.js#L27-L85)
 
 ### Validation Rules
 - **Setup validation**: All teams, players, names, and averages required
 - **Match validation**: All 4 players per team must have scores before advancing
 - **Game completion**: All 3 matches must be complete to finish
-- **Location**: [gameUtils.js](src/utils/gameUtils.js#L41-L65)
+- **Location**: [gameUtils.js](../src/utils/gameUtils.js#L41-L65)
 
 ## Component-to-Utility Communication Patterns
 
 ### State Update Flow
 ```
-App.jsx state → updateMatchScore() → calculateBonusPoints() + calculateMatchResults() + calculateTotalBonus() → setCurrentGame()
+App.jsx state → updateMatchScore() → calculateBonusPoints() + calculateMatchResults() + calculateGrandTotalPoints() → setCurrentGame()
 ```
 
 ### Key State Mutations (All in App.jsx)
@@ -97,15 +97,15 @@ setCurrentGame(updated);
 
 ## When Adding Features
 
-1. **New scoring rule?** → Modify [matchUtils.js](src/utils/matchUtils.js), ensure backward compatibility with existing `calculateMatchResults()` structure
-2. **New statistic?** → Add to [statsUtils.js](src/utils/statsUtils.js), follow reduce pattern
-3. **New player/team?** → Update array sizes in [gameUtils.js](src/utils/gameUtils.js#L5-L20) AND component inputs
+1. **New scoring rule?** → Modify [matchUtils.js](../src/utils/matchUtils.js), ensure backward compatibility with existing `calculateMatchResults()` structure
+2. **New statistic?** → Add to [statsUtils.js](../src/utils/statsUtils.js), follow reduce pattern
+3. **New player/team?** → Update array sizes in [gameUtils.js](../src/utils/gameUtils.js#L5-L20) AND component inputs
 4. **UI changes?** → React components import from utils, don't duplicate calculation logic
-5. **Validation changes?** → Update [gameUtils.js](src/utils/gameUtils.js), add guards in [App.jsx](App.jsx) before state updates
+5. **Validation changes?** → Update [gameUtils.js](../src/utils/gameUtils.js), add guards in [App.jsx](../src/App.jsx) before state updates
 
 ## Known Edge Cases
 
 - **Empty pin strings**: Treated as 0 in calculations, not entered in calculations until all pins filled
 - **Draws in individual games**: Each team gets 0.5 points
 - **Incomplete matches**: Handicap totals calculated as 0 for missing pins
-- **Grand total bonus**: Only awarded if all 3 matches complete with all scores entered
+- **Grand total points**: Only awarded if all 3 matches complete with all scores entered

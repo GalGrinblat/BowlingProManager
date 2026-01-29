@@ -26,7 +26,7 @@ export const createNewGame = () => {
       createEmptyMatch(2),
       createEmptyMatch(3)
     ],
-    totalScoreBonus: { team1: 0, team2: 0 }
+    grandTotalPoints: { team1: 0, team2: 0 }
   };
 };
 

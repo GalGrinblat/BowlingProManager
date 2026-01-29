@@ -46,6 +46,21 @@ BowlingAppAi/
 - **Multi-Layer Bonus Points**: 
   - +1 point for scoring 50+ pins above average
   - +2 points for scoring 70+ pins above average
+  
+- **Comprehensive Statistics**:
+  - Individual player totals and 3-game averages
+  - Team statistics (total pins, pins with handicap)
+  - Game-by-game breakdown with points earned
+  - Absent player tracking in summaries
+  
+- **Responsive Design**: 
+  - Mobile-friendly interface
+  - Dark theme scoring cards with gradients
+  - Animated transitions between views
+  - Input validation preventing invalid characters
+
+## Scoring Rules
+
 ### Per-Match Scoring
 1. **Individual Game Points** (4 games per match):
    - Each player competes against their rank counterpart (1 vs 1, 2 vs 2, etc.)
@@ -54,7 +69,31 @@ BowlingAppAi/
 
 2. **Per-Player Bonus Points**:
    - +1 point if score ≥ average + 50 pins
-   -Development Setup
+   - +2 points if score ≥ average + 70 pins
+   - Applied individually per player, per match
+
+3. **Match Winner Point**:
+   - +1 point to team with highest total pins (with handicap)
+   - +0.5 points each if total pins tie
+
+4. **Match Score Calculation**:
+   - Match Points = Game Points + Bonus Points + Match Winner Point
+
+### Grand Total Points
+- After all 3 matches complete:
+  - +2 points to team with highest combined pins with handicap across all matches
+  - +1 point each if tied
+
+### Absent Player Rules
+- Absent players automatically score: `average - 10` pins
+- Handicap still applies to absent player scores
+- Absent players cannot earn bonus points
+- When both players in a game are absent, it's always a draw (0.5 points each)
+- Can be marked absent during setup
+
+## How to Run
+
+### Development Setup
 ```bash
 # Install dependencies
 npm install
@@ -74,13 +113,8 @@ npm run preview
 - **Vite** - Build tool and dev server
 - **Tailwind CSS 3** - Utility-first styling
 - **PostCSS** - CSS processing
-   - Match Score = Game Points + Bonus Points + Match Winner Bonus
 
-### Grand Total Bonus
-- After all 3 matches complete:
-  - +2 points to team with highest combined raw pins (no handicap)
-  - +1 point each if tied
-Architecture
+## Architecture
 
 ### Component Hierarchy
 - **App.jsx** - Root component with state management and view routing
@@ -96,7 +130,42 @@ Architecture
 - **matchUtils.js** - Core scoring logic:
   - Individual game comparisons
   - Bonus point calculations
-  **Tailwind CSS** - Utility-first responsive design
+  - Match winner determination
+  - Absent player score handling
+- **statsUtils.js** - Statistical aggregations:
+  - Player totals and averages
+  - Team grand totals
+  - Grand total points calculation
+
+### Data Flow
+```
+App.jsx (state) 
+  → User actions (update functions)
+  → Utility calculations (pure functions)
+  → State updates (immutable)
+  → Component re-render
+```
+
+### State Structure
+```javascript
+{
+  team1: { name, players: [{ name, average, handicap, absent, rank }] },
+  team2: { name, players: [...] },
+  matches: [
+    {
+      matchNumber,
+      team1: { score, totalPins, totalWithHandicap, bonusPoints, players: [{ pins, bonusPoints }] },
+      team2: { ... },
+      games: [{ player, result, team1Points, team2Points }]
+    }
+  ],
+  grandTotalPoints: { team1, team2 }
+}
+```
+
+## Styling
+
+- **Tailwind CSS** - Utility-first responsive design
 - **Custom Animations** - Slide-in transitions and hover effects
 - **Color Themes**:
   - Orange/Red gradients for Team 1
@@ -145,73 +214,3 @@ All numeric inputs include:
 - [ ] Variable match counts (1-5 matches)
 - [ ] Player statistics over time
 - [ ] Dark mode toggle for entire app
-{
-  team1: { name, players: [{ name, average, handicap, absent, rank }] },
-  team2: { name, players: [...] },
-  matches: [
-    {
-      matchNumber,
-      team1: { score, totalPins, totalWithHandicap, bonusPoints, players: [{ pins, bonusPoints }] },
-      team2: { ... },
-      games: [{ player, result, team1Points, team2Points }]
-    }
-  ],
-  totalScoreBonus: { team1, team2 }
-}
-```
-  - Animated transitions between views
-  - Input validation preventing invalid characters
-
-## Scoring Rules
-
-1. **Individual Match Points**: 1 point per game won (against opponent)
-2. **Bonus Points**: Extra points for high scoring
-3. **Total Match Points**: Game points + bonus points
-4. **Match Winner**: Team with highest total pins (with handicap)
-5. **Game Winner**: Team with most total points across all 3 matches
-
-## How to Run
-
-### Using the Browser Directly
-1. Open `public/index.html` in a web browser
-2. Use CDN versions of React, React-DOM, and Tailwind CSS
-
-### Development Setup
-1. Install dependencies: `npm install`
-2. Run dev server: `npm run dev`
-3. Build for production: `npm build`
-
-## Component Overview
-
-- **Header**: Displays the app title and logo
-- **StartView**: Main menu to begin a new game
-- **SetupView**: Configure teams and players
-- **MatchView**: Reusable component for entering match scores
-- **SummaryView**: Display final results and statistics
-
-## Utility Functions
-
-- **gameUtils.js**: Game creation, validation, and initialization
-- **matchUtils.js**: Match calculations, bonus points, handicap handling
-- **statsUtils.js**: Player statistics, game totals, and analysis
-
-## Styling
-
-- Tailwind CSS for responsive design
-- Custom CSS animations and patterns
-- Dark theme for scoring cards
-- Light theme for main interface
-
-## Browser Support
-
-- Modern browsers with ES6+ support
-- React 18+
-- Tailwind CSS 3+
-
-## Future Enhancements
-
-- Persistent storage (localStorage/database)
-- Game history export
-- Advanced statistics and trends
-- Player ranking system
-- Multiple league support

@@ -6,7 +6,7 @@ import { MatchView } from './components/MatchView';
 import { SummaryView } from './components/SummaryView';
 import { createNewGame, validateSetup, validateAllMatches } from './utils/gameUtils';
 import { calculateMatchResults, calculateBonusPoints, validateMatch } from './utils/matchUtils';
-import { calculatePlayerStats, calculateGameTotals, calculateTotalBonus } from './utils/statsUtils';
+import { calculatePlayerStats, calculateGameTotals, calculateGrandTotalPoints } from './utils/statsUtils';
 import { TEAM_PLAYERS } from './constants/teams';
 import './styles/globals.css';
 
@@ -92,7 +92,7 @@ export default function App() {
       calculateBonusPoints(pinsValue, playerAverage, isAbsent);
     
     calculateMatchResults(updated, matchIndex);
-    calculateTotalBonus(updated);
+    calculateGrandTotalPoints(updated);
     setCurrentGame(updated);
   };
 

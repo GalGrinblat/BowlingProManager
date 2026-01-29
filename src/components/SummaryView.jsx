@@ -59,7 +59,7 @@ export function SummaryView({ game, totals, playerStats, onBack, onFinish }) {
               <div className="text-center">
                 <div className="text-white font-bold text-sm mb-1">TOTAL</div>
                 <div className="text-yellow-400 font-bold text-2xl">
-                  {game.totalScoreBonus.team1} - {game.totalScoreBonus.team2}
+                  {game.grandTotalPoints.team1} - {game.grandTotalPoints.team2}
                 </div>
               </div>
               <div className="text-center">
@@ -83,20 +83,16 @@ export function SummaryView({ game, totals, playerStats, onBack, onFinish }) {
           <div className="space-y-2">
             {playerStats.team1Stats.map((player, idx) => (
               <div key={idx} className={`bg-gray-700 rounded p-3 ${player.isAbsent ? 'opacity-60 bg-red-900' : ''}`}>
-                <div className="grid grid-cols-5 gap-3 items-center h-14">
+                <div className="grid grid-cols-4 gap-3 items-center h-14">
                   <div className="col-span-2">
                     <div className="text-white font-semibold text-lg">{player.name}</div>
                   </div>
                   {player.isAbsent ? (
-                    <div className="col-span-3 text-center">
+                    <div className="col-span-2 text-center">
                       <div className="text-red-400 font-bold">ABSENT</div>
                     </div>
                   ) : (
                     <>
-                      <div className="text-center">
-                        <div className="text-gray-400 text-xs font-semibold">Total Pins</div>
-                        <div className="text-orange-400 font-bold">{player.totalPins}</div>
-                      </div>
                       <div className="text-center">
                         <div className="text-gray-400 text-xs font-semibold">3-Game Avg</div>
                         <div className={`font-bold ${parseInt(player.average) <= player.gameAverage ? 'text-green-400' : 'text-red-400'}`}>{player.gameAverage.toFixed(1)}</div>
@@ -111,13 +107,9 @@ export function SummaryView({ game, totals, playerStats, onBack, onFinish }) {
               </div>
             ))}
             <div className="bg-orange-600 rounded p-3 h-14">
-              <div className="grid grid-cols-5 gap-3 items-center h-full">
+              <div className="grid grid-cols-4 gap-3 items-center h-full">
                 <div className="col-span-2">
                   <div className="text-white font-semibold text-lg">TEAM TOTAL</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-gray-400 text-xs font-semibold">Total Pins</div>
-                  <div className="text-white font-bold text-lg">{playerStats.team1TotalPins}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-gray-400 text-xs font-semibold">Team Average</div>
@@ -136,20 +128,16 @@ export function SummaryView({ game, totals, playerStats, onBack, onFinish }) {
           <div className="space-y-2">
             {playerStats.team2Stats.map((player, idx) => (
               <div key={idx} className={`bg-gray-700 rounded p-3 ${player.isAbsent ? 'opacity-60 bg-red-900' : ''}`}>
-                <div className="grid grid-cols-5 gap-3 items-center h-14">
+                <div className="grid grid-cols-4 gap-3 items-center h-14">
                   <div className="col-span-2">
                     <div className="text-white font-semibold text-lg">{player.name}</div>
                   </div>
                   {player.isAbsent ? (
-                    <div className="col-span-3 text-center">
+                    <div className="col-span-2 text-center">
                       <div className="text-red-400 font-bold">ABSENT</div>
                     </div>
                   ) : (
                     <>
-                      <div className="text-center">
-                        <div className="text-gray-400 text-xs font-semibold">Total Pins</div>
-                        <div className="text-blue-400 font-bold">{player.totalPins}</div>
-                      </div>
                       <div className="text-center">
                         <div className="text-gray-400 text-xs font-semibold">3-Game Avg</div>
                         <div className={`font-bold ${parseInt(player.average) <= player.gameAverage ? 'text-green-400' : 'text-red-400'}`}>{player.gameAverage.toFixed(1)}</div>
@@ -164,13 +152,9 @@ export function SummaryView({ game, totals, playerStats, onBack, onFinish }) {
               </div>
             ))}
             <div className="bg-blue-600 rounded p-3 h-14">
-              <div className="grid grid-cols-5 gap-3 items-center h-full">
+              <div className="grid grid-cols-4 gap-3 items-center h-full">
                 <div className="col-span-2">
                   <div className="text-white font-semibold text-lg">TEAM TOTAL</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-gray-400 text-xs font-semibold">Total Pins</div>
-                  <div className="text-white font-bold text-lg">{playerStats.team2TotalPins}</div>
                 </div>
                 <div className="text-center">
                   <div className="text-gray-400 text-xs font-semibold">Team Average</div>

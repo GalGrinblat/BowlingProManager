@@ -51,8 +51,8 @@ export const calculatePlayerStats = (game) => {
 };
 
 export const calculateGameTotals = (game) => {
-  const team1Total = game.matches.reduce((sum, m) => sum + m.team1.score, 0) + game.totalScoreBonus.team1;
-  const team2Total = game.matches.reduce((sum, m) => sum + m.team2.score, 0) + game.totalScoreBonus.team2;
+  const team1Total = game.matches.reduce((sum, m) => sum + m.team1.score, 0) + game.grandTotalPoints.team1;
+  const team2Total = game.matches.reduce((sum, m) => sum + m.team2.score, 0) + game.grandTotalPoints.team2;
   
   const team1TotalPinsNoHandicap = game.matches.reduce((sum, m) => sum + m.team1.totalPins, 0);
   const team2TotalPinsNoHandicap = game.matches.reduce((sum, m) => sum + m.team2.totalPins, 0);
@@ -70,7 +70,7 @@ export const calculateGameTotals = (game) => {
   };
 };
 
-export const calculateTotalBonus = (game) => {
+export const calculateGrandTotalPoints = (game) => {
   // Check if all matches are complete (accounting for absent players)
   const allMatchesComplete = game.matches.every((m, matchIdx) => {
     const team1Complete = game.team1.players.every((p, idx) => p.absent || m.team1.players[idx].pins !== '');
@@ -79,22 +79,22 @@ export const calculateTotalBonus = (game) => {
   });
   
   if (allMatchesComplete) {
-    // Calculate total raw pins across all matches (excluding absent players)
-    const team1GrandTotal = game.matches.reduce((sum, m) => sum + m.team1.totalPins, 0);
-    const team2GrandTotal = game.matches.reduce((sum, m) => sum + m.team2.totalPins, 0);
+    // Calculate total pins with handicap across all matches
+    const team1GrandTotal = game.matches.reduce((sum, m) => sum + m.team1.totalWithHandicap, 0);
+    const team2GrandTotal = game.matches.reduce((sum, m) => sum + m.team2.totalWithHandicap, 0);
     
     if (team1GrandTotal > team2GrandTotal) {
-      game.totalScoreBonus.team1 = 2;
-      game.totalScoreBonus.team2 = 0;
+      game.grandTotalPoints.team1 = 2;
+      game.grandTotalPoints.team2 = 0;
     } else if (team2GrandTotal > team1GrandTotal) {
-      game.totalScoreBonus.team1 = 0;
-      game.totalScoreBonus.team2 = 2;
+      game.grandTotalPoints.team1 = 0;
+      game.grandTotalPoints.team2 = 2;
     } else {
-      game.totalScoreBonus.team1 = 1;
-      game.totalScoreBonus.team2 = 1;
+      game.grandTotalPoints.team1 = 1;
+      game.grandTotalPoints.team2 = 1;
     }
   } else {
-    game.totalScoreBonus.team1 = 0;
-    game.totalScoreBonus.team2 = 0;
+    game.grandTotalPoints.team1 = 0;
+    game.grandTotalPoints.team2 = 0;
   }
 };

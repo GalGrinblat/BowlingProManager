@@ -33,13 +33,8 @@ export const createEmptyMatch = (matchNumber) => ({
 });
 
 export const calculateBonusPoints = (score, average, isAbsent) => {
-  // If player is absent, they use average - 10
-  if (isAbsent && average !== '') {
-    const absenceScore = parseInt(average) - 10;
-    if (absenceScore >= parseInt(average) + 70) return 2;
-    if (absenceScore >= parseInt(average) + 50) return 1;
-    return 0;
-  }
+  // Absent players cannot earn bonus points
+  if (isAbsent) return 0;
   
   if (score === '' || average === '') return 0;
   const scoreNum = parseInt(score);
@@ -70,7 +65,12 @@ export const calculateMatchResults = (game, matchIndex) => {
     const team2HasScore = team2Player.absent || match.team2.players[idx].pins !== '';
     
     if (team1HasScore && team2HasScore) {
-      if (team1WithHandicap > team2WithHandicap) {
+      // Special rule: If both players are absent, it's always a draw
+      if (team1Player.absent && team2Player.absent) {
+        gameResult.result = 'draw';
+        gameResult.team1Points = 0.5;
+        gameResult.team2Points = 0.5;
+      } else if (team1WithHandicap > team2WithHandicap) {
         gameResult.result = 'team1';
         gameResult.team1Points = 1;
         gameResult.team2Points = 0;
