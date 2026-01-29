@@ -53,7 +53,12 @@ export function SetupView({ game, onTeamNameChange, onPlayerNameChange, onPlayer
             {game.team1.name || 'TEAM 1'} PLAYERS
           </h3>
           <div className="space-y-3">
-            {game.team1.players.map((player, idx) => (
+            {[...game.team1.players].sort((a, b) => {
+              if (a.average === '' && b.average === '') return 0;
+              if (a.average === '') return 1;
+              if (b.average === '') return -1;
+              return parseInt(b.average) - parseInt(a.average);
+            }).map((player, idx) => (
               <div key={idx} className={`bg-white rounded-lg p-3 shadow-sm ${player.absent ? 'opacity-60 bg-gray-100' : ''}`}>
                 <div className="flex items-center gap-2 mb-2">
                   <div className="bg-orange-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">
@@ -108,7 +113,12 @@ export function SetupView({ game, onTeamNameChange, onPlayerNameChange, onPlayer
             {game.team2.name || 'TEAM 2'} PLAYERS
           </h3>
           <div className="space-y-3">
-            {game.team2.players.map((player, idx) => (
+            {[...game.team2.players].sort((a, b) => {
+              if (a.average === '' && b.average === '') return 0;
+              if (a.average === '') return 1;
+              if (b.average === '') return -1;
+              return parseInt(b.average) - parseInt(a.average);
+            }).map((player, idx) => (
               <div key={idx} className={`bg-white rounded-lg p-3 shadow-sm ${player.absent ? 'opacity-60 bg-gray-100' : ''}`}>
                 <div className="flex items-center gap-2 mb-2">
                   <div className="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">

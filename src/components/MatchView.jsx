@@ -60,12 +60,14 @@ export function MatchView({ matchNumber, game, onUpdateScore, onNavigate, onCanc
                             {(parseInt(player.average) - 10) + player.handicap}
                           </div>
                         </div>
-                        {match.team1.players[idx].bonusPoints > 0 && (
-                          <div className="flex items-center gap-1 text-yellow-400 flex-shrink-0">
-                            <Star size={12} fill="currentColor" />
-                            <span className="text-xs font-bold">+{match.team1.players[idx].bonusPoints}</span>
-                          </div>
-                        )}
+                        <div className="flex items-center gap-1 text-yellow-400 flex-shrink-0 w-12">
+                          {match.team1.players[idx].bonusPoints > 0 && (
+                            <>
+                              <Star size={12} fill="currentColor" />
+                              <span className="text-xs font-bold">+{match.team1.players[idx].bonusPoints}</span>
+                            </>
+                          )}
+                        </div>
                       </>
                     ) : (
                       <>
@@ -84,18 +86,20 @@ export function MatchView({ matchNumber, game, onUpdateScore, onNavigate, onCanc
                         </div>
                         <div className="text-center">
                           <label className="text-gray-400 text-sm block">W/Hdc</label>
-                          {match.team1.players[idx].pins !== '' && (
-                            <div className="w-16 px-2 py-1 text-orange-400 font-bold text-sm text-center">
-                              {parseInt(match.team1.players[idx].pins) + player.handicap}
-                            </div>
+                          <div className="w-16 px-2 py-1 text-orange-400 font-bold text-sm text-center">
+                            {match.team1.players[idx].pins !== '' 
+                              ? parseInt(match.team1.players[idx].pins) + player.handicap 
+                              : 0}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1 text-yellow-400 flex-shrink-0 w-12">
+                          {match.team1.players[idx].bonusPoints > 0 && (
+                            <>
+                              <Star size={12} fill="currentColor" />
+                              <span className="text-xs font-bold">+{match.team1.players[idx].bonusPoints}</span>
+                            </>
                           )}
                         </div>
-                        {match.team1.players[idx].bonusPoints > 0 && (
-                          <div className="flex items-center gap-1 text-yellow-400 flex-shrink-0">
-                            <Star size={12} fill="currentColor" />
-                            <span className="text-xs font-bold">+{match.team1.players[idx].bonusPoints}</span>
-                          </div>
-                        )}
                       </>
                     )}
                   </div>
@@ -122,12 +126,14 @@ export function MatchView({ matchNumber, game, onUpdateScore, onNavigate, onCanc
                   <div className="flex items-center gap-2 flex-shrink-0">
                     {game.team2.players[idx].absent ? (
                       <>
-                        {match.team2.players[idx].bonusPoints > 0 && (
-                          <div className="flex items-center gap-1 text-yellow-400 flex-shrink-0">
-                            <span className="text-xs font-bold">+{match.team2.players[idx].bonusPoints}</span>
-                            <Star size={12} fill="currentColor" />
-                          </div>
-                        )}
+                        <div className="flex items-center gap-1 text-yellow-400 flex-shrink-0 w-12">
+                          {match.team2.players[idx].bonusPoints > 0 && (
+                            <>
+                              <span className="text-xs font-bold">+{match.team2.players[idx].bonusPoints}</span>
+                              <Star size={12} fill="currentColor" />
+                            </>
+                          )}
+                        </div>
                         <div className="text-center">
                           <label className="text-gray-400 text-sm block">W/Hdc</label>
                           <div className="w-16 px-2 py-1 text-blue-400 font-bold text-sm text-center">
@@ -143,19 +149,21 @@ export function MatchView({ matchNumber, game, onUpdateScore, onNavigate, onCanc
                       </>
                     ) : (
                       <>
-                        {match.team2.players[idx].bonusPoints > 0 && (
-                          <div className="flex items-center gap-1 text-yellow-400 flex-shrink-0">
-                            <span className="text-xs font-bold">+{match.team2.players[idx].bonusPoints}</span>
-                            <Star size={12} fill="currentColor" />
-                          </div>
-                        )}
+                        <div className="flex items-center gap-1 text-yellow-400 flex-shrink-0 w-12">
+                          {match.team2.players[idx].bonusPoints > 0 && (
+                            <>
+                              <span className="text-xs font-bold">+{match.team2.players[idx].bonusPoints}</span>
+                              <Star size={12} fill="currentColor" />
+                            </>
+                          )}
+                        </div>
                         <div className="text-center">
                           <label className="text-gray-400 text-sm block">W/Hdc</label>
-                          {match.team2.players[idx].pins !== '' && (
-                            <div className="w-16 px-2 py-1 text-blue-400 font-bold text-sm text-center">
-                              {parseInt(match.team2.players[idx].pins) + game.team2.players[idx].handicap}
-                            </div>
-                          )}
+                          <div className="w-16 px-2 py-1 text-blue-400 font-bold text-sm text-center">
+                            {match.team2.players[idx].pins !== '' 
+                              ? parseInt(match.team2.players[idx].pins) + game.team2.players[idx].handicap 
+                              : 0}
+                          </div>
                         </div>
                         <div className="text-center">
                           <label className="text-gray-400 text-sm block">Score</label>

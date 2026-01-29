@@ -52,6 +52,19 @@ export default function App() {
       updated[team].players[playerIndex].handicap = 0;
     }
     
+    // Sort players by average (descending), empty averages go to bottom
+    updated[team].players.sort((a, b) => {
+      if (a.average === '' && b.average === '') return 0;
+      if (a.average === '') return 1;
+      if (b.average === '') return -1;
+      return parseInt(b.average) - parseInt(a.average);
+    });
+    
+    // Update rank after sorting
+    updated[team].players.forEach((p, idx) => {
+      p.rank = idx + 1;
+    });
+    
     setCurrentGame(updated);
   };
 
