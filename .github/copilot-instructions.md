@@ -2,12 +2,188 @@
 
 ## Architecture Overview
 
-This is a **3-match bowling league scoring React app** with handicap calculations and multi-layered bonus point systems. The state flows unidirectionally: `App.jsx` (state management) → Components (UI) → Utility functions (logic).
+This is a **comprehensive bowling league management system** with multi-league support, season tracking, and the original 3-match scoring system with handicap calculations and multi-layered bonus points. The system has evolved from single-game tracking to full organization management.
+
+### System Hierarchy
+```
+Organization
+├── Player Registry (shared across all leagues)
+└── Leagues (multiple leagues supported)
+    ├── League Config (rules, handicap basis, players per team)
+    └── Seasons (per league)
+        ├── Season Config (teams, rounds, schedule)
+        ├── Teams (assigned players from registry)
+        ├── Games (3-match scoring system)
+        └── Standings (team & player stats)
+```
 
 ### Core Data Model
-- **Game object**: Contains team setup, 3 match results, and cumulative bonus scoring
-- **Team structure**: Name + 4 players (each with name, average, handicap)
-- **Match structure**: Nested data for individual game results, team totals, and bonus calculations
+- **Organization**: Top-level container for all players and leagues
+- **Player Registry**: All players in the organization (can participate in multiple leagues)
+- **League**: Independent league with its own rules and seasons
+- **Season**: Time-bound competition within a league
+- **Team**: Group of players assigned to compete in a season
+- **Game**: 3-match bowling game (existing scoring logic)
+- **Standings**: Calculated team rankings and player statistics
+
+### State Management & Data Flow
+- **API Layer** (`src/services/api.js`): Abstract interface over localStorage (DB-agnostic)
+- **Models** (`src/models/index.js`): Data schemas and validation
+- **State Flow**: API → Components (UI) → Utility functions (logic) → API
+- **Authentication**: Role-based (Admin/Player) via AuthContext
+
+## Critical Business Logic (Must Understand These)
+
+### Handicap Calculation
+- **Rule**: Configurable per season (default 160-pin) → `handicap = Math.max(0, basis - average)`
+- **Applied to**: Individual game comparisons AND match totals
+- **Location**: Season setup, [matchUtils.js](../src/utils/matchUtils.js)
+
+### Scoring System (Complex Multi-Layer) - UNCHANGED
+1. **Individual Game Points**: Compare player1 vs player1 (with handicap) across 4 player pairs
+2. **Bonus Points**: Per-player based on score vs average (+1 for ≥50, +2 for ≥70)
+3. **Match Winner Point**: +1 if team wins match (higher total with handicap)
+4. **Grand Total Points**: +2 to team with highest pins across 3 matches
+- **Location**: [matchUtils.js](../src/utils/matchUtils.js)
+
+### Season Management
+- **Round-Robin Scheduling**: Auto-generated in [scheduleUtils.js](../src/utils/scheduleUtils.js)
+  - Each round = complete round-robin (every team plays every other team once)
+  - Split into "Match Days" where no team plays twice on the same day
+  - Match days numbered continuously across rounds (Round 1: Days 1-3, Round 2: Days 4-6, etc.)
+  - Schedule structure: `[{ round: 1, matchDay: 1, matches: [{team1Id, team2Id}, ...] }, ...]`
+  - Example (4 teams, 2 rounds): Round 1 has 3 match days, Round 2 has 3 match days = 6 total match days
+  - Handles odd/even number of teams (bye system for odd teams)
+- **Game Lifecycle**: pending → in-progress → completed
+- **Season Status**: setup → active → completed
+- **Game Lifecycle**: pending → in-progress → completed
+- **Season Status**: setup → active → completed
+
+### Standings Calculation
+- **Team Standings**: Points, wins/losses, total pins (with/without handicap)
+- **Player Stats**: Average, high game, high series, total pins, games played
+- **Location**: [standingsUtils.js](../src/utils/standingsUtils.js)
+- **Real-time**: Updated automatically after each game completion
+
+## API & Data Persistence
+
+### API Service Layer (`src/services/api.js`)
+```javascript
+// All APIs follow same pattern - easy to swap localStorage for DB
+organizationApi.{ get, update }
+playersApi.{ getAll, getById, create, update, delete }
+leaguesApi.{ getAll, getById, create, update, delete, getSeasons }
+seasonsApi.{ getAll, getById, getByLeague, create, update, delete }
+teamsApi.{ getAll, getById, getBySeason, create, update, delete }
+gamesApi.{ getAll, getById, getBySeason, getByRound, create, update, delete }
+authApi.{ getCurrentUser, login, logout, isAdmin }
+```
+
+### Migration Path to Database
+1. Keep API interface unchanged
+2. Replace localStorage calls with HTTP/database calls
+3. Components remain untouched
+4. Consider: Supabase, PostgreSQL, Firebase, or custom backend
+
+## Component Architecture
+
+### Admin Portal
+- **AdminDashboard**: Main hub, league overview
+- **PlayerRegistry**: CRUD for all organization players
+- **LeagueManagement**: Create/edit leagues with rules
+- **LeagueDetail**: View league, seasons, navigate
+- **SeasonSetup**: Assign players to teams, generate schedule
+- **SeasonDashboard**: View schedule, standings, select games
+- **SeasonGamePlayer**: Wrapper around MatchView for season games
+
+### Existing Game Components (Reused)
+- **MatchView**: 3-match scoring interface
+- **SummaryView**: Game results and statistics
+- All existing scoring logic works within season context
+
+### View Navigation & State Management
+```
+Admin Flow:
+dashboard → players/leagues → league-detail → season-setup → season-dashboard → season-game → (MatchView)
+
+State: navigationState = { leagueId, seasonId, gameId }
+Navigation: navigateTo(view, params)
+```
+
+## Common Implementation Patterns
+
+### API Usage Pattern
+```javascript
+// Read
+const players = playersApi.getAll();
+const player = playersApi.getById(id);
+const teams = teamsApi.getBySeason(seasonId);
+
+// Write
+const newPlayer = playersApi.create({ name, average, ... });
+playersApi.update(id, { name: 'Updated' });
+playersApi.delete(id);
+```
+
+### Standings Calculation
+```javascript
+import { calculateTeamStandings, calculatePlayerSeasonStats } from '../utils/standingsUtils';
+
+const standings = calculateTeamStandings(teams, games);
+const playerStats = calculatePlayerSeasonStats(teams, games);
+```
+
+### Schedule Generation
+```javascript
+import { generateRoundRobinSchedule } from '../utils/scheduleUtils';
+
+const teamIds = teams.map(t => t.id);
+const schedule = generateRoundRobinSchedule(teamIds, numberOfRounds);
+```
+
+## Development Workflow
+
+- **Start dev**: `npm run dev` (Vite hot reload)
+- **Build**: `npm run build` (Vite output to dist/)
+- **Styling**: Tailwind CSS + custom `globals.css`
+- **Data**: Stored in localStorage (dev), browser DevTools to inspect
+- **Clear data**: `localStorage.clear()` in browser console
+
+## When Adding Features
+
+1. **New API entity?** → Add to [src/services/api.js](../src/services/api.js), follow existing pattern
+2. **New data model?** → Add to [src/models/index.js](../src/models/index.js) with validation
+3. **New admin view?** → Create in `src/components/admin/`, add routing in [App.jsx](../src/App.jsx)
+4. **New statistic?** → Add to [standingsUtils.js](../src/utils/standingsUtils.js)
+5. **Schedule changes?** → Modify [scheduleUtils.js](../src/utils/scheduleUtils.js)
+6. **Scoring changes?** → Update [matchUtils.js](../src/utils/matchUtils.js) - test thoroughly!
+
+## Known Features & Behaviors
+
+### User Roles
+- **Admin**: Full CRUD on players, leagues, seasons, teams; can record games
+- **Player**: View standings, record scores for their own games (coming soon)
+
+### Season Lifecycle
+1. **Setup Phase**: Create teams, assign players, configure rules
+2. **Active Phase**: Games scheduled, record results, standings update live
+3. **Completed Phase**: Final standings, historical record, cannot edit
+
+### Data Relationships
+- Players can be in multiple leagues/seasons simultaneously
+- Deleting league/season requires no active games
+- Team assignments are season-specific
+- Games link to teams via IDs, store full player data for historical accuracy
+
+## Future Enhancements (Roadmap)
+
+1. **Player Portal**: Login, view personal stats, enter scores
+2. **Advanced Stats**: Strike rates, spare conversion, consistency metrics
+3. **Playoff System**: Bracket generation for top teams
+4. **Export/Import**: Download season data, share results
+5. **Database Migration**: Move from localStorage to persistent backend
+6. **Mobile Optimization**: Better responsive design for score entry
+7. **Real-time Updates**: WebSocket support for live scoring
 
 ## Critical Business Logic (Must Understand These)
 

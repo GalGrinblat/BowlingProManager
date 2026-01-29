@@ -1,14 +1,17 @@
 import React from 'react';
 import { ArrowLeft, ArrowRight, Star } from './Icons';
 
-export function MatchView({ matchNumber, game, onUpdateScore, onNavigate, onCancel }) {
+export function MatchView({ matchNumber, game, onUpdateScore, onNavigate, onCancel, isReadOnly = false }) {
   const matchIndex = matchNumber - 1;
   const match = game.matches[matchIndex];
   
   return (
     <div className="scorecard rounded-xl p-6 md:p-8 mb-8 animate-slide-in">
       <div className="flex items-center justify-between mb-6">
-        <div className="bowling-title text-white text-3xl">MATCH {matchNumber} OF 3</div>
+        <div className="bowling-title text-white text-3xl">
+          MATCH {matchNumber} OF 3
+          {isReadOnly && <span className="text-sm ml-3 text-yellow-400">(Read Only)</span>}
+        </div>
         <div className="flex gap-2">
           {[1, 2, 3].map(num => (
             <div key={num} className={`w-3 h-3 rounded-full ${num === matchNumber ? 'bg-orange-500' : 'bg-gray-600'}`} />
@@ -81,7 +84,12 @@ export function MatchView({ matchNumber, game, onUpdateScore, onNavigate, onCanc
                             placeholder="0-300"
                             min="0"
                             max="300"
-                            className="w-16 px-2 py-1 bg-gray-600 text-white rounded border border-gray-500 focus:border-orange-500 focus:outline-none font-bold text-center text-sm"
+                            disabled={isReadOnly}
+                            className={`w-16 px-2 py-1 rounded border font-bold text-center text-sm ${
+                              isReadOnly 
+                                ? 'bg-gray-600 text-gray-400 border-gray-500 cursor-not-allowed'
+                                : 'bg-gray-600 text-white border-gray-500 focus:border-orange-500 focus:outline-none'
+                            }`}
                           />
                         </div>
                         <div className="text-center">
@@ -175,7 +183,12 @@ export function MatchView({ matchNumber, game, onUpdateScore, onNavigate, onCanc
                             placeholder="0-300"
                             min="0"
                             max="300"
-                            className="w-16 px-2 py-1 bg-gray-600 text-white rounded border border-gray-500 focus:border-blue-500 focus:outline-none font-bold text-center text-sm"
+                            disabled={isReadOnly}
+                            className={`w-16 px-2 py-1 rounded border font-bold text-center text-sm ${
+                              isReadOnly 
+                                ? 'bg-gray-600 text-gray-400 border-gray-500 cursor-not-allowed'
+                                : 'bg-gray-600 text-white border-gray-500 focus:border-blue-500 focus:outline-none'
+                            }`}
                           />
                         </div>
                       </>

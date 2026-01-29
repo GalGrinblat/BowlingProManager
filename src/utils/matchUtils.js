@@ -1,36 +1,35 @@
-export const createEmptyMatch = (matchNumber) => ({
-  matchNumber,
-  team1: {
-    score: 0,
-    totalPins: 0,
-    totalWithHandicap: 0,
-    bonusPoints: 0,
-    players: [
-      { pins: '', bonusPoints: 0 },
-      { pins: '', bonusPoints: 0 },
-      { pins: '', bonusPoints: 0 },
-      { pins: '', bonusPoints: 0 }
-    ]
-  },
-  team2: {
-    score: 0,
-    totalPins: 0,
-    totalWithHandicap: 0,
-    bonusPoints: 0,
-    players: [
-      { pins: '', bonusPoints: 0 },
-      { pins: '', bonusPoints: 0 },
-      { pins: '', bonusPoints: 0 },
-      { pins: '', bonusPoints: 0 }
-    ]
-  },
-  games: [
-    { player: 1, result: null, team1Points: 0, team2Points: 0 },
-    { player: 2, result: null, team1Points: 0, team2Points: 0 },
-    { player: 3, result: null, team1Points: 0, team2Points: 0 },
-    { player: 4, result: null, team1Points: 0, team2Points: 0 }
-  ]
-});
+export const createEmptyMatch = (matchNumber, playersPerTeam = 4) => {
+  const emptyPlayers = Array.from({ length: playersPerTeam }, () => ({ 
+    pins: '', 
+    bonusPoints: 0 
+  }));
+  
+  const emptyGames = Array.from({ length: playersPerTeam }, (_, i) => ({ 
+    player: i + 1, 
+    result: null, 
+    team1Points: 0, 
+    team2Points: 0 
+  }));
+  
+  return {
+    matchNumber,
+    team1: {
+      score: 0,
+      totalPins: 0,
+      totalWithHandicap: 0,
+      bonusPoints: 0,
+      players: emptyPlayers
+    },
+    team2: {
+      score: 0,
+      totalPins: 0,
+      totalWithHandicap: 0,
+      bonusPoints: 0,
+      players: [...emptyPlayers]
+    },
+    games: emptyGames
+  };
+};
 
 export const calculateBonusPoints = (score, average, isAbsent) => {
   // Absent players cannot earn bonus points

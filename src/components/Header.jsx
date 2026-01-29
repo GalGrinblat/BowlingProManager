@@ -1,17 +1,47 @@
 import React from 'react';
 import { Trophy } from './Icons';
+import { useAuth } from '../contexts/AuthContext';
 
-export function Header() {
+export function Header({ currentUser, onLogout }) {
+  const { playerData } = useAuth();
+
   return (
     <div className="text-center mb-8 animate-slide-in">
-      <div className="flex items-center justify-center gap-3 mb-2">
-        <Trophy className="text-orange-600" size={40} strokeWidth={2.5} />
-        <h1 className="bowling-title text-5xl md:text-6xl text-gray-900">
-          BOWLING LEAGUE
-        </h1>
-        <Trophy className="text-orange-600" size={40} strokeWidth={2.5} />
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex-1"></div>
+        <div className="flex items-center gap-3">
+          <Trophy className="text-orange-600" size={40} strokeWidth={2.5} />
+          <h1 className="bowling-title text-5xl md:text-6xl text-gray-900">
+            BOWLING LEAGUE
+          </h1>
+          <Trophy className="text-orange-600" size={40} strokeWidth={2.5} />
+        </div>
+        <div className="flex-1 flex justify-end items-center">
+          {currentUser && (
+            <div className="flex items-center gap-3">
+              <div className="text-right">
+                {currentUser.role === 'admin' ? (
+                  <span className="text-sm text-gray-600">👤 Admin</span>
+                ) : playerData ? (
+                  <>
+                    <div className="text-sm font-semibold text-gray-800">{playerData.name}</div>
+                    <div className="text-xs text-gray-500">Player</div>
+                  </>
+                ) : (
+                  <span className="text-sm text-gray-600">👤 Player</span>
+                )}
+              </div>
+              <button
+                onClick={onLogout}
+                className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+              >
+                Logout
+              </button>
+            </div>
+          )}
+        </div>
       </div>
-      <p className="text-gray-600 font-semibold text-lg">3-Match Game Tracker</p>
+      <p className="text-gray-600 font-semibold text-lg">League Management System</p>
     </div>
   );
 }

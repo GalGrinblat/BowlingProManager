@@ -1,0 +1,196 @@
+/**
+ * Data Models and Schema Definitions
+ * These define the structure of all entities in the system
+ */
+
+// ===== PLAYER MODEL =====
+export const createPlayer = ({
+  name = '',
+  email = '',
+  phone = '',
+  startingAverage = 0,
+  active = true
+}) => ({
+  name,
+  email,
+  phone,
+  startingAverage: parseInt(startingAverage) || 0,
+  active
+});
+
+// ===== LEAGUE MODEL =====
+export const createLeague = ({
+  name = '',
+  description = '',
+  defaultHandicapBasis = 160,
+  defaultPlayersPerTeam = 4,
+  active = true
+}) => ({
+  name,
+  description,
+  defaultHandicapBasis: parseInt(defaultHandicapBasis) || 160,
+  defaultPlayersPerTeam: parseInt(defaultPlayersPerTeam) || 4,
+  active
+});
+
+// ===== SEASON MODEL =====
+export const createSeason = ({
+  leagueId = '',
+  name = '',
+  numberOfTeams = 0,
+  playersPerTeam = 4,
+  numberOfRounds = 1,
+  handicapBasis = 160,
+  startDate = null,
+  endDate = null
+}) => ({
+  leagueId,
+  name,
+  numberOfTeams: parseInt(numberOfTeams) || 0,
+  playersPerTeam: parseInt(playersPerTeam) || 4,
+  numberOfRounds: parseInt(numberOfRounds) || 1,
+  handicapBasis: parseInt(handicapBasis) || 160,
+  startDate: startDate || new Date().toISOString(),
+  endDate,
+  status: 'setup', // setup, active, completed
+  schedule: [] // Will be populated by schedule generator
+});
+
+// ===== TEAM MODEL =====
+export const createTeam = ({
+  seasonId = '',
+  name = '',
+  playerIds = []
+}) => ({
+  seasonId,
+  name,
+  playerIds // Array of player IDs
+});
+
+// ===== GAME MODEL =====
+// This extends your existing game structure to include season context
+export const createGame = ({
+  seasonId = '',
+  round = 1,
+  team1Id = '',
+  team2Id = '',
+  team1 = null,
+  team2 = null
+}) => ({
+  seasonId,
+  round,
+  team1Id,
+  team2Id,
+  team1: team1 || {
+    name: '',
+    players: []
+  },
+  team2: team2 || {
+    name: '',
+    players: []
+  },
+  matches: [],
+  grandTotalPoints: { team1: 0, team2: 0 },
+  status: 'pending', // pending, in-progress, completed
+  completedAt: null
+});
+
+// ===== SEASON STANDINGS =====
+export const createStandingsEntry = ({
+  teamId = '',
+  teamName = '',
+  wins = 0,
+  losses = 0,
+  draws = 0,
+  points = 0,
+  totalPins = 0,
+  totalPinsWithHandicap = 0
+}) => ({
+  teamId,
+  teamName,
+  wins,
+  losses,
+  draws,
+  points,
+  totalPins,
+  totalPinsWithHandicap
+});
+
+// ===== PLAYER SEASON STATS =====
+export const createPlayerSeasonStats = ({
+  playerId = '',
+  playerName = '',
+  teamId = '',
+  gamesPlayed = 0,
+  totalPins = 0,
+  average = 0,
+  highGame = 0,
+  highSeries = 0,
+  pointsScored = 0
+}) => ({
+  playerId,
+  playerName,
+  teamId,
+  gamesPlayed,
+  totalPins,
+  average,
+  highGame,
+  highSeries,
+  pointsScored
+});
+
+// ===== VALIDATION HELPERS =====
+
+export const validatePlayer = (player) => {
+  if (!player.name || player.name.trim() === '') {
+    return { valid: false, error: 'Player name is required' };
+  }
+  if (player.startingAverage < 0 || player.startingAverage > 300) {
+    return { valid: false, error: 'Starting average must be between 0 and 300' };
+  }
+  return { valid: true };
+};
+
+export const validateLeague = (league) => {
+  if (!league.name || league.name.trim() === '') {
+    return { valid: false, error: 'League name is required' };
+  }
+  if (league.defaultHandicapBasis < 0 || league.defaultHandicapBasis > 300) {
+    return { valid: false, error: 'Handicap basis must be between 0 and 300' };
+  }
+  if (league.defaultPlayersPerTeam < 1 || league.defaultPlayersPerTeam > 10) {
+    return { valid: false, error: 'Players per team must be between 1 and 10' };
+  }
+  return { valid: true };
+};
+
+export const validateSeason = (season) => {
+  if (!season.leagueId) {
+    return { valid: false, error: 'League ID is required' };
+  }
+  if (!season.name || season.name.trim() === '') {
+    return { valid: false, error: 'Season name is required' };
+  }
+  if (season.numberOfTeams < 2) {
+    return { valid: false, error: 'At least 2 teams are required' };
+  }
+  if (season.numberOfRounds < 1) {
+    return { valid: false, error: 'At least 1 round is required' };
+  }
+  return { valid: true };
+};
+
+export const validateTeam = (team, playersPerTeam) => {
+  if (!team.name || team.name.trim() === '') {
+    return { valid: false, error: 'Team name is required' };
+  }
+  if (team.playerIds.length !== playersPerTeam) {
+    return { valid: false, error: `Team must have exactly ${playersPerTeam} players` };
+  }
+  // Check for duplicate players
+  const uniquePlayers = new Set(team.playerIds);
+  if (uniquePlayers.size !== team.playerIds.length) {
+    return { valid: false, error: 'Team cannot have duplicate players' };
+  }
+  return { valid: true };
+};
