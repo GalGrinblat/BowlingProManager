@@ -1,0 +1,276 @@
+import React, { useState, useEffect } from 'react';
+import { teamsApi, playersApi, seasonsApi } from '../../services/api';
+
+export const TeamManagement = ({ seasonId, onBack }) => {
+  const [season, setSeason] = useState(null);
+  const [teams, setTeams] = useState([]);
+  const [allPlayers, setAllPlayers] = useState([]);
+  const [selectedTeam, setSelectedTeam] = useState(null);
+  const [editingRoster, setEditingRoster] = useState(false);
+  const [rosterChanges, setRosterChanges] = useState([]);
+
+  useEffect(() => {
+    loadData();
+  }, [seasonId]);
+
+  const loadData = () => {
+    const seasonData = seasonsApi.getById(seasonId);
+    setSeason(seasonData);
+    
+    const teamsData = teamsApi.getBySeason(seasonId);
+    setTeams(teamsData);
+    
+    const playersData = playersApi.getAll();
+    setAllPlayers(playersData.filter(p => p.active));
+  };
+
+  const handleEditRoster = (team) => {
+    setSelectedTeam(team);
+    setEditingRoster(true);
+  };
+
+  const handleSubstitutePlayer = (team, oldPlayerIndex, newPlayerId) => {
+    const oldPlayerId = team.playerIds[oldPlayerIndex];
+    const oldPlayer = allPlayers.find(p => p.id === oldPlayerId);
+    const newPlayer = allPlayers.find(p => p.id === newPlayerId);
+
+    if (!newPlayer || !oldPlayer) return;
+
+    // Create roster change record
+    const change = {
+      teamId: team.id,
+      teamName: team.name,
+      date: new Date().toISOString(),
+      type: 'substitution',
+      oldPlayer: {
+        id: oldPlayerId,
+        name: oldPlayer.name
+      },
+      newPlayer: {
+        id: newPlayerId,
+        name: newPlayer.name
+      },
+      position: oldPlayerIndex
+    };
+
+    // Update team roster
+    const updatedPlayerIds = [...team.playerIds];
+    updatedPlayerIds[oldPlayerIndex] = newPlayerId;
+
+    // Save roster changes to team metadata
+    const existingChanges = team.rosterChanges || [];
+    teamsApi.update(team.id, {
+      playerIds: updatedPlayerIds,
+      rosterChanges: [...existingChanges, change]
+    });
+
+    setRosterChanges([change, ...rosterChanges]);
+    loadData();
+    setEditingRoster(false);
+    setSelectedTeam(null);
+  };
+
+  const getPlayerInfo = (playerId) => {
+    return allPlayers.find(p => p.id === playerId);
+  };
+
+  const getAvailablePlayers = (team) => {
+    // Filter out players already on this team
+    return allPlayers.filter(p => !team.playerIds.includes(p.id));
+  };
+
+  if (!season) return <div>Loading...</div>;
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="bg-white rounded-xl shadow-lg p-6">
+        <button
+          onClick={onBack}
+          className="text-gray-600 hover:text-gray-800 mb-4"
+        >
+          ← Back to Season
+        </button>
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">Team Management</h1>
+        <p className="text-gray-600">{season.name}</p>
+      </div>
+
+      {/* Info Card */}
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+        <div className="flex items-start gap-3">
+          <span className="text-2xl">ℹ️</span>
+          <div>
+            <p className="font-semibold text-blue-800 mb-1">Player Substitutions & Roster Changes</p>
+            <p className="text-sm text-blue-600">
+              You can substitute players on team rosters during the season. Changes are tracked and logged. 
+              For absent players in individual games, use the "Absent" checkbox when entering scores.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Teams List */}
+      <div className="grid md:grid-cols-2 gap-6">
+        {teams.map(team => {
+          const teamPlayers = team.playerIds.map(id => getPlayerInfo(id)).filter(Boolean);
+          const recentChanges = (team.rosterChanges || []).slice(0, 3);
+
+          return (
+            <div key={team.id} className="bg-white rounded-xl shadow-lg p-6">
+              <div className="flex justify-between items-start mb-4">
+                <h2 className="text-xl font-bold text-gray-800">{team.name}</h2>
+                <button
+                  onClick={() => handleEditRoster(team)}
+                  className="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 font-semibold text-sm"
+                >
+                  ✏️ Edit Roster
+                </button>
+              </div>
+
+              {/* Current Roster */}
+              <div className="space-y-2 mb-4">
+                {teamPlayers.map((player, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold">
+                        {idx + 1}
+                      </div>
+                      <div>
+                        <div className="font-semibold text-gray-800">{player.name}</div>
+                        <div className="text-xs text-gray-500">Avg: {player.startingAverage}</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Recent Changes */}
+              {recentChanges.length > 0 && (
+                <div className="border-t pt-3">
+                  <h3 className="text-sm font-semibold text-gray-600 mb-2">Recent Changes</h3>
+                  <div className="space-y-1">
+                    {recentChanges.map((change, idx) => (
+                      <div key={idx} className="text-xs text-gray-600 bg-yellow-50 p-2 rounded">
+                        <span className="font-semibold">{change.oldPlayer.name}</span>
+                        {' → '}
+                        <span className="font-semibold">{change.newPlayer.name}</span>
+                        <span className="text-gray-500 ml-2">
+                          ({new Date(change.date).toLocaleDateString()})
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Edit Modal */}
+      {editingRoster && selectedTeam && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">
+                Edit Roster - {selectedTeam.name}
+              </h2>
+              
+              <div className="space-y-4">
+                {selectedTeam.playerIds.map((playerId, idx) => {
+                  const currentPlayer = getPlayerInfo(playerId);
+                  const availablePlayers = getAvailablePlayers(selectedTeam);
+
+                  return (
+                    <div key={idx} className="border border-gray-200 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold">
+                            {idx + 1}
+                          </div>
+                          <div>
+                            <div className="font-semibold text-gray-800">{currentPlayer?.name}</div>
+                            <div className="text-xs text-gray-500">Avg: {currentPlayer?.startingAverage}</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Substitute with:
+                        </label>
+                        <select
+                          onChange={(e) => {
+                            if (e.target.value && confirm(`Replace ${currentPlayer?.name} with this player?`)) {
+                              handleSubstitutePlayer(selectedTeam, idx, e.target.value);
+                            }
+                          }}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                          defaultValue=""
+                        >
+                          <option value="">Select player...</option>
+                          {availablePlayers.map(player => (
+                            <option key={player.id} value={player.id}>
+                              {player.name} (Avg: {player.startingAverage})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => {
+                    setEditingRoster(false);
+                    setSelectedTeam(null);
+                  }}
+                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 font-semibold"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* All Roster Changes History */}
+      {teams.some(t => t.rosterChanges && t.rosterChanges.length > 0) && (
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <h2 className="text-xl font-bold text-gray-800 mb-4">Season Roster Change History</h2>
+          <div className="space-y-2">
+            {teams
+              .flatMap(t => (t.rosterChanges || []).map(c => ({ ...c, teamName: t.name })))
+              .sort((a, b) => new Date(b.date) - new Date(a.date))
+              .map((change, idx) => (
+                <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-4">
+                    <span className="text-2xl">🔄</span>
+                    <div>
+                      <div className="font-semibold text-gray-800">
+                        {change.teamName}
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        <span className="font-medium">{change.oldPlayer.name}</span>
+                        {' → '}
+                        <span className="font-medium">{change.newPlayer.name}</span>
+                        <span className="text-gray-400 ml-2">
+                          (Position {change.position + 1})
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    {new Date(change.date).toLocaleDateString()}
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};

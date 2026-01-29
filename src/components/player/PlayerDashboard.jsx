@@ -6,7 +6,8 @@ export const PlayerDashboard = ({ playerId, onNavigate }) => {
   const [playerLeagues, setPlayerLeagues] = useState([]);
   const [upcomingGames, setUpcomingGames] = useState([]);
   const [recentCompletedGames, setRecentCompletedGames] = useState([]);
-  const [view, setView] = useState('dashboard'); // dashboard, stats, leagues
+  const [completedSeasons, setCompletedSeasons] = useState([]);
+  const [view, setView] = useState('dashboard'); // dashboard, stats, leagues, history
   const [playerStats, setPlayerStats] = useState(null);
 
   useEffect(() => {
@@ -79,6 +80,34 @@ export const PlayerDashboard = ({ playerId, onNavigate }) => {
     });
 
     setRecentCompletedGames(sortedCompletedGames.slice(0, 5)); // Show last 5 completed games
+
+    // Get completed seasons where player participated
+    const completedPlayerSeasons = seasons
+      .filter(s => s.status === 'completed')
+      .map(season => {
+        const league = leaguesApi.getById(season.leagueId);
+        const playerTeam = playerTeams.find(t => t.seasonId === season.id);
+        const seasonGames = gamesApi.getBySeason(season.id);
+        const seasonTeams = teamsApi.getBySeason(season.id);
+        
+        // Calculate standings for this season
+        const { calculateTeamStandings } = require('../../utils/standingsUtils');
+        const standings = calculateTeamStandings(seasonTeams, seasonGames);
+        const playerTeamStanding = standings.find(s => s.teamId === playerTeam?.id);
+        const champion = standings[0];
+        
+        return {
+          ...season,
+          league,
+          playerTeam,
+          playerTeamStanding,
+          champion,
+          totalGames: seasonGames.length
+        };
+      })
+      .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+    
+    setCompletedSeasons(completedPlayerSeasons);
 
     // Calculate player statistics across all games
     calculatePlayerStats(allGames, playerTeams);
@@ -275,6 +304,16 @@ export const PlayerDashboard = ({ playerId, onNavigate }) => {
           }`}
         >
           🏆 My Leagues
+        </button>
+        <button
+          onClick={() => setView('history')}
+          className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-colors ${
+            view === 'history'
+              ? 'bg-purple-600 text-white'
+              : 'text-gray-600 hover:bg-gray-100'
+          }`}
+        >
+          📚 History
         </button>
       </div>
 
@@ -545,6 +584,100 @@ export const PlayerDashboard = ({ playerId, onNavigate }) => {
                         </div>
                       );
                     })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* History View */}
+      {view === 'history' && (
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Season History</h2>
+          {completedSeasons.length === 0 ? (
+            <div className="text-center py-12">
+              <span className="text-6xl mb-4 block">📚</span>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">No Completed Seasons</h3>
+              <p className="text-gray-600">You haven't participated in any completed seasons yet.</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {completedSeasons.map(season => (
+                <div
+                  key={season.id}
+                  className="border border-gray-200 rounded-lg p-5 hover:border-purple-300 transition-colors"
+                >
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="text-xl font-bold text-gray-800">{season.name}</h3>
+                        <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold">
+                          COMPLETED
+                        </span>
+                      </div>
+                      <p className="text-sm text-purple-600 font-semibold">{season.league?.name}</p>
+                    </div>
+                  </div>
+
+                  {/* Season Champion */}
+                  {season.champion && (
+                    <div className="mb-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                      <div className="flex items-center gap-2">
+                        <span className="text-2xl">🏆</span>
+                        <div>
+                          <p className="text-xs text-gray-600">Season Champion</p>
+                          <p className="font-bold text-gray-800">{season.champion.teamName}</p>
+                          <p className="text-sm text-gray-600">{season.champion.points} points • {season.champion.wins}-{season.champion.losses}-{season.champion.draws}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Player's Team Performance */}
+                  {season.playerTeam && season.playerTeamStanding && (
+                    <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-2xl">👥</span>
+                        <div>
+                          <p className="text-xs text-gray-600">Your Team</p>
+                          <p className="font-bold text-gray-800">{season.playerTeam.name}</p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-4 gap-3 text-center">
+                        <div>
+                          <p className="text-xs text-gray-600">Rank</p>
+                          <p className="text-lg font-bold text-blue-600">
+                            #{season.playerTeamStanding.teamId === season.champion?.teamId ? '1 🏆' : 
+                              completedSeasons.findIndex(s => s.id === season.id) + 1}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-600">Points</p>
+                          <p className="text-lg font-bold text-gray-800">{season.playerTeamStanding.points}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-600">Record</p>
+                          <p className="text-sm font-semibold text-gray-800">
+                            {season.playerTeamStanding.wins}-{season.playerTeamStanding.losses}-{season.playerTeamStanding.draws}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-600">Total Pins</p>
+                          <p className="text-lg font-bold text-gray-800">{season.playerTeamStanding.totalPinsWithHandicap.toLocaleString()}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Season Info */}
+                  <div className="flex gap-4 text-sm text-gray-600 mt-3">
+                    <span>📅 {new Date(season.startDate).toLocaleDateString()}</span>
+                    <span>🎳 {season.totalGames} games</span>
+                    {season.updatedAt && (
+                      <span>✓ Completed {new Date(season.updatedAt).toLocaleDateString()}</span>
+                    )}
                   </div>
                 </div>
               ))}

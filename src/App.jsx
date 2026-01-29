@@ -10,6 +10,7 @@ import { SeasonSetup } from './components/admin/SeasonSetup';
 import { SeasonDashboard } from './components/admin/SeasonDashboard';
 import { SeasonGamePlayer } from './components/admin/SeasonGamePlayer';
 import { Settings } from './components/admin/Settings';
+import { TeamManagement } from './components/admin/TeamManagement';
 import { PlayerDashboard } from './components/player/PlayerDashboard';
 import { GameHistoryView } from './components/GameHistoryView';
 import { StartView } from './components/StartView';
@@ -243,6 +244,14 @@ function AppContent() {
                 onBack={() => navigateTo('league-detail', { leagueId: navigationState.leagueId })}
                 onPlayGame={(gameId) => navigateTo('season-game', { gameId })}
                 onViewGame={(gameId, game) => navigateTo('game-history', { gameId, gameData: game })}
+                onManageTeams={() => navigateTo('team-management', { seasonId: navigationState.seasonId })}
+              />
+            )}
+
+            {currentView === 'team-management' && navigationState.seasonId && (
+              <TeamManagement 
+                seasonId={navigationState.seasonId}
+                onBack={() => navigateTo('season-dashboard', { seasonId: navigationState.seasonId })}
               />
             )}
 

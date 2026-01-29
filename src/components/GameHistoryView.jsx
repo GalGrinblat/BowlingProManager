@@ -202,19 +202,19 @@ export const GameHistoryView = ({ game, onBack }) => {
         <div className="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl shadow-lg p-6 text-white">
           <div className="flex items-center justify-between">
             <div className="text-center flex-1">
-              <div className="text-sm opacity-90 mb-1">Grand Total Bonus</div>
+              <div className="text-sm opacity-90 mb-1">Grand Total Points</div>
               <div className="text-3xl font-bold">+{game.grandTotalPoints.team1}</div>
               <div className="text-sm opacity-90 mt-1">{game.team1.name}</div>
             </div>
             <div className="text-4xl">🏆</div>
             <div className="text-center flex-1">
-              <div className="text-sm opacity-90 mb-1">Grand Total Bonus</div>
+              <div className="text-sm opacity-90 mb-1">Grand Total Points</div>
               <div className="text-3xl font-bold">+{game.grandTotalPoints.team2}</div>
               <div className="text-sm opacity-90 mt-1">{game.team2.name}</div>
             </div>
           </div>
           <div className="text-center text-sm opacity-90 mt-4">
-            Awarded for highest combined pins across all 3 matches
+            2 points awarded to team with highest combined pins across all 3 matches
           </div>
         </div>
       )}

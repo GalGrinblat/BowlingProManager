@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { leaguesApi, seasonsApi, teamsApi, playersApi, gamesApi } from '../../services/api';
 import { createSeason, createTeam, validateSeason, validateTeam } from '../../models';
 import { generateRoundRobinSchedule } from '../../utils/scheduleUtils';
+import { exportSeasonJSON } from '../../utils/exportUtils';
 
 export const LeagueDetail = ({ leagueId, onBack, onViewSeason }) => {
   const [league, setLeague] = useState(null);
@@ -168,32 +169,67 @@ export const LeagueDetail = ({ leagueId, onBack, onViewSeason }) => {
       {/* Completed Seasons */}
       {completedSeasons.length > 0 && (
         <div className="bg-white rounded-xl shadow-lg p-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Past Seasons</h2>
+          <h2 className="text-xl font-bold text-gray-800 mb-4">Season Archives</h2>
           <div className="space-y-3">
             {completedSeasons.map(season => {
               const teams = teamsApi.getBySeason(season.id);
               const games = gamesApi.getBySeason(season.id);
               
+              // Calculate champion
+              const { calculateTeamStandings } = require('../../utils/standingsUtils');
+              const standings = calculateTeamStandings(teams, games);
+              const champion = standings[0];
+              
+              const handleExport = (e) => {
+                e.stopPropagation(); // Prevent navigation when clicking export
+                const { calculatePlayerSeasonStats } = require('../../utils/standingsUtils');
+                const playerStats = calculatePlayerSeasonStats(teams, games);
+                exportSeasonJSON(season, teams, games, standings, playerStats, league);
+              };
+              
               return (
                 <div
                   key={season.id}
-                  className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors"
+                  className="border border-gray-200 rounded-lg p-4 hover:border-purple-300 transition-colors cursor-pointer"
+                  onClick={() => onViewSeason(season.id, 'completed')}
                 >
                   <div className="flex justify-between items-start">
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-800">{season.name}</h3>
-                      <div className="flex gap-4 mt-2 text-sm text-gray-600">
-                        <span>🏆 {teams.length} teams</span>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="text-lg font-semibold text-gray-800">{season.name}</h3>
+                        <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold">
+                          COMPLETED
+                        </span>
+                      </div>
+                      {champion && (
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-yellow-500 text-xl">🏆</span>
+                          <span className="font-semibold text-purple-600">{champion.teamName}</span>
+                          <span className="text-sm text-gray-500">• {champion.points} points</span>
+                        </div>
+                      )}
+                      <div className="flex gap-4 text-sm text-gray-600">
+                        <span>👥 {teams.length} teams</span>
                         <span>🎳 {games.length} games</span>
                         <span>📅 {new Date(season.startDate).toLocaleDateString()}</span>
+                        {season.updatedAt && (
+                          <span>✓ {new Date(season.updatedAt).toLocaleDateString()}</span>
+                        )}
                       </div>
                     </div>
-                    <button
-                      onClick={() => onViewSeason(season.id, 'completed')}
-                      className="px-3 py-1 text-sm bg-purple-100 text-purple-700 rounded hover:bg-purple-200"
-                    >
-                      View Results
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleExport}
+                        className="px-3 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 font-semibold text-sm transition-colors"
+                      >
+                        📦 Export
+                      </button>
+                      <button
+                        className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-semibold"
+                      >
+                        View Archive →
+                      </button>
+                    </div>
                   </div>
                 </div>
               );

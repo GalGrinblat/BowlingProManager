@@ -2,8 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { seasonsApi, teamsApi, gamesApi, leaguesApi } from '../../services/api';
 import { calculateTeamStandings, calculatePlayerSeasonStats } from '../../utils/standingsUtils';
 import { createEmptyMatch } from '../../utils/matchUtils';
+import { 
+  exportStandingsCSV, 
+  exportPlayerStatsCSV, 
+  exportGamesCSV, 
+  exportSeasonJSON, 
+  exportAllSeasonData 
+} from '../../utils/exportUtils';
 
-export const SeasonDashboard = ({ seasonId, onBack, onPlayGame, onViewGame }) => {
+export const SeasonDashboard = ({ seasonId, onBack, onPlayGame, onViewGame, onManageTeams }) => {
   const [season, setSeason] = useState(null);
   const [league, setLeague] = useState(null);
   const [teams, setTeams] = useState([]);
@@ -70,6 +77,8 @@ export const SeasonDashboard = ({ seasonId, onBack, onPlayGame, onViewGame }) =>
   const totalGames = games.length;
   const completedGames = games.filter(g => g.status === 'completed').length;
   const progressPercent = totalGames > 0 ? (completedGames / totalGames) * 100 : 0;
+  const isCompleted = season.status === 'completed';
+  const champion = isCompleted && teamStandings.length > 0 ? teamStandings[0] : null;
 
   return (
     <div className="space-y-6">
@@ -83,7 +92,14 @@ export const SeasonDashboard = ({ seasonId, onBack, onPlayGame, onViewGame }) =>
         </button>
         <div className="flex justify-between items-start">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">{season.name}</h1>
+            <div className="flex items-center gap-3 mb-2">
+              <h1 className="text-3xl font-bold text-gray-800">{season.name}</h1>
+              {isCompleted && (
+                <span className="px-3 py-1 bg-green-100 text-green-700 rounded-lg text-sm font-semibold">
+                  COMPLETED
+                </span>
+              )}
+            </div>
             <p className="text-gray-600">{league.name}</p>
             <div className="flex gap-4 mt-4 text-sm text-gray-600">
               <span>🏆 {teams.length} teams</span>
@@ -91,16 +107,51 @@ export const SeasonDashboard = ({ seasonId, onBack, onPlayGame, onViewGame }) =>
               <span>🔄 Round {selectedRound} of {season.numberOfRounds}</span>
             </div>
           </div>
-          {season.status === 'active' && completedGames === totalGames && (
-            <button
-              onClick={handleCompleteSeason}
-              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold"
-            >
-              Complete Season
-            </button>
-          )}
+          <div className="flex gap-2">
+            {season.status === 'active' && (
+              <button
+                onClick={onManageTeams}
+                className="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 font-semibold"
+              >
+                👥 Manage Teams
+              </button>
+            )}
+            {season.status === 'active' && completedGames === totalGames && (
+              <button
+                onClick={handleCompleteSeason}
+                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold"
+              >
+                Complete Season
+              </button>
+            )}
+          </div>
         </div>
       </div>
+
+      {/* Champion Banner */}
+      {champion && (
+        <div className="bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-500 rounded-xl shadow-lg p-8 text-white">
+          <div className="text-center">
+            <div className="text-6xl mb-4">🏆</div>
+            <h2 className="text-4xl font-bold mb-2">Season Champion</h2>
+            <h3 className="text-3xl font-bold mb-4">{champion.teamName}</h3>
+            <div className="flex justify-center gap-8 text-lg">
+              <div>
+                <div className="text-2xl font-bold">{champion.points}</div>
+                <div className="text-sm opacity-90">Points</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold">{champion.wins}-{champion.losses}-{champion.draws}</div>
+                <div className="text-sm opacity-90">W-L-D</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold">{champion.totalPinsWithHandicap.toLocaleString()}</div>
+                <div className="text-sm opacity-90">Total Pins</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Progress Bar */}
       <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">
@@ -116,6 +167,63 @@ export const SeasonDashboard = ({ seasonId, onBack, onPlayGame, onViewGame }) =>
         </div>
       </div>
 
+      {/* Export Section */}
+      {completedGames > 0 && (
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-bold text-gray-800 mb-1">Export Season Data</h3>
+              <p className="text-sm text-gray-600">Download standings, player stats, and game results</p>
+            </div>
+            <div className="flex gap-2 flex-wrap">
+              <button
+                onClick={() => exportStandingsCSV(teamStandings, season.name)}
+                className="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 font-semibold text-sm transition-colors"
+              >
+                📊 Standings CSV
+              </button>
+              <button
+                onClick={() => exportPlayerStatsCSV(playerStats, season.name)}
+                className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 font-semibold text-sm transition-colors"
+              >
+                👥 Player Stats CSV
+              </button>
+              <button
+                onClick={() => exportGamesCSV(games, teams, season.name)}
+                className="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 font-semibold text-sm transition-colors"
+              >
+                🎳 Games CSV
+              </button>
+              <button
+                onClick={() => exportSeasonJSON(season, teams, games, teamStandings, playerStats, league)}
+                className="px-4 py-2 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 font-semibold text-sm transition-colors"
+              >
+                📦 Complete JSON
+              </button>
+              <button
+                onClick={() => exportAllSeasonData(season, teams, games, teamStandings, playerStats, league)}
+                className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 font-semibold text-sm transition-all shadow-md"
+              >
+                ⬇️ Download All
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Archive Notice for Completed Seasons */}
+      {isCompleted && (
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">📚</span>
+            <div>
+              <p className="font-semibold text-blue-800">Season Archive</p>
+              <p className="text-sm text-blue-600">This season has been completed. You can view all results and statistics below.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* View Tabs */}
       <div className="bg-white rounded-xl shadow-lg p-2 flex gap-2">
         <button
@@ -126,7 +234,7 @@ export const SeasonDashboard = ({ seasonId, onBack, onPlayGame, onViewGame }) =>
               : 'text-gray-600 hover:bg-gray-100'
           }`}
         >
-          📅 Schedule
+          📅 {isCompleted ? 'Game Results' : 'Schedule'}
         </button>
         <button
           onClick={() => setView('standings')}
@@ -136,7 +244,7 @@ export const SeasonDashboard = ({ seasonId, onBack, onPlayGame, onViewGame }) =>
               : 'text-gray-600 hover:bg-gray-100'
           }`}
         >
-          🏆 Team Standings
+          🏆 {isCompleted ? 'Final Standings' : 'Team Standings'}
         </button>
         <button
           onClick={() => setView('players')}

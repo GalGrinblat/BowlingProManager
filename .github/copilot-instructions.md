@@ -43,7 +43,7 @@ Organization
 1. **Individual Game Points**: Compare player1 vs player1 (with handicap) across 4 player pairs
 2. **Bonus Points**: Per-player based on score vs average (+1 for ≥50, +2 for ≥70)
 3. **Match Winner Point**: +1 if team wins match (higher total with handicap)
-4. **Grand Total Points**: +2 to team with highest pins across 3 matches
+4. **Grand Total Points**: +2 points awarded to team with highest combined pins across 3 matches (not a bonus, but additional points)
 - **Location**: [matchUtils.js](../src/utils/matchUtils.js)
 
 ### Season Management
@@ -56,8 +56,11 @@ Organization
   - Handles odd/even number of teams (bye system for odd teams)
 - **Game Lifecycle**: pending → in-progress → completed
 - **Season Status**: setup → active → completed
-- **Game Lifecycle**: pending → in-progress → completed
-- **Season Status**: setup → active → completed
+- **Player Management**: 
+  - Roster substitutions tracked in team.rosterChanges array
+  - Each change logged with date, old/new player info, position
+  - Absent players handled per-game via "absent" checkbox (score = average - 10)
+  - TeamManagement component provides UI for substitutions
 
 ### Standings Calculation
 - **Team Standings**: Points, wins/losses, total pins (with/without handicap)
@@ -200,7 +203,7 @@ const schedule = generateRoundRobinSchedule(teamIds, numberOfRounds);
    - +2 bonus if score ≥ average + 70 pins
    - Applied to match score calculation
 3. **Match Winner Point**: +1 point if team wins match (has higher total with handicap)
-4. **Grand Total Points**: +2 points to team with highest combined pins across all 3 matches (only if all matches complete)
+4. **Grand Total Points**: +2 points awarded to team with highest combined pins across all 3 matches (not a bonus, but additional points only if all matches complete)
 - **Key insight**: Game points + bonus points + match winner = match score
 - **Location**: [matchUtils.js](../src/utils/matchUtils.js#L27-L85)
 
