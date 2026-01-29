@@ -21,10 +21,10 @@ export const AdminDashboard = ({ onNavigate }) => {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <button
           onClick={() => onNavigate('players')}
-          className="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all"
+          className="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all touch-manipulation"
         >
           <div className="text-4xl mb-2">👥</div>
           <h3 className="text-xl font-bold mb-1">Manage Players</h3>
@@ -33,7 +33,7 @@ export const AdminDashboard = ({ onNavigate }) => {
 
         <button
           onClick={() => onNavigate('leagues')}
-          className="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all"
+          className="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all touch-manipulation"
         >
           <div className="text-4xl mb-2">🏆</div>
           <h3 className="text-xl font-bold mb-1">Manage Leagues</h3>
@@ -42,7 +42,7 @@ export const AdminDashboard = ({ onNavigate }) => {
 
         <button
           onClick={() => onNavigate('settings')}
-          className="bg-gradient-to-br from-green-500 to-green-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all"
+          className="bg-gradient-to-br from-green-500 to-green-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all touch-manipulation"
         >
           <div className="text-4xl mb-2">⚙️</div>
           <h3 className="text-xl font-bold mb-1">Settings</h3>

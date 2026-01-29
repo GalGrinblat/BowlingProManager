@@ -169,40 +169,40 @@ export const SeasonDashboard = ({ seasonId, onBack, onPlayGame, onViewGame, onMa
 
       {/* Export Section */}
       {completedGames > 0 && (
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <div className="flex items-center justify-between">
+        <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h3 className="text-lg font-bold text-gray-800 mb-1">Export Season Data</h3>
               <p className="text-sm text-gray-600">Download standings, player stats, and game results</p>
             </div>
-            <div className="flex gap-2 flex-wrap">
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
               <button
                 onClick={() => exportStandingsCSV(teamStandings, season.name)}
-                className="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 font-semibold text-sm transition-colors"
+                className="px-3 py-2 sm:px-4 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 font-semibold text-xs sm:text-sm transition-colors whitespace-nowrap"
               >
-                📊 Standings CSV
+                📊 Standings
               </button>
               <button
                 onClick={() => exportPlayerStatsCSV(playerStats, season.name)}
-                className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 font-semibold text-sm transition-colors"
+                className="px-3 py-2 sm:px-4 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 font-semibold text-xs sm:text-sm transition-colors whitespace-nowrap"
               >
-                👥 Player Stats CSV
+                👥 Players
               </button>
               <button
                 onClick={() => exportGamesCSV(games, teams, season.name)}
-                className="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 font-semibold text-sm transition-colors"
+                className="px-3 py-2 sm:px-4 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 font-semibold text-xs sm:text-sm transition-colors whitespace-nowrap"
               >
-                🎳 Games CSV
+                🎳 Games
               </button>
               <button
                 onClick={() => exportSeasonJSON(season, teams, games, teamStandings, playerStats, league)}
-                className="px-4 py-2 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 font-semibold text-sm transition-colors"
+                className="px-3 py-2 sm:px-4 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 font-semibold text-xs sm:text-sm transition-colors whitespace-nowrap"
               >
-                📦 Complete JSON
+                📦 JSON
               </button>
               <button
                 onClick={() => exportAllSeasonData(season, teams, games, teamStandings, playerStats, league)}
-                className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 font-semibold text-sm transition-all shadow-md"
+                className="col-span-2 sm:col-span-1 px-3 py-2 sm:px-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 font-semibold text-xs sm:text-sm transition-all shadow-md whitespace-nowrap"
               >
                 ⬇️ Download All
               </button>
@@ -358,82 +358,93 @@ export const SeasonDashboard = ({ seasonId, onBack, onPlayGame, onViewGame, onMa
 
       {/* Team Standings View */}
       {view === 'standings' && (
-        <div className="bg-white rounded-xl shadow-lg p-6">
+        <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Team Standings</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-100">
-                <tr className="text-left">
-                  <th className="px-4 py-3 font-semibold text-gray-700">Rank</th>
-                  <th className="px-4 py-3 font-semibold text-gray-700">Team</th>
-                  <th className="px-4 py-3 font-semibold text-gray-700 text-center">GP</th>
-                  <th className="px-4 py-3 font-semibold text-gray-700 text-center">W</th>
-                  <th className="px-4 py-3 font-semibold text-gray-700 text-center">L</th>
-                  <th className="px-4 py-3 font-semibold text-gray-700 text-center">D</th>
-                  <th className="px-4 py-3 font-semibold text-gray-700 text-center">Points</th>
-                  <th className="px-4 py-3 font-semibold text-gray-700 text-center">Pins</th>
-                </tr>
-              </thead>
-              <tbody>
-                {teamStandings.map((standing, index) => (
-                  <tr key={standing.teamId} className="border-b border-gray-200 hover:bg-gray-50">
-                    <td className="px-4 py-3">
-                      <span className="font-bold text-gray-800">#{index + 1}</span>
-                    </td>
-                    <td className="px-4 py-3 font-semibold text-gray-800">{standing.teamName}</td>
-                    <td className="px-4 py-3 text-center text-gray-600">{standing.gamesPlayed}</td>
-                    <td className="px-4 py-3 text-center text-green-600 font-semibold">{standing.wins}</td>
-                    <td className="px-4 py-3 text-center text-red-600 font-semibold">{standing.losses}</td>
-                    <td className="px-4 py-3 text-center text-gray-600">{standing.draws}</td>
-                    <td className="px-4 py-3 text-center">
-                      <span className="font-bold text-blue-600 text-lg">{standing.points}</span>
-                    </td>
-                    <td className="px-4 py-3 text-center text-gray-600">{standing.totalPinsWithHandicap}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="overflow-x-auto -mx-4 sm:mx-0">
+            <div className="inline-block min-w-full align-middle">
+              <div className="overflow-hidden">
+                <table className="min-w-full">
+                  <thead className="bg-gray-100">
+                    <tr className="text-left">
+                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm">Rank</th>
+                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm">Team</th>
+                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm">GP</th>
+                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm">W</th>
+                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm">L</th>
+                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm hidden sm:table-cell">D</th>
+                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm">Points</th>
+                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm hidden md:table-cell">Pins</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {teamStandings.map((standing, index) => (
+                      <tr key={standing.teamId} className="border-b border-gray-200 hover:bg-gray-50">
+                        <td className="px-3 sm:px-4 py-3">
+                          <span className="font-bold text-gray-800">#{index + 1}</span>
+                        </td>
+                        <td className="px-3 sm:px-4 py-3 font-semibold text-gray-800 text-sm">{standing.teamName}</td>
+                        <td className="px-3 sm:px-4 py-3 text-center text-gray-600 text-sm">{standing.gamesPlayed}</td>
+                        <td className="px-3 sm:px-4 py-3 text-center text-green-600 font-semibold text-sm">{standing.wins}</td>
+                        <td className="px-3 sm:px-4 py-3 text-center text-red-600 font-semibold text-sm">{standing.losses}</td>
+                        <td className="px-3 sm:px-4 py-3 text-center text-gray-600 text-sm hidden sm:table-cell">{standing.draws}</td>
+                        <td className="px-3 sm:px-4 py-3 text-center">
+                          <span className="font-bold text-blue-600 text-base sm:text-lg">{standing.points}</span>
+                        </td>
+                        <td className="px-3 sm:px-4 py-3 text-center text-gray-600 text-sm hidden md:table-cell">{standing.totalPinsWithHandicap}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
       )}
 
       {/* Player Stats View */}
       {view === 'players' && (
-        <div className="bg-white rounded-xl shadow-lg p-6">
+        <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Player Statistics</h2>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-100">
-                <tr className="text-left">
-                  <th className="px-4 py-3 font-semibold text-gray-700">Rank</th>
-                  <th className="px-4 py-3 font-semibold text-gray-700">Player</th>
-                  <th className="px-4 py-3 font-semibold text-gray-700">Team</th>
-                  <th className="px-4 py-3 font-semibold text-gray-700 text-center">Games</th>
-                  <th className="px-4 py-3 font-semibold text-gray-700 text-center">Average</th>
-                  <th className="px-4 py-3 font-semibold text-gray-700 text-center">High Game</th>
-                  <th className="px-4 py-3 font-semibold text-gray-700 text-center">High Series</th>
-                  <th className="px-4 py-3 font-semibold text-gray-700 text-center">Total Pins</th>
-                </tr>
-              </thead>
-              <tbody>
-                {playerStats.map((stat, index) => (
-                  <tr key={`${stat.teamId}-${stat.playerName}`} className="border-b border-gray-200 hover:bg-gray-50">
-                    <td className="px-4 py-3">
-                      <span className="font-bold text-gray-800">#{index + 1}</span>
-                    </td>
-                    <td className="px-4 py-3 font-semibold text-gray-800">{stat.playerName}</td>
-                    <td className="px-4 py-3 text-gray-600 text-sm">{stat.teamName}</td>
-                    <td className="px-4 py-3 text-center text-gray-600">{stat.gamesPlayed}</td>
-                    <td className="px-4 py-3 text-center">
-                      <span className="font-bold text-blue-600 text-lg">{stat.average}</span>
-                    </td>
-                    <td className="px-4 py-3 text-center text-purple-600 font-semibold">{stat.highGame}</td>
-                    <td className="px-4 py-3 text-center text-green-600 font-semibold">{stat.highSeries}</td>
-                    <td className="px-4 py-3 text-center text-gray-600">{stat.totalPins}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="overflow-x-auto -mx-4 sm:mx-0">
+            <div className="inline-block min-w-full align-middle">
+              <div className="overflow-hidden">
+                <table className="min-w-full">
+                  <thead className="bg-gray-100">
+                    <tr className="text-left">
+                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm">Rank</th>
+                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm">Player</th>
+                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm hidden lg:table-cell">Team</th>
+                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm">GP</th>
+                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm">Avg</th>
+                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm hidden sm:table-cell">High</th>
+                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm hidden md:table-cell">Series</th>
+                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm hidden lg:table-cell">Pins</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {playerStats.map((stat, index) => (
+                      <tr key={`${stat.teamId}-${stat.playerName}`} className="border-b border-gray-200 hover:bg-gray-50">
+                        <td className="px-3 sm:px-4 py-3">
+                          <span className="font-bold text-gray-800">#{index + 1}</span>
+                        </td>
+                        <td className="px-3 sm:px-4 py-3 font-semibold text-gray-800 text-sm">{stat.playerName}</td>
+                        <td className="px-3 sm:px-4 py-3 text-gray-600 text-sm hidden lg:table-cell">{stat.teamName}</td>
+                        <td className="px-3 sm:px-4 py-3 text-center text-gray-600 text-sm">{stat.gamesPlayed}</td>
+                        <td className="px-3 sm:px-4 py-3 text-center">
+                          <span className="font-bold text-blue-600 text-base sm:text-lg">{stat.average}</span>
+                        </td>
+                        <td className="px-3 sm:px-4 py-3 text-center text-purple-600 font-semibold text-sm hidden sm:table-cell">{stat.highGame}</td>
+                        <td className="px-3 sm:px-4 py-3 text-center text-green-600 font-semibold text-sm hidden md:table-cell">{stat.highSeries}</td>
+                        <td className="px-3 sm:px-4 py-3 text-center text-gray-600 text-sm hidden lg:table-cell">{stat.totalPins}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
           </div>
         </div>
       )}

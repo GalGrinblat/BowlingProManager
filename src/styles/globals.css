@@ -57,31 +57,12 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+/* Touch-friendly buttons and inputs on mobile */
+@media (hover: none) and (pointer: coarse) {
+  button, input[type="submit"], input[type="button"] {
+    touch-action: manipulation;
+    min-height: 44px; /* iOS recommended touch target size */
+    min-width: 44px;
   }
 }
 
-.animate-slide-in {
-  animation: slideIn 0.3s ease-out forwards;
-}
-
-.winner-badge {
-  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-  animation: pulse 2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.8;
-  }
-}

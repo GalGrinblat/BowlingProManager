@@ -85,10 +85,10 @@ export function MatchView({ matchNumber, game, onUpdateScore, onNavigate, onCanc
                             min="0"
                             max="300"
                             disabled={isReadOnly}
-                            className={`w-16 px-2 py-1 rounded border font-bold text-center text-sm ${
+                            className={`w-16 sm:w-20 px-2 py-2 sm:py-3 rounded border font-bold text-center text-base sm:text-lg ${
                               isReadOnly 
                                 ? 'bg-gray-600 text-gray-400 border-gray-500 cursor-not-allowed'
-                                : 'bg-gray-600 text-white border-gray-500 focus:border-orange-500 focus:outline-none'
+                                : 'bg-gray-600 text-white border-gray-500 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500'
                             }`}
                           />
                         </div>
@@ -184,10 +184,10 @@ export function MatchView({ matchNumber, game, onUpdateScore, onNavigate, onCanc
                             min="0"
                             max="300"
                             disabled={isReadOnly}
-                            className={`w-16 px-2 py-1 rounded border font-bold text-center text-sm ${
+                            className={`w-16 sm:w-20 px-2 py-2 sm:py-3 rounded border font-bold text-center text-base sm:text-lg ${
                               isReadOnly 
                                 ? 'bg-gray-600 text-gray-400 border-gray-500 cursor-not-allowed'
-                                : 'bg-gray-600 text-white border-gray-500 focus:border-blue-500 focus:outline-none'
+                                : 'bg-gray-600 text-white border-gray-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500'
                             }`}
                           />
                         </div>
@@ -252,25 +252,25 @@ export function MatchView({ matchNumber, game, onUpdateScore, onNavigate, onCanc
       </div>
 
       {/* Navigation */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
         <button
           onClick={() => onNavigate('back')}
-          className="flex items-center justify-center gap-2 bg-gray-700 text-white py-3 rounded-lg font-bold uppercase text-sm hover:bg-gray-600 transition-colors"
+          className="flex items-center justify-center gap-1 sm:gap-2 bg-gray-700 text-white py-3 sm:py-4 rounded-lg font-bold uppercase text-xs sm:text-sm hover:bg-gray-600 transition-colors touch-manipulation"
         >
           <ArrowLeft size={18} />
-          Back
+          <span className="hidden sm:inline">Back</span>
         </button>
         
         <button
           onClick={onCancel}
-          className="bg-red-600 text-white py-3 rounded-lg font-bold uppercase text-sm hover:bg-red-700 transition-colors"
+          className="bg-red-600 text-white py-3 sm:py-4 rounded-lg font-bold uppercase text-xs sm:text-sm hover:bg-red-700 transition-colors touch-manipulation"
         >
           Cancel
         </button>
         
         <button
           onClick={() => onNavigate('next')}
-          className="flex items-center justify-center gap-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 rounded-lg font-bold uppercase text-sm hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg"
+          className="flex items-center justify-center gap-1 sm:gap-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 sm:py-4 rounded-lg font-bold uppercase text-xs sm:text-sm hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg touch-manipulation"
         >
           {matchNumber === 3 ? 'Summary' : 'Next'}
           <ArrowRight size={18} />

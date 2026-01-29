@@ -274,10 +274,10 @@ export const PlayerDashboard = ({ playerId, onNavigate }) => {
       </div>
 
       {/* View Tabs */}
-      <div className="bg-white rounded-xl shadow-lg p-2 flex gap-2">
+      <div className="bg-white rounded-xl shadow-lg p-2 flex gap-1 sm:gap-2 overflow-x-auto">
         <button
           onClick={() => setView('dashboard')}
-          className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-colors ${
+          className={`flex-1 min-w-[90px] py-2 sm:py-3 px-2 sm:px-4 rounded-lg font-semibold text-xs sm:text-base transition-colors whitespace-nowrap ${
             view === 'dashboard'
               ? 'bg-purple-600 text-white'
               : 'text-gray-600 hover:bg-gray-100'
@@ -287,7 +287,7 @@ export const PlayerDashboard = ({ playerId, onNavigate }) => {
         </button>
         <button
           onClick={() => setView('stats')}
-          className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-colors ${
+          className={`flex-1 min-w-[90px] py-2 sm:py-3 px-2 sm:px-4 rounded-lg font-semibold text-xs sm:text-base transition-colors whitespace-nowrap ${
             view === 'stats'
               ? 'bg-purple-600 text-white'
               : 'text-gray-600 hover:bg-gray-100'
@@ -297,7 +297,7 @@ export const PlayerDashboard = ({ playerId, onNavigate }) => {
         </button>
         <button
           onClick={() => setView('leagues')}
-          className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-colors ${
+          className={`flex-1 min-w-[90px] py-2 sm:py-3 px-2 sm:px-4 rounded-lg font-semibold text-xs sm:text-base transition-colors whitespace-nowrap ${
             view === 'leagues'
               ? 'bg-purple-600 text-white'
               : 'text-gray-600 hover:bg-gray-100'
@@ -307,7 +307,7 @@ export const PlayerDashboard = ({ playerId, onNavigate }) => {
         </button>
         <button
           onClick={() => setView('history')}
-          className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-colors ${
+          className={`flex-1 min-w-[90px] py-2 sm:py-3 px-2 sm:px-4 rounded-lg font-semibold text-xs sm:text-base transition-colors whitespace-nowrap ${
             view === 'history'
               ? 'bg-purple-600 text-white'
               : 'text-gray-600 hover:bg-gray-100'
