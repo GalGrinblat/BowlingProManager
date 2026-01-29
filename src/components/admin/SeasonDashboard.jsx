@@ -3,7 +3,7 @@ import { seasonsApi, teamsApi, gamesApi, leaguesApi } from '../../services/api';
 import { calculateTeamStandings, calculatePlayerSeasonStats } from '../../utils/standingsUtils';
 import { createEmptyMatch } from '../../utils/matchUtils';
 
-export const SeasonDashboard = ({ seasonId, onBack, onPlayGame }) => {
+export const SeasonDashboard = ({ seasonId, onBack, onPlayGame, onViewGame }) => {
   const [season, setSeason] = useState(null);
   const [league, setLeague] = useState(null);
   const [teams, setTeams] = useState([]);
@@ -238,7 +238,7 @@ export const SeasonDashboard = ({ seasonId, onBack, onPlayGame }) => {
                       team1={team1}
                       team2={team2}
                       onPlayGame={() => onPlayGame(game.id)}
-                      onViewGame={() => onPlayGame(game.id)}
+                      onViewGame={() => onViewGame(game.id, game)}
                     />
                   );
                 })}

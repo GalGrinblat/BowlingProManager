@@ -11,6 +11,7 @@ import { SeasonDashboard } from './components/admin/SeasonDashboard';
 import { SeasonGamePlayer } from './components/admin/SeasonGamePlayer';
 import { Settings } from './components/admin/Settings';
 import { PlayerDashboard } from './components/player/PlayerDashboard';
+import { GameHistoryView } from './components/GameHistoryView';
 import { StartView } from './components/StartView';
 import { SetupView } from './components/SetupView';
 import { MatchView } from './components/MatchView';
@@ -241,12 +242,20 @@ function AppContent() {
                 seasonId={navigationState.seasonId}
                 onBack={() => navigateTo('league-detail', { leagueId: navigationState.leagueId })}
                 onPlayGame={(gameId) => navigateTo('season-game', { gameId })}
+                onViewGame={(gameId, game) => navigateTo('game-history', { gameId, gameData: game })}
               />
             )}
 
             {currentView === 'season-game' && navigationState.gameId && (
               <SeasonGamePlayer 
                 gameId={navigationState.gameId}
+                onBack={() => navigateTo('season-dashboard', { seasonId: navigationState.seasonId })}
+              />
+            )}
+
+            {currentView === 'game-history' && navigationState.gameId && (
+              <GameHistoryView 
+                game={navigationState.gameData}
                 onBack={() => navigateTo('season-dashboard', { seasonId: navigationState.seasonId })}
               />
             )}
@@ -272,6 +281,13 @@ function AppContent() {
             {currentView === 'player-game' && navigationState.gameId && (
               <SeasonGamePlayer 
                 gameId={navigationState.gameId}
+                onBack={() => navigateTo('player-dashboard')}
+              />
+            )}
+
+            {currentView === 'player-game-history' && navigationState.gameId && (
+              <GameHistoryView 
+                game={navigationState.gameData}
                 onBack={() => navigateTo('player-dashboard')}
               />
             )}

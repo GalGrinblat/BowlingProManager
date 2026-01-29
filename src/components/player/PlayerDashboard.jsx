@@ -5,6 +5,7 @@ export const PlayerDashboard = ({ playerId, onNavigate }) => {
   const [player, setPlayer] = useState(null);
   const [playerLeagues, setPlayerLeagues] = useState([]);
   const [upcomingGames, setUpcomingGames] = useState([]);
+  const [recentCompletedGames, setRecentCompletedGames] = useState([]);
   const [view, setView] = useState('dashboard'); // dashboard, stats, leagues
   const [playerStats, setPlayerStats] = useState(null);
 
@@ -61,6 +62,23 @@ export const PlayerDashboard = ({ playerId, onNavigate }) => {
     });
 
     setUpcomingGames(sortedGames.slice(0, 5)); // Show next 5 games
+
+    // Get recent completed games
+    const completedPlayerGames = allGames.filter(game => {
+      const team1 = teamsApi.getById(game.team1Id);
+      const team2 = teamsApi.getById(game.team2Id);
+      return (team1?.playerIds.includes(playerId) || team2?.playerIds.includes(playerId)) &&
+             game.status === 'completed';
+    });
+
+    // Sort by completion date (most recent first)
+    const sortedCompletedGames = completedPlayerGames.sort((a, b) => {
+      const dateA = new Date(a.completedAt || a.updatedAt || 0);
+      const dateB = new Date(b.completedAt || b.updatedAt || 0);
+      return dateB - dateA;
+    });
+
+    setRecentCompletedGames(sortedCompletedGames.slice(0, 5)); // Show last 5 completed games
 
     // Calculate player statistics across all games
     calculatePlayerStats(allGames, playerTeams);
@@ -312,6 +330,75 @@ export const PlayerDashboard = ({ playerId, onNavigate }) => {
                           </span>
                         )}
                         <span className="text-blue-600 font-semibold">Play →</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Recent Completed Games */}
+          {recentCompletedGames.length > 0 && (
+            <div className="bg-white rounded-xl shadow-lg p-6">
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">Recent Completed Games</h2>
+              <div className="space-y-3">
+                {recentCompletedGames.map(game => {
+                  const season = seasonsApi.getById(game.seasonId);
+                  const league = season ? leaguesApi.getById(season.leagueId) : null;
+                  const team1 = teamsApi.getById(game.team1Id);
+                  const team2 = teamsApi.getById(game.team2Id);
+                  const isTeam1 = team1?.playerIds.includes(playerId);
+                  
+                  const team1TotalPoints = game.matches?.reduce((sum, m) => sum + (m.team1?.score || 0), 0) + (game.grandTotalPoints?.team1 || 0);
+                  const team2TotalPoints = game.matches?.reduce((sum, m) => sum + (m.team2?.score || 0), 0) + (game.grandTotalPoints?.team2 || 0);
+                  const playerWon = (isTeam1 && team1TotalPoints > team2TotalPoints) || (!isTeam1 && team2TotalPoints > team1TotalPoints);
+                  
+                  return (
+                    <div
+                      key={game.id}
+                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                      onClick={() => onNavigate('player-game-history', { gameId: game.id, gameData: game })}
+                    >
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-xs font-semibold text-purple-600 bg-purple-100 px-2 py-1 rounded">
+                            {league?.name}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            Round {game.round} • Match Day {game.matchDay}
+                          </span>
+                          <span className="text-xs text-gray-400">
+                            {new Date(game.completedAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <span className={`font-semibold ${isTeam1 ? 'text-blue-600' : 'text-gray-700'}`}>
+                            {game.team1?.name || team1?.name}
+                          </span>
+                          <span className="text-gray-400">
+                            <span className="font-bold">{team1TotalPoints}</span> - <span className="font-bold">{team2TotalPoints}</span>
+                          </span>
+                          <span className={`font-semibold ${!isTeam1 ? 'text-blue-600' : 'text-gray-700'}`}>
+                            {game.team2?.name || team2?.name}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {playerWon ? (
+                          <span className="text-xs bg-green-100 text-green-700 px-3 py-1 rounded font-semibold">
+                            Won
+                          </span>
+                        ) : team1TotalPoints === team2TotalPoints ? (
+                          <span className="text-xs bg-gray-200 text-gray-700 px-3 py-1 rounded font-semibold">
+                            Tie
+                          </span>
+                        ) : (
+                          <span className="text-xs bg-red-100 text-red-700 px-3 py-1 rounded font-semibold">
+                            Lost
+                          </span>
+                        )}
+                        <span className="text-purple-600 font-semibold">View →</span>
                       </div>
                     </div>
                   );
