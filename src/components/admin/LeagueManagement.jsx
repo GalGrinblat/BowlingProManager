@@ -11,7 +11,12 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
     description: '',
     defaultHandicapBasis: 160,
     defaultPlayersPerTeam: 4,
+    defaultMatchesPerGame: 3,
     dayOfWeek: '',
+    bonusRules: [
+      { type: 'player', condition: 'vs_average', threshold: 50, points: 1 },
+      { type: 'player', condition: 'vs_average', threshold: 70, points: 2 }
+    ],
     active: true
   });
 
@@ -46,7 +51,12 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
       description: '',
       defaultHandicapBasis: 160,
       defaultPlayersPerTeam: 4,
+      defaultMatchesPerGame: 3,
       dayOfWeek: '',
+      bonusRules: [
+        { type: 'player', condition: 'vs_average', threshold: 50, points: 1 },
+        { type: 'player', condition: 'vs_average', threshold: 70, points: 2 }
+      ],
       active: true
     });
     setIsAdding(false);
@@ -59,7 +69,12 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
       description: league.description || '',
       defaultHandicapBasis: league.defaultHandicapBasis,
       defaultPlayersPerTeam: league.defaultPlayersPerTeam,
+      defaultMatchesPerGame: league.defaultMatchesPerGame || 3,
       dayOfWeek: league.dayOfWeek || '',
+      bonusRules: league.bonusRules || [
+        { type: 'player', condition: 'vs_average', threshold: 50, points: 1 },
+        { type: 'player', condition: 'vs_average', threshold: 70, points: 2 }
+      ],
       active: league.active
     });
     setEditingId(league.id);
@@ -180,6 +195,20 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Default Matches per Game
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="5"
+                  value={formData.defaultMatchesPerGame}
+                  onChange={(e) => setFormData({ ...formData, defaultMatchesPerGame: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <p className="text-xs text-gray-500 mt-1">Number of matches in each game</p>
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   League Day
                 </label>
                 <select
@@ -199,6 +228,140 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
                 <p className="text-xs text-gray-500 mt-1">Day of the week games are played</p>
               </div>
             </div>
+
+            {/* Bonus Rules Section */}
+            <div className="border-t pt-4 mt-4">
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="text-lg font-bold text-gray-800">Bonus Point Rules</h3>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFormData({
+                      ...formData,
+                      bonusRules: [
+                        ...formData.bonusRules,
+                        { type: 'player', condition: 'vs_average', threshold: 50, points: 1 }
+                      ]
+                    });
+                  }}
+                  className="px-3 py-1 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 font-semibold text-sm"
+                >
+                  + Add Rule
+                </button>
+              </div>
+              <p className="text-sm text-gray-600 mb-3">
+                Configure bonus points awarded during games. Rules are evaluated in order (highest points first).
+              </p>
+              
+              <div className="space-y-3">
+                {formData.bonusRules.map((rule, index) => (
+                  <div key={index} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                    <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-600 mb-1">Apply To</label>
+                        <select
+                          value={rule.type}
+                          onChange={(e) => {
+                            const updated = [...formData.bonusRules];
+                            updated[index].type = e.target.value;
+                            // Force condition to pure_score when switching to team
+                            if (e.target.value === 'team') {
+                              updated[index].condition = 'pure_score';
+                            }
+                            setFormData({ ...formData, bonusRules: updated });
+                          }}
+                          className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
+                        >
+                          <option value="player">Player</option>
+                          <option value="team">Team</option>
+                        </select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-600 mb-1">Condition</label>
+                        <select
+                          value={rule.condition}
+                          onChange={(e) => {
+                            const updated = [...formData.bonusRules];
+                            updated[index].condition = e.target.value;
+                            setFormData({ ...formData, bonusRules: updated });
+                          }}
+                          className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
+                          disabled={rule.type === 'team'}
+                        >
+                          {rule.type === 'player' && (
+                            <option value="vs_average">Score vs Average</option>
+                          )}
+                          <option value="pure_score">Score</option>
+                        </select>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-600 mb-1">
+                          {rule.condition === 'vs_average' ? 'Above Avg' : 'Min Score'}
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="300"
+                          value={rule.threshold}
+                          onChange={(e) => {
+                            const updated = [...formData.bonusRules];
+                            updated[index].threshold = parseInt(e.target.value) || 0;
+                            setFormData({ ...formData, bonusRules: updated });
+                          }}
+                          className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-600 mb-1">Points</label>
+                        <input
+                          type="number"
+                          min="1"
+                          max="10"
+                          value={rule.points}
+                          onChange={(e) => {
+                            const updated = [...formData.bonusRules];
+                            updated[index].points = parseInt(e.target.value) || 1;
+                            setFormData({ ...formData, bonusRules: updated });
+                          }}
+                          className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
+                        />
+                      </div>
+                      
+                      <div className="flex items-end">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = formData.bonusRules.filter((_, i) => i !== index);
+                            setFormData({ ...formData, bonusRules: updated });
+                          }}
+                          className="w-full px-2 py-1.5 bg-red-100 text-red-700 rounded hover:bg-red-200 font-semibold text-sm"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-2 text-xs text-gray-600">
+                      {rule.type === 'player' ? '👤 Player' : '👥 Team'} gets <strong>+{rule.points} point{rule.points !== 1 ? 's' : ''}</strong> when scoring{' '}
+                      {rule.condition === 'vs_average' 
+                        ? `${rule.threshold}+ pins above average`
+                        : `${rule.threshold}+ pins total`
+                      }
+                    </div>
+                  </div>
+                ))}
+                
+                {formData.bonusRules.length === 0 && (
+                  <div className="text-center py-4 text-gray-500 text-sm">
+                    No bonus rules configured. Click "Add Rule" to create one.
+                  </div>
+                )}
+              </div>
+            </div>
+
             <div className="flex items-center">
               <input
                 type="checkbox"

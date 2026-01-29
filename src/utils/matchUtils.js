@@ -31,7 +31,7 @@ export const createEmptyMatch = (matchNumber, playersPerTeam = 4) => {
   };
 };
 
-export const calculateBonusPoints = (score, average, isAbsent) => {
+export const calculateBonusPoints = (score, average, isAbsent, bonusRules = null) => {
   // Absent players cannot earn bonus points
   if (isAbsent) return 0;
   
@@ -39,8 +39,30 @@ export const calculateBonusPoints = (score, average, isAbsent) => {
   const scoreNum = parseInt(score);
   const avgNum = parseInt(average);
   
-  if (scoreNum >= avgNum + 70) return 2;
-  if (scoreNum >= avgNum + 50) return 1;
+  // Use custom bonus rules if provided, otherwise use default
+  const rules = bonusRules || [
+    { type: 'player', condition: 'vs_average', threshold: 70, points: 2 },
+    { type: 'player', condition: 'vs_average', threshold: 50, points: 1 }
+  ];
+  
+  // Filter for player bonuses only and sort by points descending to award highest first
+  const playerRules = rules
+    .filter(r => r.type === 'player')
+    .sort((a, b) => b.points - a.points);
+  
+  // Check each rule and return the first (highest) bonus that applies
+  for (const rule of playerRules) {
+    if (rule.condition === 'vs_average') {
+      if (scoreNum >= avgNum + rule.threshold) {
+        return rule.points;
+      }
+    } else if (rule.condition === 'pure_score') {
+      if (scoreNum >= rule.threshold) {
+        return rule.points;
+      }
+    }
+  }
+  
   return 0;
 };
 

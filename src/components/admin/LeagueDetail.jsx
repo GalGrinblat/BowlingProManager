@@ -258,6 +258,8 @@ const SeasonCreator = ({ league, onCancel, onSuccess }) => {
     playersPerTeam: league.defaultPlayersPerTeam,
     numberOfRounds: 1,
     handicapBasis: league.defaultHandicapBasis,
+    matchesPerGame: league.defaultMatchesPerGame || 3,
+    bonusRules: league.bonusRules || [],
     startDate: new Date().toISOString().split('T')[0]
   });
 
@@ -370,6 +372,22 @@ const SeasonCreator = ({ league, onCancel, onSuccess }) => {
               onChange={(e) => setFormData({ ...formData, handicapBasis: parseInt(e.target.value) })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Matches per Game
+            </label>
+            <input
+              type="number"
+              min="1"
+              max="5"
+              value={formData.matchesPerGame}
+              onChange={(e) => setFormData({ ...formData, matchesPerGame: parseInt(e.target.value) })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Number of matches in each game
+            </p>
           </div>
           <div className="md:col-span-2">
             <label className="block text-sm font-semibold text-gray-700 mb-2">

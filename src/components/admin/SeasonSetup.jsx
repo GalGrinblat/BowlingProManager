@@ -83,12 +83,19 @@ export const SeasonSetup = ({ seasonId, onBack }) => {
               };
             });
 
+            // Create empty matches based on season configuration
+            const emptyMatches = Array.from({ length: season.matchesPerGame }, (_, i) => 
+              createEmptyMatch(i + 1, season.playersPerTeam)
+            );
+
             gamesApi.create({
               seasonId: season.id,
               round: daySchedule.round,
               matchDay: daySchedule.matchDay,
               team1Id: team1.id,
               team2Id: team2.id,
+              bonusRules: season.bonusRules,
+              matchesPerGame: season.matchesPerGame,
               team1: {
                 name: team1.name,
                 players: team1Players
@@ -97,7 +104,7 @@ export const SeasonSetup = ({ seasonId, onBack }) => {
                 name: team2.name,
                 players: team2Players
               },
-              matches: [],
+              matches: emptyMatches,
               grandTotalPoints: { team1: 0, team2: 0 }
             });
           }

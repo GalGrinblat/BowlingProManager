@@ -24,14 +24,21 @@ export const createLeague = ({
   description = '',
   defaultHandicapBasis = 160,
   defaultPlayersPerTeam = 4,
+  defaultMatchesPerGame = 3,
   dayOfWeek = '',
+  bonusRules = [],
   active = true
 }) => ({
   name,
   description,
   defaultHandicapBasis: parseInt(defaultHandicapBasis) || 160,
   defaultPlayersPerTeam: parseInt(defaultPlayersPerTeam) || 4,
+  defaultMatchesPerGame: parseInt(defaultMatchesPerGame) || 3,
   dayOfWeek,
+  bonusRules: bonusRules.length > 0 ? bonusRules : [
+    { type: 'player', condition: 'vs_average', threshold: 50, points: 1 },
+    { type: 'player', condition: 'vs_average', threshold: 70, points: 2 }
+  ],
   active
 });
 
@@ -43,6 +50,8 @@ export const createSeason = ({
   playersPerTeam = 4,
   numberOfRounds = 1,
   handicapBasis = 160,
+  matchesPerGame = 3,
+  bonusRules = [],
   startDate = null,
   endDate = null
 }) => ({
@@ -52,6 +61,8 @@ export const createSeason = ({
   playersPerTeam: parseInt(playersPerTeam) || 4,
   numberOfRounds: parseInt(numberOfRounds) || 1,
   handicapBasis: parseInt(handicapBasis) || 160,
+  matchesPerGame: parseInt(matchesPerGame) || 3,
+  bonusRules,
   startDate: startDate || new Date().toISOString(),
   endDate,
   status: 'setup', // setup, active, completed

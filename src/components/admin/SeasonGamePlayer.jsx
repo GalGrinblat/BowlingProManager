@@ -43,11 +43,10 @@ export const SeasonGamePlayer = ({ gameId, onBack }) => {
     // Initialize matches if empty or not present
     if (!gameData.matches || gameData.matches.length === 0) {
       const playersPerTeam = gameData.team1.players.length;
-      gameData.matches = [
-        createEmptyMatch(1, playersPerTeam),
-        createEmptyMatch(2, playersPerTeam),
-        createEmptyMatch(3, playersPerTeam)
-      ];
+      const matchCount = gameData.matchesPerGame || 3;
+      gameData.matches = Array.from({ length: matchCount }, (_, i) => 
+        createEmptyMatch(i + 1, playersPerTeam)
+      );
       // Save the initialized matches
       gamesApi.update(gameId, gameData);
     }
@@ -82,11 +81,11 @@ export const SeasonGamePlayer = ({ gameId, onBack }) => {
     const pinsValue = pins === '' ? '' : Math.max(0, Math.min(300, parseInt(pins) || 0));
     updated.matches[matchIndex][team].players[playerIndex].pins = pinsValue;
     
-    // Calculate bonus points for this player
+    // Calculate bonus points for this player using season bonus rules
     const playerAverage = updated[team].players[playerIndex].average;
     const isAbsent = updated[team].players[playerIndex].absent;
     updated.matches[matchIndex][team].players[playerIndex].bonusPoints = 
-      calculateBonusPoints(pinsValue, playerAverage, isAbsent);
+      calculateBonusPoints(pinsValue, playerAverage, isAbsent, game.bonusRules);
     
     calculateMatchResults(updated, matchIndex);
     calculateGrandTotalPoints(updated);
@@ -137,7 +136,8 @@ export const SeasonGamePlayer = ({ gameId, onBack }) => {
       return;
     }
     
-    if (currentMatch < 3) {
+    const totalMatches = game.matches.length;
+    if (currentMatch < totalMatches) {
       setCurrentMatch(currentMatch + 1);
     } else {
       setShowSummary(true);
@@ -147,7 +147,7 @@ export const SeasonGamePlayer = ({ gameId, onBack }) => {
   const goToPreviousMatch = () => {
     if (showSummary) {
       setShowSummary(false);
-      setCurrentMatch(3);
+      setCurrentMatch(game.matches.length);
     } else if (currentMatch > 1) {
       setCurrentMatch(currentMatch - 1);
     }

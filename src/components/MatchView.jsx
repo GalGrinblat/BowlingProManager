@@ -4,16 +4,17 @@ import { ArrowLeft, ArrowRight, Star } from './Icons';
 export function MatchView({ matchNumber, game, onUpdateScore, onNavigate, onCancel, isReadOnly = false }) {
   const matchIndex = matchNumber - 1;
   const match = game.matches[matchIndex];
+  const totalMatches = game.matches.length;
   
   return (
     <div className="scorecard rounded-xl p-6 md:p-8 mb-8 animate-slide-in">
       <div className="flex items-center justify-between mb-6">
         <div className="bowling-title text-white text-3xl">
-          MATCH {matchNumber} OF 3
+          MATCH {matchNumber} OF {totalMatches}
           {isReadOnly && <span className="text-sm ml-3 text-yellow-400">(Read Only)</span>}
         </div>
         <div className="flex gap-2">
-          {[1, 2, 3].map(num => (
+          {Array.from({ length: totalMatches }, (_, i) => i + 1).map(num => (
             <div key={num} className={`w-3 h-3 rounded-full ${num === matchNumber ? 'bg-orange-500' : 'bg-gray-600'}`} />
           ))}
         </div>
