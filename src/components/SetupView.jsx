@@ -58,8 +58,8 @@ export function SetupView({ game, onTeamNameChange, onPlayerNameChange, onPlayer
               if (a.average === '') return 1;
               if (b.average === '') return -1;
               return parseInt(b.average) - parseInt(a.average);
-            }).map((player, idx) => (
-              <div key={idx} className={`bg-white rounded-lg p-3 shadow-sm ${player.absent ? 'opacity-60 bg-gray-100' : ''}`}>
+            }).map((player) => (
+              <div key={player.rank} className={`bg-white rounded-lg p-3 shadow-sm ${player.absent ? 'opacity-60 bg-gray-100' : ''}`}>
                 <div className="flex items-center gap-2 mb-2">
                   <div className="bg-orange-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">
                     {player.rank}
@@ -67,7 +67,7 @@ export function SetupView({ game, onTeamNameChange, onPlayerNameChange, onPlayer
                   <input
                     type="text"
                     value={player.name}
-                    onChange={(e) => onPlayerNameChange('team1', idx, e.target.value)}
+                    onChange={(e) => onPlayerNameChange('team1', game.team1.players.indexOf(player), e.target.value)}
                     placeholder="Player name"
                     className="flex-1 px-3 py-2 border border-gray-300 rounded focus:border-orange-500 focus:outline-none font-semibold"
                   />
@@ -75,7 +75,7 @@ export function SetupView({ game, onTeamNameChange, onPlayerNameChange, onPlayer
                     <input
                       type="checkbox"
                       checked={player.absent}
-                      onChange={() => onToggleAbsent('team1', idx)}
+                      onChange={() => onToggleAbsent('team1', game.team1.players.indexOf(player))}
                       className="w-4 h-4 text-orange-600 border-gray-300 rounded"
                     />
                     <span className="text-xs font-semibold text-gray-600">Absent</span>
@@ -87,7 +87,7 @@ export function SetupView({ game, onTeamNameChange, onPlayerNameChange, onPlayer
                     <input
                       type="number"
                       value={player.average}
-                      onChange={(e) => onPlayerAverageChange('team1', idx, e.target.value)}
+                      onChange={(e) => onPlayerAverageChange('team1', game.team1.players.indexOf(player), e.target.value)}
                       onKeyDown={(e) => ['-', '+', 'e', 'E'].includes(e.key) && e.preventDefault()}
                       placeholder="0-300"
                       min="0"
@@ -118,8 +118,8 @@ export function SetupView({ game, onTeamNameChange, onPlayerNameChange, onPlayer
               if (a.average === '') return 1;
               if (b.average === '') return -1;
               return parseInt(b.average) - parseInt(a.average);
-            }).map((player, idx) => (
-              <div key={idx} className={`bg-white rounded-lg p-3 shadow-sm ${player.absent ? 'opacity-60 bg-gray-100' : ''}`}>
+            }).map((player) => (
+              <div key={player.rank} className={`bg-white rounded-lg p-3 shadow-sm ${player.absent ? 'opacity-60 bg-gray-100' : ''}`}>
                 <div className="flex items-center gap-2 mb-2">
                   <div className="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">
                     {player.rank}
@@ -127,7 +127,7 @@ export function SetupView({ game, onTeamNameChange, onPlayerNameChange, onPlayer
                   <input
                     type="text"
                     value={player.name}
-                    onChange={(e) => onPlayerNameChange('team2', idx, e.target.value)}
+                    onChange={(e) => onPlayerNameChange('team2', game.team2.players.indexOf(player), e.target.value)}
                     placeholder="Player name"
                     className="flex-1 px-3 py-2 border border-gray-300 rounded focus:border-blue-500 focus:outline-none font-semibold"
                   />
@@ -135,7 +135,7 @@ export function SetupView({ game, onTeamNameChange, onPlayerNameChange, onPlayer
                     <input
                       type="checkbox"
                       checked={player.absent}
-                      onChange={() => onToggleAbsent('team2', idx)}
+                      onChange={() => onToggleAbsent('team2', game.team2.players.indexOf(player))}
                       className="w-4 h-4 text-blue-600 border-gray-300 rounded"
                     />
                     <span className="text-xs font-semibold text-gray-600">Absent</span>
@@ -147,7 +147,7 @@ export function SetupView({ game, onTeamNameChange, onPlayerNameChange, onPlayer
                     <input
                       type="number"
                       value={player.average}
-                      onChange={(e) => onPlayerAverageChange('team2', idx, e.target.value)}
+                      onChange={(e) => onPlayerAverageChange('team2', game.team2.players.indexOf(player), e.target.value)}
                       onKeyDown={(e) => ['-', '+', 'e', 'E'].includes(e.key) && e.preventDefault()}
                       placeholder="0-300"
                       min="0"
