@@ -1,6 +1,6 @@
-# Bowling League App
+# Bowling League Scoring App
 
-A comprehensive 3-match bowling league scoring application built with React and Tailwind CSS.
+A comprehensive 3-match bowling league scoring application built with React, Vite, and Tailwind CSS. Features automatic handicap calculation, multi-layer bonus point system, and real-time match scoring with absent player support.
 
 ## Project Structure
 
@@ -31,18 +31,136 @@ BowlingAppAi/
 
 ## Features
 
-- **Game Setup**: Create teams and add player averages
-- **Automatic Handicap Calculation**: Based on player averages (160-pin standard)
-- **3-Match Scoring**: Track scores across three matches
-- **Bonus Points System**: 
+- **Team Setup**: 
+  - Pre-configured team options with player rosters
+  - Manual player name and average entry
+  - Absent player handling (auto-scores as average - 10)
+  - Automatic handicap calculation (160-pin standard)
+  
+- **3-Match Scoring System**: 
+  - Individual game tracking (4 players per team)
+  - Real-time score entry with validation (0-300 pins)
+  - Live calculation of pins with handicap
+  - Visual winner indicators per game
+  
+- **Multi-Layer Bonus Points**: 
   - +1 point for scoring 50+ pins above average
   - +2 points for scoring 70+ pins above average
-- **Comprehensive Statistics**:
-  - Individual player totals and 3-game averages
-  - Team statistics and totals
-  - Game-by-game breakdown
-- **Winner Determination**: Based on total pins with handicap
-- **Game History**: Save and track completed games
+### Per-Match Scoring
+1. **Individual Game Points** (4 games per match):
+   - Each player competes against their rank counterpart (1 vs 1, 2 vs 2, etc.)
+   - Score = pins + handicap
+   - Win = 1 point, Draw = 0.5 points, Loss = 0 points
+
+2. **Per-Player Bonus Points**:
+   - +1 point if score ≥ average + 50 pins
+   -Development Setup
+```bash
+# Install dependencies
+npm install
+
+# Start development server (http://localhost:5173)
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+```
+
+### Technology Stack
+- **React 18** - UI framework
+- **Vite** - Build tool and dev server
+- **Tailwind CSS 3** - Utility-first styling
+- **PostCSS** - CSS processing
+   - Match Score = Game Points + Bonus Points + Match Winner Bonus
+
+### Grand Total Bonus
+- After all 3 matches complete:
+  - +2 points to team with highest combined raw pins (no handicap)
+  - +1 point each if tied
+Architecture
+
+### Component Hierarchy
+- **App.jsx** - Root component with state management and view routing
+  - **Header.jsx** - App title and branding
+  - **StartView.jsx** - Landing page
+  - **SetupView.jsx** - Team and player configuration with absent toggle
+  - **MatchView.jsx** - Reusable match scoring interface (used 3 times)
+  - **SummaryView.jsx** - Final results and statistics display
+  - **Icons.jsx** - Reusable SVG icon components
+
+### Utility Modules
+- **gameUtils.js** - Game initialization, setup validation, match completion checks
+- **matchUtils.js** - Core scoring logic:
+  - Individual game comparisons
+  - Bonus point calculations
+  **Tailwind CSS** - Utility-first responsive design
+- **Custom Animations** - Slide-in transitions and hover effects
+- **Color Themes**:
+  - Orange/Red gradients for Team 1
+  - Blue/Indigo gradients for Team 2
+  - Dark gray backgrounds for scoring cards
+  - Yellow highlights for bonus points
+- **Typography** - Custom "bowling-title" font class
+- **Responsive Grid** - Adapts to mobile and desktop layouts
+
+## Input Validation
+
+All numeric inputs include:
+- Min/max constraints (0-300 for pins, 0-300 for averages)
+- Keyboard prevention for `-`, `+`, `e`, `E` characters
+- Auto-clamping on onChange events
+- Empty string handling (treated as 0 in calculations)
+
+## Browser Support
+
+- Modern browsers with ES6+ support
+- Chrome, Firefox, Safari, Edge (latest versions)
+- Mobile browsers (iOS Safari, Chrome Mobile)
+
+## Development Notes
+
+- Uses React functional components with hooks
+- Pure utility functions for easy testing
+- Immutable state updates for React optimization
+- No external state management library needed
+- All calculations happen synchronously in the UI
+
+## Known Limitations
+
+- No persistent storage (state resets on page refresh)
+- Maximum of 4 players per team (hardcoded)
+- Fixed 3-match format
+- Single active game at a time
+
+## Future Enhancements
+
+- [ ] localStorage for game persistence
+- [ ] Game history with replay capability
+- [ ] Export results to PDF/Excel
+- [ ] League standings across multiple games
+- [ ] Configurable team sizes (3-5 players)
+- [ ] Variable match counts (1-5 matches)
+- [ ] Player statistics over time
+- [ ] Dark mode toggle for entire app
+{
+  team1: { name, players: [{ name, average, handicap, absent, rank }] },
+  team2: { name, players: [...] },
+  matches: [
+    {
+      matchNumber,
+      team1: { score, totalPins, totalWithHandicap, bonusPoints, players: [{ pins, bonusPoints }] },
+      team2: { ... },
+      games: [{ player, result, team1Points, team2Points }]
+    }
+  ],
+  totalScoreBonus: { team1, team2 }
+}
+```
+  - Animated transitions between views
+  - Input validation preventing invalid characters
 
 ## Scoring Rules
 
