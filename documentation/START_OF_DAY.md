@@ -1,9 +1,62 @@
 # 🎳 Start of Day - Quick Reference
 
-## Run the Check
+## Quick Start
+
+Run one of these commands at the beginning of your development session:
+
+### Windows PowerShell (Recommended for Windows)
+```powershell
+npm run check:ps
+```
+
+### Node.js (Cross-platform)
 ```bash
 npm run check
 ```
+
+### Direct Execution
+```powershell
+# PowerShell
+.\scripts\start-of-day.ps1
+
+# Node.js
+node scripts/start-of-day.js
+```
+
+## What It Checks
+
+### 1. Environment Setup ✅
+- Node.js version
+- NPM version
+- Current working directory
+
+### 2. Git Status 📝
+- Uncommitted changes
+- Unpushed commits
+- Working directory cleanliness
+
+### 3. Dependencies 📦
+- Security vulnerabilities (`npm audit`)
+- Outdated packages (`npm outdated`)
+- Helps maintain up-to-date dependencies
+
+### 4. Code Quality 🔍
+- **Console.log statements** - Find leftover debugging code
+- **TODO/FIXME comments** - Track unfinished work
+- **Large files (>500 lines)** - Identify refactoring candidates
+- **localStorage Health** - Check for localStorage usage consistency
+- **Component Complexity** - Identify components with too many lines
+- **Unused Imports** - Find unused dependencies in files
+- **Bundle Size** - Monitor production build size
+- **API Consistency** - Ensure API calls follow patterns
+
+### 5. Tests 🧪
+- Run test suite (when tests exist)
+- Verify all tests pass before starting work
+
+### 6. Project Structure 📁
+- Count source files
+- Verify project integrity
 
 ## What You'll See
 
@@ -117,6 +170,55 @@ npm audit fix
 
 # Force fix (may break things)
 npm audit fix --force
+```
+
+## Exit Codes
+
+- `0` - All checks passed
+- `1+` - Number of errors found (warnings don't cause failure)
+
+## Customization
+
+### Add Your Own Checks
+
+Edit `scripts/start-of-day.js` or `scripts/start-of-day.ps1` to add custom checks:
+
+```javascript
+// Example: Check for specific patterns
+section('Custom Check');
+const results = searchFiles(/URGENT:/);
+if (results.length > 0) {
+  warning(`Found ${results.length} urgent items`);
+}
+```
+
+## Troubleshooting
+
+### "Execution Policy Error" (PowerShell)
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+```
+
+### "Permission Denied" (Node.js)
+```bash
+chmod +x scripts/start-of-day.js
+```
+
+### Git Commands Fail
+- Ensure you're in a git repository
+- Check git is installed and in PATH
+
+### NPM Commands Hang
+- Check internet connection
+- Clear npm cache: `npm cache clean --force`
+
+## Integration with CI/CD
+
+You can add this to your GitHub Actions workflow:
+
+```yaml
+- name: Start of Day Checks
+  run: npm run check
 ```
 
 ## Keyboard Shortcuts
