@@ -4,6 +4,11 @@
 
 This is a **comprehensive bowling league management system** with multi-league support, season tracking, and an n-match scoring system (configurable matches per game) with handicap calculations and multi-layered bonus points.
 
+### Critical Features (Must Always Work)
+1. **Player Registry**: Centralized player management with unique IDs
+2. **Scoring System**: Multi-layer point calculations with configurable rules
+3. **Data Export**: Backup and restore functionality
+
 ### System Hierarchy
 ```
 Organization
@@ -72,6 +77,7 @@ Organization
   - Roster substitutions tracked in team.rosterChanges array
   - Each change logged with date, old/new player info, position
   - Absent players handled per-game via "absent" checkbox (score = average - 10)
+  - When both players in a matchup are absent: always a draw, each gets 50% of gameWinPoints
   - TeamManagement component provides UI for substitutions
 
 ### Standings Calculation
@@ -109,7 +115,13 @@ authApi.{ getCurrentUser, login, logout, isAdmin }
 - **LeagueDetail**: View league, seasons, navigate
 - **SeasonSetup**: Assign players to teams, generate schedule
 - **SeasonDashboard**: View schedule, standings, select games
+- **TeamManagement**: Manage roster substitutions and team changes
 - **SeasonGamePlayer**: Wrapper around MatchView for season games
+- **Settings**: Data export/import, organization settings
+
+### Player Portal
+- **PlayerDashboard**: Player home, view stats, leagues, upcoming games
+- **PlayerSeasonComparison**: Compare performance across seasons with charts
 
 ### Game Components
 - **MatchView**: Multi-match scoring interface
@@ -161,9 +173,45 @@ const schedule = generateRoundRobinSchedule(teamIds, numberOfRounds);
 - **Start dev**: `npm run dev` (Vite hot reload)
 - **Build**: `npm run build` (Vite output to dist/)
 - **Preview**: `npm run preview` (serve dist/ locally)
+- **Test**: `npm test` (runs all test files in tests/ folder)
 - **Styling**: Tailwind CSS + custom `globals.css` (dark scoring cards, light UI)
 - **Data**: Stored in localStorage (dev), browser DevTools to inspect
 - **Clear data**: `localStorage.clear()` in browser console
+
+### Testing Conventions
+- **Location**: All tests in `tests/` folder
+- **Naming**: `test-[feature].js` (e.g., `test-scoring.js`, `test-validation.js`)
+- **Pattern**: Node.js scripts with console output (no test framework)
+- **Structure**:
+  ```javascript
+  // Import modules being tested
+  const { functionToTest } = require('../src/utils/someUtils');
+  
+  console.log('✅ Testing Feature Name\n');
+  console.log('='.repeat(80));
+  
+  let passed = 0, failed = 0;
+  
+  // Test 1
+  console.log('✅ Test 1: Description');
+  console.log('   Should [expected behavior]\n');
+  // ... test logic ...
+  
+  // Results summary
+  console.log('='.repeat(80));
+  console.log(`\nResults: ${passed} passed, ${failed} failed out of ${passed + failed} tests`);
+  console.log(failed === 0 ? '✅ All tests passed!' : '❌ Some tests failed');
+  process.exit(failed > 0 ? 1 : 0);
+  ```
+- **Adding New Tests**: 
+  1. Create `tests/test-[feature].js` following the pattern above
+  2. Add to package.json test script: `"test": "node tests/test-validation.js && node tests/test-scoring.js && node tests/test-schedule.js && node tests/test-handicap.js && node tests/test-[feature].js"`
+  3. Run `npm test` to verify all tests pass
+- **Current Test Files** (54 tests total):
+  - `test-validation.js` (15 tests) - Data model validation
+  - `test-scoring.js` (21 tests) - Scoring system and configurable points
+  - `test-schedule.js` (10 tests) - Round-robin scheduling
+  - `test-handicap.js` (8 tests) - Handicap calculations
 
 ## When Adding Features
 
@@ -173,12 +221,16 @@ const schedule = generateRoundRobinSchedule(teamIds, numberOfRounds);
 4. **New statistic?** → Add to [standingsUtils.js](../src/utils/standingsUtils.js)
 5. **Schedule changes?** → Modify [scheduleUtils.js](../src/utils/scheduleUtils.js)
 6. **Scoring changes?** → Update [matchUtils.js](../src/utils/matchUtils.js) - test thoroughly!
+7. **Head-to-head stats?** → Update [headToHeadUtils.js](../src/utils/headToHeadUtils.js)
+8. **Export functionality?** → Update [exportUtils.js](../src/utils/exportUtils.js)
+9. **Player statistics?** → Update [statsUtils.js](../src/utils/statsUtils.js)
+10. **Pagination needed?** → Use [Pagination.jsx](../src/components/Pagination.jsx) component
 
 ## Known Features & Behaviors
 
 ### User Roles
 - **Admin**: Full CRUD on players, leagues, seasons, teams; can record games
-- **Player**: View standings, record scores for their own games (coming soon)
+- **Player**: View standings, record scores for their own games, view personal statistics and game history
 
 ### Season Lifecycle
 1. **Setup Phase**: Create teams, assign players, configure rules
@@ -189,17 +241,14 @@ const schedule = generateRoundRobinSchedule(teamIds, numberOfRounds);
 - Players can be in multiple leagues/seasons simultaneously
 - Deleting league/season requires no active games
 - Team assignments are season-specific
-- Games link to teams via IDs, store full player data for historical accuracy
+- Games link to teams and players via unique IDs, displaying current player data from registry
+- Each player has a unique ID maintained throughout their history
 
 ## Future Enhancements (Roadmap)
 
-1. **Player Portal**: Login, view personal stats, enter scores
-2. **Advanced Stats**: Strike rates, spare conversion, consistency metrics
-3. **Playoff System**: Bracket generation for top teams
-4. **Export/Import**: Download season data, share results
-5. **Database Migration**: Move from localStorage to persistent backend
-6. **Mobile Optimization**: Better responsive design for score entry
-7. **Real-time Updates**: WebSocket support for live scoring
+1. **Database Migration**: Move from localStorage to persistent backend (HIGH PRIORITY - near-term)
+2. **Advanced Stats**: Strike rates, spare conversion, consistency metrics (low priority)
+3. **Mobile Optimization**: Better responsive design for score entry
 
 ## Known Edge Cases
 
