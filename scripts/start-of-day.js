@@ -243,16 +243,35 @@ async function startOfDay() {
 
   // Step 5: Tests
   section('Step 5: Test Status');
-  const hasTests = fs.existsSync('src') && 
-    fs.readdirSync('src', { recursive: true }).some(f => f.endsWith('.test.js'));
+  const hasTestsDir = fs.existsSync('tests');
+  let testFiles = [];
   
-  if (hasTests) {
+  if (hasTestsDir) {
+    testFiles = fs.readdirSync('tests').filter(f => 
+      f.startsWith('test-') && f.endsWith('.js')
+    );
+  }
+  
+  if (testFiles.length > 0) {
+    info(`Found ${testFiles.length} test file(s)`);
+    testFiles.forEach(file => info(`  - ${file}`));
+    
     info('Running tests...');
-    const testResult = run('npm test');
-    if (testResult === null) {
-      error('Tests failed');
+    let allTestsPassed = true;
+    
+    for (const testFile of testFiles) {
+      info(`Running ${testFile}...`);
+      const testResult = run(`node tests/${testFile}`, { silent: true });
+      if (testResult === null) {
+        error(`${testFile} failed`);
+        allTestsPassed = false;
+      }
+    }
+    
+    if (allTestsPassed) {
+      success('All tests passed');
     } else {
-      success('Tests passed');
+      error('Some tests failed');
     }
   } else {
     warning('No tests found. Consider adding test coverage.');
