@@ -18,12 +18,16 @@ A comprehensive bowling league management system built with React, Vite, and Tai
 - Role-based authentication (Admin/Player)
 - Mobile-responsive design
 - localStorage persistence with DB-agnostic API
+- Player portal with self-service score entry
+- Pagination for large datasets (players, games)
+- Head-to-head statistics and matchup tracking
+- Season comparison view with performance charts
+- Data import/export (CSV/JSON)
 
 ### Future Enhancements 🚀
-- Player portal for self-service score entry
 - Advanced statistics (strike rates, spare conversion, consistency metrics)
 - Playoff bracket generation for top teams
-- Export to PDF/Excel formats
+- Export to PDF format
 - Backend database migration (Supabase, PostgreSQL, Firebase)
 - Real-time updates (WebSocket support)
 - Email notifications for upcoming games
@@ -105,7 +109,7 @@ A comprehensive bowling league management system built with React, Vite, and Tai
 
 ### Authentication & Roles
 - **Admin Role**: Full CRUD on players, leagues, seasons, teams; record games
-- **Player Role**: View personal stats, leagues, and game history (score entry coming soon)
+- **Player Role**: View personal stats, enter scores for own games, compare season performance
 - **Simple Login**: Role-based authentication via AuthContext
 
 ### Data Persistence

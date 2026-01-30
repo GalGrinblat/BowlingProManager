@@ -256,9 +256,8 @@ export const PlayerRegistry = ({ onBack }) => {
         {activePlayers.length === 0 ? (
           <p className="text-gray-500 text-center py-8">No active players</p>
         ) : (
-          <>
-            <div className="p-6 space-y-2">
-              {paginatedActivePlayers.map(player => (
+          <div className="p-6 space-y-2">
+            {paginatedActivePlayers.map(player => (
               <div
                 key={player.id}
                 className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors"
@@ -289,14 +288,13 @@ export const PlayerRegistry = ({ onBack }) => {
                 </div>
               </div>
             ))}
+            <Pagination
+              currentPage={activePagination.currentPage}
+              totalItems={activePlayers.length}
+              itemsPerPage={activePagination.itemsPerPage}
+              onPageChange={activePagination.setCurrentPage}
+            />
           </div>
-          <Pagination
-            currentPage={activePagination.currentPage}
-            totalItems={activePlayers.length}
-            itemsPerPage={activePagination.itemsPerPage}
-            onPageChange={activePagination.setCurrentPage}
-          />
-        </>
         )}
       </div>
 
