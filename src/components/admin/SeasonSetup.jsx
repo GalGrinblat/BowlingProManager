@@ -112,6 +112,9 @@ export const SeasonSetup = ({ seasonId, onBack }) => {
               team2Id: team2.id,
               bonusRules: season.bonusRules,
               matchesPerGame: season.matchesPerGame,
+              gameWinPoints: season.gameWinPoints || 1,
+              matchWinPoints: season.matchWinPoints || 1,
+              grandTotalPoints: season.grandTotalPoints || 2,
               team1: {
                 name: team1.name,
                 players: team1Players
@@ -121,7 +124,7 @@ export const SeasonSetup = ({ seasonId, onBack }) => {
                 players: team2Players
               },
               matches: emptyMatches,
-              grandTotalPoints: { team1: 0, team2: 0 }
+              grandTotalScore: { team1: 0, team2: 0 }
             });
           }
         });

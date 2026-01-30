@@ -46,11 +46,17 @@ Complete transformation from a single-game scoring app to a comprehensive multi-
   - Team score bonuses
   - Dynamic add/remove rules
   - Custom thresholds and points
+- [x] Configurable point values system:
+  - Game Win Points (default: 1)
+  - Match Win Points (default: 1)
+  - Grand Total Points (default: 2)
+  - Auto 50% for draws
 
 ### Game Scoring ✅
 - [x] Dynamic match count (1-5 matches)
 - [x] Individual game tracking with handicap
 - [x] Configurable bonus point calculations
+- [x] Configurable game/match/grand total points
 - [x] Absent player handling (avg - 10)
 - [x] Real-time score validation
 - [x] Match winner determination

@@ -71,6 +71,9 @@ export const calculateGameTotals = (game) => {
 };
 
 export const calculateGrandTotalPoints = (game) => {
+  // Get configurable grand total points (defaults to 2 if not set)
+  const grandTotalPoints = game.grandTotalPoints || 2;
+  
   // Check if all matches are complete (accounting for absent players)
   const allMatchesComplete = game.matches.every((m, matchIdx) => {
     const team1Complete = game.team1.players.every((p, idx) => p.absent || m.team1.players[idx].pins !== '');
@@ -84,17 +87,17 @@ export const calculateGrandTotalPoints = (game) => {
     const team2GrandTotal = game.matches.reduce((sum, m) => sum + m.team2.totalWithHandicap, 0);
     
     if (team1GrandTotal > team2GrandTotal) {
-      game.grandTotalPoints.team1 = 2;
-      game.grandTotalPoints.team2 = 0;
-    } else if (team2GrandTotal > team1GrandTotal) {
-      game.grandTotalPoints.team1 = 0;
-      game.grandTotalPoints.team2 = 2;
+      game.grandTotalPoints.team1 = grandTotalPoints;
+      game.grandTotalScore.team2 = 0;
+    } else if (team2Total > team1Total) {
+      game.grandTotalScore.team1 = 0;
+      game.grandTotalScore.team2 = grandTotalPoints;
     } else {
-      game.grandTotalPoints.team1 = 1;
-      game.grandTotalPoints.team2 = 1;
+      game.grandTotalPoints.team1 = grandTotalPoints / 2;
+      game.grandTotalScore.team2 = grandTotalPoints / 2;
     }
   } else {
-    game.grandTotalPoints.team1 = 0;
-    game.grandTotalPoints.team2 = 0;
+    game.grandTotalScore.team1 = 0;
+    game.grandTotalScore.team2 = 0;
   }
 };

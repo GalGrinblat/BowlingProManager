@@ -163,7 +163,8 @@ Organization
 1. **Individual Game Points** (configurable players per team, default 4):
    - Each player competes against their rank counterpart (1 vs 1, 2 vs 2, etc.)
    - Score = pins + handicap
-   - Win = 1 point, Draw = 0.5 points, Loss = 0 points
+   - **Configurable**: Game Win Points (default: 1)
+   - Win = configured points, Draw = 50% of win points, Loss = 0 points
 
 2. **Per-Player Bonus Points** (configurable):
    - Default: +1 point if score ≥ average + 50 pins
@@ -171,17 +172,19 @@ Organization
    - Customizable per league with flexible rules
    - Applied individually per player, per match
 
-3. **Match Winner Point**:
-   - +1 point to team with highest total pins (with handicap)
-   - +0.5 points each if total pins tie
+3. **Match Winner Points** (configurable):
+   - **Configurable**: Match Win Points (default: 1)
+   - Awarded to team with highest total pins (with handicap)
+   - Draw = 50% of win points to each team if total pins tie
 
 4. **Match Score Calculation**:
-   - Match Points = Game Points + Bonus Points + Match Winner Point
+   - Match Points = Game Points + Bonus Points + Match Winner Points
 
-### Grand Total Points
+### Grand Total Points (configurable)
 - After all matches complete:
-  - +2 points to team with highest combined pins with handicap across all matches
-  - +1 point each if tied
+  - **Configurable**: Grand Total Points (default: 2)
+  - Awarded to team with highest combined pins with handicap across all matches
+  - Draw = 50% of grand total points to each team if tied
 
 ### Absent Player Rules
 - Absent players automatically score: `average - 10` pins
@@ -350,7 +353,7 @@ Component → API Service → localStorage → API Service → Component
       }]
     }
   ],
-  grandTotalPoints: { team1, team2 },
+  grandTotalScore: { team1, team2 },
   status: 'completed' // pending, in-progress, completed
 }
 ```

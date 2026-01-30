@@ -58,7 +58,7 @@ export function SummaryView({ game, totals, playerStats, onBack, onFinish }) {
               <div className="text-center">
                 <div className="text-white font-bold text-sm mb-1">TOTAL</div>
                 <div className="text-yellow-400 font-bold text-2xl">
-                  {game.grandTotalPoints.team1} - {game.grandTotalPoints.team2}
+                  {game.grandTotalScore.team1} - {game.grandTotalScore.team2}
                 </div>
               </div>
               <div className="text-center">

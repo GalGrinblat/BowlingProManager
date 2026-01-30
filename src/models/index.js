@@ -29,6 +29,9 @@ export const createLeague = ({
   defaultMatchesPerGame = 3,
   dayOfWeek = '',
   bonusRules = [],
+  gameWinPoints = 1,
+  matchWinPoints = 1,
+  grandTotalPoints = 2,
   active = true
 }) => ({
   name,
@@ -43,6 +46,9 @@ export const createLeague = ({
     { type: 'player', condition: 'vs_average', threshold: 50, points: 1 },
     { type: 'player', condition: 'vs_average', threshold: 70, points: 2 }
   ],
+  gameWinPoints: parseFloat(gameWinPoints) || 1,
+  matchWinPoints: parseFloat(matchWinPoints) || 1,
+  grandTotalPoints: parseFloat(grandTotalPoints) || 2,
   active
 });
 
@@ -58,6 +64,9 @@ export const createSeason = ({
   handicapPercentage = 100,
   matchesPerGame = 3,
   bonusRules = [],
+  gameWinPoints = 1,
+  matchWinPoints = 1,
+  grandTotalPoints = 2,
   startDate = null,
   endDate = null
 }) => ({
@@ -71,6 +80,9 @@ export const createSeason = ({
   handicapPercentage: Math.min(100, Math.max(0, parseInt(handicapPercentage) || 100)),
   matchesPerGame: parseInt(matchesPerGame) || 3,
   bonusRules,
+  gameWinPoints: parseFloat(gameWinPoints) || 1,
+  matchWinPoints: parseFloat(matchWinPoints) || 1,
+  grandTotalPoints: parseFloat(grandTotalPoints) || 2,
   startDate: startDate || new Date().toISOString(),
   endDate,
   status: 'setup', // setup, active, completed
@@ -111,7 +123,7 @@ export const createGame = ({
     players: []
   },
   matches: [],
-  grandTotalPoints: { team1: 0, team2: 0 },
+  grandTotalScore: { team1: 0, team2: 0 },
   status: 'pending', // pending, in-progress, completed
   completedAt: null
 });

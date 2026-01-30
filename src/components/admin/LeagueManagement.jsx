@@ -19,6 +19,9 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
       { type: 'player', condition: 'vs_average', threshold: 50, points: 1 },
       { type: 'player', condition: 'vs_average', threshold: 70, points: 2 }
     ],
+    gameWinPoints: 1,
+    matchWinPoints: 1,
+    grandTotalPoints: 2,
     active: true
   });
 
@@ -61,6 +64,9 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
         { type: 'player', condition: 'vs_average', threshold: 50, points: 1 },
         { type: 'player', condition: 'vs_average', threshold: 70, points: 2 }
       ],
+      gameWinPoints: 1,
+      matchWinPoints: 1,
+      grandTotalPoints: 2,
       active: true
     });
     setIsAdding(false);
@@ -81,6 +87,9 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
         { type: 'player', condition: 'vs_average', threshold: 50, points: 1 },
         { type: 'player', condition: 'vs_average', threshold: 70, points: 2 }
       ],
+      gameWinPoints: league.gameWinPoints || 1,
+      matchWinPoints: league.matchWinPoints || 1,
+      grandTotalPoints: league.grandTotalPoints || 2,
       active: league.active
     });
     setEditingId(league.id);
@@ -232,6 +241,59 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
                 </select>
                 <p className="text-xs text-gray-500 mt-1">Day of the week games are played</p>
               </div>
+              </div>
+            </div>
+
+            {/* Point Configuration Section */}
+            <div className="border-t pt-4 mt-4">
+              <h3 className="text-lg font-bold text-gray-800 mb-3">Points Configuration</h3>
+              <p className="text-sm text-gray-600 mb-3">
+                Configure points values for winning games and matches (draws are always 50% of win points)
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Individual Game Win Points
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.5"
+                    value={formData.gameWinPoints}
+                    onChange={(e) => setFormData({ ...formData, gameWinPoints: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Points for winning an individual player vs player game</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Match Winner Points
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.5"
+                    value={formData.matchWinPoints}
+                    onChange={(e) => setFormData({ ...formData, matchWinPoints: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Points for winning a match (higher total pins)</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Grand Total Points
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.5"
+                    value={formData.grandTotalPoints}
+                    onChange={(e) => setFormData({ ...formData, grandTotalPoints: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Points for highest total pins across all matches</p>
+                </div>
               </div>
             </div>
 
@@ -423,18 +485,6 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
               </div>
             </div>
 
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="active"
-                checked={formData.active}
-                onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
-                className="w-4 h-4 text-blue-600"
-              />
-              <label htmlFor="active" className="ml-2 text-sm text-gray-700">
-                Active league
-              </label>
-            </div>
             <div className="flex gap-3">
               <button
                 type="submit"

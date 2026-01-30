@@ -42,14 +42,20 @@ Organization
 - **Location**: SeasonSetup.jsx (season games), models/index.js (data)
 
 ### Scoring System (Complex Multi-Layer)
-**Note**: Players per team, matches per game, and bonus rules are all configurable per league/season.
+**Note**: Players per team, matches per game, bonus rules, and all point values are configurable per league/season.
 
 1. **Individual Game Points**: Compare player1 vs player1 (with handicap) across all player pairs (configurable players per team)
+   - **Configurable**: gameWinPoints (default: 1)
+   - Win = configured points, Draw = 50% of win points
 2. **Bonus Points**: Per-player based on configurable bonus rules
    - Default: +1 bonus if score ≥ average + 50 pins, +2 if ≥ average + 70 pins
    - Fully customizable via bonusRules array in league/season config
-3. **Match Winner Point**: +1 if team wins match (higher total with handicap)
-4. **Grand Total Points**: +2 points awarded to team with highest combined pins across all matches (not a bonus, but additional points only if all matches complete)
+3. **Match Winner Points**: Awarded if team wins match (higher total with handicap)
+   - **Configurable**: matchWinPoints (default: 1)
+   - Draw = 50% of win points to each team
+4. **Grand Total Points**: Awarded to team with highest combined pins across all matches
+   - **Configurable**: grandTotalPoints (default: 2)
+   - Draw = 50% of points to each team
 - **Location**: [matchUtils.js](../src/utils/matchUtils.js)
 
 ### Season Management
@@ -154,7 +160,8 @@ const schedule = generateRoundRobinSchedule(teamIds, numberOfRounds);
 
 - **Start dev**: `npm run dev` (Vite hot reload)
 - **Build**: `npm run build` (Vite output to dist/)
-- **Styling**: Tailwind CSS + custom `globals.css`
+- **Preview**: `npm run preview` (serve dist/ locally)
+- **Styling**: Tailwind CSS + custom `globals.css` (dark scoring cards, light UI)
 - **Data**: Stored in localStorage (dev), browser DevTools to inspect
 - **Clear data**: `localStorage.clear()` in browser console
 
@@ -194,106 +201,10 @@ const schedule = generateRoundRobinSchedule(teamIds, numberOfRounds);
 6. **Mobile Optimization**: Better responsive design for score entry
 7. **Real-time Updates**: WebSocket support for live scoring
 
-## Critical Business Logic (Must Understand These)
-
-### Handicap Calculation
-- **Rule**: Optional and percentage-based → `handicap = Math.round((basis - average) * (percentage / 100))`
-- **Configuration**: Each league/season has useHandicap (boolean), handicapBasis (0-300), handicapPercentage (0-100%)
-- **Default**: useHandicap=true, handicapBasis=160, handicapPercentage=100%
-- **Applied to**: Both individual game comparisons AND match totals with handicap
-- **Location**: SeasonSetup.jsx (season games), models/index.js (schemas)
-
-### Scoring System (Complex Multi-Layer)
-**Configurable**: Players per team (default 4), matches per game (default 3), bonus rules (customizable)
-
-1. **Individual Game Points**: Compare player1 vs player1 (with handicap) across all player pairs
-   - Win = 1 point, Draw = 0.5 points, Loss = 0 points
-2. **Bonus Points**: Per-player based on configurable bonus rules
-   - Default: +1 bonus if score ≥ average + 50 pins, +2 if ≥ average + 70 pins
-   - Custom rules supported via bonusRules array (condition types: 'vs_average', 'pure_score')
-   - Applied to match score calculation
-3. **Match Winner Point**: +1 point if team wins match (has higher total with handicap)
-4. **Grand Total Points**: +2 points awarded to team with highest combined pins across all matches (only if all matches complete)
-- **Key insight**: Game points + bonus points + match winner = match score
-- **Location**: [matchUtils.js](../src/utils/matchUtils.js)
-
-### Validation Rules
-- **Season setup validation**: All teams must have assigned players
-- **Match validation**: All players per team must have scores before advancing (configurable players per team)
-- **Game completion**: All matches must be complete to finish (configurable matches per game)
-- **Location**: SeasonSetup.jsx, SeasonGamePlayer.jsx
-
-## Component-to-Utility Communication Patterns
-
-### State Update Flow
-```
-SeasonGamePlayer state → updateMatchScore() → calculateBonusPoints() + calculateMatchResults() + calculateGrandTotalPoints() → setGame()
-```
-
-### Key State Mutations (In SeasonGamePlayer)
-- Game state managed per season game
-- All mutations use immutable pattern: `const updated = { ...game }`
-- Changes persisted via gamesApi.update()
-
-### Utility Function Organization
-- **matchUtils.js**: Calculations for individual games, bonus points, match totals, empty match creation
-- **statsUtils.js**: Aggregation functions (player stats, game totals, grand totals)
-- **scheduleUtils.js**: Round-robin schedule generation
-- **standingsUtils.js**: Team and player standings calculations
-
-## Common Implementation Patterns
-
-### Reducing Across Match Arrays
-```javascript
-game.matches.reduce((sum, m) => sum + (m.team1.players[idx].pins || 0), 0)
-```
-- Used everywhere: totals, averages, grand totals
-- Default to 0 for empty pins strings
-
-### Conditional Scoring
-```javascript
-if (scoreNum >= avgNum + 70) return 2;
-if (scoreNum >= avgNum + 50) return 1;
-return 0;
-```
-- Always check higher thresholds first
-- Empty strings must be handled before parseInt
-
-### Immutable State Updates
-```javascript
-const updated = { ...currentGame };
-updated[team].players[playerIndex].average = avgValue;
-setCurrentGame(updated);
-```
-- Required for React state immutability
-- Deep copy arrays/objects when modifying
-
-## View Navigation & State Management
-
-**Admin Flow**: dashboard → players/leagues → league-detail → season-setup → season-dashboard → season-game → (MatchView)
-
-**State**: navigationState = { leagueId, seasonId, gameId }
-**Navigation**: navigateTo(view, params)
-
-## Development Workflow
-
-- **Start dev**: `npm run dev` (Vite hot reload)
-- **Build**: `npm run build` (Vite output to dist/)
-- **Preview**: `npm run preview` (serve dist/ locally)
-- **Styling**: Tailwind CSS + custom `globals.css` (dark scoring cards, light UI)
-
-## When Adding Features
-
-1. **New API entity?** → Add to [src/services/api.js](../src/services/api.js), follow existing pattern
-2. **New data model?** → Add to [src/models/index.js](../src/models/index.js) with validation
-3. **New admin view?** → Create in `src/components/admin/`, add routing in [App.jsx](../src/App.jsx)
-4. **New statistic?** → Add to [standingsUtils.js](../src/utils/standingsUtils.js)
-5. **Schedule changes?** → Modify [scheduleUtils.js](../src/utils/scheduleUtils.js)
-6. **Scoring changes?** → Update [matchUtils.js](../src/utils/matchUtils.js) - test thoroughly!
-
 ## Known Edge Cases
 
 - **Empty pin strings**: Treated as 0 in calculations, not entered in calculations until all pins filled
-- **Draws in individual games**: Each team gets 0.5 points
+- **Draws**: Always award 50% of respective win points (gameWinPoints, matchWinPoints, or grandTotalPoints)
 - **Incomplete matches**: Handicap totals calculated as 0 for missing pins
 - **Grand total points**: Only awarded if all matches complete with all scores entered (number of matches is configurable)
+- **Point values**: All point values (gameWinPoints, matchWinPoints, grandTotalPoints) are configurable per league/season with defaults (1, 1, 2)

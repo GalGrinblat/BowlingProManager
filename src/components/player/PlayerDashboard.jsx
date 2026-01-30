@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { playersApi, leaguesApi, seasonsApi, teamsApi, gamesApi } from '../../services/api';
+import { calculateTeamStandings } from '../../utils/standingsUtils';
 
 export const PlayerDashboard = ({ playerId, onNavigate }) => {
   const [player, setPlayer] = useState(null);
@@ -91,7 +92,6 @@ export const PlayerDashboard = ({ playerId, onNavigate }) => {
         const seasonTeams = teamsApi.getBySeason(season.id);
         
         // Calculate standings for this season
-        const { calculateTeamStandings } = require('../../utils/standingsUtils');
         const standings = calculateTeamStandings(seasonTeams, seasonGames);
         const playerTeamStanding = standings.find(s => s.teamId === playerTeam?.id);
         const champion = standings[0];
