@@ -52,7 +52,7 @@ A comprehensive bowling league management system built with React, Vite, and Tai
 ### Configurable Bonus Rules
 - **Rule Types**:
   - **Player Bonuses**: Individual performance rewards
-  - **Team Bonuses**: Collective team achievements
+  - **Team Bonuses**: Supported by data model (UI coming soon)
 - **Conditions**:
   - **vs Average**: Points for exceeding personal average by threshold
   - **Score**: Points for reaching pure score thresholds
@@ -79,8 +79,8 @@ A comprehensive bowling league management system built with React, Vite, and Tai
 
 ### Game Scoring System
 - **Team Setup**: 
-  - Pre-configured team options with player rosters
-  - Manual player name and average entry
+  - Teams assigned from player registry
+  - Player averages from registry
   - Absent player handling (auto-scores as average - 10)
   - Optional handicap system with percentage control (0-100%)
   - Configurable handicap basis per league/season
@@ -105,14 +105,14 @@ A comprehensive bowling league management system built with React, Vite, and Tai
 
 ### Authentication & Roles
 - **Admin Role**: Full CRUD on players, leagues, seasons, teams; record games
-- **Player Role**: View standings, record scores for own games (coming soon)
+- **Player Role**: View personal stats, leagues, and game history (score entry coming soon)
 - **Simple Login**: Role-based authentication via AuthContext
 
 ### Data Persistence
 - **localStorage API**: DB-agnostic abstraction layer
 - **Easy Migration**: Switch to backend database by updating API service
 - **CRUD Operations**: Full create, read, update, delete for all entities
-- **Export/Import**: Utility functions for data backup
+- **Season Export**: Export standings, player stats, and games to CSV/JSON
   
 - **Responsive Design**: 
   - Mobile-friendly interface
