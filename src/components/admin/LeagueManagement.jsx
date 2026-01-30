@@ -44,11 +44,24 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
       return;
     }
 
+    // Check for duplicate league names (excluding current league when editing)
+    const duplicateName = leagues.find(l => 
+      l.name.trim().toLowerCase() === formData.name.trim().toLowerCase() && 
+      l.id !== editingId
+    );
+    
+    if (duplicateName) {
+      alert(`A league with the name "${formData.name}" already exists. Please choose a different name.`);
+      return;
+    }
+
     if (editingId) {
       leaguesApi.update(editingId, leagueData);
+      alert('League updated successfully!');
       setEditingId(null);
     } else {
       leaguesApi.create(leagueData);
+      alert('League created successfully!');
     }
 
     setFormData({
@@ -97,21 +110,49 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
   };
 
   const handleDelete = (id) => {
+    const league = leagues.find(l => l.id === id);
     const seasons = seasonsApi.getByLeague(id);
+    
     if (seasons.length > 0) {
-      alert('Cannot delete league with existing seasons. Archive it instead.');
+      const activeSeasons = seasons.filter(s => s.status === 'active');
+      const setupSeasons = seasons.filter(s => s.status === 'setup');
+      
+      let message = `Cannot delete league "${league.name}" because it has ${seasons.length} season(s):\n\n`;
+      if (activeSeasons.length > 0) {
+        message += `• ${activeSeasons.length} active season(s)\n`;
+      }
+      if (setupSeasons.length > 0) {
+        message += `• ${setupSeasons.length} season(s) in setup\n`;
+      }
+      message += '\nPlease complete or delete all seasons first, or toggle the league to inactive to archive it.';
+      
+      alert(message);
       return;
     }
     
-    if (confirm('Are you sure you want to delete this league?')) {
+    if (confirm(`Are you sure you want to permanently delete the league "${league.name}"?\n\nThis action cannot be undone.`)) {
       leaguesApi.delete(id);
       loadLeagues();
+      alert('League deleted successfully.');
     }
   };
 
   const toggleActive = (league) => {
-    leaguesApi.update(league.id, { active: !league.active });
-    loadLeagues();
+    if (league.active) {
+      // Archiving an active league
+      if (confirm(`📦 Archive league "${league.name}"?\n\nArchived leagues:\n• Won't show in main dashboard\n• Can still view seasons and data\n• Can be restored anytime\n\nThis is useful for completed or inactive leagues.`)) {
+        leaguesApi.update(league.id, { active: false });
+        alert(`✅ League "${league.name}" has been archived.`);
+        loadLeagues();
+      }
+    } else {
+      // Restoring an archived league
+      if (confirm(`📤 Restore league "${league.name}"?\n\nThis will move the league back to your active leagues list.`)) {
+        leaguesApi.update(league.id, { active: true });
+        alert(`✅ League "${league.name}" has been restored.`);
+        loadLeagues();
+      }
+    }
   };
 
   const handleCancel = () => {
@@ -515,9 +556,14 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
 
       {/* Active Leagues */}
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">
-          Active Leagues ({activeLeagues.length})
-        </h2>
+        <div className="mb-4">
+          <h2 className="text-2xl font-bold text-gray-800">
+            Active Leagues ({activeLeagues.length})
+          </h2>
+          <p className="text-sm text-gray-600 mt-1">
+            Your current leagues. You can archive leagues when they're completed or no longer active.
+          </p>
+        </div>
         {activeLeagues.length === 0 ? (
           <p className="text-gray-500 text-center py-4">No active leagues</p>
         ) : (
@@ -565,8 +611,9 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
                       <button
                         onClick={() => toggleActive(league)}
                         className="px-3 py-1 text-sm bg-orange-100 text-orange-700 rounded hover:bg-orange-200"
+                        title="Archive this league (can be restored later)"
                       >
-                        Archive
+                        📦 Archive
                       </button>
                       {seasons.length === 0 && (
                         <button
@@ -588,9 +635,14 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
       {/* Archived Leagues */}
       {archivedLeagues.length > 0 && (
         <div className="bg-white rounded-xl shadow-lg p-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">
-            Archived Leagues ({archivedLeagues.length})
-          </h2>
+          <div className="mb-4">
+            <h2 className="text-xl font-bold text-gray-800">
+              📦 Archived Leagues ({archivedLeagues.length})
+            </h2>
+            <p className="text-sm text-gray-600 mt-1">
+              Completed or inactive leagues. All data is preserved and can be viewed or restored anytime.
+            </p>
+          </div>
           <div className="space-y-3">
             {archivedLeagues.map(league => {
               const seasons = seasonsApi.getByLeague(league.id);
@@ -618,8 +670,9 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
                       <button
                         onClick={() => toggleActive(league)}
                         className="px-3 py-1 text-sm bg-green-100 text-green-700 rounded hover:bg-green-200"
+                        title="Move this league back to active leagues"
                       >
-                        Restore
+                        📤 Restore
                       </button>
                     </div>
                   </div>

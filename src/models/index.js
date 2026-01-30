@@ -125,7 +125,8 @@ export const createGame = ({
   matches: [],
   grandTotalScore: { team1: 0, team2: 0 },
   status: 'pending', // pending, in-progress, completed
-  completedAt: null
+  completedAt: null,
+  enteredBy: null // userId of who completed the game (admin or player)
 });
 
 // ===== SEASON STANDINGS =====

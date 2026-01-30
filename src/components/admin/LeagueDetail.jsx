@@ -28,19 +28,25 @@ export const LeagueDetail = ({ leagueId, onBack, onViewSeason }) => {
   };
 
   const handleDeleteSeason = (seasonId) => {
+    const season = seasonsApi.getById(seasonId);
     const games = gamesApi.getBySeason(seasonId);
+    const teams = teamsApi.getBySeason(seasonId);
+    
     if (games.length > 0) {
-      alert('Cannot delete season with recorded games.');
+      const completedGames = games.filter(g => g.status === 'completed').length;
+      const pendingGames = games.filter(g => g.status === 'pending').length;
+      alert(`❌ Cannot delete season "${season?.name}" because it has ${games.length} recorded game(s):\n• ${completedGames} completed\n• ${pendingGames} pending\n\nPlease delete all games first.`);
       return;
     }
     
-    if (confirm('Are you sure you want to delete this season?')) {
+    const message = `⚠️ Delete season "${season?.name}"?\n\nThis will also delete:\n• ${teams.length} team(s)\n\nThis action cannot be undone.`;
+    if (confirm(message)) {
       // Delete teams first
-      const teams = teamsApi.getBySeason(seasonId);
       teams.forEach(team => teamsApi.delete(team.id));
       
       // Delete season
       seasonsApi.delete(seasonId);
+      alert(`✅ Season "${season?.name}" deleted successfully.`);
       loadLeagueData();
     }
   };

@@ -7,6 +7,8 @@ export const Settings = ({ onBack }) => {
   const [formData, setFormData] = useState({
     name: ''
   });
+  const [importFile, setImportFile] = useState(null);
+  const [importPreview, setImportPreview] = useState(null);
 
   useEffect(() => {
     loadOrganization();
@@ -22,6 +24,56 @@ export const Settings = ({ onBack }) => {
     organizationApi.update({ name: formData.name });
     setIsEditing(false);
     loadOrganization();
+  };
+
+  const handleExport = () => {
+    const data = utilApi.exportData();
+    const dataStr = JSON.stringify(data, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `bowling-backup-${new Date().toISOString().split('T')[0]}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const data = JSON.parse(event.target.result);
+        setImportFile(file);
+        setImportPreview(data);
+      } catch (error) {
+        alert('Invalid JSON file. Please select a valid backup file.');
+        setImportFile(null);
+        setImportPreview(null);
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const handleImport = () => {
+    if (!importPreview) return;
+
+    if (confirm('This will replace all current data with the imported data. Continue?')) {
+      try {
+        utilApi.importData(importPreview);
+        alert('Data imported successfully! Reloading page...');
+        window.location.reload();
+      } catch (error) {
+        alert('Error importing data: ' + error.message);
+      }
+    }
+  };
+
+  const cancelImport = () => {
+    setImportFile(null);
+    setImportPreview(null);
   };
 
   if (!organization) return <div>Loading...</div>;
@@ -112,6 +164,70 @@ export const Settings = ({ onBack }) => {
 
       {/* System Information */}
       <div className="bg-white rounded-xl shadow-lg p-6">
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">Backup & Restore</h2>
+        
+        {/* Export Section */}
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold text-gray-700 mb-2">Export Data</h3>
+          <p className="text-sm text-gray-600 mb-3">
+            Download a backup of all your data (players, leagues, seasons, teams, and games).
+          </p>
+          <button
+            onClick={handleExport}
+            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold"
+          >
+            📥 Export All Data
+          </button>
+        </div>
+
+        {/* Import Section */}
+        <div className="border-t pt-6">
+          <h3 className="text-lg font-semibold text-gray-700 mb-2">Import Data</h3>
+          <p className="text-sm text-gray-600 mb-3">
+            Restore data from a previously exported backup file. This will replace all current data.
+          </p>
+          
+          {!importPreview ? (
+            <div>
+              <input
+                type="file"
+                accept=".json"
+                onChange={handleFileSelect}
+                className="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              />
+            </div>
+          ) : (
+            <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+              <h4 className="font-semibold text-blue-900 mb-2">📄 Import Preview</h4>
+              <p className="text-sm text-blue-800 mb-1">File: {importFile.name}</p>
+              <div className="text-sm text-blue-700 space-y-1 mb-4">
+                {importPreview.PLAYERS && <div>• {importPreview.PLAYERS.length || 0} players</div>}
+                {importPreview.LEAGUES && <div>• {importPreview.LEAGUES.length || 0} leagues</div>}
+                {importPreview.SEASONS && <div>• {importPreview.SEASONS.length || 0} seasons</div>}
+                {importPreview.TEAMS && <div>• {importPreview.TEAMS.length || 0} teams</div>}
+                {importPreview.GAMES && <div>• {importPreview.GAMES.length || 0} games</div>}
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleImport}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
+                >
+                  ✓ Import Data
+                </button>
+                <button
+                  onClick={cancelImport}
+                  className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-semibold"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* System Information */}
+      <div className="bg-white rounded-xl shadow-lg p-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">System Information</h2>
         <div className="space-y-3">
           <div className="p-4 bg-blue-50 rounded-lg">
@@ -126,7 +242,7 @@ export const Settings = ({ onBack }) => {
             </p>
             <ul className="text-sm text-yellow-900 mt-2 ml-4 list-disc">
               <li>Don't clear browser data</li>
-              <li>Regularly export your data (feature coming soon)</li>
+              <li>Regularly export your data using the backup feature above</li>
               <li>Consider migrating to a database for production use</li>
             </ul>
           </div>

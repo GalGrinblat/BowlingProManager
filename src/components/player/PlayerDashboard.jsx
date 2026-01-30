@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { playersApi, leaguesApi, seasonsApi, teamsApi, gamesApi } from '../../services/api';
 import { calculateTeamStandings } from '../../utils/standingsUtils';
+import { PlayerSeasonComparison } from './PlayerSeasonComparison';
 
 export const PlayerDashboard = ({ playerId, onNavigate }) => {
   const [player, setPlayer] = useState(null);
@@ -296,6 +297,16 @@ export const PlayerDashboard = ({ playerId, onNavigate }) => {
           📊 My Stats
         </button>
         <button
+          onClick={() => setView('comparison')}
+          className={`flex-1 min-w-[90px] py-2 sm:py-3 px-2 sm:px-4 rounded-lg font-semibold text-xs sm:text-base transition-colors whitespace-nowrap ${
+            view === 'comparison'
+              ? 'bg-purple-600 text-white'
+              : 'text-gray-600 hover:bg-gray-100'
+          }`}
+        >
+          📈 Compare
+        </button>
+        <button
           onClick={() => setView('leagues')}
           className={`flex-1 min-w-[90px] py-2 sm:py-3 px-2 sm:px-4 rounded-lg font-semibold text-xs sm:text-base transition-colors whitespace-nowrap ${
             view === 'leagues'
@@ -323,7 +334,12 @@ export const PlayerDashboard = ({ playerId, onNavigate }) => {
           {/* Upcoming Games */}
           {upcomingGames.length > 0 && (
             <div className="bg-white rounded-xl shadow-lg p-6">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">Upcoming Games</h2>
+              <div className="mb-4">
+                <h2 className="text-2xl font-bold text-gray-800">Upcoming Games</h2>
+                <p className="text-sm text-gray-600 mt-1">
+                  💡 Click on any game to enter scores for your team!
+                </p>
+              </div>
               <div className="space-y-3">
                 {upcomingGames.map(game => {
                   const season = seasonsApi.getById(game.seasonId);
@@ -364,16 +380,27 @@ export const PlayerDashboard = ({ playerId, onNavigate }) => {
                           </span>
                         )}
                         {game.status === 'pending' && (
-                          <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded font-semibold">
-                            Not Started
+                          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded font-semibold">
+                            📝 Ready to Score
                           </span>
                         )}
-                        <span className="text-blue-600 font-semibold">Play →</span>
+                        <span className="text-blue-600 font-semibold">Enter Scores →</span>
                       </div>
                     </div>
                   );
                 })}
               </div>
+            </div>
+          )}
+
+          {/* No Upcoming Games Message */}
+          {upcomingGames.length === 0 && playerLeagues.length > 0 && (
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl shadow-lg p-6 text-center">
+              <p className="text-2xl mb-2">🎳</p>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">All Caught Up!</h3>
+              <p className="text-gray-600">
+                No upcoming games right now. When your next game is scheduled, you'll see it here and can enter scores yourself!
+              </p>
             </div>
           )}
 
@@ -389,9 +416,10 @@ export const PlayerDashboard = ({ playerId, onNavigate }) => {
                   const team2 = teamsApi.getById(game.team2Id);
                   const isTeam1 = team1?.playerIds.includes(playerId);
                   
-                  const team1TotalPoints = game.matches?.reduce((sum, m) => sum + (m.team1?.score || 0), 0) + (game.grandTotalPoints?.team1 || 0);
-                  const team2TotalPoints = game.matches?.reduce((sum, m) => sum + (m.team2?.score || 0), 0) + (game.grandTotalPoints?.team2 || 0);
+                  const team1TotalPoints = game.matches?.reduce((sum, m) => sum + (m.team1?.score || 0), 0) + (game.grandTotalScore?.team1 || 0);
+                  const team2TotalPoints = game.matches?.reduce((sum, m) => sum + (m.team2?.score || 0), 0) + (game.grandTotalScore?.team2 || 0);
                   const playerWon = (isTeam1 && team1TotalPoints > team2TotalPoints) || (!isTeam1 && team2TotalPoints > team1TotalPoints);
+                  const playerEntered = game.enteredBy === playerId;
                   
                   return (
                     <div
@@ -424,6 +452,11 @@ export const PlayerDashboard = ({ playerId, onNavigate }) => {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
+                        {playerEntered && (
+                          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded font-semibold" title="You entered this score">
+                            📝 Self-Entered
+                          </span>
+                        )}
                         {playerWon ? (
                           <span className="text-xs bg-green-100 text-green-700 px-3 py-1 rounded font-semibold">
                             Won
@@ -684,6 +717,14 @@ export const PlayerDashboard = ({ playerId, onNavigate }) => {
             </div>
           )}
         </div>
+      )}
+
+      {/* Season Comparison View */}
+      {view === 'comparison' && (
+        <PlayerSeasonComparison 
+          playerId={playerId}
+          onBack={() => setView('dashboard')}
+        />
       )}
     </div>
   );

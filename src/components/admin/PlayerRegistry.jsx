@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { playersApi } from '../../services/api';
+import { playersApi, teamsApi, seasonsApi } from '../../services/api';
 import { createPlayer, validatePlayer } from '../../models';
+import { Pagination, usePagination } from '../Pagination';
 
 export const PlayerRegistry = ({ onBack }) => {
   const [players, setPlayers] = useState([]);
@@ -14,6 +15,10 @@ export const PlayerRegistry = ({ onBack }) => {
     active: true
   });
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // Pagination state
+  const activePagination = usePagination(20); // 20 players per page
+  const inactivePagination = usePagination(20);
 
   useEffect(() => {
     loadPlayers();
@@ -34,11 +39,24 @@ export const PlayerRegistry = ({ onBack }) => {
       return;
     }
 
+    // Check for duplicate player names (case-insensitive, excluding current player if editing)
+    const existingPlayer = players.find(p => 
+      p.name.toLowerCase() === playerData.name.toLowerCase() && 
+      p.id !== editingId
+    );
+    
+    if (existingPlayer) {
+      alert(`❌ A player named "${existingPlayer.name}" already exists. Please use a different name.`);
+      return;
+    }
+
     if (editingId) {
       playersApi.update(editingId, playerData);
+      alert(`✅ Player "${playerData.name}" updated successfully.`);
       setEditingId(null);
     } else {
       playersApi.create(playerData);
+      alert(`✅ Player "${playerData.name}" created successfully.`);
     }
 
     setFormData({ name: '', email: '', phone: '', startingAverage: '', active: true });
@@ -59,8 +77,26 @@ export const PlayerRegistry = ({ onBack }) => {
   };
 
   const handleDelete = (id) => {
-    if (confirm('Are you sure you want to delete this player?')) {
+    const player = playersApi.getById(id);
+    
+    // Check if player is assigned to any teams
+    const allTeams = teamsApi.getAll();
+    const teamsWithPlayer = allTeams.filter(team => team.playerIds.includes(id));
+    
+    if (teamsWithPlayer.length > 0) {
+      // Get season names for better context
+      const seasonNames = teamsWithPlayer.map(team => {
+        const season = seasonsApi.getById(team.seasonId);
+        return season ? season.name : 'Unknown Season';
+      });
+      
+      alert(`❌ Cannot delete player "${player?.name}" because they are assigned to ${teamsWithPlayer.length} team(s):\n\n${[...new Set(seasonNames)].map(s => `• ${s}`).join('\n')}\n\nPlease remove them from all teams first, or mark them as inactive instead.`);
+      return;
+    }
+    
+    if (confirm(`⚠️ Delete player "${player?.name}"?\n\nThis action cannot be undone.`)) {
       playersApi.delete(id);
+      alert(`✅ Player "${player?.name}" deleted successfully.`);
       loadPlayers();
     }
   };
@@ -76,8 +112,18 @@ export const PlayerRegistry = ({ onBack }) => {
     (p.email && p.email.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
+  // Reset pagination when search changes
+  React.useEffect(() => {
+    activePagination.resetPage();
+    inactivePagination.resetPage();
+  }, [searchTerm]);
+
   const activePlayers = filteredPlayers.filter(p => p.active);
   const inactivePlayers = filteredPlayers.filter(p => !p.active);
+  
+  // Paginated lists
+  const paginatedActivePlayers = activePagination.paginate(activePlayers);
+  const paginatedInactivePlayers = inactivePagination.paginate(inactivePlayers);
 
   return (
     <div className="space-y-6">
@@ -201,15 +247,18 @@ export const PlayerRegistry = ({ onBack }) => {
       )}
 
       {/* Active Players List */}
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">
-          Active Players ({activePlayers.length})
-        </h2>
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="p-6 pb-0">
+          <h2 className="text-xl font-bold text-gray-800 mb-4">
+            Active Players ({activePlayers.length})
+          </h2>
+        </div>
         {activePlayers.length === 0 ? (
-          <p className="text-gray-500 text-center py-4">No active players</p>
+          <p className="text-gray-500 text-center py-8">No active players</p>
         ) : (
-          <div className="space-y-2">
-            {activePlayers.map(player => (
+          <>
+            <div className="p-6 space-y-2">
+              {paginatedActivePlayers.map(player => (
               <div
                 key={player.id}
                 className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors"
@@ -241,17 +290,26 @@ export const PlayerRegistry = ({ onBack }) => {
               </div>
             ))}
           </div>
+          <Pagination
+            currentPage={activePagination.currentPage}
+            totalItems={activePlayers.length}
+            itemsPerPage={activePagination.itemsPerPage}
+            onPageChange={activePagination.setCurrentPage}
+          />
+        </>
         )}
       </div>
 
       {/* Inactive Players */}
       {inactivePlayers.length > 0 && (
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">
-            Inactive Players ({inactivePlayers.length})
-          </h2>
-          <div className="space-y-2">
-            {inactivePlayers.map(player => (
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div className="p-6 pb-0">
+            <h2 className="text-xl font-bold text-gray-800 mb-4">
+              Inactive Players ({inactivePlayers.length})
+            </h2>
+          </div>
+          <div className="p-6 space-y-2">
+            {paginatedInactivePlayers.map(player => (
               <div
                 key={player.id}
                 className="border border-gray-200 rounded-lg p-4 bg-gray-50"
@@ -275,6 +333,12 @@ export const PlayerRegistry = ({ onBack }) => {
               </div>
             ))}
           </div>
+          <Pagination
+            currentPage={inactivePagination.currentPage}
+            totalItems={inactivePlayers.length}
+            itemsPerPage={inactivePagination.itemsPerPage}
+            onPageChange={inactivePagination.setCurrentPage}
+          />
         </div>
       )}
     </div>

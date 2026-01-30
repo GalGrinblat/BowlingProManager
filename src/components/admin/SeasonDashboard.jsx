@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { seasonsApi, teamsApi, gamesApi, leaguesApi } from '../../services/api';
 import { calculateTeamStandings, calculatePlayerSeasonStats } from '../../utils/standingsUtils';
 import { postponeMatchDay, formatMatchDate } from '../../utils/scheduleUtils';
+import { calculateHeadToHead, formatHeadToHead } from '../../utils/headToHeadUtils';
+import { Pagination, usePagination } from '../Pagination';
 import { 
   exportStandingsCSV, 
   exportPlayerStatsCSV, 
@@ -20,6 +22,9 @@ export const SeasonDashboard = ({ seasonId, onBack, onPlayGame, onViewGame, onMa
   const [selectedMatchDay, setSelectedMatchDay] = useState(null);
   const [showPostponeModal, setShowPostponeModal] = useState(false);
   const [postponeWeeks, setPostponeWeeks] = useState(1);
+  
+  // Pagination for player stats
+  const playerStatsPagination = usePagination(15); // 15 players per page
 
   useEffect(() => {
     loadSeasonData();
@@ -115,6 +120,7 @@ export const SeasonDashboard = ({ seasonId, onBack, onPlayGame, onViewGame, onMa
 
   const teamStandings = calculateTeamStandings(teams, games);
   const playerStats = calculatePlayerSeasonStats(teams, games);
+  const paginatedPlayerStats = playerStatsPagination.paginate(playerStats);
   
   const roundGames = games.filter(g => g.round === selectedRound);
   const matchDayGames = selectedMatchDay ? roundGames.filter(g => g.matchDay === selectedMatchDay) : [];
@@ -271,10 +277,10 @@ export const SeasonDashboard = ({ seasonId, onBack, onPlayGame, onViewGame, onMa
       )}
 
       {/* View Tabs */}
-      <div className="bg-white rounded-xl shadow-lg p-2 flex gap-2">
+      <div className="bg-white rounded-xl shadow-lg p-2 flex gap-2 overflow-x-auto">
         <button
           onClick={() => setView('schedule')}
-          className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-colors ${
+          className={`flex-1 min-w-[120px] py-3 px-4 rounded-lg font-semibold transition-colors ${
             view === 'schedule'
               ? 'bg-blue-600 text-white'
               : 'text-gray-600 hover:bg-gray-100'
@@ -284,17 +290,27 @@ export const SeasonDashboard = ({ seasonId, onBack, onPlayGame, onViewGame, onMa
         </button>
         <button
           onClick={() => setView('standings')}
-          className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-colors ${
+          className={`flex-1 min-w-[120px] py-3 px-4 rounded-lg font-semibold transition-colors ${
             view === 'standings'
               ? 'bg-blue-600 text-white'
               : 'text-gray-600 hover:bg-gray-100'
           }`}
         >
-          🏆 {isCompleted ? 'Final Standings' : 'Team Standings'}
+          🏆 {isCompleted ? 'Final Standings' : 'Standings'}
+        </button>
+        <button
+          onClick={() => setView('h2h')}
+          className={`flex-1 min-w-[120px] py-3 px-4 rounded-lg font-semibold transition-colors ${
+            view === 'h2h'
+              ? 'bg-blue-600 text-white'
+              : 'text-gray-600 hover:bg-gray-100'
+          }`}
+        >
+          📊 Head-to-Head
         </button>
         <button
           onClick={() => setView('players')}
-          className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-colors ${
+          className={`flex-1 min-w-[120px] py-3 px-4 rounded-lg font-semibold transition-colors ${
             view === 'players'
               ? 'bg-blue-600 text-white'
               : 'text-gray-600 hover:bg-gray-100'
@@ -403,6 +419,7 @@ export const SeasonDashboard = ({ seasonId, onBack, onPlayGame, onViewGame, onMa
                 {matchDayGames.map(game => {
                   const team1 = teams.find(t => t.id === game.team1Id);
                   const team2 = teams.find(t => t.id === game.team2Id);
+                  const h2h = calculateHeadToHead(game.team1Id, game.team2Id, games);
                   
                   return (
                     <GameCard
@@ -410,6 +427,7 @@ export const SeasonDashboard = ({ seasonId, onBack, onPlayGame, onViewGame, onMa
                       game={game}
                       team1={team1}
                       team2={team2}
+                      h2h={h2h}
                       onPlayGame={() => onPlayGame(game.id)}
                       onViewGame={() => onViewGame(game.id, game)}
                     />
@@ -466,48 +484,125 @@ export const SeasonDashboard = ({ seasonId, onBack, onPlayGame, onViewGame, onMa
         </div>
       )}
 
+      {/* Head-to-Head View */}
+      {view === 'h2h' && (
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Head-to-Head Records</h2>
+          <p className="text-gray-600 mb-6">All team matchup records for this season</p>
+          <div className="space-y-6">
+            {teams.map(team => {
+              // Get all opponents this team has played
+              const opponents = teams.filter(t => t.id !== team.id);
+              
+              return (
+                <div key={team.id} className="border border-gray-200 rounded-lg p-4">
+                  <h3 className="text-xl font-bold text-gray-800 mb-3">{team.name}</h3>
+                  <div className="space-y-2">
+                    {opponents.map(opponent => {
+                      const h2h = calculateHeadToHead(team.id, opponent.id, games);
+                      
+                      if (h2h.gamesPlayed === 0) {
+                        return (
+                          <div key={opponent.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <span className="text-gray-600">vs {opponent.name}</span>
+                            <span className="text-sm text-gray-500 italic">No matchups yet</span>
+                          </div>
+                        );
+                      }
+                      
+                      const teamWins = h2h.team1Wins;
+                      const opponentWins = h2h.team2Wins;
+                      const isWinning = teamWins > opponentWins;
+                      const isLosing = teamWins < opponentWins;
+                      
+                      return (
+                        <div key={opponent.id} className={`flex items-center justify-between p-3 rounded-lg ${
+                          isWinning ? 'bg-green-50 border border-green-200' : 
+                          isLosing ? 'bg-red-50 border border-red-200' : 
+                          'bg-gray-50 border border-gray-200'
+                        }`}>
+                          <div className="flex-1">
+                            <div className="font-semibold text-gray-800">vs {opponent.name}</div>
+                            <div className="text-sm text-gray-600 mt-1">
+                              {formatHeadToHead(h2h, team.name, opponent.name)}
+                            </div>
+                          </div>
+                          <div className="text-right ml-4">
+                            <div className={`text-2xl font-bold ${
+                              isWinning ? 'text-green-600' : 
+                              isLosing ? 'text-red-600' : 
+                              'text-gray-600'
+                            }`}>
+                              {teamWins}-{opponentWins}{h2h.ties > 0 ? `-${h2h.ties}` : ''}
+                            </div>
+                            <div className="text-xs text-gray-500 mt-1">
+                              Avg: {h2h.team1AvgPoints.toFixed(1)} pts
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Player Stats View */}
       {view === 'players' && (
-        <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Player Statistics</h2>
-          <div className="overflow-x-auto -mx-4 sm:mx-0">
-            <div className="inline-block min-w-full align-middle">
-              <div className="overflow-hidden">
-                <table className="min-w-full">
-                  <thead className="bg-gray-100">
-                    <tr className="text-left">
-                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm">Rank</th>
-                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm">Player</th>
-                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm hidden lg:table-cell">Team</th>
-                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm">GP</th>
-                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm">Avg</th>
-                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm hidden sm:table-cell">High</th>
-                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm hidden md:table-cell">Series</th>
-                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm hidden lg:table-cell">Pins</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {playerStats.map((stat, index) => (
-                      <tr key={`${stat.teamId}-${stat.playerName}`} className="border-b border-gray-200 hover:bg-gray-50">
-                        <td className="px-3 sm:px-4 py-3">
-                          <span className="font-bold text-gray-800">#{index + 1}</span>
-                        </td>
-                        <td className="px-3 sm:px-4 py-3 font-semibold text-gray-800 text-sm">{stat.playerName}</td>
-                        <td className="px-3 sm:px-4 py-3 text-gray-600 text-sm hidden lg:table-cell">{stat.teamName}</td>
-                        <td className="px-3 sm:px-4 py-3 text-center text-gray-600 text-sm">{stat.gamesPlayed}</td>
-                        <td className="px-3 sm:px-4 py-3 text-center">
-                          <span className="font-bold text-blue-600 text-base sm:text-lg">{stat.average}</span>
-                        </td>
-                        <td className="px-3 sm:px-4 py-3 text-center text-purple-600 font-semibold text-sm hidden sm:table-cell">{stat.highGame}</td>
-                        <td className="px-3 sm:px-4 py-3 text-center text-green-600 font-semibold text-sm hidden md:table-cell">{stat.highSeries}</td>
-                        <td className="px-3 sm:px-4 py-3 text-center text-gray-600 text-sm hidden lg:table-cell">{stat.totalPins}</td>
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div className="p-4 sm:p-6">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">Player Statistics ({playerStats.length} players)</h2>
+            <div className="overflow-x-auto -mx-4 sm:mx-0">
+              <div className="inline-block min-w-full align-middle">
+                <div className="overflow-hidden">
+                  <table className="min-w-full">
+                    <thead className="bg-gray-100">
+                      <tr className="text-left">
+                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm">Rank</th>
+                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm">Player</th>
+                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm hidden lg:table-cell">Team</th>
+                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm">GP</th>
+                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm">Avg</th>
+                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm hidden sm:table-cell">High</th>
+                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm hidden md:table-cell">Series</th>
+                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm hidden lg:table-cell">Pins</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {paginatedPlayerStats.map((stat, index) => {
+                        const globalRank = (playerStatsPagination.currentPage - 1) * playerStatsPagination.itemsPerPage + index + 1;
+                        return (
+                          <tr key={`${stat.teamId}-${stat.playerName}`} className="border-b border-gray-200 hover:bg-gray-50">
+                            <td className="px-3 sm:px-4 py-3">
+                              <span className="font-bold text-gray-800">#{globalRank}</span>
+                            </td>
+                            <td className="px-3 sm:px-4 py-3 font-semibold text-gray-800 text-sm">{stat.playerName}</td>
+                            <td className="px-3 sm:px-4 py-3 text-gray-600 text-sm hidden lg:table-cell">{stat.teamName}</td>
+                            <td className="px-3 sm:px-4 py-3 text-center text-gray-600 text-sm">{stat.gamesPlayed}</td>
+                            <td className="px-3 sm:px-4 py-3 text-center">
+                              <span className="font-bold text-blue-600 text-base sm:text-lg">{stat.average}</span>
+                            </td>
+                            <td className="px-3 sm:px-4 py-3 text-center text-purple-600 font-semibold text-sm hidden sm:table-cell">{stat.highGame}</td>
+                            <td className="px-3 sm:px-4 py-3 text-center text-green-600 font-semibold text-sm hidden md:table-cell">{stat.highSeries}</td>
+                            <td className="px-3 sm:px-4 py-3 text-center text-gray-600 text-sm hidden lg:table-cell">{stat.totalPins}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </div>
+          <Pagination
+            currentPage={playerStatsPagination.currentPage}
+            totalItems={playerStats.length}
+            itemsPerPage={playerStatsPagination.itemsPerPage}
+            onPageChange={playerStatsPagination.setCurrentPage}
+          />
         </div>
       )}
 
@@ -573,7 +668,7 @@ export const SeasonDashboard = ({ seasonId, onBack, onPlayGame, onViewGame, onMa
 };
 
 // Game Card Component
-const GameCard = ({ game, team1, team2, onPlayGame, onViewGame }) => {
+const GameCard = ({ game, team1, team2, h2h, onPlayGame, onViewGame }) => {
   const getStatusBadge = () => {
     switch (game.status) {
       case 'completed':
@@ -585,8 +680,8 @@ const GameCard = ({ game, team1, team2, onPlayGame, onViewGame }) => {
     }
   };
 
-  const team1TotalPoints = game.matches?.reduce((sum, m) => sum + (m.team1?.score || 0), 0) + (game.grandTotalPoints?.team1 || 0);
-  const team2TotalPoints = game.matches?.reduce((sum, m) => sum + (m.team2?.score || 0), 0) + (game.grandTotalPoints?.team2 || 0);
+  const team1TotalPoints = game.matches?.reduce((sum, m) => sum + (m.team1?.score || 0), 0) + (game.grandTotalScore?.team1 || 0);
+  const team2TotalPoints = game.matches?.reduce((sum, m) => sum + (m.team2?.score || 0), 0) + (game.grandTotalScore?.team2 || 0);
 
   return (
     <div className={`border rounded-lg p-4 transition-colors ${
@@ -596,6 +691,16 @@ const GameCard = ({ game, team1, team2, onPlayGame, onViewGame }) => {
         ? 'border-yellow-300 bg-yellow-50'
         : 'border-gray-300 hover:border-blue-300'
     }`}>
+      {/* Head-to-Head Record */}
+      {h2h && h2h.gamesPlayed > 0 && (
+        <div className="mb-3 pb-3 border-b border-gray-300">
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <span className="font-semibold">📊 Series Record:</span>
+            <span>{formatHeadToHead(h2h, team1?.name, team2?.name)}</span>
+          </div>
+        </div>
+      )}
+      
       <div className="flex justify-between items-center">
         <div className="flex-1">
           <div className="flex items-center justify-between mb-2">

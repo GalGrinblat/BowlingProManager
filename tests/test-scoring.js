@@ -35,16 +35,36 @@ function calculateBonusPoints(score, average, isAbsent, bonusRules = null) {
   return 0;
 }
 
-function calculateIndividualGameResult(team1Score, team2Score, team1Handicap, team2Handicap) {
+function calculateIndividualGameResult(team1Score, team2Score, team1Handicap, team2Handicap, gameWinPoints = 1) {
   const team1Total = team1Score + team1Handicap;
   const team2Total = team2Score + team2Handicap;
   
   if (team1Total > team2Total) {
-    return { result: 'team1', team1Points: 1, team2Points: 0 };
+    return { result: 'team1', team1Points: gameWinPoints, team2Points: 0 };
   } else if (team2Total > team1Total) {
-    return { result: 'team2', team1Points: 0, team2Points: 1 };
+    return { result: 'team2', team1Points: 0, team2Points: gameWinPoints };
   } else {
-    return { result: 'draw', team1Points: 0.5, team2Points: 0.5 };
+    return { result: 'draw', team1Points: gameWinPoints / 2, team2Points: gameWinPoints / 2 };
+  }
+}
+
+function calculateMatchWinner(team1TotalPins, team2TotalPins, matchWinPoints = 1) {
+  if (team1TotalPins > team2TotalPins) {
+    return { team1Points: matchWinPoints, team2Points: 0 };
+  } else if (team2TotalPins > team1TotalPins) {
+    return { team1Points: 0, team2Points: matchWinPoints };
+  } else {
+    return { team1Points: matchWinPoints / 2, team2Points: matchWinPoints / 2 };
+  }
+}
+
+function calculateGrandTotal(team1TotalPins, team2TotalPins, grandTotalPoints = 2) {
+  if (team1TotalPins > team2TotalPins) {
+    return { team1: grandTotalPoints, team2: 0 };
+  } else if (team2TotalPins > team1TotalPins) {
+    return { team1: 0, team2: grandTotalPoints };
+  } else {
+    return { team1: grandTotalPoints / 2, team2: grandTotalPoints / 2 };
   }
 }
 
@@ -145,6 +165,121 @@ const tests = [
     },
     expected: 5,
     description: 'Should support pure score bonus rules'
+  },
+  
+  // Configurable Points Tests
+  {
+    name: 'Configurable Game Win Points - Default (1 point)',
+    test: () => {
+      const result = calculateIndividualGameResult(180, 170, 10, 15);
+      return result.result === 'team1' && result.team1Points === 1 && result.team2Points === 0;
+    },
+    expected: 'team1 wins with 1 point',
+    description: 'Default game win points should be 1'
+  },
+  {
+    name: 'Configurable Game Win Points - Custom (2 points)',
+    test: () => {
+      const result = calculateIndividualGameResult(180, 170, 10, 15, 2);
+      return result.result === 'team1' && result.team1Points === 2 && result.team2Points === 0;
+    },
+    expected: 'team1 wins with 2 points',
+    description: 'Should award custom game win points'
+  },
+  {
+    name: 'Configurable Game Win Points - Draw with custom points',
+    test: () => {
+      const result = calculateIndividualGameResult(180, 175, 10, 15, 3);
+      return result.result === 'draw' && result.team1Points === 1.5 && result.team2Points === 1.5;
+    },
+    expected: 'draw with 1.5 points each',
+    description: 'Draw should award 50% of custom game win points (3 / 2 = 1.5)'
+  },
+  {
+    name: 'Configurable Match Win Points - Default (1 point)',
+    test: () => {
+      const result = calculateMatchWinner(540, 520);
+      return result.team1Points === 1 && result.team2Points === 0;
+    },
+    expected: 'team1 wins match with 1 point',
+    description: 'Default match win points should be 1'
+  },
+  {
+    name: 'Configurable Match Win Points - Custom (3 points)',
+    test: () => {
+      const result = calculateMatchWinner(540, 520, 3);
+      return result.team1Points === 3 && result.team2Points === 0;
+    },
+    expected: 'team1 wins match with 3 points',
+    description: 'Should award custom match win points'
+  },
+  {
+    name: 'Configurable Match Win Points - Draw',
+    test: () => {
+      const result = calculateMatchWinner(540, 540, 2);
+      return result.team1Points === 1 && result.team2Points === 1;
+    },
+    expected: 'draw with 1 point each',
+    description: 'Draw should award 50% of custom match win points (2 / 2 = 1)'
+  },
+  {
+    name: 'Configurable Grand Total Points - Default (2 points)',
+    test: () => {
+      const result = calculateGrandTotal(1620, 1580);
+      return result.team1 === 2 && result.team2 === 0;
+    },
+    expected: 'team1 gets 2 grand total points',
+    description: 'Default grand total points should be 2'
+  },
+  {
+    name: 'Configurable Grand Total Points - Custom (5 points)',
+    test: () => {
+      const result = calculateGrandTotal(1620, 1580, 5);
+      return result.team1 === 5 && result.team2 === 0;
+    },
+    expected: 'team1 gets 5 grand total points',
+    description: 'Should award custom grand total points'
+  },
+  {
+    name: 'Configurable Grand Total Points - Draw',
+    test: () => {
+      const result = calculateGrandTotal(1620, 1620, 4);
+      return result.team1 === 2 && result.team2 === 2;
+    },
+    expected: 'draw with 2 points each',
+    description: 'Draw should award 50% of custom grand total points (4 / 2 = 2)'
+  },
+  {
+    name: 'Configurable Points - All types working together',
+    test: () => {
+      // Simulate a complete scoring scenario
+      const gameWinPoints = 2;
+      const matchWinPoints = 3;
+      const grandTotalPoints = 5;
+      
+      // Team 1 wins individual game
+      const game = calculateIndividualGameResult(180, 170, 10, 15, gameWinPoints);
+      // Team 1 wins match
+      const match = calculateMatchWinner(540, 520, matchWinPoints);
+      // Team 1 wins grand total
+      const grand = calculateGrandTotal(1620, 1580, grandTotalPoints);
+      
+      const team1Total = game.team1Points + match.team1Points + grand.team1;
+      const team2Total = game.team2Points + match.team2Points + grand.team2;
+      
+      return team1Total === 10 && team2Total === 0; // 2 + 3 + 5 = 10
+    },
+    expected: 'team1 gets 10 total points (2+3+5)',
+    description: 'All configurable point types should work together correctly'
+  },
+  {
+    name: 'Configurable Points - Fractional values (0.5 points)',
+    test: () => {
+      const result = calculateIndividualGameResult(180, 170, 10, 15, 0.5);
+      return result.result === 'team1' && result.team1Points === 0.5 && result.team2Points === 0;
+    },
+    expected: 'team1 wins with 0.5 points',
+    description: 'Should support fractional point values'
   }
 ];
 

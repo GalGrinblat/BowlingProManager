@@ -29,17 +29,56 @@ export const SeasonSetup = ({ seasonId, onBack }) => {
   };
 
   const handleStartSeason = () => {
-    // Validate all teams are complete
-    const incompleteTeams = teams.filter(t => 
-      t.playerIds.length !== season.playersPerTeam || !t.name.trim()
-    );
+    // Comprehensive validation
+    const validationErrors = [];
     
-    if (incompleteTeams.length > 0) {
-      alert(`Please complete setup for all teams. ${incompleteTeams.length} team(s) incomplete.`);
+    // Check team count
+    if (teams.length !== season.numberOfTeams) {
+      validationErrors.push(`Expected ${season.numberOfTeams} teams, but only ${teams.length} configured.`);
+    }
+    
+    // Validate each team
+    teams.forEach((team, index) => {
+      if (!team.name || team.name.trim() === '') {
+        validationErrors.push(`Team ${index + 1} has no name.`);
+      }
+      
+      if (team.playerIds.length !== season.playersPerTeam) {
+        validationErrors.push(`Team "${team.name || index + 1}" needs ${season.playersPerTeam} players but has ${team.playerIds.length}.`);
+      }
+      
+      // Check for duplicate players within a team
+      const uniquePlayers = new Set(team.playerIds);
+      if (uniquePlayers.size !== team.playerIds.length) {
+        validationErrors.push(`Team "${team.name || index + 1}" has duplicate players.`);
+      }
+      
+      // Check that all players exist
+      team.playerIds.forEach(playerId => {
+        const player = players.find(p => p.id === playerId);
+        if (!player) {
+          validationErrors.push(`Team "${team.name || index + 1}" has an invalid player.`);
+        }
+      });
+    });
+    
+    // Check for players on multiple teams
+    const allPlayerIds = teams.flatMap(t => t.playerIds);
+    const duplicatePlayers = allPlayerIds.filter((id, index) => allPlayerIds.indexOf(id) !== index);
+    if (duplicatePlayers.length > 0) {
+      const playerNames = [...new Set(duplicatePlayers)].map(id => {
+        const player = players.find(p => p.id === id);
+        return player?.name || 'Unknown';
+      });
+      validationErrors.push(`Players cannot be on multiple teams: ${playerNames.join(', ')}`);
+    }
+    
+    if (validationErrors.length > 0) {
+      alert('❌ Cannot start season. Please fix these issues:\n\n' + validationErrors.map((e, i) => `${i + 1}. ${e}`).join('\n'));
       return;
     }
 
-    if (confirm('Start this season? Teams cannot be changed after starting.')) {
+    if (confirm('Start this season? Teams and schedule will be locked after starting.')) {
       // Generate schedule with actual team IDs
       const teamIds = teams.map(t => t.id);
       const schedule = generateRoundRobinSchedule(
@@ -236,11 +275,23 @@ const TeamSetupCard = ({ team, season, players, allTeams, isEditing, onEdit, onS
 
   const handleSave = () => {
     if (!teamName.trim()) {
-      alert('Team name is required');
+      alert('❌ Team name is required');
       return;
     }
+    
+    // Check for duplicate team names (case-insensitive)
+    const duplicateName = allTeams.find(t => 
+      t.id !== team.id && 
+      t.name.toLowerCase() === teamName.trim().toLowerCase()
+    );
+    
+    if (duplicateName) {
+      alert(`❌ A team named "${duplicateName.name}" already exists. Please use a different name.`);
+      return;
+    }
+    
     if (selectedPlayers.length !== season.playersPerTeam) {
-      alert(`Please select exactly ${season.playersPerTeam} players`);
+      alert(`❌ Please select exactly ${season.playersPerTeam} players`);
       return;
     }
     onSave({ name: teamName, playerIds: selectedPlayers });

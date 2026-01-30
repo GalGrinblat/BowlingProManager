@@ -154,8 +154,13 @@ export const SeasonGamePlayer = ({ gameId, onBack }) => {
   };
 
   const finishGame = () => {
-    // Ensure game is marked as completed
-    const updated = { ...game, status: 'completed', completedAt: new Date().toISOString() };
+    // Ensure game is marked as completed and track who completed it
+    const updated = { 
+      ...game, 
+      status: 'completed', 
+      completedAt: new Date().toISOString(),
+      enteredBy: currentUser.userId // Track who completed this game
+    };
     gamesApi.update(gameId, updated);
     onBack();
   };
