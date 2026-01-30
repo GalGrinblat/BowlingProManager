@@ -1,5 +1,4 @@
-import React from 'react';
-import { Trophy, Plus } from './Icons';
+import { Plus } from './Icons';
 
 export function StartView({ onStartGame }) {
   return (

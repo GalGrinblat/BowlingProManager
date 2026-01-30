@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { seasonsApi, teamsApi, gamesApi, leaguesApi } from '../../services/api';
 import { calculateTeamStandings, calculatePlayerSeasonStats } from '../../utils/standingsUtils';
-import { createEmptyMatch } from '../../utils/matchUtils';
 import { postponeMatchDay, formatMatchDate } from '../../utils/scheduleUtils';
 import { 
   exportStandingsCSV, 

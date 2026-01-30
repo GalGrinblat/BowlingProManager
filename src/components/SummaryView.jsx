@@ -1,4 +1,3 @@
-import React from 'react';
 import { ArrowLeft, CheckCircle } from './Icons';
 
 export function SummaryView({ game, totals, playerStats, onBack, onFinish }) {

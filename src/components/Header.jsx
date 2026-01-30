@@ -1,4 +1,3 @@
-import React from 'react';
 import { Trophy } from './Icons';
 import { useAuth } from '../contexts/AuthContext';
 

@@ -1,4 +1,3 @@
-import React from 'react';
 import { ArrowLeft, ArrowRight, Star } from './Icons';
 
 export function MatchView({ matchNumber, game, onUpdateScore, onNavigate, onCancel, isReadOnly = false }) {

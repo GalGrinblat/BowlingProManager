@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { leaguesApi, seasonsApi, teamsApi, playersApi, gamesApi } from '../../services/api';
-import { createSeason, createTeam, validateSeason, validateTeam } from '../../models';
+import { leaguesApi, seasonsApi, teamsApi, gamesApi } from '../../services/api';
+import { createSeason, createTeam, validateSeason } from '../../models';
 import { generateRoundRobinSchedule } from '../../utils/scheduleUtils';
 import { exportSeasonJSON } from '../../utils/exportUtils';
 

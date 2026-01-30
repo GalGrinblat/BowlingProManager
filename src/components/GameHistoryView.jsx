@@ -1,6 +1,3 @@
-import React from 'react';
-import { Star } from './Icons';
-
 export const GameHistoryView = ({ game, onBack }) => {
   if (!game) return <div>Loading...</div>;
 

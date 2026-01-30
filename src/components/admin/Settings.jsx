@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { organizationApi } from '../../services/api';
+import { organizationApi, utilApi } from '../../services/api';
 
 export const Settings = ({ onBack }) => {
   const [organization, setOrganization] = useState(null);
@@ -147,7 +147,7 @@ export const Settings = ({ onBack }) => {
               onClick={() => {
                 if (confirm('Are you sure you want to delete ALL data? This cannot be undone!')) {
                   if (confirm('This is your final warning. Delete everything?')) {
-                    localStorage.clear();
+                    utilApi.clearAll();
                     window.location.reload();
                   }
                 }

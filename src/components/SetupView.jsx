@@ -1,4 +1,3 @@
-import React from 'react';
 import { TEAM_OPTIONS } from '../constants/teams';
 
 export function SetupView({ game, onTeamNameChange, onPlayerNameChange, onPlayerAverageChange, onToggleAbsent, onStartMatches, onCancel }) {
