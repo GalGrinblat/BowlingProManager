@@ -97,7 +97,7 @@ export function SetupView({ game, onTeamNameChange, onPlayerNameChange, onPlayer
                   <div>
                     <label className="text-xs font-semibold text-gray-600 block mb-1">Handicap</label>
                     <div className="px-2 py-2 sm:py-3 bg-yellow-100 text-yellow-800 rounded font-bold text-center border border-yellow-300 text-sm sm:text-base">
-                      {player.handicap}
+                      {game.useHandicap === false ? 'N/A' : player.handicap}
                     </div>
                   </div>
                 </div>
@@ -157,7 +157,7 @@ export function SetupView({ game, onTeamNameChange, onPlayerNameChange, onPlayer
                   <div>
                     <label className="text-xs font-semibold text-gray-600 block mb-1">Handicap</label>
                     <div className="px-2 py-2 sm:py-3 bg-yellow-100 text-yellow-800 rounded font-bold text-center border border-yellow-300 text-sm sm:text-base">
-                      {player.handicap}
+                      {game.useHandicap === false ? 'N/A' : player.handicap}
                     </div>
                   </div>
                 </div>

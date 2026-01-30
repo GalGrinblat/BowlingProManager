@@ -1,6 +1,6 @@
 # Bowling League Management System
 
-A comprehensive bowling league management system built with React, Vite, and Tailwind CSS. Features multi-league support, season tracking, automated scheduling with dates, configurable bonus rules, and the original 3-match scoring system with handicap calculations and multi-layered bonus points.
+A comprehensive bowling league management system built with React, Vite, and Tailwind CSS. Features multi-league support, season tracking, automated scheduling with dates, configurable bonus rules, optional percentage-based handicap system, and the original 3-match scoring system with multi-layered bonus points.
 
 ## Project Structure
 
@@ -119,7 +119,8 @@ Organization
   - Pre-configured team options with player rosters
   - Manual player name and average entry
   - Absent player handling (auto-scores as average - 10)
-  - Automatic handicap calculation (configurable basis)
+  - Optional handicap system with percentage control (0-100%)
+  - Configurable handicap basis per league/season
   
 - **Dynamic Match Scoring**: 
   - Configurable number of matches (1-5)
@@ -190,9 +191,13 @@ Organization
 - Can be marked absent during setup or per-game
 
 ### Handicap Calculation
-- Configurable per league (default 160-pin basis)
-- Formula: `handicap = Math.max(0, basis - average)`
+- **Optional**: Can be enabled/disabled per league
+- **Percentage-Based**: Configure handicap as a percentage of the difference
+- **Formula**: `handicap = Math.round((basis - average) * (percentage / 100))`
+- **Example**: 160 basis, 150 average, 80% → 10 difference × 80% = 8 handicap
+- **Default**: Enabled with 160-pin basis at 100% (maintains traditional calculation)
 - Applied to all individual game comparisons and match totals
+- Shows "N/A" or "Disabled" when handicap is turned off
 
 ## How to Run
 

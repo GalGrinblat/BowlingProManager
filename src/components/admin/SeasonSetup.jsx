@@ -63,22 +63,38 @@ export const SeasonSetup = ({ seasonId, onBack }) => {
           if (team1 && team2) {
             const team1Players = team1.playerIds.map(id => {
               const player = players.find(p => p.id === id);
+              const playerAvg = player?.startingAverage || 0;
+              let handicap = 0;
+              
+              if (season.useHandicap && playerAvg < season.handicapBasis) {
+                const diff = season.handicapBasis - playerAvg;
+                handicap = Math.round(diff * (season.handicapPercentage / 100));
+              }
+              
               return {
                 rank: team1.playerIds.indexOf(id) + 1,
                 name: player?.name || '',
-                average: player?.startingAverage || 0,
-                handicap: Math.max(0, season.handicapBasis - (player?.startingAverage || 0)),
+                average: playerAvg,
+                handicap,
                 absent: false
               };
             });
 
             const team2Players = team2.playerIds.map(id => {
               const player = players.find(p => p.id === id);
+              const playerAvg = player?.startingAverage || 0;
+              let handicap = 0;
+              
+              if (season.useHandicap && playerAvg < season.handicapBasis) {
+                const diff = season.handicapBasis - playerAvg;
+                handicap = Math.round(diff * (season.handicapPercentage / 100));
+              }
+              
               return {
                 rank: team2.playerIds.indexOf(id) + 1,
                 name: player?.name || '',
-                average: player?.startingAverage || 0,
-                handicap: Math.max(0, season.handicapBasis - (player?.startingAverage || 0)),
+                average: playerAvg,
+                handicap,
                 absent: false
               };
             });
@@ -137,7 +153,7 @@ export const SeasonSetup = ({ seasonId, onBack }) => {
           <span>🏆 {season.numberOfTeams} teams</span>
           <span>👥 {season.playersPerTeam} players/team</span>
           <span>🔄 {season.numberOfRounds} round{season.numberOfRounds !== 1 ? 's' : ''}</span>
-          <span>📊 Handicap: {season.handicapBasis}</span>
+          <span>📊 Handicap: {season.useHandicap ? `${season.handicapBasis} (${season.handicapPercentage}%)` : 'Disabled'}</span>
         </div>
       </div>
 

@@ -10,6 +10,8 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
     name: '',
     description: '',
     defaultHandicapBasis: 160,
+    useHandicap: true,
+    handicapPercentage: 100,
     defaultPlayersPerTeam: 4,
     defaultMatchesPerGame: 3,
     dayOfWeek: '',
@@ -50,8 +52,10 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
       name: '',
       description: '',
       defaultHandicapBasis: 160,
+      useHandicap: true,
+      handicapPercentage: 100,
       defaultPlayersPerTeam: 4,
-      defaultMatchesPerGame: 3,
+      defaultMatchesPerTeam: 3,
       dayOfWeek: '',
       bonusRules: [
         { type: 'player', condition: 'vs_average', threshold: 50, points: 1 },
@@ -68,6 +72,8 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
       name: league.name,
       description: league.description || '',
       defaultHandicapBasis: league.defaultHandicapBasis,
+      useHandicap: league.useHandicap !== undefined ? league.useHandicap : true,
+      handicapPercentage: league.handicapPercentage || 100,
       defaultPlayersPerTeam: league.defaultPlayersPerTeam,
       defaultMatchesPerGame: league.defaultMatchesPerGame || 3,
       dayOfWeek: league.dayOfWeek || '',
@@ -104,7 +110,15 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
       name: '',
       description: '',
       defaultHandicapBasis: 160,
+      useHandicap: true,
+      handicapPercentage: 100,
       defaultPlayersPerTeam: 4,
+      defaultMatchesPerGame: 3,
+      dayOfWeek: '',
+      bonusRules: [
+        { type: 'player', condition: 'vs_average', threshold: 50, points: 1 },
+        { type: 'player', condition: 'vs_average', threshold: 70, points: 2 }
+      ],
       active: true
     });
     setIsAdding(false);
@@ -165,21 +179,12 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
                   rows="3"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Default Handicap Basis
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  max="300"
-                  value={formData.defaultHandicapBasis}
-                  onChange={(e) => setFormData({ ...formData, defaultHandicapBasis: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-                <p className="text-xs text-gray-500 mt-1">Pin basis for handicap calculation</p>
-              </div>
-              <div>
+            </div>
+
+            {/* League Settings */}
+            <div className="border-t pt-4 mt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Default Players per Team
                 </label>
@@ -226,6 +231,62 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
                   <option value="Saturday">Saturday</option>
                 </select>
                 <p className="text-xs text-gray-500 mt-1">Day of the week games are played</p>
+              </div>
+              </div>
+            </div>
+
+            {/* Handicap Settings Section */}
+            <div className="border-t pt-4 mt-4">
+              <h3 className="text-lg font-bold text-gray-800 mb-3">Handicap Settings</h3>
+              <p className="text-sm text-gray-600 mb-3">
+                Configure how handicap is calculated for this league
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.useHandicap}
+                      onChange={(e) => setFormData({ ...formData, useHandicap: e.target.checked })}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                    />
+                    <span className="text-sm font-semibold text-gray-700">Use Handicap</span>
+                  </label>
+                  <p className="text-xs text-gray-500 mt-1">Enable or disable handicap for this league</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Handicap Basis
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="300"
+                    value={formData.defaultHandicapBasis}
+                    onChange={(e) => setFormData({ ...formData, defaultHandicapBasis: e.target.value })}
+                    disabled={!formData.useHandicap}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Pin basis for handicap calculation</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Handicap Percentage
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={formData.handicapPercentage}
+                    onChange={(e) => setFormData({ ...formData, handicapPercentage: e.target.value })}
+                    disabled={!formData.useHandicap}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Percentage of difference from basis (e.g., 80% = 8 pins if diff is 10)
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -428,7 +489,7 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
                       )}
                       <div className="flex gap-4 mt-2 text-sm text-gray-500">
                         {league.dayOfWeek && <span>📅 {league.dayOfWeek}s</span>}
-                        <span>📊 Handicap: {league.defaultHandicapBasis}</span>
+                        <span>📊 Handicap: {league.useHandicap !== false ? `${league.defaultHandicapBasis} (${league.handicapPercentage || 100}%)` : 'Disabled'}</span>
                         <span>👥 {league.defaultPlayersPerTeam} players/team</span>
                         <span>🎳 {seasons.length} season{seasons.length !== 1 ? 's' : ''}</span>
                       </div>

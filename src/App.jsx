@@ -83,8 +83,14 @@ function AppContent() {
     const avgValue = average === '' ? '' : Math.max(0, Math.min(300, parseInt(average) || 0));
     updated[team].players[playerIndex].average = avgValue;
     
-    if (avgValue !== '' && avgValue < 160) {
-      updated[team].players[playerIndex].handicap = 160 - avgValue;
+    // For legacy games, use default handicap settings (160 basis, 100%, always enabled)
+    const useHandicap = updated.useHandicap !== undefined ? updated.useHandicap : true;
+    const handicapBasis = updated.handicapBasis || 160;
+    const handicapPercentage = updated.handicapPercentage || 100;
+    
+    if (useHandicap && avgValue !== '' && avgValue < handicapBasis) {
+      const diff = handicapBasis - avgValue;
+      updated[team].players[playerIndex].handicap = Math.round(diff * (handicapPercentage / 100));
     } else {
       updated[team].players[playerIndex].handicap = 0;
     }

@@ -35,9 +35,11 @@ Organization
 ## Critical Business Logic (Must Understand These)
 
 ### Handicap Calculation
-- **Rule**: Configurable per season (default 160-pin) → `handicap = Math.max(0, basis - average)`
+- **Rule**: Optional and percentage-based → `handicap = Math.round((basis - average) * (percentage / 100))`
+- **Configuration**: Each league can enable/disable handicap and set percentage (0-100%)
+- **Default**: useHandicap=true, handicapBasis=160, handicapPercentage=100%
 - **Applied to**: Individual game comparisons AND match totals
-- **Location**: Season setup, [matchUtils.js](../src/utils/matchUtils.js)
+- **Location**: App.jsx (legacy), SeasonSetup.jsx (season games), models/index.js (data)
 
 ### Scoring System (Complex Multi-Layer) - UNCHANGED
 1. **Individual Game Points**: Compare player1 vs player1 (with handicap) across 4 player pairs
@@ -191,9 +193,11 @@ const schedule = generateRoundRobinSchedule(teamIds, numberOfRounds);
 ## Critical Business Logic (Must Understand These)
 
 ### Handicap Calculation
-- **Rule**: 160-pin standard → `handicap = Math.max(0, 160 - average)`
+- **Rule**: Optional and percentage-based → `handicap = Math.round((basis - average) * (percentage / 100))`
+- **Configuration**: Each league/season has useHandicap (boolean), handicapBasis (0-300), handicapPercentage (0-100%)
+- **Default**: useHandicap=true, handicapBasis=160, handicapPercentage=100% (maintains legacy behavior)
 - **Applied to**: Both individual game comparisons AND match totals with handicap
-- **Location**: [App.jsx](../src/App.jsx#L39-L45) (setup), [matchUtils.js](../src/utils/matchUtils.js) (calculations)
+- **Location**: App.jsx (legacy games), SeasonSetup.jsx (season games), models/index.js (schemas)
 
 ### Scoring System (Complex Multi-Layer)
 1. **Individual Game Points**: Compare player1 vs player1 (with handicap) across all 4 player pairs

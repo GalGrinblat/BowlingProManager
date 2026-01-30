@@ -83,7 +83,7 @@ export const LeagueDetail = ({ leagueId, onBack, onViewSeason }) => {
         )}
         <div className="flex gap-4 mt-4 text-sm text-gray-600">
           {league.dayOfWeek && <span>📅 {league.dayOfWeek}s</span>}
-          <span>📊 Handicap Basis: {league.defaultHandicapBasis}</span>
+          <span>📊 Handicap: {league.useHandicap !== false ? `${league.defaultHandicapBasis} (${league.handicapPercentage || 100}%)` : 'Disabled'}</span>
           <span>👥 Default: {league.defaultPlayersPerTeam} players/team</span>
         </div>
       </div>
@@ -277,6 +277,8 @@ const SeasonCreator = ({ league, onCancel, onSuccess }) => {
     playersPerTeam: league.defaultPlayersPerTeam,
     numberOfRounds: 1,
     handicapBasis: league.defaultHandicapBasis,
+    useHandicap: league.useHandicap !== undefined ? league.useHandicap : true,
+    handicapPercentage: league.handicapPercentage || 100,
     matchesPerGame: league.defaultMatchesPerGame || 3,
     bonusRules: league.bonusRules || [],
     startDate: new Date().toISOString().split('T')[0]
@@ -391,6 +393,34 @@ const SeasonCreator = ({ league, onCancel, onSuccess }) => {
               onChange={(e) => setFormData({ ...formData, handicapBasis: parseInt(e.target.value) })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
+          </div>
+          <div>
+            <label className="flex items-center space-x-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.useHandicap}
+                onChange={(e) => setFormData({ ...formData, useHandicap: e.target.checked })}
+                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+              />
+              <span className="text-sm font-semibold text-gray-700">Use Handicap</span>
+            </label>
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Handicap Percentage
+            </label>
+            <input
+              type="number"
+              min="0"
+              max="100"
+              value={formData.handicapPercentage}
+              onChange={(e) => setFormData({ ...formData, handicapPercentage: parseInt(e.target.value) })}
+              disabled={!formData.useHandicap}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Percentage of difference from basis
+            </p>
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">

@@ -44,7 +44,7 @@ export function MatchView({ matchNumber, game, onUpdateScore, onNavigate, onCanc
                   <div className="flex-1 min-w-0">
                     <div className="font-semibold text-white text-sm truncate">{player.name}</div>
                     <div className="text-xs text-gray-400">
-                      Avg: {player.average} | HC: {player.handicap}
+                      Avg: {player.average} | HC: {game.useHandicap === false ? 'N/A' : player.handicap}
                       {player.absent && <span className="text-red-400 font-bold ml-1">(ABSENT)</span>}
                     </div>
                   </div>
@@ -197,7 +197,7 @@ export function MatchView({ matchNumber, game, onUpdateScore, onNavigate, onCanc
                   <div className="flex-1 min-w-0">
                     <div className="font-semibold text-white text-sm text-right truncate">{game.team2.players[idx].name}</div>
                     <div className="text-xs text-gray-400 text-right">
-                      Avg: {game.team2.players[idx].average} | HC: {game.team2.players[idx].handicap}
+                      Avg: {game.team2.players[idx].average} | HC: {game.useHandicap === false ? 'N/A' : game.team2.players[idx].handicap}
                       {game.team2.players[idx].absent && <span className="text-red-400 font-bold ml-1">(ABSENT)</span>}
                     </div>
                   </div>
