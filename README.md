@@ -196,6 +196,13 @@ Organization
 
 ## How to Run
 
+### Start of Day Routine ☀️
+Before starting work each day, run the health check:
+```bash
+npm run check
+```
+This checks for errors, warnings, TODOs, and project health. See [START_OF_DAY.md](START_OF_DAY.md) for details.
+
 ### Development Setup
 ```bash
 # Install dependencies

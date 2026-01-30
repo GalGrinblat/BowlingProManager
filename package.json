@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "check": "node scripts/start-of-day.js",
+    "check:ps": "powershell -ExecutionPolicy Bypass -File scripts/start-of-day.ps1"
   },
   "dependencies": {
     "react": "^18.0.0",
