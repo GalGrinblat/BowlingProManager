@@ -1,6 +1,6 @@
 # Bowling League Management System
 
-A comprehensive bowling league management system built with React, Vite, and Tailwind CSS. Features multi-league support, season tracking, automated scheduling with dates, configurable bonus rules, optional percentage-based handicap system, and the original 3-match scoring system with multi-layered bonus points.
+A comprehensive bowling league management system built with React, Vite, and Tailwind CSS. Features multi-league support, season tracking, automated scheduling with dates, configurable bonus rules, optional percentage-based handicap system, and an n-match scoring system (configurable matches per game) with multi-layered bonus points.
 
 ## Project Structure
 
@@ -62,7 +62,7 @@ Organization
     └── Seasons (per league)
         ├── Season Config (teams, rounds, schedule with dates)
         ├── Teams (assigned players from registry)
-        ├── Games (3-match scoring system)
+        ├── Games (n-match scoring system)
         └── Standings (team & player stats)
 ```
 
@@ -123,8 +123,8 @@ Organization
   - Configurable handicap basis per league/season
   
 - **Dynamic Match Scoring**: 
-  - Configurable number of matches (1-5)
-  - Individual game tracking (4 players per team default)
+  - Configurable number of matches (1-5, default 3)
+  - Individual game tracking (configurable players per team, default 4)
   - Real-time score entry with validation (0-300 pins)
   - Live calculation of pins with handicap
   - Visual winner indicators per game
@@ -159,8 +159,8 @@ Organization
 
 ## Scoring Rules
 
-### Per-Match Scoring
-1. **Individual Game Points** (4 games per match by default):
+### Per-Match Scoring (All values configurable)
+1. **Individual Game Points** (configurable players per team, default 4):
    - Each player competes against their rank counterpart (1 vs 1, 2 vs 2, etc.)
    - Score = pins + handicap
    - Win = 1 point, Draw = 0.5 points, Loss = 0 points

@@ -38,7 +38,7 @@ The Bowling League Management System includes a comprehensive test suite coverin
 - Pure score bonus rules
 
 **Key Tests**:
-- ✅ Bonus points: +1 for 50+, +2 for 70+ above average
+- ✅ Bonus points: Default +1 for 50+, +2 for 70+ above average (configurable)
 - ✅ Individual game wins/losses with handicap
 - ✅ Draw when totals are equal
 - ✅ Absent players cannot earn bonuses

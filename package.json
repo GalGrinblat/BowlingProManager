@@ -1,7 +1,7 @@
 {
   "name": "bowling-league-app",
   "version": "1.0.0",
-  "description": "A 3-match bowling league scoring application with handicap calculations",
+  "description": "An n-match bowling league scoring application with configurable matches per game and handicap calculations",
   "type": "module",
   "scripts": {
     "dev": "vite",

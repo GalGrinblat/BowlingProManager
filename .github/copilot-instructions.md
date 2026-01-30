@@ -2,7 +2,7 @@
 
 ## Architecture Overview
 
-This is a **comprehensive bowling league management system** with multi-league support, season tracking, and the original 3-match scoring system with handicap calculations and multi-layered bonus points. The system has evolved from single-game tracking to full organization management.
+This is a **comprehensive bowling league management system** with multi-league support, season tracking, and an n-match scoring system (configurable matches per game) with handicap calculations and multi-layered bonus points.
 
 ### System Hierarchy
 ```
@@ -13,7 +13,7 @@ Organization
     └── Seasons (per league)
         ├── Season Config (teams, rounds, schedule)
         ├── Teams (assigned players from registry)
-        ├── Games (3-match scoring system)
+        ├── Games (n-match scoring system)
         └── Standings (team & player stats)
 ```
 
@@ -23,7 +23,7 @@ Organization
 - **League**: Independent league with its own rules and seasons
 - **Season**: Time-bound competition within a league
 - **Team**: Group of players assigned to compete in a season
-- **Game**: 3-match bowling game (existing scoring logic)
+- **Game**: Multi-match bowling game with scoring system (configurable matches per game)
 - **Standings**: Calculated team rankings and player statistics
 
 ### State Management & Data Flow
@@ -39,13 +39,17 @@ Organization
 - **Configuration**: Each league can enable/disable handicap and set percentage (0-100%)
 - **Default**: useHandicap=true, handicapBasis=160, handicapPercentage=100%
 - **Applied to**: Individual game comparisons AND match totals
-- **Location**: App.jsx (legacy), SeasonSetup.jsx (season games), models/index.js (data)
+- **Location**: SeasonSetup.jsx (season games), models/index.js (data)
 
-### Scoring System (Complex Multi-Layer) - UNCHANGED
-1. **Individual Game Points**: Compare player1 vs player1 (with handicap) across 4 player pairs
-2. **Bonus Points**: Per-player based on score vs average (+1 for ≥50, +2 for ≥70)
+### Scoring System (Complex Multi-Layer)
+**Note**: Players per team, matches per game, and bonus rules are all configurable per league/season.
+
+1. **Individual Game Points**: Compare player1 vs player1 (with handicap) across all player pairs (configurable players per team)
+2. **Bonus Points**: Per-player based on configurable bonus rules
+   - Default: +1 bonus if score ≥ average + 50 pins, +2 if ≥ average + 70 pins
+   - Fully customizable via bonusRules array in league/season config
 3. **Match Winner Point**: +1 if team wins match (higher total with handicap)
-4. **Grand Total Points**: +2 points awarded to team with highest combined pins across 3 matches (not a bonus, but additional points)
+4. **Grand Total Points**: +2 points awarded to team with highest combined pins across all matches (not a bonus, but additional points only if all matches complete)
 - **Location**: [matchUtils.js](../src/utils/matchUtils.js)
 
 ### Season Management
@@ -101,10 +105,10 @@ authApi.{ getCurrentUser, login, logout, isAdmin }
 - **SeasonDashboard**: View schedule, standings, select games
 - **SeasonGamePlayer**: Wrapper around MatchView for season games
 
-### Existing Game Components (Reused)
-- **MatchView**: 3-match scoring interface
+### Game Components
+- **MatchView**: Multi-match scoring interface
 - **SummaryView**: Game results and statistics
-- All existing scoring logic works within season context
+- **GameHistoryView**: View completed game details
 
 ### View Navigation & State Management
 ```
@@ -195,44 +199,47 @@ const schedule = generateRoundRobinSchedule(teamIds, numberOfRounds);
 ### Handicap Calculation
 - **Rule**: Optional and percentage-based → `handicap = Math.round((basis - average) * (percentage / 100))`
 - **Configuration**: Each league/season has useHandicap (boolean), handicapBasis (0-300), handicapPercentage (0-100%)
-- **Default**: useHandicap=true, handicapBasis=160, handicapPercentage=100% (maintains legacy behavior)
+- **Default**: useHandicap=true, handicapBasis=160, handicapPercentage=100%
 - **Applied to**: Both individual game comparisons AND match totals with handicap
-- **Location**: App.jsx (legacy games), SeasonSetup.jsx (season games), models/index.js (schemas)
+- **Location**: SeasonSetup.jsx (season games), models/index.js (schemas)
 
 ### Scoring System (Complex Multi-Layer)
-1. **Individual Game Points**: Compare player1 vs player1 (with handicap) across all 4 player pairs
+**Configurable**: Players per team (default 4), matches per game (default 3), bonus rules (customizable)
+
+1. **Individual Game Points**: Compare player1 vs player1 (with handicap) across all player pairs
    - Win = 1 point, Draw = 0.5 points, Loss = 0 points
-2. **Bonus Points**: Per-player based on score vs average
-   - +1 bonus if score ≥ average + 50 pins
-   - +2 bonus if score ≥ average + 70 pins
+2. **Bonus Points**: Per-player based on configurable bonus rules
+   - Default: +1 bonus if score ≥ average + 50 pins, +2 if ≥ average + 70 pins
+   - Custom rules supported via bonusRules array (condition types: 'vs_average', 'pure_score')
    - Applied to match score calculation
 3. **Match Winner Point**: +1 point if team wins match (has higher total with handicap)
-4. **Grand Total Points**: +2 points awarded to team with highest combined pins across all 3 matches (not a bonus, but additional points only if all matches complete)
+4. **Grand Total Points**: +2 points awarded to team with highest combined pins across all matches (only if all matches complete)
 - **Key insight**: Game points + bonus points + match winner = match score
-- **Location**: [matchUtils.js](../src/utils/matchUtils.js#L27-L85)
+- **Location**: [matchUtils.js](../src/utils/matchUtils.js)
 
 ### Validation Rules
-- **Setup validation**: All teams, players, names, and averages required
-- **Match validation**: All 4 players per team must have scores before advancing
-- **Game completion**: All 3 matches must be complete to finish
-- **Location**: [gameUtils.js](../src/utils/gameUtils.js#L41-L65)
+- **Season setup validation**: All teams must have assigned players
+- **Match validation**: All players per team must have scores before advancing (configurable players per team)
+- **Game completion**: All matches must be complete to finish (configurable matches per game)
+- **Location**: SeasonSetup.jsx, SeasonGamePlayer.jsx
 
 ## Component-to-Utility Communication Patterns
 
 ### State Update Flow
 ```
-App.jsx state → updateMatchScore() → calculateBonusPoints() + calculateMatchResults() + calculateGrandTotalPoints() → setCurrentGame()
+SeasonGamePlayer state → updateMatchScore() → calculateBonusPoints() + calculateMatchResults() + calculateGrandTotalPoints() → setGame()
 ```
 
-### Key State Mutations (All in App.jsx)
-- `updatePlayerAverage()`: Mutates player average AND recalculates handicap
-- `updateMatchScore()`: Mutates pins AND triggers 3 utility recalculations
-- All mutations use immutable pattern: `const updated = { ...currentGame }`
+### Key State Mutations (In SeasonGamePlayer)
+- Game state managed per season game
+- All mutations use immutable pattern: `const updated = { ...game }`
+- Changes persisted via gamesApi.update()
 
 ### Utility Function Organization
-- **gameUtils.js**: Game initialization (`createNewGame`), validation only
-- **matchUtils.js**: Calculations for individual games, bonus points, match totals
+- **matchUtils.js**: Calculations for individual games, bonus points, match totals, empty match creation
 - **statsUtils.js**: Aggregation functions (player stats, game totals, grand totals)
+- **scheduleUtils.js**: Round-robin schedule generation
+- **standingsUtils.js**: Team and player standings calculations
 
 ## Common Implementation Patterns
 
@@ -263,13 +270,10 @@ setCurrentGame(updated);
 
 ## View Navigation & State Management
 
-**View states**: `start` → `setup` → `match1` → `match2` → `match3` → `summary` → `start`
+**Admin Flow**: dashboard → players/leagues → league-detail → season-setup → season-dashboard → season-game → (MatchView)
 
-- **Games array**: Completed games stored here
-- **currentGame**: Active game during play
-- **currentView**: Controls which component renders
-
-**Navigation functions**: `startNewGame()`, `goToNextMatch()`, `goToPreviousMatch()`, `finishGame()`, `cancelGame()`
+**State**: navigationState = { leagueId, seasonId, gameId }
+**Navigation**: navigateTo(view, params)
 
 ## Development Workflow
 
@@ -280,15 +284,16 @@ setCurrentGame(updated);
 
 ## When Adding Features
 
-1. **New scoring rule?** → Modify [matchUtils.js](../src/utils/matchUtils.js), ensure backward compatibility with existing `calculateMatchResults()` structure
-2. **New statistic?** → Add to [statsUtils.js](../src/utils/statsUtils.js), follow reduce pattern
-3. **New player/team?** → Update array sizes in [gameUtils.js](../src/utils/gameUtils.js#L5-L20) AND component inputs
-4. **UI changes?** → React components import from utils, don't duplicate calculation logic
-5. **Validation changes?** → Update [gameUtils.js](../src/utils/gameUtils.js), add guards in [App.jsx](../src/App.jsx) before state updates
+1. **New API entity?** → Add to [src/services/api.js](../src/services/api.js), follow existing pattern
+2. **New data model?** → Add to [src/models/index.js](../src/models/index.js) with validation
+3. **New admin view?** → Create in `src/components/admin/`, add routing in [App.jsx](../src/App.jsx)
+4. **New statistic?** → Add to [standingsUtils.js](../src/utils/standingsUtils.js)
+5. **Schedule changes?** → Modify [scheduleUtils.js](../src/utils/scheduleUtils.js)
+6. **Scoring changes?** → Update [matchUtils.js](../src/utils/matchUtils.js) - test thoroughly!
 
 ## Known Edge Cases
 
 - **Empty pin strings**: Treated as 0 in calculations, not entered in calculations until all pins filled
 - **Draws in individual games**: Each team gets 0.5 points
 - **Incomplete matches**: Handicap totals calculated as 0 for missing pins
-- **Grand total points**: Only awarded if all 3 matches complete with all scores entered
+- **Grand total points**: Only awarded if all matches complete with all scores entered (number of matches is configurable)
