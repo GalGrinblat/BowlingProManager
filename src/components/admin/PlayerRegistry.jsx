@@ -9,8 +9,6 @@ export const PlayerRegistry = ({ onBack }) => {
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
-    phone: '',
     startingAverage: '',
     active: true
   });
@@ -59,7 +57,7 @@ export const PlayerRegistry = ({ onBack }) => {
       alert(`✅ Player "${playerData.name}" created successfully.`);
     }
 
-    setFormData({ name: '', email: '', phone: '', startingAverage: '', active: true });
+    setFormData({ name: '', startingAverage: '', active: true });
     setIsAdding(false);
     loadPlayers();
   };
@@ -67,8 +65,6 @@ export const PlayerRegistry = ({ onBack }) => {
   const handleEdit = (player) => {
     setFormData({
       name: player.name,
-      email: player.email || '',
-      phone: player.phone || '',
       startingAverage: player.startingAverage || '',
       active: player.active
     });
@@ -102,16 +98,14 @@ export const PlayerRegistry = ({ onBack }) => {
   };
 
   const handleCancel = () => {
-    setFormData({ name: '', email: '', phone: '', startingAverage: '', active: true });
+    setFormData({ name: '', startingAverage: '', active: true });
     setIsAdding(false);
     setEditingId(null);
   };
 
   const filteredPlayers = players.filter(p =>
-    p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (p.email && p.email.toLowerCase().includes(searchTerm.toLowerCase()))
+    p.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
   // Reset pagination when search changes
   React.useEffect(() => {
     activePagination.resetPage();
@@ -173,28 +167,6 @@ export const PlayerRegistry = ({ onBack }) => {
                   max="300"
                   value={formData.startingAverage}
                   onChange={(e) => setFormData({ ...formData, startingAverage: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Phone
-                </label>
-                <input
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
@@ -265,9 +237,7 @@ export const PlayerRegistry = ({ onBack }) => {
                 <div className="flex justify-between items-start">
                   <div>
                     <h3 className="font-semibold text-gray-800">{player.name}</h3>
-                    <div className="text-sm text-gray-600 mt-1 space-y-1">
-                      {player.email && <div>📧 {player.email}</div>}
-                      {player.phone && <div>📱 {player.phone}</div>}
+                    <div className="text-sm text-gray-600 mt-1">
                       <div>📊 Starting Average: {player.startingAverage || 'Not set'}</div>
                     </div>
                   </div>

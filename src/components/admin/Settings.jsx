@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { organizationApi, utilApi } from '../../services/api';
+import { seedDemoData } from '../../utils/demoDataUtils';
 
 export const Settings = ({ onBack }) => {
   const [organization, setOrganization] = useState(null);
@@ -9,6 +10,7 @@ export const Settings = ({ onBack }) => {
   });
   const [importFile, setImportFile] = useState(null);
   const [importPreview, setImportPreview] = useState(null);
+  const [isSeeding, setIsSeeding] = useState(false);
 
   useEffect(() => {
     loadOrganization();
@@ -74,6 +76,26 @@ export const Settings = ({ onBack }) => {
   const cancelImport = () => {
     setImportFile(null);
     setImportPreview(null);
+  };
+
+  const handleSeedDemoData = () => {
+    if (confirm('This will create demo data including 40 players, 2 leagues, 16 teams, and completed first round games. Continue?')) {
+      setIsSeeding(true);
+      try {
+        const result = seedDemoData();
+        alert(`Demo data created successfully!\n\n` +
+              `- ${result.players} players\n` +
+              `- ${result.leagues} leagues\n` +
+              `- ${result.seasons} seasons\n` +
+              `- ${result.teams} teams\n` +
+              `- ${result.completedGames} completed games\n\n` +
+              `Reloading page...`);
+        window.location.reload();
+      } catch (error) {
+        alert('Error seeding demo data: ' + error.message);
+        setIsSeeding(false);
+      }
+    }
   };
 
   if (!organization) return <div>Loading...</div>;
@@ -223,6 +245,36 @@ export const Settings = ({ onBack }) => {
               </div>
             </div>
           )}
+        </div>
+      </div>
+
+      {/* Demo Data Section */}
+      <div className="bg-white rounded-xl shadow-lg p-6">
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">Demo Data</h2>
+        <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
+          <h3 className="text-lg font-semibold text-purple-900 mb-2">🎳 Seed Demo Data</h3>
+          <p className="text-sm text-purple-800 mb-3">
+            Quickly populate your system with realistic demo data for testing:
+          </p>
+          <ul className="text-sm text-purple-700 mb-4 ml-4 list-disc space-y-1">
+            <li>40 players with realistic names and averages (120-220)</li>
+            <li>2 leagues (Monday & Thursday nights)</li>
+            <li>8 teams per league (16 teams total)</li>
+            <li>4 players per team</li>
+            <li>4 rounds scheduled per season</li>
+            <li>First round completed with realistic scores</li>
+          </ul>
+          <button
+            onClick={handleSeedDemoData}
+            disabled={isSeeding}
+            className={`px-6 py-2 rounded-lg font-semibold ${
+              isSeeding 
+                ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                : 'bg-purple-600 text-white hover:bg-purple-700'
+            }`}
+          >
+            {isSeeding ? '🔄 Creating Demo Data...' : '🚀 Seed Demo Data'}
+          </button>
         </div>
       </div>
 

@@ -6,14 +6,10 @@
 // ===== PLAYER MODEL =====
 export const createPlayer = ({
   name = '',
-  email = '',
-  phone = '',
   startingAverage = 0,
   active = true
 }) => ({
   name,
-  email,
-  phone,
   startingAverage: parseInt(startingAverage) || 0,
   active
 });

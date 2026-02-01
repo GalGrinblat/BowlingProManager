@@ -275,6 +275,82 @@ export const calculatePlayerSeasonStats = (teams, games) => {
 };
 
 /**
+ * Calculate current player averages for handicap recalculation
+ * Returns a map of playerName -> { average, gamesPlayed }
+ * Uses completed games only to determine current performance
+ */
+export const calculateCurrentPlayerAverages = (teams, games) => {
+  const playerAverages = {};
+  
+  // Process completed games only
+  const completedGames = games.filter(g => g.status === 'completed');
+  
+  completedGames.forEach(game => {
+    // Process team1 players
+    if (game.team1 && game.team1.players) {
+      game.team1.players.forEach((player, playerIdx) => {
+        if (!player.name) return;
+        
+        if (!playerAverages[player.name]) {
+          playerAverages[player.name] = {
+            totalPins: 0,
+            gamesPlayed: 0,
+            average: 0
+          };
+        }
+        
+        // Count pins from all matches in this game
+        game.matches.forEach(match => {
+          if (match.team1 && match.team1.players[playerIdx]) {
+            const pins = parseInt(match.team1.players[playerIdx].pins) || 0;
+            if (pins > 0 || match.team1.players[playerIdx].pins !== '') {
+              playerAverages[player.name].totalPins += pins;
+              playerAverages[player.name].gamesPlayed++;
+            }
+          }
+        });
+      });
+    }
+    
+    // Process team2 players
+    if (game.team2 && game.team2.players) {
+      game.team2.players.forEach((player, playerIdx) => {
+        if (!player.name) return;
+        
+        if (!playerAverages[player.name]) {
+          playerAverages[player.name] = {
+            totalPins: 0,
+            gamesPlayed: 0,
+            average: 0
+          };
+        }
+        
+        // Count pins from all matches in this game
+        game.matches.forEach(match => {
+          if (match.team2 && match.team2.players[playerIdx]) {
+            const pins = parseInt(match.team2.players[playerIdx].pins) || 0;
+            if (pins > 0 || match.team2.players[playerIdx].pins !== '') {
+              playerAverages[player.name].totalPins += pins;
+              playerAverages[player.name].gamesPlayed++;
+            }
+          }
+        });
+      });
+    }
+  });
+  
+  // Calculate averages
+  Object.keys(playerAverages).forEach(playerName => {
+    const data = playerAverages[playerName];
+    if (data.gamesPlayed > 0) {
+      data.average = Math.round(data.totalPins / data.gamesPlayed);
+    }
+  });
+  
+  return playerAverages;
+};
+
+/**
  * Get top performers for the season
  */
 export const getTopPerformers = (playerStats) => {

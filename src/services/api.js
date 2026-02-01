@@ -184,8 +184,8 @@ export const seasonsApi = {
     const seasons = seasonsApi.getAll();
     const newSeason = {
       id: generateId(),
-      ...seasonData,
       status: 'setup', // setup, active, completed
+      ...seasonData,
       createdAt: new Date().toISOString()
     };
     seasons.push(newSeason);
@@ -292,8 +292,8 @@ export const gamesApi = {
     const games = gamesApi.getAll();
     const newGame = {
       id: generateId(),
-      ...gameData,
       status: 'pending', // pending, in-progress, completed
+      ...gameData,
       createdAt: new Date().toISOString()
     };
     games.push(newGame);

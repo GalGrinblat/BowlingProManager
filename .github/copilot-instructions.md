@@ -44,7 +44,12 @@ Organization
 - **Configuration**: Each league can enable/disable handicap and set percentage (0-100%)
 - **Default**: useHandicap=true, handicapBasis=160, handicapPercentage=100%
 - **Applied to**: Individual game comparisons AND match totals
-- **Location**: SeasonSetup.jsx (season games), models/index.js (data)
+- **Dynamic Updates**: Handicaps recalculate before each game based on current season average
+  - When a game loads in SeasonGamePlayer, it checks completed games before that matchday
+  - Calculates current average from all completed matches (uses `calculateCurrentPlayerAverages` from `src/utils/standingsUtils.js`)
+  - If player has completed games, handicap uses current average; otherwise uses startingAverage from player registry
+  - Example: Player starts at 150 avg (handicap 10), bowls 165 avg in round 1, round 2 handicap becomes 0
+- **Location**: SeasonSetup.jsx (initial games), SeasonGamePlayer.jsx (dynamic updates), models/index.js (data)
 
 ### Scoring System (Complex Multi-Layer)
 **Note**: Players per team, matches per game, bonus rules, and all point values are configurable per league/season.
@@ -61,10 +66,10 @@ Organization
 4. **Grand Total Points**: Awarded to team with highest combined pins across all matches
    - **Configurable**: grandTotalPoints (default: 2)
    - Draw = 50% of points to each team
-- **Location**: [matchUtils.js](../src/utils/matchUtils.js)
+- **Location**: `src/utils/matchUtils.js`
 
 ### Season Management
-- **Round-Robin Scheduling**: Auto-generated in [scheduleUtils.js](../src/utils/scheduleUtils.js)
+- **Round-Robin Scheduling**: Auto-generated in `src/utils/scheduleUtils.js`
   - Each round = complete round-robin (every team plays every other team once)
   - Split into "Match Days" where no team plays twice on the same day
   - Match days numbered continuously across rounds (Round 1: Days 1-3, Round 2: Days 4-6, etc.)
@@ -83,7 +88,7 @@ Organization
 ### Standings Calculation
 - **Team Standings**: Points, wins/losses, total pins (with/without handicap)
 - **Player Stats**: Average, high game, high series, total pins, games played
-- **Location**: [standingsUtils.js](../src/utils/standingsUtils.js)
+- **Location**: `src/utils/standingsUtils.js`
 - **Real-time**: Updated automatically after each game completion
 
 ## API & Data Persistence
@@ -205,26 +210,27 @@ const schedule = generateRoundRobinSchedule(teamIds, numberOfRounds);
   ```
 - **Adding New Tests**: 
   1. Create `tests/test-[feature].js` following the pattern above
-  2. Add to package.json test script: `"test": "node tests/test-validation.js && node tests/test-scoring.js && node tests/test-schedule.js && node tests/test-handicap.js && node tests/test-[feature].js"`
+  2. Add to package.json test script: `"test": "node tests/test-validation.js && node tests/test-scoring.js && node tests/test-schedule.js && node tests/test-handicap.js && node tests/test-dynamic-handicap.js && node tests/test-[feature].js"`
   3. Run `npm test` to verify all tests pass
-- **Current Test Files** (54 tests total):
+- **Current Test Files** (65 tests total):
   - `test-validation.js` (15 tests) - Data model validation
   - `test-scoring.js` (21 tests) - Scoring system and configurable points
   - `test-schedule.js` (10 tests) - Round-robin scheduling
   - `test-handicap.js` (8 tests) - Handicap calculations
+  - `test-dynamic-handicap.js` (11 tests) - Dynamic handicap recalculation during season
 
 ## When Adding Features
 
-1. **New API entity?** → Add to [src/services/api.js](../src/services/api.js), follow existing pattern
-2. **New data model?** → Add to [src/models/index.js](../src/models/index.js) with validation
-3. **New admin view?** → Create in `src/components/admin/`, add routing in [App.jsx](../src/App.jsx)
-4. **New statistic?** → Add to [standingsUtils.js](../src/utils/standingsUtils.js)
-5. **Schedule changes?** → Modify [scheduleUtils.js](../src/utils/scheduleUtils.js)
-6. **Scoring changes?** → Update [matchUtils.js](../src/utils/matchUtils.js) - test thoroughly!
-7. **Head-to-head stats?** → Update [headToHeadUtils.js](../src/utils/headToHeadUtils.js)
-8. **Export functionality?** → Update [exportUtils.js](../src/utils/exportUtils.js)
-9. **Player statistics?** → Update [statsUtils.js](../src/utils/statsUtils.js)
-10. **Pagination needed?** → Use [Pagination.jsx](../src/components/Pagination.jsx) component
+1. **New API entity?** → Add to `src/services/api.js`, follow existing pattern
+2. **New data model?** → Add to `src/models/index.js` with validation
+3. **New admin view?** → Create in `src/components/admin/`, add routing in `src/App.jsx`
+4. **New statistic?** → Add to `src/utils/standingsUtils.js`
+5. **Schedule changes?** → Modify `src/utils/scheduleUtils.js`
+6. **Scoring changes?** → Update `src/utils/matchUtils.js` - test thoroughly!
+7. **Head-to-head stats?** → Update `src/utils/headToHeadUtils.js`
+8. **Export functionality?** → Update `src/utils/exportUtils.js`
+9. **Player statistics?** → Update `src/utils/statsUtils.js`
+10. **Pagination needed?** → Use `src/components/Pagination.jsx` component
 
 ## Known Features & Behaviors
 
