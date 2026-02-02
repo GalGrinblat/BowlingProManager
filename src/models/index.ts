@@ -103,26 +103,40 @@ export const createSeason = ({
   gameWinPoints = 1,
   matchWinPoints = 1,
   grandTotalPoints = 2,
-  startDate = null,
-  endDate = null
-}) => ({
+  startDate = '',
+  endDate = ''
+}: {
+  leagueId?: string;
+  name?: string;
+  numberOfTeams?: number | string;
+  playersPerTeam?: number | string;
+  numberOfRounds?: number | string;
+  handicapBasis?: number | string;
+  useHandicap?: boolean;
+  handicapPercentage?: number | string;
+  matchesPerGame?: number | string;
+  bonusRules?: BonusRule[];
+  gameWinPoints?: number | string;
+  matchWinPoints?: number | string;
+  grandTotalPoints?: number | string;
+  startDate?: string;
+  endDate?: string;
+}): Omit<Season, 'id' | 'createdAt'> => ({
   leagueId,
   name,
-  numberOfTeams: parseInt(numberOfTeams) || 0,
-  playersPerTeam: parseInt(playersPerTeam) || 4,
-  numberOfRounds: parseInt(numberOfRounds) || 1,
-  handicapBasis: parseInt(handicapBasis) || 160,
+  playersPerTeam: parseInt(String(playersPerTeam)) || 4,
+  numberOfRounds: parseInt(String(numberOfRounds)) || 1,
+  handicapBasis: parseInt(String(handicapBasis)) || 160,
   useHandicap: useHandicap !== false,
-  handicapPercentage: Math.min(100, Math.max(0, parseInt(handicapPercentage) || 100)),
-  matchesPerGame: parseInt(matchesPerGame) || 3,
+  handicapPercentage: Math.min(100, Math.max(0, parseInt(String(handicapPercentage)) || 100)),
+  matchesPerGame: parseInt(String(matchesPerGame)) || 3,
   bonusRules,
-  gameWinPoints: parseFloat(gameWinPoints) || 1,
-  matchWinPoints: parseFloat(matchWinPoints) || 1,
-  grandTotalPoints: parseFloat(grandTotalPoints) || 2,
+  gameWinPoints: parseFloat(String(gameWinPoints)) || 1,
+  matchWinPoints: parseFloat(String(matchWinPoints)) || 1,
+  grandTotalPoints: parseFloat(String(grandTotalPoints)) || 2,
   startDate: startDate || new Date().toISOString(),
   endDate,
-  status: 'setup', // setup, active, completed
-  schedule: [] // Will be populated by schedule generator
+  status: 'setup'
 });
 
 // ===== TEAM MODEL =====
@@ -130,131 +144,86 @@ export const createTeam = ({
   seasonId = '',
   name = '',
   playerIds = []
-}) => ({
+}: {
+  seasonId?: string;
+  name?: string;
+  playerIds?: string[];
+}): Omit<Team, 'id' | 'createdAt'> => ({
   seasonId,
   name,
-  playerIds // Array of player IDs
+  playerIds,
+  rosterChanges: []
 });
 
 // ===== GAME MODEL =====
-// This extends your existing game structure to include season context
 export const createGame = ({
   seasonId = '',
   round = 1,
+  matchDay = 1,
   team1Id = '',
-  team2Id = '',
-  team1 = null,
-  team2 = null
-}) => ({
+  team2Id = ''
+}: {
+  seasonId?: string;
+  round?: number;
+  matchDay?: number;
+  team1Id?: string;
+  team2Id?: string;
+}): Omit<Game, 'id' | 'createdAt'> => ({
   seasonId,
   round,
+  matchDay,
   team1Id,
   team2Id,
-  team1: team1 || {
-    name: '',
-    players: []
-  },
-  team2: team2 || {
-    name: '',
-    players: []
-  },
-  matches: [],
-  grandTotalScore: { team1: 0, team2: 0 },
-  status: 'pending', // pending, in-progress, completed
-  completedAt: null,
-  enteredBy: null // userId of who completed the game (admin or player)
-});
-
-// ===== SEASON STANDINGS =====
-export const createStandingsEntry = ({
-  teamId = '',
-  teamName = '',
-  wins = 0,
-  losses = 0,
-  draws = 0,
-  points = 0,
-  totalPins = 0,
-  totalPinsWithHandicap = 0
-}) => ({
-  teamId,
-  teamName,
-  wins,
-  losses,
-  draws,
-  points,
-  totalPins,
-  totalPinsWithHandicap
-});
-
-// ===== PLAYER SEASON STATS =====
-export const createPlayerSeasonStats = ({
-  playerId = '',
-  playerName = '',
-  teamId = '',
-  gamesPlayed = 0,
-  totalPins = 0,
-  average = 0,
-  highGame = 0,
-  highSeries = 0,
-  pointsScored = 0
-}) => ({
-  playerId,
-  playerName,
-  teamId,
-  gamesPlayed,
-  totalPins,
-  average,
-  highGame,
-  highSeries,
-  pointsScored
+  matchScores: [],
+  team1TotalPoints: 0,
+  team2TotalPoints: 0,
+  status: 'pending',
+  completedAt: undefined
 });
 
 // ===== VALIDATION HELPERS =====
 
-export const validatePlayer = (player) => {
+export const validatePlayer = (player: Partial<Player>): ValidationResult => {
   if (!player.name || player.name.trim() === '') {
     return { valid: false, error: 'Player name is required' };
   }
-  if (player.startingAverage < 0 || player.startingAverage > 300) {
+  if (player.startingAverage !== undefined && (player.startingAverage < 0 || player.startingAverage > 300)) {
     return { valid: false, error: 'Starting average must be between 0 and 300' };
   }
   return { valid: true };
 };
 
-export const validateLeague = (league) => {
+export const validateLeague = (league: Partial<League>): ValidationResult => {
   if (!league.name || league.name.trim() === '') {
     return { valid: false, error: 'League name is required' };
   }
-  if (league.defaultHandicapBasis < 0 || league.defaultHandicapBasis > 300) {
+  if (league.defaultHandicapBasis !== undefined && (league.defaultHandicapBasis < 0 || league.defaultHandicapBasis > 300)) {
     return { valid: false, error: 'Handicap basis must be between 0 and 300' };
   }
-  if (league.defaultPlayersPerTeam < 1 || league.defaultPlayersPerTeam > 10) {
+  if (league.defaultPlayersPerTeam !== undefined && (league.defaultPlayersPerTeam < 1 || league.defaultPlayersPerTeam > 10)) {
     return { valid: false, error: 'Players per team must be between 1 and 10' };
   }
   return { valid: true };
 };
 
-export const validateSeason = (season) => {
+export const validateSeason = (season: Partial<Season>): ValidationResult => {
   if (!season.leagueId) {
     return { valid: false, error: 'League ID is required' };
   }
   if (!season.name || season.name.trim() === '') {
     return { valid: false, error: 'Season name is required' };
   }
-  if (season.numberOfTeams < 2) {
-    return { valid: false, error: 'At least 2 teams are required' };
-  }
-  if (season.numberOfRounds < 1) {
+  if (season.numberOfRounds !== undefined && season.numberOfRounds < 1) {
     return { valid: false, error: 'At least 1 round is required' };
   }
   return { valid: true };
 };
 
-export const validateTeam = (team, playersPerTeam) => {
+export const validateTeam = (team: Partial<Team>, playersPerTeam: number): ValidationResult => {
   if (!team.name || team.name.trim() === '') {
     return { valid: false, error: 'Team name is required' };
   }
-  if (team.playerIds.length !== playersPerTeam) {
+  if (!team.playerIds || team.playerIds.length !== playersPerTeam) {
     return { valid: false, error: `Team must have exactly ${playersPerTeam} players` };
   }
   // Check for duplicate players

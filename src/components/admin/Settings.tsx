@@ -3,7 +3,9 @@ import { organizationApi, utilApi } from '../../services/api';
 import { seedDemoData } from '../../utils/demoDataUtils';
 import { useTranslation } from '../../contexts/LanguageContext';
 
-export const Settings = ({ onBack }) => {
+import type { SettingsProps } from '../../types';
+
+export const Settings: React.FC<SettingsProps> = ({ onBack }) => {
   const { t, language, setLanguage } = useTranslation();
   const [organization, setOrganization] = useState(null);
   const [isEditing, setIsEditing] = useState(false);

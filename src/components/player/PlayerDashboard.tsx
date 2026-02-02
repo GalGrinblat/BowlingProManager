@@ -3,7 +3,9 @@ import { playersApi, leaguesApi, seasonsApi, teamsApi, gamesApi } from '../../se
 import { calculateTeamStandings } from '../../utils/standingsUtils';
 import { PlayerSeasonComparison } from './PlayerSeasonComparison';
 
-export const PlayerDashboard = ({ playerId, onNavigate }) => {
+import type { PlayerDashboardProps } from '../../types';
+
+export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNavigate }) => {
   const [player, setPlayer] = useState(null);
   const [playerLeagues, setPlayerLeagues] = useState([]);
   const [upcomingGames, setUpcomingGames] = useState([]);

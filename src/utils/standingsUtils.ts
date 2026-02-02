@@ -1,3 +1,5 @@
+import type { Team, Game, TeamStanding, PlayerStats, CurrentPlayerAverages } from '../types';
+
 /**
  * Standings Calculator - Calculate team and player standings from completed games
  */
@@ -8,7 +10,7 @@
  * @param {Array} games - All games in the season
  * @returns {Array} Team standings sorted by points
  */
-export const calculateTeamStandings = (teams, games) => {
+export const calculateTeamStandings = (teams: Team[], games: Game[]): TeamStanding[] => {
   const standings = teams.map(team => ({
     teamId: team.id,
     teamName: team.name,
@@ -90,7 +92,7 @@ export const calculateTeamStandings = (teams, games) => {
  * @param {Array} games - All games in the season
  * @returns {Array} Player stats sorted by average
  */
-export const calculatePlayerSeasonStats = (teams, games) => {
+export const calculatePlayerSeasonStats = (teams: Team[], games: Game[]): PlayerStats[] => {
   const playerStats = [];
   
   // Initialize player stats from teams
@@ -279,8 +281,8 @@ export const calculatePlayerSeasonStats = (teams, games) => {
  * Returns a map of playerName -> { average, gamesPlayed }
  * Uses completed games only to determine current performance
  */
-export const calculateCurrentPlayerAverages = (teams, games) => {
-  const playerAverages = {};
+export const calculateCurrentPlayerAverages = (teams: Team[], games: Game[]): CurrentPlayerAverages => {
+  const playerAverages: CurrentPlayerAverages = {};
   
   // Process completed games only
   const completedGames = games.filter(g => g.status === 'completed');
@@ -353,7 +355,11 @@ export const calculateCurrentPlayerAverages = (teams, games) => {
 /**
  * Get top performers for the season
  */
-export const getTopPerformers = (playerStats) => {
+export const getTopPerformers = (playerStats: PlayerStats[]): {
+  topAverage: PlayerStats[];
+  topHighGame: PlayerStats[];
+  topHighSeries: PlayerStats[];
+} => {
   const sortedByAverage = [...playerStats].sort((a, b) => b.average - a.average);
   const sortedByHighGame = [...playerStats].sort((a, b) => b.highGame - a.highGame);
   const sortedByHighSeries = [...playerStats].sort((a, b) => b.highSeries - a.highSeries);

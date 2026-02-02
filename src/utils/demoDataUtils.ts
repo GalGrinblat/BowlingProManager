@@ -204,7 +204,17 @@ const completeRound1Games = (seasonId) => {
 /**
  * Seed complete demo data
  */
-export const seedDemoData = () => {
+import { 
+  organizationApi, 
+  playersApi, 
+  leaguesApi, 
+  seasonsApi, 
+  teamsApi, 
+  gamesApi, 
+  authApi 
+} from '../services/api';
+
+export const seedDemoData = (): void => {
   console.log('🎳 Seeding demo data...');
 
   // 1. Create 40 players

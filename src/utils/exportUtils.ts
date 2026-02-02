@@ -1,3 +1,5 @@
+import type { TeamStanding, PlayerStats, Game, Team, Season, League } from '../types';
+
 /**
  * Export utilities for downloading season data
  */
@@ -5,7 +7,7 @@
 /**
  * Convert array of objects to CSV string
  */
-const convertToCSV = (data, headers) => {
+const convertToCSV = (data: any[], headers: string[]): string => {
   if (!data || data.length === 0) return '';
   
   const headerRow = headers.join(',');
@@ -26,7 +28,7 @@ const convertToCSV = (data, headers) => {
 /**
  * Trigger browser download of file
  */
-const downloadFile = (content, filename, mimeType) => {
+const downloadFile = (content: string, filename: string, mimeType: string): void => {
   const blob = new Blob([content], { type: mimeType });
   const url = window.URL.createObjectURL(blob);
   const link = document.createElement('a');
@@ -41,7 +43,7 @@ const downloadFile = (content, filename, mimeType) => {
 /**
  * Export team standings as CSV
  */
-export const exportStandingsCSV = (standings, seasonName) => {
+export const exportStandingsCSV = (standings: TeamStanding[], seasonName: string): void => {
   const headers = [
     'Rank',
     'Team',
@@ -80,7 +82,7 @@ export const exportStandingsCSV = (standings, seasonName) => {
 /**
  * Export player statistics as CSV
  */
-export const exportPlayerStatsCSV = (playerStats, seasonName) => {
+export const exportPlayerStatsCSV = (playerStats: PlayerStats[], seasonName: string): void => {
   const headers = [
     'Rank',
     'Player',
@@ -113,7 +115,7 @@ export const exportPlayerStatsCSV = (playerStats, seasonName) => {
 /**
  * Export game results as CSV
  */
-export const exportGamesCSV = (games, teams, seasonName) => {
+export const exportGamesCSV = (games: Game[], teams: Team[], seasonName: string): void => {
   const headers = [
     'Round',
     'Match Day',
@@ -172,7 +174,14 @@ export const exportGamesCSV = (games, teams, seasonName) => {
 /**
  * Export complete season data as JSON
  */
-export const exportSeasonJSON = (season, teams, games, standings, playerStats, league) => {
+export const exportSeasonJSON = (
+  season: Season, 
+  teams: Team[], 
+  games: Game[], 
+  standings: TeamStanding[], 
+  playerStats: PlayerStats[], 
+  league: League
+): void => {
   const exportData = {
     season: {
       name: season.name,
@@ -214,7 +223,14 @@ export const exportSeasonJSON = (season, teams, games, standings, playerStats, l
 /**
  * Export all season data (zip-like functionality via multiple downloads)
  */
-export const exportAllSeasonData = (season, teams, games, standings, playerStats, league) => {
+export const exportAllSeasonData = (
+  season: Season, 
+  teams: Team[], 
+  games: Game[], 
+  standings: TeamStanding[], 
+  playerStats: PlayerStats[], 
+  league: League
+): void => {
   // Trigger multiple downloads
   exportStandingsCSV(standings, season.name);
   

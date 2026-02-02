@@ -7,7 +7,11 @@ import React from 'react';
  * @param {number} itemsPerPage - Items to show per page
  * @param {function} onPageChange - Callback when page changes
  */
-export const Pagination = ({ currentPage, totalItems, itemsPerPage, onPageChange }) => {
+import type { PaginationProps } from '../types';
+
+// ... previous code ...
+
+export const Pagination: React.FC<PaginationProps> = ({ currentPage, totalItems, itemsPerPage, onPageChange }) => {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   
   if (totalPages <= 1) return null; // Don't show pagination if only 1 page

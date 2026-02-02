@@ -1,7 +1,22 @@
+import type { Game, Team } from '../types';
+
 /**
  * Head-to-Head Statistics Utilities
  * Calculate matchup records between teams
  */
+
+interface HeadToHeadStats {
+  gamesPlayed: number;
+  team1Wins: number;
+  team2Wins: number;
+  ties: number;
+  team1TotalPoints: number;
+  team2TotalPoints: number;
+  team1AvgPoints: number;
+  team2AvgPoints: number;
+  lastMeetingDate: string | null;
+  winStreak: { team: string; count: number } | null;
+}
 
 /**
  * Calculate head-to-head record between two teams
@@ -10,7 +25,7 @@
  * @param {Array} games - All games in the season
  * @returns {object} Head-to-head statistics
  */
-export const calculateHeadToHead = (team1Id, team2Id, games) => {
+export const calculateHeadToHead = (team1Id: string, team2Id: string, games: Game[]): HeadToHeadStats => {
   // Filter games between these two teams
   const matchups = games.filter(game => 
     (game.team1Id === team1Id && game.team2Id === team2Id) ||
@@ -140,7 +155,7 @@ export const calculateHeadToHead = (team1Id, team2Id, games) => {
  * @param {Array} games - All games in the season
  * @returns {Array} Array of head-to-head records with opponent info
  */
-export const getTeamHeadToHeadRecords = (teamId, allTeams, games) => {
+export const getTeamHeadToHeadRecords = (teamId: string, allTeams: Team[], games: Game[]): Array<{teamId: string; teamName: string; record: HeadToHeadStats}> => {
   const opponents = allTeams.filter(t => t.id !== teamId);
   
   return opponents.map(opponent => {
@@ -160,7 +175,7 @@ export const getTeamHeadToHeadRecords = (teamId, allTeams, games) => {
  * @param {string} team2Name - Second team name
  * @returns {string} Formatted string
  */
-export const formatHeadToHead = (h2h, team1Name, team2Name) => {
+export const formatHeadToHead = (h2h: HeadToHeadStats, team1Name: string, team2Name: string): string => {
   if (h2h.gamesPlayed === 0) {
     return 'No previous matchups';
   }

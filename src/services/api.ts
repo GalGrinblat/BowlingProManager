@@ -3,6 +3,16 @@
  * This allows easy migration to backend database later
  */
 
+import type {
+  Organization,
+  Player,
+  League,
+  Season,
+  Team,
+  Game,
+  User
+} from '../types';
+
 const STORAGE_KEYS = {
   ORGANIZATION: 'bowling_organization',
   PLAYERS: 'bowling_players',
@@ -11,21 +21,21 @@ const STORAGE_KEYS = {
   TEAMS: 'bowling_teams',
   GAMES: 'bowling_games',
   CURRENT_USER: 'bowling_current_user'
-};
+} as const;
 
 // ===== HELPER FUNCTIONS =====
 
-const getFromStorage = (key) => {
+const getFromStorage = <T>(key: string): T | null => {
   try {
     const data = localStorage.getItem(key);
-    return data ? JSON.parse(data) : null;
+    return data ? JSON.parse(data) as T : null;
   } catch (error) {
     console.error(`Error reading ${key} from storage:`, error);
     return null;
   }
 };
 
-const saveToStorage = (key, data) => {
+const saveToStorage = <T>(key: string, data: T): boolean => {
   try {
     localStorage.setItem(key, JSON.stringify(data));
     return true;
@@ -35,17 +45,16 @@ const saveToStorage = (key, data) => {
   }
 };
 
-const generateId = () => `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+const generateId = (): string => `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
 // ===== ORGANIZATION =====
 
 export const organizationApi = {
-  get: () => {
-    const org = getFromStorage(STORAGE_KEYS.ORGANIZATION);
+  get: (): Organization => {
+    const org = getFromStorage<Organization>(STORAGE_KEYS.ORGANIZATION);
     if (!org) {
       // Create default organization
-      const defaultOrg = {
-        id: generateId(),
+      const defaultOrg: Organization = {
         name: 'My Bowling Organization',
         language: 'en',
         createdAt: new Date().toISOString()
@@ -61,9 +70,9 @@ export const organizationApi = {
     return org;
   },
   
-  update: (data) => {
+  update: (data: Partial<Organization>): Organization => {
     const org = organizationApi.get();
-    const updated = { ...org, ...data, updatedAt: new Date().toISOString() };
+    const updated = { ...org, ...data };
     saveToStorage(STORAGE_KEYS.ORGANIZATION, updated);
     return updated;
   }
@@ -72,29 +81,28 @@ export const organizationApi = {
 // ===== PLAYERS =====
 
 export const playersApi = {
-  getAll: () => {
-    return getFromStorage(STORAGE_KEYS.PLAYERS) || [];
+  getAll: (): Player[] => {
+    return getFromStorage<Player[]>(STORAGE_KEYS.PLAYERS) || [];
   },
   
-  getById: (id) => {
+  getById: (id: string): Player | undefined => {
     const players = playersApi.getAll();
     return players.find(p => p.id === id);
   },
   
-  create: (playerData) => {
+  create: (playerData: Omit<Player, 'id' | 'createdAt'>): Player => {
     const players = playersApi.getAll();
-    const newPlayer = {
+    const newPlayer: Player = {
       id: generateId(),
       ...playerData,
-      createdAt: new Date().toISOString(),
-      active: true
+      createdAt: new Date().toISOString()
     };
     players.push(newPlayer);
     saveToStorage(STORAGE_KEYS.PLAYERS, players);
     return newPlayer;
   },
   
-  update: (id, updates) => {
+  update: (id: string, updates: Partial<Player>): Player | null => {
     const players = playersApi.getAll();
     const index = players.findIndex(p => p.id === id);
     if (index === -1) return null;
@@ -108,7 +116,7 @@ export const playersApi = {
     return players[index];
   },
   
-  delete: (id) => {
+  delete: (id: string): boolean => {
     const players = playersApi.getAll();
     const filtered = players.filter(p => p.id !== id);
     saveToStorage(STORAGE_KEYS.PLAYERS, filtered);
@@ -119,43 +127,41 @@ export const playersApi = {
 // ===== LEAGUES =====
 
 export const leaguesApi = {
-  getAll: () => {
-    return getFromStorage(STORAGE_KEYS.LEAGUES) || [];
+  getAll: (): League[] => {
+    return getFromStorage<League[]>(STORAGE_KEYS.LEAGUES) || [];
   },
   
-  getById: (id) => {
+  getById: (id: string): League | undefined => {
     const leagues = leaguesApi.getAll();
     return leagues.find(l => l.id === id);
   },
   
-  create: (leagueData) => {
+  create: (leagueData: Omit<League, 'id' | 'createdAt'>): League => {
     const leagues = leaguesApi.getAll();
-    const newLeague = {
+    const newLeague: League = {
       id: generateId(),
       ...leagueData,
-      createdAt: new Date().toISOString(),
-      active: true
+      createdAt: new Date().toISOString()
     };
     leagues.push(newLeague);
     saveToStorage(STORAGE_KEYS.LEAGUES, leagues);
     return newLeague;
   },
   
-  update: (id, updates) => {
+  update: (id: string, updates: Partial<League>): League | null => {
     const leagues = leaguesApi.getAll();
     const index = leagues.findIndex(l => l.id === id);
     if (index === -1) return null;
     
     leagues[index] = {
       ...leagues[index],
-      ...updates,
-      updatedAt: new Date().toISOString()
+      ...updates
     };
     saveToStorage(STORAGE_KEYS.LEAGUES, leagues);
     return leagues[index];
   },
   
-  delete: (id) => {
+  delete: (id: string): boolean => {
     const leagues = leaguesApi.getAll();
     const filtered = leagues.filter(l => l.id !== id);
     saveToStorage(STORAGE_KEYS.LEAGUES, filtered);
@@ -163,7 +169,7 @@ export const leaguesApi = {
   },
   
   // Get seasons for a league
-  getSeasons: (leagueId) => {
+  getSeasons: (leagueId: string): Season[] => {
     const seasons = seasonsApi.getAll();
     return seasons.filter(s => s.leagueId === leagueId);
   }
@@ -172,23 +178,23 @@ export const leaguesApi = {
 // ===== SEASONS =====
 
 export const seasonsApi = {
-  getAll: () => {
-    return getFromStorage(STORAGE_KEYS.SEASONS) || [];
+  getAll: (): Season[] => {
+    return getFromStorage<Season[]>(STORAGE_KEYS.SEASONS) || [];
   },
   
-  getById: (id) => {
+  getById: (id: string): Season | undefined => {
     const seasons = seasonsApi.getAll();
     return seasons.find(s => s.id === id);
   },
   
-  getByLeague: (leagueId) => {
+  getByLeague: (leagueId: string): Season[] => {
     const seasons = seasonsApi.getAll();
     return seasons.filter(s => s.leagueId === leagueId);
   },
   
-  create: (seasonData) => {
+  create: (seasonData: Omit<Season, 'id' | 'createdAt'>): Season => {
     const seasons = seasonsApi.getAll();
-    const newSeason = {
+    const newSeason: Season = {
       id: generateId(),
       status: 'setup', // setup, active, completed
       ...seasonData,
@@ -199,7 +205,7 @@ export const seasonsApi = {
     return newSeason;
   },
   
-  update: (id, updates) => {
+  update: (id: string, updates: Partial<Season>): Season | null => {
     const seasons = seasonsApi.getAll();
     const index = seasons.findIndex(s => s.id === id);
     if (index === -1) return null;
@@ -213,7 +219,7 @@ export const seasonsApi = {
     return seasons[index];
   },
   
-  delete: (id) => {
+  delete: (id: string): boolean => {
     const seasons = seasonsApi.getAll();
     const filtered = seasons.filter(s => s.id !== id);
     saveToStorage(STORAGE_KEYS.SEASONS, filtered);
@@ -224,23 +230,23 @@ export const seasonsApi = {
 // ===== TEAMS =====
 
 export const teamsApi = {
-  getAll: () => {
-    return getFromStorage(STORAGE_KEYS.TEAMS) || [];
+  getAll: (): Team[] => {
+    return getFromStorage<Team[]>(STORAGE_KEYS.TEAMS) || [];
   },
   
-  getById: (id) => {
+  getById: (id: string): Team | undefined => {
     const teams = teamsApi.getAll();
     return teams.find(t => t.id === id);
   },
   
-  getBySeason: (seasonId) => {
+  getBySeason: (seasonId: string): Team[] => {
     const teams = teamsApi.getAll();
     return teams.filter(t => t.seasonId === seasonId);
   },
   
-  create: (teamData) => {
+  create: (teamData: Omit<Team, 'id' | 'createdAt'>): Team => {
     const teams = teamsApi.getAll();
-    const newTeam = {
+    const newTeam: Team = {
       id: generateId(),
       ...teamData,
       createdAt: new Date().toISOString()
@@ -250,7 +256,7 @@ export const teamsApi = {
     return newTeam;
   },
   
-  update: (id, updates) => {
+  update: (id: string, updates: Partial<Team>): Team | null => {
     const teams = teamsApi.getAll();
     const index = teams.findIndex(t => t.id === id);
     if (index === -1) return null;
@@ -264,7 +270,7 @@ export const teamsApi = {
     return teams[index];
   },
   
-  delete: (id) => {
+  delete: (id: string): boolean => {
     const teams = teamsApi.getAll();
     const filtered = teams.filter(t => t.id !== id);
     saveToStorage(STORAGE_KEYS.TEAMS, filtered);
@@ -275,28 +281,28 @@ export const teamsApi = {
 // ===== GAMES =====
 
 export const gamesApi = {
-  getAll: () => {
-    return getFromStorage(STORAGE_KEYS.GAMES) || [];
+  getAll: (): Game[] => {
+    return getFromStorage<Game[]>(STORAGE_KEYS.GAMES) || [];
   },
   
-  getById: (id) => {
+  getById: (id: string): Game | undefined => {
     const games = gamesApi.getAll();
     return games.find(g => g.id === id);
   },
   
-  getBySeason: (seasonId) => {
+  getBySeason: (seasonId: string): Game[] => {
     const games = gamesApi.getAll();
     return games.filter(g => g.seasonId === seasonId);
   },
   
-  getByRound: (seasonId, round) => {
+  getByRound: (seasonId: string, round: number): Game[] => {
     const games = gamesApi.getAll();
     return games.filter(g => g.seasonId === seasonId && g.round === round);
   },
   
-  create: (gameData) => {
+  create: (gameData: Omit<Game, 'id' | 'createdAt' | 'status'>): Game => {
     const games = gamesApi.getAll();
-    const newGame = {
+    const newGame: Game = {
       id: generateId(),
       status: 'pending', // pending, in-progress, completed
       ...gameData,
@@ -307,7 +313,7 @@ export const gamesApi = {
     return newGame;
   },
   
-  update: (id, updates) => {
+  update: (id: string, updates: Partial<Game>): Game | null => {
     const games = gamesApi.getAll();
     const index = games.findIndex(g => g.id === id);
     if (index === -1) return null;
@@ -321,7 +327,7 @@ export const gamesApi = {
     return games[index];
   },
   
-  delete: (id) => {
+  delete: (id: string): boolean => {
     const games = gamesApi.getAll();
     const filtered = games.filter(g => g.id !== id);
     saveToStorage(STORAGE_KEYS.GAMES, filtered);
@@ -331,47 +337,52 @@ export const gamesApi = {
 
 // ===== AUTH (Simple role-based) =====
 
+interface User {
+  userId: string;
+  role: 'admin' | 'player';
+}
+
 export const authApi = {
-  getCurrentUser: () => {
-    return getFromStorage(STORAGE_KEYS.CURRENT_USER);
+  getCurrentUser: (): User | null => {
+    return getFromStorage<User>(STORAGE_KEYS.CURRENT_USER);
   },
   
-  login: (userId, role = 'player') => {
-    const user = { userId, role }; // role: 'admin' or 'player'
+  login: (userId: string, role: 'admin' | 'player' = 'player'): User => {
+    const user: User = { userId, role };
     saveToStorage(STORAGE_KEYS.CURRENT_USER, user);
     return user;
   },
   
-  logout: () => {
+  logout: (): void => {
     localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
   },
   
-  isAdmin: () => {
+  isAdmin: (): boolean => {
     const user = authApi.getCurrentUser();
-    return user && user.role === 'admin';
+    return user !== null && user.role === 'admin';
   }
 };
 
 // ===== UTILITY =====
 
 export const utilApi = {
-  clearAll: () => {
+  clearAll: (): void => {
     Object.values(STORAGE_KEYS).forEach(key => {
       localStorage.removeItem(key);
     });
   },
   
-  exportData: () => {
-    const data = {};
+  exportData: (): Record<string, any> => {
+    const data: Record<string, any> = {};
     Object.entries(STORAGE_KEYS).forEach(([name, key]) => {
       data[name] = getFromStorage(key);
     });
     return data;
   },
   
-  importData: (data) => {
+  importData: (data: Record<string, any>): void => {
     Object.entries(data).forEach(([name, value]) => {
-      const key = STORAGE_KEYS[name];
+      const key = STORAGE_KEYS[name as keyof typeof STORAGE_KEYS];
       if (key && value) {
         saveToStorage(key, value);
       }

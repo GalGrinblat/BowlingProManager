@@ -1,10 +1,32 @@
-export const createEmptyMatch = (matchNumber, playersPerTeam = 4) => {
-  const emptyPlayers = Array.from({ length: playersPerTeam }, () => ({ 
+import type { BonusRule, Game, IndividualGameResult, MatchResult } from '../types';
+
+interface MatchPlayer {
+  pins: string;
+  bonusPoints: number;
+}
+
+interface MatchTeam {
+  score: number;
+  totalPins: number;
+  totalWithHandicap: number;
+  bonusPoints: number;
+  players: MatchPlayer[];
+}
+
+interface Match {
+  matchNumber: number;
+  team1: MatchTeam;
+  team2: MatchTeam;
+  games: IndividualGameResult[];
+}
+
+export const createEmptyMatch = (matchNumber: number, playersPerTeam: number = 4): Match => {
+  const emptyPlayers: MatchPlayer[] = Array.from({ length: playersPerTeam }, () => ({ 
     pins: '', 
     bonusPoints: 0 
   }));
   
-  const emptyGames = Array.from({ length: playersPerTeam }, (_, i) => ({ 
+  const emptyGames: IndividualGameResult[] = Array.from({ length: playersPerTeam }, (_, i) => ({ 
     player: i + 1, 
     result: null, 
     team1Points: 0, 
@@ -31,16 +53,21 @@ export const createEmptyMatch = (matchNumber, playersPerTeam = 4) => {
   };
 };
 
-export const calculateBonusPoints = (score, average, isAbsent, bonusRules = null) => {
+export const calculateBonusPoints = (
+  score: string | number, 
+  average: string | number, 
+  isAbsent: boolean, 
+  bonusRules: BonusRule[] | null = null
+): number => {
   // Absent players cannot earn bonus points
   if (isAbsent) return 0;
   
   if (score === '' || average === '') return 0;
-  const scoreNum = parseInt(score);
-  const avgNum = parseInt(average);
+  const scoreNum = typeof score === 'string' ? parseInt(score) : score;
+  const avgNum = typeof average === 'string' ? parseInt(average) : average;
   
   // Use custom bonus rules if provided, otherwise use default
-  const rules = bonusRules || [
+  const rules: BonusRule[] = bonusRules || [
     { type: 'player', condition: 'vs_average', threshold: 70, points: 2 },
     { type: 'player', condition: 'vs_average', threshold: 50, points: 1 }
   ];
@@ -66,7 +93,7 @@ export const calculateBonusPoints = (score, average, isAbsent, bonusRules = null
   return 0;
 };
 
-export const calculateMatchResults = (game, matchIndex) => {
+export const calculateMatchResults = (game: Game, matchIndex: number): void => {
   const match = game.matches[matchIndex];
   
   // Get configurable point values (defaults to 1 if not set)
@@ -171,7 +198,7 @@ export const calculateMatchResults = (game, matchIndex) => {
   }
 };
 
-export const validateMatch = (currentGame, matchIndex) => {
+export const validateMatch = (currentGame: Game, matchIndex: number): boolean => {
   const match = currentGame.matches[matchIndex];
   const team1Valid = currentGame.team1.players.every((p, idx) => p.absent || match.team1.players[idx].pins !== '');
   const team2Valid = currentGame.team2.players.every((p, idx) => p.absent || match.team2.players[idx].pins !== '');

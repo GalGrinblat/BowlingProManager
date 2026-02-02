@@ -1,3 +1,5 @@
+import type { ScheduleMatchDay, Match } from '../types';
+
 /**
  * Schedule Generator - Creates round-robin tournament schedules with dates
  */
@@ -9,7 +11,7 @@
  * @param {Number} weeksToAdd - Number of weeks to add (0 for first occurrence)
  * @returns {Date} The calculated date
  */
-const getNextDayOfWeek = (startDate, dayOfWeek, weeksToAdd = 0) => {
+const getNextDayOfWeek = (startDate: Date, dayOfWeek: string, weeksToAdd: number = 0): Date => {
   const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
   const targetDay = daysOfWeek.indexOf(dayOfWeek);
   
@@ -39,7 +41,12 @@ const getNextDayOfWeek = (startDate, dayOfWeek, weeksToAdd = 0) => {
  * @param {String} dayOfWeek - Day of week for games (e.g., 'Monday')
  * @returns {Array} Schedule array with match day number, dates, and matchups
  */
-export const generateRoundRobinSchedule = (teamIds, numberOfRounds = 1, startDate = null, dayOfWeek = null) => {
+export const generateRoundRobinSchedule = (
+  teamIds: string[], 
+  numberOfRounds: number = 1, 
+  startDate: string | null = null, 
+  dayOfWeek: string | null = null
+): ScheduleMatchDay[] => {
   if (!teamIds || teamIds.length < 2) {
     throw new Error('At least 2 teams are required');
   }
@@ -104,14 +111,14 @@ export const generateRoundRobinSchedule = (teamIds, numberOfRounds = 1, startDat
 /**
  * Get all match days for a specific round
  */
-export const getMatchDaysForRound = (schedule, round) => {
+export const getMatchDaysForRound = (schedule: ScheduleMatchDay[], round: number): ScheduleMatchDay[] => {
   return schedule.filter(s => s.round === round);
 };
 
 /**
  * Get matchups for a specific match day
  */
-export const getMatchupsForMatchDay = (schedule, matchDay) => {
+export const getMatchupsForMatchDay = (schedule: ScheduleMatchDay[], matchDay: number): Match[] => {
   const daySchedule = schedule.find(s => s.matchDay === matchDay);
   return daySchedule ? daySchedule.matches : [];
 };
@@ -119,7 +126,7 @@ export const getMatchupsForMatchDay = (schedule, matchDay) => {
 /**
  * Get total number of match days in the season
  */
-export const getTotalMatchDays = (numberOfTeams, numberOfRounds) => {
+export const getTotalMatchDays = (numberOfTeams: number, numberOfRounds: number): number => {
   const teamsCount = numberOfTeams % 2 === 0 ? numberOfTeams : numberOfTeams + 1;
   const matchDaysPerRound = teamsCount - 1;
   return matchDaysPerRound * numberOfRounds;
@@ -128,7 +135,7 @@ export const getTotalMatchDays = (numberOfTeams, numberOfRounds) => {
 /**
  * Get total number of games in the season
  */
-export const getTotalGames = (numberOfTeams, numberOfRounds) => {
+export const getTotalGames = (numberOfTeams: number, numberOfRounds: number): number => {
   const teamsCount = numberOfTeams % 2 === 0 ? numberOfTeams : numberOfTeams + 1;
   const gamesPerRound = (teamsCount / 2) * (teamsCount - 1);
   return gamesPerRound * numberOfRounds;
@@ -137,9 +144,9 @@ export const getTotalGames = (numberOfTeams, numberOfRounds) => {
 /**
  * Validate schedule integrity
  */
-export const validateSchedule = (schedule, teamIds) => {
+export const validateSchedule = (schedule: ScheduleMatchDay[], teamIds: string[]): { valid: boolean; error?: string } => {
   const teamSet = new Set(teamIds);
-  const matchCounts = {};
+  const matchCounts: Record<string, number> = {};
   
   // Initialize match counts
   teamIds.forEach(id => {
@@ -171,8 +178,20 @@ export const validateSchedule = (schedule, teamIds) => {
 /**
  * Get team's schedule
  */
-export const getTeamSchedule = (schedule, teamId) => {
-  const teamGames = [];
+export const getTeamSchedule = (schedule: ScheduleMatchDay[], teamId: string): Array<{
+  round: number;
+  matchDay: number;
+  date: string | null;
+  opponentId: string;
+  isHome: boolean;
+}> => {
+  const teamGames: Array<{
+    round: number;
+    matchDay: number;
+    date: string | null;
+    opponentId: string;
+    isHome: boolean;
+  }> = [];
   
   schedule.forEach(daySchedule => {
     const teamMatch = daySchedule.matches.find(
@@ -201,7 +220,12 @@ export const getTeamSchedule = (schedule, teamId) => {
  * @param {String} dayOfWeek - Day of week for rescheduling
  * @returns {Array} Updated schedule with new dates
  */
-export const postponeMatchDay = (schedule, matchDayToPostpone, weeksToDelay = 1, dayOfWeek) => {
+export const postponeMatchDay = (
+  schedule: ScheduleMatchDay[], 
+  matchDayToPostpone: number, 
+  weeksToDelay: number = 1, 
+  dayOfWeek: string
+): ScheduleMatchDay[] => {
   const updatedSchedule = [...schedule];
   
   // Find the match day to postpone
@@ -238,7 +262,7 @@ export const postponeMatchDay = (schedule, matchDayToPostpone, weeksToDelay = 1,
  * @param {String} isoDate - ISO date string
  * @returns {String} Formatted date string
  */
-export const formatMatchDate = (isoDate) => {
+export const formatMatchDate = (isoDate: string | null): string => {
   if (!isoDate) return 'TBD';
   const date = new Date(isoDate);
   return date.toLocaleDateString('en-US', { 

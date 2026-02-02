@@ -1,9 +1,10 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import translations from '../translations';
+import type { LanguageContextType } from '../types';
 
-const LanguageContext = createContext();
+const LanguageContext = createContext<LanguageContextType | null>(null);
 
-export const useTranslation = () => {
+export const useTranslation = (): LanguageContextType => {
   const context = useContext(LanguageContext);
   if (!context) {
     throw new Error('useTranslation must be used within LanguageProvider');
@@ -11,8 +12,12 @@ export const useTranslation = () => {
   return context;
 };
 
-export const LanguageProvider = ({ children }) => {
-  const [language, setLanguage] = useState('en');
+interface LanguageProviderProps {
+  children: ReactNode;
+}
+
+export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
+  const [language, setLanguage] = useState<'en' | 'he'>('en');
 
   // Load language preference from organization settings
   useEffect(() => {
@@ -55,7 +60,7 @@ export const LanguageProvider = ({ children }) => {
   }, [language]);
 
   // Translation function with nested key support
-  const t = (key) => {
+  const t = (key: string): string => {
     const keys = key.split('.');
     let value = translations[language];
     
@@ -75,7 +80,7 @@ export const LanguageProvider = ({ children }) => {
   const direction = language === 'he' ? 'rtl' : 'ltr';
 
   // Custom setLanguage that also updates localStorage
-  const updateLanguage = (newLang) => {
+  const updateLanguage = (newLang: 'en' | 'he'): void => {
     if (newLang === 'en' || newLang === 'he') {
       setLanguage(newLang);
       // Also update organization in localStorage to keep it in sync

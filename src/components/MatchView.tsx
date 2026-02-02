@@ -1,6 +1,8 @@
 import { ArrowLeft, ArrowRight, Star } from './Icons';
 
-export function MatchView({ matchNumber, game, onUpdateScore, onNavigate, onCancel, isReadOnly = false }) {
+import type { MatchViewProps } from '../types';
+
+export const MatchView: React.FC<MatchViewProps> = ({ matchNumber, game, onUpdateScore, onNavigate, onCancel, isReadOnly = false }) => {
   const matchIndex = matchNumber - 1;
   const match = game.matches[matchIndex];
   const totalMatches = game.matches.length;

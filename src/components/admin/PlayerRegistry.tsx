@@ -4,7 +4,9 @@ import { createPlayer, validatePlayer } from '../../models';
 import { Pagination, usePagination } from '../Pagination';
 import { useTranslation } from '../../contexts/LanguageContext';
 
-export const PlayerRegistry = ({ onBack }) => {
+import type { PlayerRegistryProps } from '../../types';
+
+export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
   const { t } = useTranslation();
   const [players, setPlayers] = useState([]);
   const [isAdding, setIsAdding] = useState(false);

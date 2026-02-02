@@ -16,12 +16,18 @@ import { PlayerDashboard } from './components/player/PlayerDashboard';
 import { GameHistoryView } from './components/GameHistoryView';
 import './styles/globals.css';
 
+interface NavigationState {
+  leagueId: string | null;
+  seasonId: string | null;
+  gameId: string | null;
+}
+
 function AppContent() {
   const { currentUser, login, logout, isAdmin, isPlayer } = useAuth();
-  const [currentView, setCurrentView] = useState(
+  const [currentView, setCurrentView] = useState<string>(
     currentUser ? (isAdmin() ? 'dashboard' : 'player-dashboard') : 'login'
   );
-  const [navigationState, setNavigationState] = useState({
+  const [navigationState, setNavigationState] = useState<NavigationState>({
     leagueId: null,
     seasonId: null,
     gameId: null
@@ -37,7 +43,7 @@ function AppContent() {
   }, [currentUser, isAdmin, isPlayer]);
 
   // Navigation helpers
-  const navigateTo = (view, params = {}) => {
+  const navigateTo = (view: string, params: Partial<NavigationState> = {}): void => {
     setCurrentView(view);
     setNavigationState({ ...navigationState, ...params });
   };

@@ -1,4 +1,23 @@
-export const calculatePlayerStats = (game) => {
+import type { Game } from '../types';
+
+interface PlayerGameStats {
+  totalPins: number;
+  gameAverage: number;
+  pointsScored: number;
+  isAbsent: boolean;
+  [key: string]: any;
+}
+
+interface GameStats {
+  team1Stats: PlayerGameStats[];
+  team2Stats: PlayerGameStats[];
+  team1TotalPins: number;
+  team2TotalPins: number;
+  team1Average: number;
+  team2Average: number;
+}
+
+export const calculatePlayerStats = (game: Game): GameStats => {
   const team1Stats = game.team1.players.map((player, idx) => {
     if (player.absent) {
       const absenceScore = parseInt(player.average) - 10;
@@ -50,7 +69,7 @@ export const calculatePlayerStats = (game) => {
   };
 };
 
-export const calculateGameTotals = (game) => {
+export const calculateGameTotals = (game: Game): { team1Total: number; team2Total: number } => {
   const team1Total = game.matches.reduce((sum, m) => sum + m.team1.score, 0) + game.grandTotalPoints.team1;
   const team2Total = game.matches.reduce((sum, m) => sum + m.team2.score, 0) + game.grandTotalPoints.team2;
   
@@ -70,7 +89,7 @@ export const calculateGameTotals = (game) => {
   };
 };
 
-export const calculateGrandTotalPoints = (game) => {
+export const calculateGrandTotalPoints = (game: Game): { team1: number; team2: number } => {
   // Get configurable grand total points (defaults to 2 if not set)
   const grandTotalPoints = game.grandTotalPoints || 2;
   

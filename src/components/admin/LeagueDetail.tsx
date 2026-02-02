@@ -4,7 +4,9 @@ import { createSeason, createTeam, validateSeason } from '../../models';
 import { generateRoundRobinSchedule } from '../../utils/scheduleUtils';
 import { exportSeasonJSON } from '../../utils/exportUtils';
 
-export const LeagueDetail = ({ leagueId, onBack, onViewSeason }) => {
+import type { LeagueDetailProps } from '../../types';
+
+export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, onViewSeason }) => {
   const [league, setLeague] = useState(null);
   const [seasons, setSeasons] = useState([]);
   const [isCreatingSeason, setIsCreatingSeason] = useState(false);

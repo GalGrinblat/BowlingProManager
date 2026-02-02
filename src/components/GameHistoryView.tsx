@@ -1,4 +1,6 @@
-export const GameHistoryView = ({ game, onBack }) => {
+import type { GameHistoryViewProps } from '../types';
+
+export const GameHistoryView: React.FC<GameHistoryViewProps> = ({ game, onBack }) => {
   if (!game) return <div>Loading...</div>;
 
   const totals = {

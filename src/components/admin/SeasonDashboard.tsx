@@ -12,7 +12,9 @@ import {
   exportAllSeasonData 
 } from '../../utils/exportUtils';
 
-export const SeasonDashboard = ({ seasonId, onBack, onPlayGame, onViewGame, onManageTeams }) => {
+import type { SeasonDashboardProps } from '../../types';
+
+export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBack, onPlayGame, onViewGame, onManageTeams }) => {
   const [season, setSeason] = useState(null);
   const [league, setLeague] = useState(null);
   const [teams, setTeams] = useState([]);

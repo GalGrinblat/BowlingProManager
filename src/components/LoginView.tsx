@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { playersApi } from '../services/api';
 import { useTranslation } from '../contexts/LanguageContext';
 
-export const LoginView = ({ onLogin }) => {
+import type { LoginViewProps } from '../types';
+
+export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
   const { t } = useTranslation();
   const [selectedRole, setSelectedRole] = useState('admin');
   const [players, setPlayers] = useState([]);

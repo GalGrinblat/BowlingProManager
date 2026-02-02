@@ -1,6 +1,8 @@
 import { ArrowLeft, CheckCircle } from './Icons';
 
-export function SummaryView({ game, totals, playerStats, onBack, onFinish }) {
+import type { SummaryViewProps } from '../types';
+
+export const SummaryView: React.FC<SummaryViewProps> = ({ game, totals, playerStats, onBack, onFinish }) => {
   return (
     <div className="scorecard rounded-xl p-6 md:p-8 mb-8 animate-slide-in">
       <div className="flex items-center justify-between mb-6">

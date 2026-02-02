@@ -3,7 +3,9 @@ import { leaguesApi, seasonsApi } from '../../services/api';
 import { createLeague, validateLeague } from '../../models';
 import { useTranslation } from '../../contexts/LanguageContext';
 
-export const LeagueManagement = ({ onBack, onViewLeague }) => {
+import type { LeagueManagementProps } from '../../types';
+
+export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onViewLeague }) => {
   const { t } = useTranslation();
   const [leagues, setLeagues] = useState([]);
   const [isAdding, setIsAdding] = useState(false);
