@@ -1,4 +1,4 @@
-import { TranslationDictionary } from '../types';
+import type { TranslationDictionary } from '../types/index.ts';
 
 const en: TranslationDictionary = {
   // Common words and actions

@@ -1,4 +1,4 @@
-import { TranslationDictionary } from '../types';
+import type { TranslationDictionary } from '../types/index.ts';
 
 const he: TranslationDictionary = {
   // מילים ופעולות נפוצות

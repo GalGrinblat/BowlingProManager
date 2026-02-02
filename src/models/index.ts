@@ -14,7 +14,7 @@ import type {
   BonusRule,
   PlayerScore,
   MatchScore
-} from '../types';
+} from '../types/index.ts';
 
 // ===== ORGANIZATION MODEL =====
 export const createOrganization = ({

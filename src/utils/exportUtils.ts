@@ -1,4 +1,4 @@
-import type { TeamStanding, PlayerStats, Game, Team, Season, League } from '../types';
+import type { TeamStanding, PlayerStats, Game, Team, Season, League } from '../types/index.ts';
 
 /**
  * Export utilities for downloading season data

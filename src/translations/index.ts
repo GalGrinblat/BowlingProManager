@@ -1,6 +1,6 @@
-import en from './en';
-import he from './he';
-import { TranslationDictionary } from '../types';
+import en from './en.ts';
+import he from './he.ts';
+import type { TranslationDictionary } from '../types/index.ts';
 
 const translations: Record<'en' | 'he', TranslationDictionary> = {
   en,

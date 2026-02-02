@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { playersApi } from '../services/api';
 import { useTranslation } from '../contexts/LanguageContext';
 
-import type { LoginViewProps } from '../types';
+import type { LoginViewProps } from '../types/index.ts';
 
 export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
   const { t } = useTranslation();

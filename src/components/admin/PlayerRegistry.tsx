@@ -4,7 +4,7 @@ import { createPlayer, validatePlayer } from '../../models';
 import { Pagination, usePagination } from '../Pagination';
 import { useTranslation } from '../../contexts/LanguageContext';
 
-import type { PlayerRegistryProps } from '../../types';
+import type { PlayerRegistryProps } from '../../types/index.ts';
 
 export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
   const { t } = useTranslation();

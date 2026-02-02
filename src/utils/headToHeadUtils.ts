@@ -1,4 +1,4 @@
-import type { Game, Team } from '../types';
+import type { Game, Team } from '../types/index.ts';
 
 /**
  * Head-to-Head Statistics Utilities

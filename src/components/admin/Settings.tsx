@@ -3,7 +3,7 @@ import { organizationApi, utilApi } from '../../services/api';
 import { seedDemoData } from '../../utils/demoDataUtils';
 import { useTranslation } from '../../contexts/LanguageContext';
 
-import type { SettingsProps } from '../../types';
+import type { SettingsProps } from '../../types/index.ts';
 
 export const Settings: React.FC<SettingsProps> = ({ onBack }) => {
   const { t, language, setLanguage } = useTranslation();

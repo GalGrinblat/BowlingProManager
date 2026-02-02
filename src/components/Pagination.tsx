@@ -7,7 +7,7 @@ import React from 'react';
  * @param {number} itemsPerPage - Items to show per page
  * @param {function} onPageChange - Callback when page changes
  */
-import type { PaginationProps } from '../types';
+import type { PaginationProps } from '../types/index.ts';
 
 // ... previous code ...
 

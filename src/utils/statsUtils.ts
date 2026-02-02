@@ -1,4 +1,4 @@
-import type { Game } from '../types';
+import type { Game } from '../types/index.ts';
 
 interface PlayerGameStats {
   totalPins: number;

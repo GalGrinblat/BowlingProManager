@@ -8,7 +8,7 @@ import { calculatePlayerStats, calculateGameTotals, calculateGrandTotalPoints } 
 import { createEmptyMatch } from '../../utils/matchUtils';
 import { calculateCurrentPlayerAverages } from '../../utils/standingsUtils';
 
-import type { SeasonGamePlayerProps } from '../../types';
+import type { SeasonGamePlayerProps } from '../../types/index.ts';
 
 export const SeasonGamePlayer: React.FC<SeasonGamePlayerProps> = ({ gameId, onBack }) => {
   const { currentUser, isAdmin, isPlayer } = useAuth();

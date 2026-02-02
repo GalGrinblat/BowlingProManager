@@ -1,4 +1,4 @@
-import type { ScheduleMatchDay, Match } from '../types';
+import type { ScheduleMatchDay, Match } from '../types/index.ts';
 
 /**
  * Schedule Generator - Creates round-robin tournament schedules with dates

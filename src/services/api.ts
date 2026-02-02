@@ -11,7 +11,7 @@ import type {
   Team,
   Game,
   User
-} from '../types';
+} from '../types/index.ts';
 
 const STORAGE_KEYS = {
   ORGANIZATION: 'bowling_organization',

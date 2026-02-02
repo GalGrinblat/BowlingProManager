@@ -3,7 +3,7 @@
  * Validates that player handicaps update based on current season performance
  */
 
-import { calculateCurrentPlayerAverages } from '../src/utils/standingsUtils.js';
+import { calculateCurrentPlayerAverages } from '../src/utils/standingsUtils.ts';
 
 console.log('✅ Testing Dynamic Handicap Calculation\n');
 console.log('='.repeat(80));

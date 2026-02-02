@@ -6,7 +6,7 @@ import { calculatePlayerSeasonStats } from '../../utils/standingsUtils';
  * Player Season Comparison Component
  * Shows player performance across multiple seasons and within a single season
  */
-import type { PlayerSeasonComparisonProps } from '../../types';
+import type { PlayerSeasonComparisonProps } from '../../types/index.ts';
 
 export const PlayerSeasonComparison: React.FC<PlayerSeasonComparisonProps> = ({ playerId, onBack }) => {
   const [player, setPlayer] = useState(null);

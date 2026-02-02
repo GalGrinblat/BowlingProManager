@@ -1,4 +1,4 @@
-import type { GameHistoryViewProps } from '../types';
+import type { GameHistoryViewProps } from '../types/index.ts';
 
 export const GameHistoryView: React.FC<GameHistoryViewProps> = ({ game, onBack }) => {
   if (!game) return <div>Loading...</div>;

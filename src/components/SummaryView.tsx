@@ -1,6 +1,6 @@
 import { ArrowLeft, CheckCircle } from './Icons';
 
-import type { SummaryViewProps } from '../types';
+import type { SummaryViewProps } from '../types/index.ts';
 
 export const SummaryView: React.FC<SummaryViewProps> = ({ game, totals, playerStats, onBack, onFinish }) => {
   return (

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { teamsApi, playersApi, seasonsApi } from '../../services/api';
 
-import type { TeamManagementProps } from '../../types';
+import type { TeamManagementProps } from '../../types/index.ts';
 
 export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack }) => {
   const [season, setSeason] = useState(null);

@@ -3,7 +3,7 @@ import { leaguesApi, seasonsApi } from '../../services/api';
 import { createLeague, validateLeague } from '../../models';
 import { useTranslation } from '../../contexts/LanguageContext';
 
-import type { LeagueManagementProps } from '../../types';
+import type { LeagueManagementProps } from '../../types/index.ts';
 
 export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onViewLeague }) => {
   const { t } = useTranslation();

@@ -1,4 +1,4 @@
-import type { BonusRule, Game, IndividualGameResult, MatchResult } from '../types';
+import type { BonusRule, Game, IndividualGameResult, MatchResult } from '../types/index.ts';
 
 interface MatchPlayer {
   pins: string;

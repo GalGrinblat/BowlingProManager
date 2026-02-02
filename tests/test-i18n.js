@@ -3,7 +3,7 @@
  * Tests Hebrew language support and RTL functionality
  */
 
-import translations from '../src/translations/index.js';
+import translations from '../src/translations/index.ts';
 
 console.log('✅ Testing i18n Infrastructure\n');
 console.log('='.repeat(80));

@@ -3,7 +3,7 @@ import { organizationApi, leaguesApi, seasonsApi, gamesApi } from '../../service
 import { formatMatchDate } from '../../utils/scheduleUtils';
 import { useTranslation } from '../../contexts/LanguageContext';
 
-import type { AdminDashboardProps } from '../../types';
+import type { AdminDashboardProps } from '../../types/index.ts';
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   const { t } = useTranslation();
