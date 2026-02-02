@@ -316,6 +316,21 @@ const en: TranslationDictionary = {
     noData: 'No standings data available',
   },
 
+  // Records
+  records: {
+    title: 'Season Records',
+    personalRecords: 'Personal Records',
+    teamRecords: 'Team Records',
+    matchScore: 'Match Score',
+    series: 'Series',
+    teamMatch: 'Team Match',
+    gameTotal: 'Game Total',
+    noRecords: 'No records',
+    noCompletedGames: 'No completed games yet. Records will appear once games are played.',
+    round: 'R',
+    day: 'D',
+  },
+
   // Settings
   settings: {
     title: 'Settings',

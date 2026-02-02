@@ -316,6 +316,21 @@ const he: TranslationDictionary = {
     noData: 'אין נתוני טבלה זמינים',
   },
 
+  // שיאים
+  records: {
+    title: 'שיאי העונה',
+    personalRecords: 'שיאים אישיים',
+    teamRecords: 'שיאים קבוצתיים',
+    matchScore: 'ציון משחק',
+    series: 'סדרה',
+    teamMatch: 'משחק קבוצתי',
+    gameTotal: 'סה"כ משחק',
+    noRecords: 'אין שיאים',
+    noCompletedGames: 'אין עדיין משחקים שהושלמו. שיאים יופיעו לאחר שמשחקים יתקיימו.',
+    round: 'ס',
+    day: 'י',
+  },
+
   // הגדרות
   settings: {
     title: 'הגדרות',
@@ -408,13 +423,13 @@ const he: TranslationDictionary = {
     title: 'לוח משחקים',
     generateSchedule: 'צור לוח משחקים',
     regenerateSchedule: 'צור מחדש לוח משחקים',
-    postponeMatchDay: 'דחה יום משחק',
-    matchDay: 'יום משחק',
+    postponeMatchDay: 'דחה מחזור',
+    matchDay: 'מחזור',
     round: 'סבב',
     bye: 'חופשי',
     noSchedule: 'לוח משחקים טרם נוצר',
-    confirmPostpone: 'האם אתה בטוח שברצונך לדחות יום משחק זה?',
-    postponeSuccess: 'יום המשחק נדחה בהצלחה',
+    confirmPostpone: 'האם אתה בטוח שברצונך לדחות מחזור זה?',
+    postponeSuccess: 'מחזור נדחה בהצלחה',
   },
 
   // ימים בשבוע

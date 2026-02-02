@@ -4,6 +4,7 @@ import { calculateTeamStandings, calculatePlayerSeasonStats } from '../../utils/
 import { postponeMatchDay, formatMatchDate } from '../../utils/scheduleUtils';
 import { calculateHeadToHead, formatHeadToHead } from '../../utils/headToHeadUtils';
 import { calculateSeasonRecords, formatRecordDate } from '../../utils/recordsUtils';
+import { useTranslation } from '../../contexts/LanguageContext';
 import { 
   exportStandingsCSV, 
   exportPlayerStatsCSV, 
@@ -15,6 +16,7 @@ import {
 import type { SeasonDashboardProps } from '../../types/index.ts';
 
 export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBack, onPlayGame, onViewGame, onManageTeams }) => {
+  const { t } = useTranslation();
   const [season, setSeason] = useState(null);
   const [league, setLeague] = useState(null);
   const [teams, setTeams] = useState([]);
@@ -562,18 +564,18 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
       {/* Season Records View */}
       {view === 'records' && (
         <div className="bg-white rounded-xl shadow-lg p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">🏅 Season Records</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">🏅 {t('records.title')}</h2>
           
           {games.filter(g => g.status === 'completed').length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">No completed games yet. Records will appear once games are played.</p>
+              <p className="text-gray-500 text-lg">{t('records.noCompletedGames')}</p>
             </div>
           ) : (
             <div className="space-y-6">
               {/* Section Headers */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <h3 className="text-xl font-bold text-gray-800 pb-2 border-b-2 border-gray-300">👤 Personal Records</h3>
-                <h3 className="text-xl font-bold text-gray-800 pb-2 border-b-2 border-gray-300">🏆 Team Records</h3>
+                <h3 className="text-xl font-bold text-gray-800 pb-2 border-b-2 border-gray-300">👤 {t('records.personalRecords')}</h3>
+                <h3 className="text-xl font-bold text-gray-800 pb-2 border-b-2 border-gray-300">🏆 {t('records.teamRecords')}</h3>
               </div>
 
               {/* All Records Grid */}
@@ -581,7 +583,7 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
                 {/* Highest Match Score (Individual) */}
                 <div className="border-2 border-purple-200 rounded-xl p-4 bg-gradient-to-br from-purple-50 to-white">
                   <h4 className="text-base font-bold text-purple-800 mb-3 flex items-center gap-2">
-                    🎯 Match Score
+                    🎯 {t('records.matchScore')}
                   </h4>
                   {seasonRecords.highestMatchScores.length > 0 ? (
                     <div className="space-y-2">
@@ -598,20 +600,20 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
                           </div>
                           <div className="text-right ml-2">
                             <p className="text-xl font-bold text-purple-600">{record.value}</p>
-                            <p className="text-xs text-gray-500">R{record.round}, D{record.matchDay}</p>
+                            <p className="text-xs text-gray-500">{t('records.round')}{record.round}, {t('records.day')}{record.matchDay}</p>
                           </div>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-gray-500 text-center py-3 text-sm">No records</p>
+                    <p className="text-gray-500 text-center py-3 text-sm">{t('records.noRecords')}</p>
                   )}
                 </div>
 
                 {/* Highest Series (Individual) */}
                 <div className="border-2 border-blue-200 rounded-xl p-4 bg-gradient-to-br from-blue-50 to-white">
                   <h4 className="text-base font-bold text-blue-800 mb-3 flex items-center gap-2">
-                    🎳 Series
+                    🎳 {t('records.series')}
                   </h4>
                   {seasonRecords.highestSeries.length > 0 ? (
                     <div className="space-y-2">
@@ -628,20 +630,20 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
                           </div>
                           <div className="text-right ml-2">
                             <p className="text-xl font-bold text-blue-600">{record.value}</p>
-                            <p className="text-xs text-gray-500">R{record.round}, D{record.matchDay}</p>
+                            <p className="text-xs text-gray-500">{t('records.round')}{record.round}, {t('records.day')}{record.matchDay}</p>
                           </div>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-gray-500 text-center py-3 text-sm">No records</p>
+                    <p className="text-gray-500 text-center py-3 text-sm">{t('records.noRecords')}</p>
                   )}
                 </div>
 
                 {/* Highest Team Match Score */}
                 <div className="border-2 border-green-200 rounded-xl p-4 bg-gradient-to-br from-green-50 to-white">
                   <h4 className="text-base font-bold text-green-800 mb-3 flex items-center gap-2">
-                    💪 Team Match
+                    💪 {t('records.teamMatch')}
                   </h4>
                   {seasonRecords.highestTeamMatchScores.length > 0 ? (
                     <div className="space-y-2">
@@ -657,20 +659,20 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
                           </div>
                           <div className="text-right ml-2">
                             <p className="text-xl font-bold text-green-600">{record.value}</p>
-                            <p className="text-xs text-gray-500">R{record.round}, D{record.matchDay}</p>
+                            <p className="text-xs text-gray-500">{t('records.round')}{record.round}, {t('records.day')}{record.matchDay}</p>
                           </div>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-gray-500 text-center py-3 text-sm">No records</p>
+                    <p className="text-gray-500 text-center py-3 text-sm">{t('records.noRecords')}</p>
                   )}
                 </div>
 
                 {/* Highest Team Game Total */}
                 <div className="border-2 border-orange-200 rounded-xl p-4 bg-gradient-to-br from-orange-50 to-white">
                   <h4 className="text-base font-bold text-orange-800 mb-3 flex items-center gap-2">
-                    🔥 Game Total
+                    🔥 {t('records.gameTotal')}
                   </h4>
                   {seasonRecords.highestTeamGameTotals.length > 0 ? (
                     <div className="space-y-2">
@@ -686,13 +688,13 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
                           </div>
                           <div className="text-right ml-2">
                             <p className="text-xl font-bold text-orange-600">{record.value}</p>
-                            <p className="text-xs text-gray-500">R{record.round}, D{record.matchDay}</p>
+                            <p className="text-xs text-gray-500">{t('records.round')}{record.round}, {t('records.day')}{record.matchDay}</p>
                           </div>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-gray-500 text-center py-3 text-sm">No records</p>
+                    <p className="text-gray-500 text-center py-3 text-sm">{t('records.noRecords')}</p>
                   )}
                 </div>
               </div>
