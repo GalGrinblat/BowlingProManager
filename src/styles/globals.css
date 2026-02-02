@@ -66,3 +66,32 @@ input[type="number"] {
   }
 }
 
+/* RTL Support */
+/* Numbers and scores should remain LTR even in RTL mode */
+.ltr-content {
+  direction: ltr;
+  text-align: left;
+}
+
+/* RTL-specific overrides */
+[dir="rtl"] .history-card {
+  border-left: none;
+  border-right: 5px solid #ff6b35;
+}
+
+[dir="rtl"] .history-card:hover {
+  transform: translateX(-4px);
+}
+
+/* Ensure numeric inputs stay LTR */
+[dir="rtl"] input[type="number"],
+[dir="rtl"] .score-input,
+[dir="rtl"] .numeric-display {
+  direction: ltr;
+  text-align: center;
+}
+
+/* Hebrew font support */
+[dir="rtl"] * {
+  font-family: 'Source Sans 3', 'Arial', sans-serif;
+}

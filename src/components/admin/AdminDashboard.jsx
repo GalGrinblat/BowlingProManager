@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { organizationApi, leaguesApi, seasonsApi, gamesApi } from '../../services/api';
 import { formatMatchDate } from '../../utils/scheduleUtils';
+import { useTranslation } from '../../contexts/LanguageContext';
 
 export const AdminDashboard = ({ onNavigate }) => {
+  const { t } = useTranslation();
   const [org, setOrg] = useState(null);
   const [leagues, setLeagues] = useState([]);
 
@@ -17,7 +19,7 @@ export const AdminDashboard = ({ onNavigate }) => {
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Admin Dashboard</h1>
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('dashboard.adminTitle')}</h1>
         <p className="text-gray-600">{org?.name || 'My Bowling Organization'}</p>
       </div>
 
@@ -28,8 +30,8 @@ export const AdminDashboard = ({ onNavigate }) => {
           className="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all touch-manipulation"
         >
           <div className="text-4xl mb-2">👥</div>
-          <h3 className="text-xl font-bold mb-1">Manage Players</h3>
-          <p className="text-sm text-blue-100">Add, edit, or remove players</p>
+          <h3 className="text-xl font-bold mb-1">{t('dashboard.managePlayers')}</h3>
+          <p className="text-sm text-blue-100">{t('dashboard.managePlayersDesc')}</p>
         </button>
 
         <button
@@ -37,8 +39,8 @@ export const AdminDashboard = ({ onNavigate }) => {
           className="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all touch-manipulation"
         >
           <div className="text-4xl mb-2">🏆</div>
-          <h3 className="text-xl font-bold mb-1">Manage Leagues</h3>
-          <p className="text-sm text-purple-100">Create and configure leagues</p>
+          <h3 className="text-xl font-bold mb-1">{t('dashboard.manageLeagues')}</h3>
+          <p className="text-sm text-purple-100">{t('dashboard.manageLeaguesDesc')}</p>
         </button>
 
         <button
@@ -46,22 +48,22 @@ export const AdminDashboard = ({ onNavigate }) => {
           className="bg-gradient-to-br from-green-500 to-green-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all touch-manipulation"
         >
           <div className="text-4xl mb-2">⚙️</div>
-          <h3 className="text-xl font-bold mb-1">Settings</h3>
-          <p className="text-sm text-green-100">Organization settings</p>
+          <h3 className="text-xl font-bold mb-1">{t('settings.title')}</h3>
+          <p className="text-sm text-green-100">{t('dashboard.organizationSettings')}</p>
         </button>
       </div>
 
       {/* Active Leagues */}
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">Active Leagues</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('dashboard.activeLeagues')}</h2>
         {activeLeagues.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
-            <p>No active leagues yet</p>
+            <p>{t('dashboard.noActiveLeagues')}</p>
             <button
               onClick={() => onNavigate('leagues')}
               className="mt-4 text-blue-600 hover:text-blue-700 font-semibold"
             >
-              Create your first league →
+              {t('dashboard.createFirstLeague')}
             </button>
           </div>
         ) : (
@@ -106,22 +108,22 @@ export const AdminDashboard = ({ onNavigate }) => {
                       {activeSeason && (
                         <div className="mt-2 space-y-1">
                           <p className="text-sm text-green-600">
-                            Active Season: {activeSeason.name}
+                            {t('dashboard.activeSeason')}: {activeSeason.name}
                           </p>
                           {nextMatchDay && (
                             <p className="text-sm text-blue-600 font-medium">
-                              📅 Next: {formatMatchDate(nextMatchDay.date)}
-                              {nextMatchDay.postponed && <span className="text-orange-600 ml-1">(Postponed)</span>}
+                              📅 {t('dashboard.next')}: {formatMatchDate(nextMatchDay.date)}
+                              {nextMatchDay.postponed && <span className="text-orange-600 ml-1">({t('dashboard.postponed')})</span>}
                             </p>
                           )}
                         </div>
                       )}
                     </div>
                     <div className="text-right text-sm text-gray-500">
-                      <div>{seasons.length} season{seasons.length !== 1 ? 's' : ''}</div>
+                      <div className="ltr-content">{seasons.length} {seasons.length !== 1 ? t('dashboard.seasons') : t('dashboard.season')}</div>
                       <div className="text-xs mt-1">
                         {league.dayOfWeek && <div>{league.dayOfWeek}s</div>}
-                        {league.defaultPlayersPerTeam} players/team
+                        <span className="ltr-content">{league.defaultPlayersPerTeam} {t('dashboard.playersPerTeam')}</span>
                       </div>
                     </div>
                   </div>

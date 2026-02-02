@@ -47,10 +47,16 @@ export const organizationApi = {
       const defaultOrg = {
         id: generateId(),
         name: 'My Bowling Organization',
+        language: 'en',
         createdAt: new Date().toISOString()
       };
       saveToStorage(STORAGE_KEYS.ORGANIZATION, defaultOrg);
       return defaultOrg;
+    }
+    // Ensure language field exists
+    if (!org.language) {
+      org.language = 'en';
+      saveToStorage(STORAGE_KEYS.ORGANIZATION, org);
     }
     return org;
   },

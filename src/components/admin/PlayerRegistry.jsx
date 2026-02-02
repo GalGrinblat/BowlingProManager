@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { playersApi, teamsApi, seasonsApi } from '../../services/api';
 import { createPlayer, validatePlayer } from '../../models';
 import { Pagination, usePagination } from '../Pagination';
+import { useTranslation } from '../../contexts/LanguageContext';
 
 export const PlayerRegistry = ({ onBack }) => {
+  const { t } = useTranslation();
   const [players, setPlayers] = useState([]);
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -44,17 +46,17 @@ export const PlayerRegistry = ({ onBack }) => {
     );
     
     if (existingPlayer) {
-      alert(`❌ A player named "${existingPlayer.name}" already exists. Please use a different name.`);
+      alert(`❌ ${t('players.duplicateName')}`);
       return;
     }
 
     if (editingId) {
       playersApi.update(editingId, playerData);
-      alert(`✅ Player "${playerData.name}" updated successfully.`);
+      alert(`✅ "${playerData.name}" ${t('players.updated')}`);
       setEditingId(null);
     } else {
       playersApi.create(playerData);
-      alert(`✅ Player "${playerData.name}" created successfully.`);
+      alert(`✅ "${playerData.name}" ${t('players.created')}`);
     }
 
     setFormData({ name: '', startingAverage: '', active: true });
@@ -86,13 +88,13 @@ export const PlayerRegistry = ({ onBack }) => {
         return season ? season.name : 'Unknown Season';
       });
       
-      alert(`❌ Cannot delete player "${player?.name}" because they are assigned to ${teamsWithPlayer.length} team(s):\n\n${[...new Set(seasonNames)].map(s => `• ${s}`).join('\n')}\n\nPlease remove them from all teams first, or mark them as inactive instead.`);
+      alert(`❌ ${t('players.cannotDeleteAssigned')} "${player?.name}" (${teamsWithPlayer.length} ${t('players.assignedToTeams')}):\n\n${[...new Set(seasonNames)].map(s => `• ${s}`).join('\n')}\n\n${t('players.removeFromTeamsFirst')}`);
       return;
     }
     
-    if (confirm(`⚠️ Delete player "${player?.name}"?\n\nThis action cannot be undone.`)) {
+    if (confirm(`⚠️ ${t('players.deleteConfirm')} "${player?.name}"?\n\n${t('players.deleteAction')}`)) {
       playersApi.delete(id);
-      alert(`✅ Player "${player?.name}" deleted successfully.`);
+      alert(`✅ "${player?.name}" ${t('players.deleted')}`);
       loadPlayers();
     }
   };
@@ -125,14 +127,14 @@ export const PlayerRegistry = ({ onBack }) => {
       <div className="bg-white rounded-xl shadow-lg p-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Player Registry</h1>
-            <p className="text-gray-600">{players.length} total players</p>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('players.title')}</h1>
+            <p className="text-gray-600"><span className="ltr-content">{players.length}</span> {t('players.totalPlayers')}</p>
           </div>
           <button
             onClick={onBack}
             className="px-4 py-2 text-gray-600 hover:text-gray-800"
           >
-            ← Back to Dashboard
+            ← {t('players.backToDashboard')}
           </button>
         </div>
       </div>
@@ -141,13 +143,13 @@ export const PlayerRegistry = ({ onBack }) => {
       {isAdding ? (
         <div className="bg-white rounded-xl shadow-lg p-6">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">
-            {editingId ? 'Edit Player' : 'Add New Player'}
+            {editingId ? t('players.editPlayer') : t('players.addNewPlayer')}
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Name *
+                  {t('common.name')} *
                 </label>
                 <input
                   type="text"
@@ -159,7 +161,7 @@ export const PlayerRegistry = ({ onBack }) => {
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Starting Average
+                  {t('players.startingAverage')}
                 </label>
                 <input
                   type="number"
@@ -180,7 +182,7 @@ export const PlayerRegistry = ({ onBack }) => {
                 className="w-4 h-4 text-blue-600"
               />
               <label htmlFor="active" className="ml-2 text-sm text-gray-700">
-                Active player
+                {t('players.activePlayer')}
               </label>
             </div>
             <div className="flex gap-3">
@@ -188,14 +190,14 @@ export const PlayerRegistry = ({ onBack }) => {
                 type="submit"
                 className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
               >
-                {editingId ? 'Update Player' : 'Add Player'}
+                {editingId ? t('players.updatePlayer') : t('players.addPlayer')}
               </button>
               <button
                 type="button"
                 onClick={handleCancel}
                 className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-semibold"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
             </div>
           </form>
@@ -204,7 +206,7 @@ export const PlayerRegistry = ({ onBack }) => {
         <div className="flex justify-between items-center">
           <input
             type="text"
-            placeholder="Search players..."
+            placeholder={t('players.searchPlayers')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -213,7 +215,7 @@ export const PlayerRegistry = ({ onBack }) => {
             onClick={() => setIsAdding(true)}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
           >
-            + Add Player
+            + {t('players.addPlayer')}
           </button>
         </div>
       )}
@@ -222,11 +224,11 @@ export const PlayerRegistry = ({ onBack }) => {
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="p-6 pb-0">
           <h2 className="text-xl font-bold text-gray-800 mb-4">
-            Active Players ({activePlayers.length})
+            {t('players.activePlayers')} (<span className="ltr-content">{activePlayers.length}</span>)
           </h2>
         </div>
         {activePlayers.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">No active players</p>
+          <p className="text-gray-500 text-center py-8">{t('players.noActivePlayers')}</p>
         ) : (
           <div className="p-6 space-y-2">
             {paginatedActivePlayers.map(player => (
@@ -238,7 +240,7 @@ export const PlayerRegistry = ({ onBack }) => {
                   <div>
                     <h3 className="font-semibold text-gray-800">{player.name}</h3>
                     <div className="text-sm text-gray-600 mt-1">
-                      <div>📊 Starting Average: {player.startingAverage || 'Not set'}</div>
+                      <div>📊 {t('players.startingAverage')}: <span className="ltr-content">{player.startingAverage || t('players.notSet')}</span></div>
                     </div>
                   </div>
                   <div className="flex gap-2">
@@ -246,13 +248,13 @@ export const PlayerRegistry = ({ onBack }) => {
                       onClick={() => handleEdit(player)}
                       className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
                     >
-                      Edit
+                      {t('common.edit')}
                     </button>
                     <button
                       onClick={() => handleDelete(player.id)}
                       className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200"
                     >
-                      Delete
+                      {t('common.delete')}
                     </button>
                   </div>
                 </div>
@@ -273,7 +275,7 @@ export const PlayerRegistry = ({ onBack }) => {
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="p-6 pb-0">
             <h2 className="text-xl font-bold text-gray-800 mb-4">
-              Inactive Players ({inactivePlayers.length})
+              {t('players.inactivePlayers')} (<span className="ltr-content">{inactivePlayers.length}</span>)
             </h2>
           </div>
           <div className="p-6 space-y-2">
@@ -286,7 +288,7 @@ export const PlayerRegistry = ({ onBack }) => {
                   <div>
                     <h3 className="font-semibold text-gray-600">{player.name}</h3>
                     <div className="text-sm text-gray-500 mt-1">
-                      Starting Average: {player.startingAverage || 'Not set'}
+                      {t('players.startingAverage')}: <span className="ltr-content">{player.startingAverage || t('players.notSet')}</span>
                     </div>
                   </div>
                   <div className="flex gap-2">
@@ -294,7 +296,7 @@ export const PlayerRegistry = ({ onBack }) => {
                       onClick={() => handleEdit(player)}
                       className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
                     >
-                      Edit
+                      {t('common.edit')}
                     </button>
                   </div>
                 </div>

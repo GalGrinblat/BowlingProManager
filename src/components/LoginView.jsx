@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { playersApi } from '../services/api';
+import { useTranslation } from '../contexts/LanguageContext';
 
 export const LoginView = ({ onLogin }) => {
+  const { t } = useTranslation();
   const [selectedRole, setSelectedRole] = useState('admin');
   const [players, setPlayers] = useState([]);
   const [selectedPlayer, setSelectedPlayer] = useState('');
@@ -31,8 +33,8 @@ export const LoginView = ({ onLogin }) => {
   return (
     <div className="bg-white rounded-xl shadow-lg p-8 max-w-md mx-auto">
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-800 mb-2">Welcome</h2>
-        <p className="text-gray-600">Select your role to continue</p>
+        <h2 className="text-3xl font-bold text-gray-800 mb-2">{t('auth.welcome')}</h2>
+        <p className="text-gray-600">{t('auth.selectRole')}</p>
       </div>
 
       {/* Role Tabs */}
@@ -45,7 +47,7 @@ export const LoginView = ({ onLogin }) => {
               : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
           }`}
         >
-          Admin
+          {t('auth.admin')}
         </button>
         <button
           onClick={() => setSelectedRole('player')}
@@ -55,7 +57,7 @@ export const LoginView = ({ onLogin }) => {
               : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
           }`}
         >
-          Player
+          {t('auth.player')}
         </button>
       </div>
 
@@ -65,17 +67,17 @@ export const LoginView = ({ onLogin }) => {
             onClick={handleAdminLogin}
             className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 px-6 rounded-lg font-semibold hover:from-blue-700 hover:to-blue-800 transition-all shadow-md hover:shadow-lg"
           >
-            Continue as Admin
+            {t('auth.loginAs')} {t('auth.admin')}
           </button>
         ) : (
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Select Your Name
+                {t('players.playerName')}
               </label>
               <input
                 type="text"
-                placeholder="Search players..."
+                placeholder={t('players.searchPlayers')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent mb-2"
@@ -83,7 +85,7 @@ export const LoginView = ({ onLogin }) => {
               <div className="max-h-64 overflow-y-auto border border-gray-300 rounded-lg">
                 {filteredPlayers.length === 0 ? (
                   <p className="p-4 text-gray-500 text-center">
-                    {searchTerm ? 'No players found' : 'No players registered'}
+                    {searchTerm ? t('players.noPlayers') : t('players.noPlayers')}
                   </p>
                 ) : (
                   filteredPlayers.map(player => (

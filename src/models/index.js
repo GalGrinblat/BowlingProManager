@@ -3,6 +3,15 @@
  * These define the structure of all entities in the system
  */
 
+// ===== ORGANIZATION MODEL =====
+export const createOrganization = ({
+  name = 'My Organization',
+  language = 'en'
+}) => ({
+  name,
+  language: language === 'he' ? 'he' : 'en'
+});
+
 // ===== PLAYER MODEL =====
 export const createPlayer = ({
   name = '',

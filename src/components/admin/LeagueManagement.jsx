@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { leaguesApi, seasonsApi } from '../../services/api';
 import { createLeague, validateLeague } from '../../models';
+import { useTranslation } from '../../contexts/LanguageContext';
 
 export const LeagueManagement = ({ onBack, onViewLeague }) => {
+  const { t } = useTranslation();
   const [leagues, setLeagues] = useState([]);
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -51,17 +53,17 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
     );
     
     if (duplicateName) {
-      alert(`A league with the name "${formData.name}" already exists. Please choose a different name.`);
+      alert(t('leagues.duplicateName'));
       return;
     }
 
     if (editingId) {
       leaguesApi.update(editingId, leagueData);
-      alert('League updated successfully!');
+      alert(t('leagues.leagueUpdated'));
       setEditingId(null);
     } else {
       leaguesApi.create(leagueData);
-      alert('League created successfully!');
+      alert(t('leagues.leagueCreated'));
     }
 
     setFormData({
@@ -117,39 +119,39 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
       const activeSeasons = seasons.filter(s => s.status === 'active');
       const setupSeasons = seasons.filter(s => s.status === 'setup');
       
-      let message = `Cannot delete league "${league.name}" because it has ${seasons.length} season(s):\n\n`;
+      let message = `${t('leagues.cannotDelete')} "${league.name}" (${seasons.length}):\n\n`;
       if (activeSeasons.length > 0) {
-        message += `• ${activeSeasons.length} active season(s)\n`;
+        message += `• ${activeSeasons.length} ${t('seasons.activeSeasons')}\n`;
       }
       if (setupSeasons.length > 0) {
-        message += `• ${setupSeasons.length} season(s) in setup\n`;
+        message += `• ${setupSeasons.length} ${t('seasons.setupSeasons')}\n`;
       }
-      message += '\nPlease complete or delete all seasons first, or toggle the league to inactive to archive it.';
+      message += `\n${t('leagues.completeOrDelete')}`;
       
       alert(message);
       return;
     }
     
-    if (confirm(`Are you sure you want to permanently delete the league "${league.name}"?\n\nThis action cannot be undone.`)) {
+    if (confirm(`${t('leagues.deleteConfirm')} "${league.name}"?\n\n${t('leagues.deleteAction')}`)) {
       leaguesApi.delete(id);
       loadLeagues();
-      alert('League deleted successfully.');
+      alert(t('leagues.leagueDeleted'));
     }
   };
 
   const toggleActive = (league) => {
     if (league.active) {
       // Archiving an active league
-      if (confirm(`📦 Archive league "${league.name}"?\n\nArchived leagues:\n• Won't show in main dashboard\n• Can still view seasons and data\n• Can be restored anytime\n\nThis is useful for completed or inactive leagues.`)) {
+      if (confirm(`📦 ${t('leagues.archiveConfirm')} "${league.name}"?\n\n${t('leagues.archiveDesc')}`)) {
         leaguesApi.update(league.id, { active: false });
-        alert(`✅ League "${league.name}" has been archived.`);
+        alert(`✅ "${league.name}" ${t('leagues.archived')}`);
         loadLeagues();
       }
     } else {
       // Restoring an archived league
-      if (confirm(`📤 Restore league "${league.name}"?\n\nThis will move the league back to your active leagues list.`)) {
+      if (confirm(`📤 ${t('leagues.restoreConfirm')} "${league.name}"?\n\n${t('leagues.restoreDesc')}`)) {
         leaguesApi.update(league.id, { active: true });
-        alert(`✅ League "${league.name}" has been restored.`);
+        alert(`✅ "${league.name}" ${t('leagues.restored')}`);
         loadLeagues();
       }
     }
@@ -184,14 +186,14 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
       <div className="bg-white rounded-xl shadow-lg p-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">League Management</h1>
-            <p className="text-gray-600">{leagues.length} total leagues</p>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('leagues.title')}</h1>
+            <p className="text-gray-600"><span className="ltr-content">{leagues.length}</span> {t('leagues.totalLeagues')}</p>
           </div>
           <button
             onClick={onBack}
             className="px-4 py-2 text-gray-600 hover:text-gray-800"
           >
-            ← Back to Dashboard
+            ← {t('players.backToDashboard')}
           </button>
         </div>
       </div>
@@ -200,32 +202,32 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
       {isAdding ? (
         <div className="bg-white rounded-xl shadow-lg p-6">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">
-            {editingId ? 'Edit League' : 'Create New League'}
+            {editingId ? t('leagues.editLeague') : t('leagues.createLeague')}
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="md:col-span-2">
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  League Name *
+                  {t('leagues.leagueName')} *
                 </label>
                 <input
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="e.g., Monday Night League"
+                  placeholder={t('leagues.exampleName')}
                   required
                 />
               </div>
               <div className="md:col-span-2">
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Description
+                  {t('leagues.description')}
                 </label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Brief description of the league"
+                  placeholder={t('leagues.briefDescription')}
                   rows="3"
                 />
               </div>
@@ -236,7 +238,7 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Default Players per Team
+                  {t('leagues.defaultPlayersPerTeam')}
                 </label>
                 <input
                   type="number"
@@ -246,11 +248,11 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
                   onChange={(e) => setFormData({ ...formData, defaultPlayersPerTeam: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
-                <p className="text-xs text-gray-500 mt-1">Can be changed per season</p>
+                <p className="text-xs text-gray-500 mt-1">{t('leagues.canChangePerSeason')}</p>
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Default Matches per Game
+                  {t('leagues.defaultMatchesPerGame')}
                 </label>
                 <input
                   type="number"
@@ -260,42 +262,42 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
                   onChange={(e) => setFormData({ ...formData, defaultMatchesPerGame: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
-                <p className="text-xs text-gray-500 mt-1">Number of matches in each game</p>
+                <p className="text-xs text-gray-500 mt-1">{t('leagues.matchesInGame')}</p>
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  League Day
+                  {t('leagues.leagueDay')}
                 </label>
                 <select
                   value={formData.dayOfWeek}
                   onChange={(e) => setFormData({ ...formData, dayOfWeek: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
-                  <option value="">Select day (optional)</option>
-                  <option value="Sunday">Sunday</option>
-                  <option value="Monday">Monday</option>
-                  <option value="Tuesday">Tuesday</option>
-                  <option value="Wednesday">Wednesday</option>
-                  <option value="Thursday">Thursday</option>
-                  <option value="Friday">Friday</option>
-                  <option value="Saturday">Saturday</option>
+                  <option value="">{t('leagues.selectDay')}</option>
+                  <option value="Sunday">{t('days.sunday')}</option>
+                  <option value="Monday">{t('days.monday')}</option>
+                  <option value="Tuesday">{t('days.tuesday')}</option>
+                  <option value="Wednesday">{t('days.wednesday')}</option>
+                  <option value="Thursday">{t('days.thursday')}</option>
+                  <option value="Friday">{t('days.friday')}</option>
+                  <option value="Saturday">{t('days.saturday')}</option>
                 </select>
-                <p className="text-xs text-gray-500 mt-1">Day of the week games are played</p>
+                <p className="text-xs text-gray-500 mt-1">{t('leagues.dayPlayed')}</p>
               </div>
               </div>
             </div>
 
             {/* Point Configuration Section */}
             <div className="border-t pt-4 mt-4">
-              <h3 className="text-lg font-bold text-gray-800 mb-3">Points Configuration</h3>
+              <h3 className="text-lg font-bold text-gray-800 mb-3">{t('leagues.pointsConfig')}</h3>
               <p className="text-sm text-gray-600 mb-3">
-                Configure points values for winning games and matches (draws are always 50% of win points)
+                {t('leagues.pointsConfigDesc')}
               </p>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Individual Game Win Points
+                    {t('leagues.gameWinPoints')}
                   </label>
                   <input
                     type="number"
@@ -305,11 +307,11 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
                     onChange={(e) => setFormData({ ...formData, gameWinPoints: e.target.value })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Points for winning an individual player vs player game</p>
+                  <p className="text-xs text-gray-500 mt-1">{t('leagues.gameWinPointsDesc')}</p>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Match Winner Points
+                    {t('leagues.matchWinPoints')}
                   </label>
                   <input
                     type="number"
@@ -319,11 +321,11 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
                     onChange={(e) => setFormData({ ...formData, matchWinPoints: e.target.value })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Points for winning a match (higher total pins)</p>
+                  <p className="text-xs text-gray-500 mt-1">{t('leagues.matchWinPointsDesc')}</p>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Grand Total Points
+                    {t('leagues.grandTotalPoints')}
                   </label>
                   <input
                     type="number"
@@ -333,16 +335,16 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
                     onChange={(e) => setFormData({ ...formData, grandTotalPoints: e.target.value })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Points for highest total pins across all matches</p>
+                  <p className="text-xs text-gray-500 mt-1">{t('leagues.grandTotalPointsDesc')}</p>
                 </div>
               </div>
             </div>
 
             {/* Handicap Settings Section */}
             <div className="border-t pt-4 mt-4">
-              <h3 className="text-lg font-bold text-gray-800 mb-3">Handicap Settings</h3>
+              <h3 className="text-lg font-bold text-gray-800 mb-3">{t('leagues.handicapSettings')}</h3>
               <p className="text-sm text-gray-600 mb-3">
-                Configure how handicap is calculated for this league
+                {t('leagues.pointsConfigDesc')}
               </p>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -354,13 +356,13 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
                       onChange={(e) => setFormData({ ...formData, useHandicap: e.target.checked })}
                       className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
                     />
-                    <span className="text-sm font-semibold text-gray-700">Use Handicap</span>
+                    <span className="text-sm font-semibold text-gray-700">{t('leagues.useHandicap')}</span>
                   </label>
-                  <p className="text-xs text-gray-500 mt-1">Enable or disable handicap for this league</p>
+                  <p className="text-xs text-gray-500 mt-1">{t('leagues.enableDisableHandicap')}</p>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Handicap Basis
+                    {t('leagues.handicapBasis')}
                   </label>
                   <input
                     type="number"
@@ -371,11 +373,11 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
                     disabled={!formData.useHandicap}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Pin basis for handicap calculation</p>
+                  <p className="text-xs text-gray-500 mt-1">{t('leagues.pinBasisCalculation')}</p>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Handicap Percentage
+                    {t('leagues.handicapPercentage')}
                   </label>
                   <input
                     type="number"
@@ -387,7 +389,7 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Percentage of difference from basis (e.g., 80% = 8 pins if diff is 10)
+                    {t('leagues.percentageExplanation')}
                   </p>
                 </div>
               </div>
@@ -396,7 +398,7 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
             {/* Bonus Rules Section */}
             <div className="border-t pt-4 mt-4">
               <div className="flex justify-between items-center mb-3">
-                <h3 className="text-lg font-bold text-gray-800">Bonus Point Rules</h3>
+                <h3 className="text-lg font-bold text-gray-800">{t('leagues.bonusRules')}</h3>
                 <button
                   type="button"
                   onClick={() => {
@@ -410,11 +412,11 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
                   }}
                   className="px-3 py-1 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 font-semibold text-sm"
                 >
-                  + Add Rule
+                  + {t('leagues.addRule')}
                 </button>
               </div>
               <p className="text-sm text-gray-600 mb-3">
-                Configure bonus points awarded during games. Rules are evaluated in order (highest points first).
+                {t('leagues.bonusRulesDesc')}
               </p>
               
               <div className="space-y-3">
@@ -422,7 +424,7 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
                   <div key={index} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
                     <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
                       <div>
-                        <label className="block text-xs font-semibold text-gray-600 mb-1">Apply To</label>
+                        <label className="block text-xs font-semibold text-gray-600 mb-1">{t('leagues.applyTo')}</label>
                         <select
                           value={rule.type}
                           onChange={(e) => {
@@ -436,13 +438,13 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
                           }}
                           className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
                         >
-                          <option value="player">Player</option>
-                          <option value="team">Team</option>
+                          <option value="player">{t('leagues.player')}</option>
+                          <option value="team">{t('leagues.team')}</option>
                         </select>
                       </div>
                       
                       <div>
-                        <label className="block text-xs font-semibold text-gray-600 mb-1">Condition</label>
+                        <label className="block text-xs font-semibold text-gray-600 mb-1">{t('leagues.condition')}</label>
                         <select
                           value={rule.condition}
                           onChange={(e) => {
@@ -454,15 +456,15 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
                           disabled={rule.type === 'team'}
                         >
                           {rule.type === 'player' && (
-                            <option value="vs_average">Score vs Average</option>
+                            <option value="vs_average">{t('leagues.scoreVsAverage')}</option>
                           )}
-                          <option value="pure_score">Score</option>
+                          <option value="pure_score">{t('leagues.score')}</option>
                         </select>
                       </div>
                       
                       <div>
                         <label className="block text-xs font-semibold text-gray-600 mb-1">
-                          {rule.condition === 'vs_average' ? 'Above Avg' : 'Min Score'}
+                          {rule.condition === 'vs_average' ? t('leagues.aboveAvg') : t('leagues.minScore')}
                         </label>
                         <input
                           type="number"
@@ -479,7 +481,7 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
                       </div>
                       
                       <div>
-                        <label className="block text-xs font-semibold text-gray-600 mb-1">Points</label>
+                        <label className="block text-xs font-semibold text-gray-600 mb-1">{t('common.points')}</label>
                         <input
                           type="number"
                           min="1"
@@ -503,16 +505,15 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
                           }}
                           className="w-full px-2 py-1.5 bg-red-100 text-red-700 rounded hover:bg-red-200 font-semibold text-sm"
                         >
-                          Remove
+                          {t('leagues.removeRule')}
                         </button>
                       </div>
                     </div>
                     
                     <div className="mt-2 text-xs text-gray-600">
-                      {rule.type === 'player' ? '👤 Player' : '👥 Team'} gets <strong>+{rule.points} point{rule.points !== 1 ? 's' : ''}</strong> when scoring{' '}
-                      {rule.condition === 'vs_average' 
-                        ? `${rule.threshold}+ pins above average`
-                        : `${rule.threshold}+ pins total`
+                      {rule.type === 'player' ? `👤 ${t('leagues.player')}` : `👥 ${t('leagues.team')}`} {t('common.points')}: <strong className="ltr-content">+{rule.points}</strong> {rule.condition === 'vs_average' 
+                        ? `(${rule.threshold}+ ${t('leagues.aboveAvg')})`
+                        : `(${rule.threshold}+ ${t('leagues.score')})`
                       }
                     </div>
                   </div>
@@ -520,7 +521,7 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
                 
                 {formData.bonusRules.length === 0 && (
                   <div className="text-center py-4 text-gray-500 text-sm">
-                    No bonus rules configured. Click "Add Rule" to create one.
+                    {t('leagues.bonusRulesDesc')}
                   </div>
                 )}
               </div>
@@ -531,14 +532,14 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
                 type="submit"
                 className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
               >
-                {editingId ? 'Update League' : 'Create League'}
+                {editingId ? t('leagues.editLeague') : t('leagues.createLeague')}
               </button>
               <button
                 type="button"
                 onClick={handleCancel}
                 className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-semibold"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
             </div>
           </form>
@@ -549,7 +550,7 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
             onClick={() => setIsAdding(true)}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
           >
-            + Create League
+            + {t('leagues.createLeague')}
           </button>
         </div>
       )}
@@ -558,14 +559,14 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
       <div className="bg-white rounded-xl shadow-lg p-6">
         <div className="mb-4">
           <h2 className="text-2xl font-bold text-gray-800">
-            Active Leagues ({activeLeagues.length})
+            {t('leagues.activeLeagues')} (<span className="ltr-content">{activeLeagues.length}</span>)
           </h2>
           <p className="text-sm text-gray-600 mt-1">
-            Your current leagues. You can archive leagues when they're completed or no longer active.
+            {t('leagues.currentLeagues')}
           </p>
         </div>
         {activeLeagues.length === 0 ? (
-          <p className="text-gray-500 text-center py-4">No active leagues</p>
+          <p className="text-gray-500 text-center py-4">{t('leagues.noActiveLeagues')}</p>
         ) : (
           <div className="space-y-3">
             {activeLeagues.map(league => {
@@ -584,14 +585,14 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
                         <p className="text-sm text-gray-600 mt-1">{league.description}</p>
                       )}
                       <div className="flex gap-4 mt-2 text-sm text-gray-500">
-                        {league.dayOfWeek && <span>📅 {league.dayOfWeek}s</span>}
-                        <span>📊 Handicap: {league.useHandicap !== false ? `${league.defaultHandicapBasis} (${league.handicapPercentage || 100}%)` : 'Disabled'}</span>
-                        <span>👥 {league.defaultPlayersPerTeam} players/team</span>
-                        <span>🎳 {seasons.length} season{seasons.length !== 1 ? 's' : ''}</span>
+                        {league.dayOfWeek && <span>📅 {t(`days.${league.dayOfWeek.toLowerCase()}`)}s</span>}
+                        <span>📊 {t('leagues.useHandicap')}: <span className="ltr-content">{league.useHandicap !== false ? `${league.defaultHandicapBasis} (${league.handicapPercentage || 100}%)` : t('leagues.handicapDisabled')}</span></span>
+                        <span>👥 <span className="ltr-content">{league.defaultPlayersPerTeam}</span> {t('leagues.playersPerTeam')}</span>
+                        <span>🎳 <span className="ltr-content">{seasons.length}</span> {seasons.length === 1 ? t('leagues.season') : t('leagues.seasons')}</span>
                       </div>
                       {activeSeason && (
                         <div className="mt-2 inline-block px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">
-                          Active: {activeSeason.name}
+                          {t('leagues.activeStatus')}: {activeSeason.name}
                         </div>
                       )}
                     </div>
@@ -600,27 +601,27 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
                         onClick={() => onViewLeague(league.id)}
                         className="px-3 py-1 text-sm bg-purple-100 text-purple-700 rounded hover:bg-purple-200"
                       >
-                        View
+                        {t('common.view')}
                       </button>
                       <button
                         onClick={() => handleEdit(league)}
                         className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
                       >
-                        Edit
+                        {t('common.edit')}
                       </button>
                       <button
                         onClick={() => toggleActive(league)}
                         className="px-3 py-1 text-sm bg-orange-100 text-orange-700 rounded hover:bg-orange-200"
-                        title="Archive this league (can be restored later)"
+                        title={t('leagues.archiveLeague')}
                       >
-                        📦 Archive
+                        📦 {t('leagues.archiveLeague')}
                       </button>
                       {seasons.length === 0 && (
                         <button
                           onClick={() => handleDelete(league.id)}
                           className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200"
                         >
-                          Delete
+                          {t('common.delete')}
                         </button>
                       )}
                     </div>
@@ -637,10 +638,10 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
         <div className="bg-white rounded-xl shadow-lg p-6">
           <div className="mb-4">
             <h2 className="text-xl font-bold text-gray-800">
-              📦 Archived Leagues ({archivedLeagues.length})
+              📦 {t('leagues.archivedLeagues')} (<span className="ltr-content">{archivedLeagues.length}</span>)
             </h2>
             <p className="text-sm text-gray-600 mt-1">
-              Completed or inactive leagues. All data is preserved and can be viewed or restored anytime.
+              {t('leagues.completedInactive')}
             </p>
           </div>
           <div className="space-y-3">
@@ -656,8 +657,8 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
                     <div>
                       <h3 className="font-semibold text-gray-600">{league.name}</h3>
                       <div className="text-sm text-gray-500 mt-1">
-                        {league.dayOfWeek && <span>{league.dayOfWeek}s • </span>}
-                        {seasons.length} season{seasons.length !== 1 ? 's' : ''}
+                        {league.dayOfWeek && <span>{t(`days.${league.dayOfWeek.toLowerCase()}`)}s • </span>}
+                        <span className="ltr-content">{seasons.length}</span> {seasons.length === 1 ? t('leagues.season') : t('leagues.seasons')}
                       </div>
                     </div>
                     <div className="flex gap-2">
@@ -665,14 +666,14 @@ export const LeagueManagement = ({ onBack, onViewLeague }) => {
                         onClick={() => onViewLeague(league.id)}
                         className="px-3 py-1 text-sm bg-purple-100 text-purple-700 rounded hover:bg-purple-200"
                       >
-                        View
+                        {t('common.view')}
                       </button>
                       <button
                         onClick={() => toggleActive(league)}
                         className="px-3 py-1 text-sm bg-green-100 text-green-700 rounded hover:bg-green-200"
-                        title="Move this league back to active leagues"
+                        title={t('leagues.restoreLeague')}
                       >
-                        📤 Restore
+                        📤 {t('leagues.restoreLeague')}
                       </button>
                     </div>
                   </div>

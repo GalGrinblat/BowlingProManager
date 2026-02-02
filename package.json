@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node tests/test-validation.js && node tests/test-scoring.js && node tests/test-schedule.js && node tests/test-handicap.js && node tests/test-dynamic-handicap.js",
+    "test": "node tests/test-validation.js && node tests/test-scoring.js && node tests/test-schedule.js && node tests/test-handicap.js && node tests/test-dynamic-handicap.js && node tests/test-i18n.js",
     "check": "node scripts/start-of-day.js",
     "check:ps": "powershell -ExecutionPolicy Bypass -File scripts/start-of-day.ps1"
   },
