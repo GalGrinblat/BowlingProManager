@@ -105,6 +105,14 @@ export const calculateMatchResults = (game: Game, matchIndex: number): void => {
     const team1Player = game.team1.players[idx];
     const team2Player = game.team2.players[idx];
     
+    // Safety check: if players are undefined, skip this game
+    if (!team1Player || !team2Player) {
+      gameResult.result = null;
+      gameResult.team1Points = 0;
+      gameResult.team2Points = 0;
+      return;
+    }
+    
     // If player is absent, use average - 10; otherwise use entered pins (or 0)
     const team1Score = team1Player.absent ? parseInt(team1Player.average) - 10 : (match.team1.players[idx].pins === '' ? 0 : parseInt(match.team1.players[idx].pins));
     const team2Score = team2Player.absent ? parseInt(team2Player.average) - 10 : (match.team2.players[idx].pins === '' ? 0 : parseInt(match.team2.players[idx].pins));
@@ -144,21 +152,25 @@ export const calculateMatchResults = (game: Game, matchIndex: number): void => {
 
   // Calculate totals
   match.team1.totalPins = game.team1.players.reduce((sum, p, idx) => {
+    if (!p || !match.team1.players[idx]) return sum;
     const score = p.absent ? parseInt(p.average) - 10 : (match.team1.players[idx].pins === '' ? 0 : parseInt(match.team1.players[idx].pins));
     return sum + score;
   }, 0);
   
   match.team2.totalPins = game.team2.players.reduce((sum, p, idx) => {
+    if (!p || !match.team2.players[idx]) return sum;
     const score = p.absent ? parseInt(p.average) - 10 : (match.team2.players[idx].pins === '' ? 0 : parseInt(match.team2.players[idx].pins));
     return sum + score;
   }, 0);
   
   match.team1.totalWithHandicap = game.team1.players.reduce((sum, p, idx) => {
+    if (!p || !match.team1.players[idx]) return sum;
     const score = p.absent ? parseInt(p.average) - 10 : (match.team1.players[idx].pins === '' ? 0 : parseInt(match.team1.players[idx].pins));
     return sum + score + p.handicap;
   }, 0);
   
   match.team2.totalWithHandicap = game.team2.players.reduce((sum, p, idx) => {
+    if (!p || !match.team2.players[idx]) return sum;
     const score = p.absent ? parseInt(p.average) - 10 : (match.team2.players[idx].pins === '' ? 0 : parseInt(match.team2.players[idx].pins));
     return sum + score + p.handicap;
   }, 0);
@@ -177,8 +189,8 @@ export const calculateMatchResults = (game: Game, matchIndex: number): void => {
   });
 
   // Calculate total points (game points + total bonus + performance bonus)
-  const team1AllScoresEntered = game.team1.players.every((p, idx) => p.absent || match.team1.players[idx].pins !== '');
-  const team2AllScoresEntered = game.team2.players.every((p, idx) => p.absent || match.team2.players[idx].pins !== '');
+  const team1AllScoresEntered = game.team1.players.every((p, idx) => !p || (p.absent || match.team1.players[idx]?.pins !== ''));
+  const team2AllScoresEntered = game.team2.players.every((p, idx) => !p || (p.absent || match.team2.players[idx]?.pins !== ''));
   const allScoresEntered = team1AllScoresEntered && team2AllScoresEntered;
   
   if (allScoresEntered) {
@@ -200,7 +212,7 @@ export const calculateMatchResults = (game: Game, matchIndex: number): void => {
 
 export const validateMatch = (currentGame: Game, matchIndex: number): boolean => {
   const match = currentGame.matches[matchIndex];
-  const team1Valid = currentGame.team1.players.every((p, idx) => p.absent || match.team1.players[idx].pins !== '');
-  const team2Valid = currentGame.team2.players.every((p, idx) => p.absent || match.team2.players[idx].pins !== '');
+  const team1Valid = currentGame.team1.players.every((p, idx) => !p || (p.absent || match.team1.players[idx]?.pins !== ''));
+  const team2Valid = currentGame.team2.players.every((p, idx) => !p || (p.absent || match.team2.players[idx]?.pins !== ''));
   return team1Valid && team2Valid;
 };

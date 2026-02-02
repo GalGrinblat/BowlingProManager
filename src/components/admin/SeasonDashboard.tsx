@@ -3,7 +3,7 @@ import { seasonsApi, teamsApi, gamesApi, leaguesApi } from '../../services/api';
 import { calculateTeamStandings, calculatePlayerSeasonStats } from '../../utils/standingsUtils';
 import { postponeMatchDay, formatMatchDate } from '../../utils/scheduleUtils';
 import { calculateHeadToHead, formatHeadToHead } from '../../utils/headToHeadUtils';
-import { Pagination, usePagination } from '../Pagination';
+import { calculateSeasonRecords, formatRecordDate } from '../../utils/recordsUtils';
 import { 
   exportStandingsCSV, 
   exportPlayerStatsCSV, 
@@ -19,14 +19,11 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
   const [league, setLeague] = useState(null);
   const [teams, setTeams] = useState([]);
   const [games, setGames] = useState([]);
-  const [view, setView] = useState('schedule'); // schedule, standings, players
+  const [view, setView] = useState('schedule'); // schedule, standings, players, h2h, records, records
   const [selectedRound, setSelectedRound] = useState(1);
   const [selectedMatchDay, setSelectedMatchDay] = useState(null);
   const [showPostponeModal, setShowPostponeModal] = useState(false);
   const [postponeWeeks, setPostponeWeeks] = useState(1);
-  
-  // Pagination for player stats
-  const playerStatsPagination = usePagination(15); // 15 players per page
 
   useEffect(() => {
     loadSeasonData();
@@ -122,7 +119,7 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
 
   const teamStandings = calculateTeamStandings(teams, games);
   const playerStats = calculatePlayerSeasonStats(teams, games);
-  const paginatedPlayerStats = playerStatsPagination.paginate(playerStats);
+  const seasonRecords = calculateSeasonRecords(teams, games);
   
   const roundGames = games.filter(g => g.round === selectedRound);
   const matchDayGames = selectedMatchDay ? roundGames.filter(g => g.matchDay === selectedMatchDay) : [];
@@ -319,6 +316,16 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
           }`}
         >
           👥 Player Stats
+        </button>
+        <button
+          onClick={() => setView('records')}
+          className={`flex-1 min-w-[120px] py-3 px-4 rounded-lg font-semibold transition-colors ${
+            view === 'records'
+              ? 'bg-blue-600 text-white'
+              : 'text-gray-600 hover:bg-gray-100'
+          }`}
+        >
+          🏅 Season Records
         </button>
       </div>
 
@@ -552,6 +559,148 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
         </div>
       )}
 
+      {/* Season Records View */}
+      {view === 'records' && (
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">🏅 Season Records</h2>
+          
+          {games.filter(g => g.status === 'completed').length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500 text-lg">No completed games yet. Records will appear once games are played.</p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {/* Section Headers */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <h3 className="text-xl font-bold text-gray-800 pb-2 border-b-2 border-gray-300">👤 Personal Records</h3>
+                <h3 className="text-xl font-bold text-gray-800 pb-2 border-b-2 border-gray-300">🏆 Team Records</h3>
+              </div>
+
+              {/* All Records Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                {/* Highest Match Score (Individual) */}
+                <div className="border-2 border-purple-200 rounded-xl p-4 bg-gradient-to-br from-purple-50 to-white">
+                  <h4 className="text-base font-bold text-purple-800 mb-3 flex items-center gap-2">
+                    🎯 Match Score
+                  </h4>
+                  {seasonRecords.highestMatchScores.length > 0 ? (
+                    <div className="space-y-2">
+                      {seasonRecords.highestMatchScores.map((record, index) => (
+                        <div key={index} className="flex items-center justify-between bg-white rounded-lg p-2 shadow-sm border border-purple-100">
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <span className="text-xl font-bold text-purple-600">
+                              {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
+                            </span>
+                            <div className="min-w-0 flex-1">
+                              <p className="font-bold text-gray-800 text-sm truncate">{record.playerName}</p>
+                              <p className="text-xs text-gray-600 truncate">{record.teamName}</p>
+                            </div>
+                          </div>
+                          <div className="text-right ml-2">
+                            <p className="text-xl font-bold text-purple-600">{record.value}</p>
+                            <p className="text-xs text-gray-500">R{record.round}, D{record.matchDay}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-center py-3 text-sm">No records</p>
+                  )}
+                </div>
+
+                {/* Highest Series (Individual) */}
+                <div className="border-2 border-blue-200 rounded-xl p-4 bg-gradient-to-br from-blue-50 to-white">
+                  <h4 className="text-base font-bold text-blue-800 mb-3 flex items-center gap-2">
+                    🎳 Series
+                  </h4>
+                  {seasonRecords.highestSeries.length > 0 ? (
+                    <div className="space-y-2">
+                      {seasonRecords.highestSeries.map((record, index) => (
+                        <div key={index} className="flex items-center justify-between bg-white rounded-lg p-2 shadow-sm border border-blue-100">
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <span className="text-xl font-bold text-blue-600">
+                              {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
+                            </span>
+                            <div className="min-w-0 flex-1">
+                              <p className="font-bold text-gray-800 text-sm truncate">{record.playerName}</p>
+                              <p className="text-xs text-gray-600 truncate">{record.teamName}</p>
+                            </div>
+                          </div>
+                          <div className="text-right ml-2">
+                            <p className="text-xl font-bold text-blue-600">{record.value}</p>
+                            <p className="text-xs text-gray-500">R{record.round}, D{record.matchDay}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-center py-3 text-sm">No records</p>
+                  )}
+                </div>
+
+                {/* Highest Team Match Score */}
+                <div className="border-2 border-green-200 rounded-xl p-4 bg-gradient-to-br from-green-50 to-white">
+                  <h4 className="text-base font-bold text-green-800 mb-3 flex items-center gap-2">
+                    💪 Team Match
+                  </h4>
+                  {seasonRecords.highestTeamMatchScores.length > 0 ? (
+                    <div className="space-y-2">
+                      {seasonRecords.highestTeamMatchScores.map((record, index) => (
+                        <div key={index} className="flex items-center justify-between bg-white rounded-lg p-2 shadow-sm border border-green-100">
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <span className="text-xl font-bold text-green-600">
+                              {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
+                            </span>
+                            <div className="min-w-0 flex-1">
+                              <p className="font-bold text-gray-800 text-sm truncate">{record.teamName}</p>
+                            </div>
+                          </div>
+                          <div className="text-right ml-2">
+                            <p className="text-xl font-bold text-green-600">{record.value}</p>
+                            <p className="text-xs text-gray-500">R{record.round}, D{record.matchDay}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-center py-3 text-sm">No records</p>
+                  )}
+                </div>
+
+                {/* Highest Team Game Total */}
+                <div className="border-2 border-orange-200 rounded-xl p-4 bg-gradient-to-br from-orange-50 to-white">
+                  <h4 className="text-base font-bold text-orange-800 mb-3 flex items-center gap-2">
+                    🔥 Game Total
+                  </h4>
+                  {seasonRecords.highestTeamGameTotals.length > 0 ? (
+                    <div className="space-y-2">
+                      {seasonRecords.highestTeamGameTotals.map((record, index) => (
+                        <div key={index} className="flex items-center justify-between bg-white rounded-lg p-2 shadow-sm border border-orange-100">
+                          <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <span className="text-xl font-bold text-orange-600">
+                              {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
+                            </span>
+                            <div className="min-w-0 flex-1">
+                              <p className="font-bold text-gray-800 text-sm truncate">{record.teamName}</p>
+                            </div>
+                          </div>
+                          <div className="text-right ml-2">
+                            <p className="text-xl font-bold text-orange-600">{record.value}</p>
+                            <p className="text-xs text-gray-500">R{record.round}, D{record.matchDay}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-center py-3 text-sm">No records</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Player Stats View */}
       {view === 'players' && (
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
@@ -574,12 +723,11 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
                       </tr>
                     </thead>
                     <tbody>
-                      {paginatedPlayerStats.map((stat, index) => {
-                        const globalRank = (playerStatsPagination.currentPage - 1) * playerStatsPagination.itemsPerPage + index + 1;
+                      {playerStats.map((stat, index) => {
                         return (
                           <tr key={`${stat.teamId}-${stat.playerName}`} className="border-b border-gray-200 hover:bg-gray-50">
                             <td className="px-3 sm:px-4 py-3">
-                              <span className="font-bold text-gray-800">#{globalRank}</span>
+                              <span className="font-bold text-gray-800">#{index + 1}</span>
                             </td>
                             <td className="px-3 sm:px-4 py-3 font-semibold text-gray-800 text-sm">{stat.playerName}</td>
                             <td className="px-3 sm:px-4 py-3 text-gray-600 text-sm hidden lg:table-cell">{stat.teamName}</td>
@@ -599,12 +747,6 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
               </div>
             </div>
           </div>
-          <Pagination
-            currentPage={playerStatsPagination.currentPage}
-            totalItems={playerStats.length}
-            itemsPerPage={playerStatsPagination.itemsPerPage}
-            onPageChange={playerStatsPagination.setCurrentPage}
-          />
         </div>
       )}
 

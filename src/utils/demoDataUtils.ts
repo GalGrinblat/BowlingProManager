@@ -149,25 +149,29 @@ const completeRound1Games = (seasonId) => {
     // Fill in scores for all matches
     game.matches.forEach((match, matchIndex) => {
       game.team1.players.forEach((player, playerIndex) => {
-        const pins = generateScore(player.average);
-        match.team1.players[playerIndex].pins = pins;
-        match.team1.players[playerIndex].bonusPoints = calculateBonusPoints(
-          pins, 
-          player.average, 
-          false, 
-          game.bonusRules
-        );
+        if (playerIndex < match.team1.players.length) {
+          const pins = generateScore(player.average);
+          match.team1.players[playerIndex].pins = pins.toString();
+          match.team1.players[playerIndex].bonusPoints = calculateBonusPoints(
+            pins, 
+            player.average, 
+            player.absent || false, 
+            game.bonusRules
+          );
+        }
       });
 
       game.team2.players.forEach((player, playerIndex) => {
-        const pins = generateScore(player.average);
-        match.team2.players[playerIndex].pins = pins;
-        match.team2.players[playerIndex].bonusPoints = calculateBonusPoints(
-          pins, 
-          player.average, 
-          false, 
-          game.bonusRules
-        );
+        if (playerIndex < match.team2.players.length) {
+          const pins = generateScore(player.average);
+          match.team2.players[playerIndex].pins = pins.toString();
+          match.team2.players[playerIndex].bonusPoints = calculateBonusPoints(
+            pins, 
+            player.average, 
+            player.absent || false, 
+            game.bonusRules
+          );
+        }
       });
 
       // Calculate match results using actual game logic
@@ -245,6 +249,8 @@ export const seedDemoData = (): void => {
     defaultPlayersPerTeam: 4,
     defaultMatchesPerGame: 3,
     dayOfWeek: 'Monday',
+    lineupStrategy: 'rule-based',
+    lineupRule: 'standard',
     bonusRules: [
       { type: 'player', condition: 'vs_average', threshold: 50, points: 1 },
       { type: 'player', condition: 'vs_average', threshold: 70, points: 2 }
@@ -264,6 +270,8 @@ export const seedDemoData = (): void => {
     defaultPlayersPerTeam: 4,
     defaultMatchesPerGame: 3,
     dayOfWeek: 'Thursday',
+    lineupStrategy: 'flexible',
+    lineupRule: 'standard',
     bonusRules: [
       { type: 'player', condition: 'vs_average', threshold: 50, points: 1 },
       { type: 'player', condition: 'vs_average', threshold: 70, points: 2 }
@@ -287,6 +295,8 @@ export const seedDemoData = (): void => {
     useHandicap: true,
     handicapPercentage: 90,
     matchesPerGame: 3,
+    lineupStrategy: league1.lineupStrategy,
+    lineupRule: league1.lineupRule,
     bonusRules: league1.bonusRules,
     gameWinPoints: 1,
     matchWinPoints: 1,
@@ -305,6 +315,8 @@ export const seedDemoData = (): void => {
     useHandicap: true,
     handicapPercentage: 100,
     matchesPerGame: 3,
+    lineupStrategy: league2.lineupStrategy,
+    lineupRule: league2.lineupRule,
     bonusRules: league2.bonusRules,
     gameWinPoints: 1,
     matchWinPoints: 1,

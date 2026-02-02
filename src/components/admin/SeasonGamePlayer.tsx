@@ -3,6 +3,7 @@ import { gamesApi, teamsApi, seasonsApi, playersApi } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { MatchView } from '../MatchView';
 import { SummaryView } from '../SummaryView';
+import { PreMatchSetup } from './PreMatchSetup';
 import { calculateMatchResults, calculateBonusPoints } from '../../utils/matchUtils';
 import { calculatePlayerStats, calculateGameTotals, calculateGrandTotalPoints } from '../../utils/statsUtils';
 import { createEmptyMatch } from '../../utils/matchUtils';
@@ -15,6 +16,7 @@ export const SeasonGamePlayer: React.FC<SeasonGamePlayerProps> = ({ gameId, onBa
   const [game, setGame] = useState(null);
   const [currentMatch, setCurrentMatch] = useState(1);
   const [showSummary, setShowSummary] = useState(false);
+  const [showPreMatch, setShowPreMatch] = useState(false);
   const [hasAccess, setHasAccess] = useState(true);
   const [isReadOnly, setIsReadOnly] = useState(false);
 
@@ -142,23 +144,42 @@ export const SeasonGamePlayer: React.FC<SeasonGamePlayerProps> = ({ gameId, onBa
     if (gameData.status === 'completed') {
       setShowSummary(true);
     } else {
-      // Find first incomplete match
-      const incompleteMatchIndex = gameData.matches.findIndex(m => {
-        const team1Complete = gameData.team1.players.every((p, idx) => 
-          p.absent || m.team1.players[idx].pins !== ''
-        );
-        const team2Complete = gameData.team2.players.every((p, idx) => 
-          p.absent || m.team2.players[idx].pins !== ''
-        );
-        return !team1Complete || !team2Complete;
-      });
+      // Check if this is the first time entering the game (no scores entered yet)
+      const hasAnyScores = gameData.matches.some(m => 
+        m.team1.players.some(p => p.pins !== '') || 
+        m.team2.players.some(p => p.pins !== '')
+      );
       
-      if (incompleteMatchIndex >= 0) {
-        setCurrentMatch(incompleteMatchIndex + 1);
+      // Show pre-match setup if no scores entered yet and not in read-only mode
+      if (!hasAnyScores && !isReadOnly) {
+        setShowPreMatch(true);
       } else {
-        setShowSummary(true);
+        // Find first incomplete match
+        const incompleteMatchIndex = gameData.matches.findIndex(m => {
+          const team1Complete = gameData.team1.players.every((p, idx) => 
+            p.absent || m.team1.players[idx].pins !== ''
+          );
+          const team2Complete = gameData.team2.players.every((p, idx) => 
+            p.absent || m.team2.players[idx].pins !== ''
+          );
+          return !team1Complete || !team2Complete;
+        });
+        
+        if (incompleteMatchIndex >= 0) {
+          setCurrentMatch(incompleteMatchIndex + 1);
+        } else {
+          setShowSummary(true);
+        }
       }
     }
+  };
+
+  const handlePreMatchContinue = (updatedGame) => {
+    // Save the updated game with absent status
+    gamesApi.update(gameId, updatedGame);
+    setGame(updatedGame);
+    setShowPreMatch(false);
+    setCurrentMatch(1);
   };
 
   const updateMatchScore = (matchIndex, team, playerIndex, pins) => {
@@ -284,6 +305,16 @@ export const SeasonGamePlayer: React.FC<SeasonGamePlayerProps> = ({ gameId, onBa
         playerStats={playerStats}
         onBack={goToPreviousMatch}
         onFinish={finishGame}
+      />
+    );
+  }
+
+  if (showPreMatch) {
+    return (
+      <PreMatchSetup
+        game={game}
+        onContinue={handlePreMatchContinue}
+        onBack={onBack}
       />
     );
   }

@@ -140,6 +140,31 @@ export const SeasonSetup: React.FC<SeasonSetupProps> = ({ seasonId, onBack }) =>
               };
             });
 
+            // Apply lineup rules if strategy is rule-based
+            const lineupStrategy = season.lineupStrategy || 'flexible';
+            const lineupRule = season.lineupRule || 'standard';
+            
+            let sortedTeam1 = [...team1Players];
+            let sortedTeam2 = [...team2Players];
+            
+            if (lineupStrategy === 'rule-based') {
+              // Sort team1 by average (highest first)
+              sortedTeam1 = [...team1Players].sort((a, b) => b.average - a.average);
+              
+              // Sort team2 based on rule
+              if (lineupRule === 'standard') {
+                // Standard: highest vs highest
+                sortedTeam2 = [...team2Players].sort((a, b) => b.average - a.average);
+              } else {
+                // Balanced: highest vs lowest
+                sortedTeam2 = [...team2Players].sort((a, b) => a.average - b.average);
+              }
+              
+              // Reassign ranks after sorting
+              sortedTeam1 = sortedTeam1.map((p, idx) => ({ ...p, rank: idx + 1 }));
+              sortedTeam2 = sortedTeam2.map((p, idx) => ({ ...p, rank: idx + 1 }));
+            }
+
             // Create empty matches based on season configuration
             const emptyMatches = Array.from({ length: season.matchesPerGame }, (_, i) => 
               createEmptyMatch(i + 1, season.playersPerTeam)
@@ -151,6 +176,8 @@ export const SeasonSetup: React.FC<SeasonSetupProps> = ({ seasonId, onBack }) =>
               matchDay: daySchedule.matchDay,
               team1Id: team1.id,
               team2Id: team2.id,
+              lineupStrategy,
+              lineupRule,
               bonusRules: season.bonusRules,
               matchesPerGame: season.matchesPerGame,
               gameWinPoints: season.gameWinPoints || 1,
@@ -158,11 +185,11 @@ export const SeasonSetup: React.FC<SeasonSetupProps> = ({ seasonId, onBack }) =>
               grandTotalPoints: season.grandTotalPoints || 2,
               team1: {
                 name: team1.name,
-                players: team1Players
+                players: sortedTeam1
               },
               team2: {
                 name: team2.name,
-                players: team2Players
+                players: sortedTeam2
               },
               matches: emptyMatches,
               grandTotalScore: { team1: 0, team2: 0 }

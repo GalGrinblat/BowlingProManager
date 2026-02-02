@@ -19,6 +19,9 @@ interface GameStats {
 
 export const calculatePlayerStats = (game: Game): GameStats => {
   const team1Stats = game.team1.players.map((player, idx) => {
+    if (!player) {
+      return { totalPins: 0, gameAverage: 0, pointsScored: 0, isAbsent: false };
+    }
     if (player.absent) {
       const absenceScore = parseInt(player.average) - 10;
       const totalPins = absenceScore * 3;
@@ -33,6 +36,9 @@ export const calculatePlayerStats = (game: Game): GameStats => {
   });
   
   const team2Stats = game.team2.players.map((player, idx) => {
+    if (!player) {
+      return { totalPins: 0, gameAverage: 0, pointsScored: 0, isAbsent: false };
+    }
     if (player.absent) {
       const absenceScore = parseInt(player.average) - 10;
       const totalPins = absenceScore * 3;
@@ -95,8 +101,8 @@ export const calculateGrandTotalPoints = (game: Game): { team1: number; team2: n
   
   // Check if all matches are complete (accounting for absent players)
   const allMatchesComplete = game.matches.every((m, matchIdx) => {
-    const team1Complete = game.team1.players.every((p, idx) => p.absent || m.team1.players[idx].pins !== '');
-    const team2Complete = game.team2.players.every((p, idx) => p.absent || m.team2.players[idx].pins !== '');
+    const team1Complete = game.team1.players.every((p, idx) => !p || (p.absent || m.team1.players[idx]?.pins !== ''));
+    const team2Complete = game.team2.players.every((p, idx) => !p || (p.absent || m.team2.players[idx]?.pins !== ''));
     return team1Complete && team2Complete;
   });
   
