@@ -321,7 +321,7 @@ const he: TranslationDictionary = {
     title: 'שיאי העונה',
     personalRecords: 'שיאים אישיים',
     teamRecords: 'שיאים קבוצתיים',
-    matchScore: 'ציון משחק',
+    matchScore: 'תוצאה גבוהה',
     series: 'סדרה',
     teamMatch: 'משחק קבוצתי',
     gameTotal: 'סה"כ משחק',
