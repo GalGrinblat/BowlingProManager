@@ -1,4 +1,4 @@
-import type { TranslationDictionary } from '../types/index.ts';
+import type { TranslationDictionary } from '../types/index';
 
 const en: TranslationDictionary = {
   // Common words and actions
@@ -132,8 +132,6 @@ const en: TranslationDictionary = {
     teamMatchPointsPerWinDesc: 'Points for winning a match (higher total pins)',
     teamGamePointsPerWin: 'Game Winner Points',
     teamGamePointsPerWinDesc: 'Points for winning the overall game (highest total pins across all matches)',
-    grandTotalPoints: 'Grand Total Points',
-    grandTotalPointsDesc: 'Points for highest total pins across all matches',
     bonusRules: 'Bonus Point Rules',
     bonusRulesDesc: 'Configure bonus points awarded during games. Rules are evaluated in order (highest points first).',
     addRule: 'Add Rule',

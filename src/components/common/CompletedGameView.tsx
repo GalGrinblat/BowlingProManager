@@ -197,18 +197,18 @@ export const CompletedGameView: React.FC<CompletedGameViewProps> = ({ game, onBa
       ))}
 
       {/* Game Total Points */}
-      {(game.grandTotalScore?.team1 > 0 || game.grandTotalScore?.team2 > 0) && (
+      {(game.grandTotalPoints?.team1 > 0 || game.grandTotalPoints?.team2 > 0) && (
         <div className="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl shadow-lg p-6 text-white">
           <div className="flex items-center justify-between">
             <div className="text-center flex-1">
               <div className="text-sm opacity-90 mb-1">Grand Total Points</div>
-              <div className="text-3xl font-bold">+{game.grandTotalScore.team1}</div>
+              <div className="text-3xl font-bold">+{game.grandTotalPoints.team1}</div>
               <div className="text-sm opacity-90 mt-1">{game.team1.name}</div>
             </div>
             <div className="text-4xl">🏆</div>
             <div className="text-center flex-1">
               <div className="text-sm opacity-90 mb-1">Grand Total Points</div>
-              <div className="text-3xl font-bold">+{game.grandTotalScore.team2}</div>
+              <div className="text-3xl font-bold">+{game.grandTotalPoints.team2}</div>
               <div className="text-sm opacity-90 mt-1">{game.team2.name}</div>
             </div>
           </div>

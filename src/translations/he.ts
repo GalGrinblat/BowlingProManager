@@ -1,4 +1,4 @@
-import type { TranslationDictionary } from '../types/index.ts';
+import type { TranslationDictionary } from '../types/index';
 
 const he: TranslationDictionary = {
   // מילים ופעולות נפוצות
@@ -132,8 +132,6 @@ const he: TranslationDictionary = {
     teamMatchPointsPerWinDesc: 'נקודות עבור ניצחון במקצה (סך כל הפינים הגבוה יותר)',
     teamGamePointsPerWin: 'נקודות ניצחון במשחק קבוצה',
     teamGamePointsPerWinDesc: 'נקודות עבור ניצחון במשחק קבוצה (סך כל נקודות המקצים)',
-    grandTotalPoints: 'נקודות סכום כולל',
-    grandTotalPointsDesc: 'נקודות עבור סך הפינים הגבוה ביותר בכל המקצים',
     bonusRules: 'חוקי נקודות בונוס',
     bonusRulesDesc: 'הגדר נקודות בונוס שמוענקות במהלך המשחקים. החוקים מוערכים לפי הסדר (נקודות גבוהות יותר קודם).',
     addRule: 'הוסף חוק',

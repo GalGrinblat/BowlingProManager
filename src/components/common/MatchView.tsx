@@ -1,6 +1,6 @@
 import { ArrowLeft, ArrowRight, Star } from './Icons';
 
-import type { MatchViewProps } from '../types/index.ts';
+import type { MatchViewProps } from '../types/index';
 
 export const MatchView: React.FC<MatchViewProps> = ({ matchNumber, game, onUpdateScore, onNavigate, onCancel, isReadOnly = false }) => {
   const matchIndex = matchNumber - 1;

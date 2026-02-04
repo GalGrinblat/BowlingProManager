@@ -782,8 +782,8 @@ const GameCard = ({ game, team1, team2, h2h, onPlayGame, onViewGame }: { game: a
     }
   };
 
-  const team1TotalPoints = game.matches?.reduce((sum: any, m: any) => sum + (m.team1?.score || 0), 0) + (game.grandTotalScore?.team1 || 0);
-  const team2TotalPoints = game.matches?.reduce((sum: any, m: any) => sum + (m.team2?.score || 0), 0) + (game.grandTotalScore?.team2 || 0);
+  const team1TotalPoints = game.matches?.reduce((sum: any, m: any) => sum + (m.team1?.score || 0), 0) + (game.grandTotalPoints?.team1 || 0);
+  const team2TotalPoints = game.matches?.reduce((sum: any, m: any) => sum + (m.team2?.score || 0), 0) + (game.grandTotalPoints?.team2 || 0);
 
   return (
     <div className={`border rounded-lg p-4 transition-colors ${

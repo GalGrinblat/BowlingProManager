@@ -1,4 +1,4 @@
-import type { BonusRule, Game, PlayerMatchResult, GameMatch, MatchPlayer } from '../types/index.ts';
+import type { BonusRule, Game, PlayerMatchResult, GameMatch, MatchPlayer } from '../types/index';
 
 export const createEmptyMatch = (matchNumber: number, playersPerTeam: number = 4): GameMatch => {
   const emptyPlayers: MatchPlayer[] = Array.from({ length: playersPerTeam }, () => ({ 

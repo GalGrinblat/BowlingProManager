@@ -1,4 +1,4 @@
-import type { Team, Game, TeamStanding, PlayerStats, CurrentPlayerAverages } from '../types/index.ts';
+import type { Team, Game, TeamStanding, PlayerStats, CurrentPlayerAverages } from '../types/index';
 
 /**
  * Standings Calculator - Calculate team and player standings from completed games

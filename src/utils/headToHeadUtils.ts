@@ -1,4 +1,4 @@
-import type { Game, Team } from '../types/index.ts';
+import type { Game, Team } from '../types/index';
 
 /**
  * Head-to-Head Statistics Utilities
@@ -65,8 +65,8 @@ export const calculateHeadToHead = (team1Id: string, team2Id: string, games: Gam
     // Calculate total points for each team
     const matchPoints1 = game.matches?.reduce((sum, m) => sum + (m.team1?.score || 0), 0) || 0;
     const matchPoints2 = game.matches?.reduce((sum, m) => sum + (m.team2?.score || 0), 0) || 0;
-    const grand1 = game.grandTotalScore?.team1 || 0;
-    const grand2 = game.grandTotalScore?.team2 || 0;
+    const grand1 = game.grandTotalPoints?.team1 || 0;
+    const grand2 = game.grandTotalPoints?.team2 || 0;
     
     const game1Total = matchPoints1 + grand1;
     const game2Total = matchPoints2 + grand2;
@@ -108,8 +108,8 @@ export const calculateHeadToHead = (team1Id: string, team2Id: string, games: Gam
     if (!game) continue;
     const matchPoints1 = game.matches?.reduce((sum: number, m: any) => sum + (m.team1?.score || 0), 0) || 0;
     const matchPoints2 = game.matches?.reduce((sum: number, m: any) => sum + (m.team2?.score || 0), 0) || 0;
-    const grand1 = game.grandTotalScore?.team1 || 0;
-    const grand2 = game.grandTotalScore?.team2 || 0;
+    const grand1 = game.grandTotalPoints?.team1 || 0;
+    const grand2 = game.grandTotalPoints?.team2 || 0;
     
     const game1Total = matchPoints1 + grand1;
     const game2Total = matchPoints2 + grand2;

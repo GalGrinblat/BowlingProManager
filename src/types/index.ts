@@ -136,8 +136,8 @@ export interface Game {
   playerMatchPointsPerWin?: number;
   teamMatchPointsPerWin?: number;
   teamGamePointsPerWin?: number;
-  grandTotalPoints?: any;
-  grandTotalScore?: any;
+  /** Points awarded for highest total pins across all matches (calculated at runtime) */
+  grandTotalPoints?: { team1: number; team2: number };
   scheduledDate?: DateString;
   postponed?: boolean;
   originalDate?: DateString;

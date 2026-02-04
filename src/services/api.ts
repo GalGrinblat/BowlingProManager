@@ -10,7 +10,7 @@ import type {
   Season,
   Team,
   Game
-} from '../types/index.ts';
+} from '../types/index';
 
 const STORAGE_KEYS = {
   ORGANIZATION: 'bowling_organization',

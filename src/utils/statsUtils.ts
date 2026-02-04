@@ -1,4 +1,4 @@
-import type { Game } from '../types/index.ts';
+import type { Game } from '../types/index';
 
 interface PlayerGameStats {
   totalPins: number;
@@ -86,8 +86,8 @@ export const calculatePlayerStats = (game: Game): GameStats => {
 };
 
 export const calculateGameTotals = (game: Game): { team1Total: number; team2Total: number } => {
-  const team1Total = (game.matches?.reduce((sum: number, m: any) => sum + m.team1.score, 0) || 0) + game.grandTotalPoints.team1;
-  const team2Total = (game.matches?.reduce((sum: number, m: any) => sum + m.team2.score, 0) || 0) + game.grandTotalPoints.team2;
+  const team1Total = (game.matches?.reduce((sum: number, m: any) => sum + m.team1.score, 0) || 0) + (game.grandTotalPoints?.team1 || 0);
+  const team2Total = (game.matches?.reduce((sum: number, m: any) => sum + m.team2.score, 0) || 0) + (game.grandTotalPoints?.team2 || 0);
   
   return {
     team1Total,

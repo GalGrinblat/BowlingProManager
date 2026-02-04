@@ -194,7 +194,7 @@ export const SeasonSetup: React.FC<SeasonSetupProps> = ({ seasonId, onBack }) =>
                 players: sortedTeam2
               },
               matches: emptyMatches,
-              grandTotalScore: { team1: 0, team2: 0 }
+              grandTotalPoints: { team1: 0, team2: 0 }
             });
           }
         });

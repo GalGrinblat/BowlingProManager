@@ -12,7 +12,7 @@ import type {
   Game,
   ValidationResult,
   BonusRule
-} from '../types/index.ts';
+} from '../types/index';
 
 // ===== ORGANIZATION MODEL =====
 export const createOrganization = ({

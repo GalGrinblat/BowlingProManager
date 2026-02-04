@@ -1,6 +1,6 @@
 import { ArrowLeft, CheckCircle } from './Icons';
 
-import type { SummaryViewProps } from '../types/index.ts';
+import type { SummaryViewProps } from '../../types/index.ts';
 
 export const SummaryView: React.FC<SummaryViewProps> = ({ game, totals, playerStats, onBack, onFinish }) => {
   return (
@@ -60,7 +60,7 @@ export const SummaryView: React.FC<SummaryViewProps> = ({ game, totals, playerSt
               <div className="text-center">
                 <div className="text-white font-bold text-sm mb-1">TOTAL</div>
                 <div className="text-yellow-400 font-bold text-2xl">
-                  {game.grandTotalScore.team1} - {game.grandTotalScore.team2}
+                  {game.grandTotalPoints.team1} - {game.grandTotalPoints.team2}
                 </div>
               </div>
               <div className="text-center">
