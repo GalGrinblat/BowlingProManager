@@ -58,7 +58,7 @@ export const calculateHeadToHead = (team1Id: string, team2Id: string, games: Gam
 
   // Sort by completion date to track streaks
   const sortedGames = [...completedMatchups].sort((a, b) => 
-    new Date(a.completedAt) - new Date(b.completedAt)
+    new Date(a.completedAt || '').getTime() - new Date(b.completedAt || '').getTime()
   );
 
   sortedGames.forEach(game => {
@@ -105,8 +105,9 @@ export const calculateHeadToHead = (team1Id: string, team2Id: string, games: Gam
 
   for (let i = sortedGames.length - 1; i >= 0; i--) {
     const game = sortedGames[i];
-    const matchPoints1 = game.matches?.reduce((sum, m) => sum + (m.team1?.score || 0), 0) || 0;
-    const matchPoints2 = game.matches?.reduce((sum, m) => sum + (m.team2?.score || 0), 0) || 0;
+    if (!game) continue;
+    const matchPoints1 = game.matches?.reduce((sum: number, m: any) => sum + (m.team1?.score || 0), 0) || 0;
+    const matchPoints2 = game.matches?.reduce((sum: number, m: any) => sum + (m.team2?.score || 0), 0) || 0;
     const grand1 = game.grandTotalScore?.team1 || 0;
     const grand2 = game.grandTotalScore?.team2 || 0;
     
@@ -143,8 +144,8 @@ export const calculateHeadToHead = (team1Id: string, team2Id: string, games: Gam
     team2TotalPoints,
     team1AvgPoints: team1TotalPoints / completedMatchups.length,
     team2AvgPoints: team2TotalPoints / completedMatchups.length,
-    lastMeetingDate: lastMeeting?.completedAt,
-    winStreak: currentStreak > 0 ? { team: streakTeam, count: currentStreak } : null
+    lastMeetingDate: lastMeeting?.completedAt || null,
+    winStreak: currentStreak > 0 && streakTeam ? { team: streakTeam, count: currentStreak } : null
   };
 };
 
@@ -161,11 +162,11 @@ export const getTeamHeadToHeadRecords = (teamId: string, allTeams: Team[], games
   return opponents.map(opponent => {
     const h2h = calculateHeadToHead(teamId, opponent.id, games);
     return {
-      opponentId: opponent.id,
-      opponentName: opponent.name,
-      ...h2h
+      teamId: opponent.id,
+      teamName: opponent.name,
+      record: h2h
     };
-  }).filter(record => record.gamesPlayed > 0);
+  }).filter(record => record.record.gamesPlayed > 0);
 };
 
 /**

@@ -20,6 +20,7 @@ interface NavigationState {
   leagueId: string | null;
   seasonId: string | null;
   gameId: string | null;
+  gameData?: any;
 }
 
 function AppContent() {
@@ -66,11 +67,11 @@ function AppContent() {
           <>
             {currentView === 'dashboard' && (
               <AdminDashboard 
-                onNavigate={(view, id) => {
-                  if (view === 'league-detail') {
-                    navigateTo(view, { leagueId: id });
+                onNavigate={(view, params) => {
+                  if (view === 'league-detail' && params?.leagueId) {
+                    navigateTo(view, { leagueId: params.leagueId });
                   } else {
-                    navigateTo(view);
+                    navigateTo(view, params);
                   }
                 }}
               />
@@ -93,12 +94,8 @@ function AppContent() {
               <LeagueDetail 
                 leagueId={navigationState.leagueId}
                 onBack={() => navigateTo('leagues')}
-                onViewSeason={(seasonId, status) => {
-                  if (status === 'setup') {
-                    navigateTo('season-setup', { seasonId });
-                  } else {
-                    navigateTo('season-dashboard', { seasonId });
-                  }
+                onViewSeason={(seasonId: string) => {
+                  navigateTo('season-dashboard', { seasonId });
                 }}
               />
             )}
@@ -114,8 +111,9 @@ function AppContent() {
               <SeasonDashboard 
                 seasonId={navigationState.seasonId}
                 onBack={() => navigateTo('league-detail', { leagueId: navigationState.leagueId })}
-                onPlayGame={(gameId) => navigateTo('season-game', { gameId })}
-                onViewGame={(gameId, game) => navigateTo('game-history', { gameId, gameData: game })}
+                onSelectGame={(gameId: string) => navigateTo('season-game', { gameId })}
+                onPlayGame={(gameId: string) => navigateTo('season-game', { gameId })}
+                onViewGame={(gameId: string, game?: any) => navigateTo('game-history', { gameId, gameData: game })}
                 onManageTeams={() => navigateTo('team-management', { seasonId: navigationState.seasonId })}
               />
             )}
@@ -155,7 +153,9 @@ function AppContent() {
             {currentView === 'player-dashboard' && (
               <PlayerDashboard 
                 playerId={currentUser.userId}
-                onNavigate={(view, params) => navigateTo(view, params)}
+                onViewGame={(gameId: string) => navigateTo('player-game', { gameId })}
+                onViewSeasonComparison={() => navigateTo('player-season-comparison')}
+                onNavigate={(view: string, params?: Record<string, any>) => navigateTo(view, params)}
               />
             )}
 

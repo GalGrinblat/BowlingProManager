@@ -362,7 +362,6 @@ export interface GameHistoryViewProps {
 // Shared Components
 export interface HeaderProps {
   currentUser: User | null;
-  user: User | null;
   onLogout: () => void;
 }
 

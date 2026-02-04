@@ -68,10 +68,7 @@ export const exportStandingsCSV = (standings: TeamStanding[], seasonName: string
     'Draws': standing.draws,
     'Points': standing.points,
     'Total Pins': standing.totalPins,
-    'Total Pins (w/handicap)': standing.totalPinsWithHandicap,
-    'Matches Won': standing.matchesWon,
-    'Matches Lost': standing.matchesLost,
-    'Matches Draw': standing.matchesDraw
+    'Total Pins (w/handicap)': standing.totalPinsWithHandicap
   }));
   
   const csv = convertToCSV(data, headers);
@@ -91,8 +88,7 @@ export const exportPlayerStatsCSV = (playerStats: PlayerStats[], seasonName: str
     'Average',
     'High Game',
     'High Series',
-    'Total Pins',
-    'Points Scored'
+    'Total Pins'
   ];
   
   const data = playerStats.map((stat, index) => ({
@@ -103,8 +99,7 @@ export const exportPlayerStatsCSV = (playerStats: PlayerStats[], seasonName: str
     'Average': stat.average,
     'High Game': stat.highGame,
     'High Series': stat.highSeries,
-    'Total Pins': stat.totalPins,
-    'Points Scored': stat.pointsScored
+    'Total Pins': stat.totalPins
   }));
   
   const csv = convertToCSV(data, headers);
