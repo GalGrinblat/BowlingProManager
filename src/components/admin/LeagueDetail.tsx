@@ -3,6 +3,7 @@ import { leaguesApi, seasonsApi, teamsApi, gamesApi } from '../../services/api';
 import { createSeason, createTeam, validateSeason } from '../../models';
 import { generateRoundRobinSchedule } from '../../utils/scheduleUtils';
 import { exportSeasonJSON } from '../../utils/exportUtils';
+import { calculateTeamStandings, calculatePlayerSeasonStats } from '../../utils/standingsUtils';
 
 import type { LeagueDetailProps } from '../../types/index.ts';
 
@@ -204,13 +205,11 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
               const games = gamesApi.getBySeason(season.id);
               
               // Calculate champion
-              const { calculateTeamStandings } = require('../../utils/standingsUtils');
               const standings = calculateTeamStandings(teams, games);
               const champion = standings[0];
               
               const handleExport = (e) => {
                 e.stopPropagation(); // Prevent navigation when clicking export
-                const { calculatePlayerSeasonStats } = require('../../utils/standingsUtils');
                 const playerStats = calculatePlayerSeasonStats(teams, games);
                 exportSeasonJSON(season, teams, games, standings, playerStats, league);
               };
