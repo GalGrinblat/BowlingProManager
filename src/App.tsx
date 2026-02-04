@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LanguageProvider } from './contexts/LanguageContext';
-import { Header } from './components/Header';
-import { LoginView } from './components/LoginView';
+import { Header } from './components/common/Header';
+import { LoginView } from './components/common/LoginView';
 import { AdminDashboard } from './components/admin/AdminDashboard';
 import { PlayerRegistry } from './components/admin/PlayerRegistry';
 import { LeagueManagement } from './components/admin/LeagueManagement';
@@ -13,7 +13,7 @@ import { SeasonGame } from './components/admin/SeasonGame';
 import { Settings } from './components/admin/Settings';
 import { TeamManagement } from './components/admin/TeamManagement';
 import { PlayerDashboard } from './components/player/PlayerDashboard';
-import { CompletedGameView } from './components/CompletedGameView';
+import { CompletedGameView } from './components/common/CompletedGameView';
 import './styles/globals.css';
 
 interface NavigationState {

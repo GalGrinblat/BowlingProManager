@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { playersApi, teamsApi, seasonsApi } from '../../services/api';
 import { createPlayer, validatePlayer } from '../../models';
-import { Pagination, usePagination } from '../Pagination';
+import { Pagination, usePagination } from '../common/Pagination';
 import { useTranslation } from '../../contexts/LanguageContext';
 
 import type { PlayerRegistryProps } from '../../types/index.ts';

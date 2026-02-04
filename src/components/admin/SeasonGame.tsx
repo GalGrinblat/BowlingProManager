@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { gamesApi, teamsApi, seasonsApi, playersApi } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
-import { MatchView } from '../MatchView';
-import { SummaryView } from '../SummaryView';
+import { MatchView } from '../common/MatchView';
+import { SummaryView } from '../common/SummaryView';
 import { PreGameSetup } from './PreGameSetup';
 import { calculateMatchResults, calculateBonusPoints } from '../../utils/matchUtils';
 import { calculatePlayerStats, calculateGameTotals, calculateGrandTotalPoints } from '../../utils/statsUtils';
@@ -52,6 +52,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
     
     // Initialize matches if empty or not present
     if (!gameData.matches || gameData.matches.length === 0) {
+      if (!gameData.team1 || !gameData.team2) return;
       const playersPerTeam = gameData.team1.players.length;
       const matchCount = gameData.matchesPerGame || 3;
       gameData.matches = Array.from({ length: matchCount }, (_, i) => 
@@ -160,11 +161,12 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
         setShowPreMatch(true);
       } else {
         // Find first incomplete match
+        if (!gameData.team1 || !gameData.team2) return;
         const incompleteMatchIndex = gameData.matches.findIndex((m: any) => {
-          const team1Complete = gameData.team1.players.every((p: any, idx: any) =>
+          const team1Complete = gameData.team1!.players.every((p: any, idx: any) =>
             p.absent || m.team1.players[idx].pins !== ''
           );
-          const team2Complete = gameData.team2.players.every((p: any, idx: any) =>
+          const team2Complete = gameData.team2!.players.every((p: any, idx: any) =>
             p.absent || m.team2.players[idx].pins !== ''
           );
           return !team1Complete || !team2Complete;
@@ -330,7 +332,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
       game={game}
       onUpdateScore={updateMatchScore}
       onToggleAbsent={togglePlayerAbsent}
-      onNavigate={(direction) => {
+      onNavigate={(direction: 'back' | 'next') => {
         if (direction === 'next') {
           goToNextMatch();
         } else {
