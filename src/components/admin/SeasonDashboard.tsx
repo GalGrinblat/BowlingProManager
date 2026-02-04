@@ -6,7 +6,7 @@ import { calculateHeadToHead, formatHeadToHead } from '../../utils/headToHeadUti
 import { calculateSeasonRecords } from '../../utils/recordsUtils';
 import { useTranslation } from '../../contexts/LanguageContext';
 
-import type { SeasonDashboardProps } from '../../types/index.ts';
+import type { SeasonDashboardProps } from '../../types/index';
 
 export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBack, onPlayGame, onViewGame, onManageTeams }) => {
   const { t } = useTranslation();

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { organizationApi, utilApi } from '../../services/api';
 import { useTranslation } from '../../contexts/LanguageContext';
 
-import type { SettingsProps } from '../../types/index.ts';
+import type { SettingsProps } from '../../types/index';
 
 export const Settings: React.FC<SettingsProps> = ({ onBack }) => {
   const { t, setLanguage } = useTranslation();

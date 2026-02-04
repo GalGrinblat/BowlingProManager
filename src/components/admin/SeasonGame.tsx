@@ -9,7 +9,7 @@ import { calculatePlayerStats, calculateGameTotals, calculateGrandTotalPoints } 
 import { createEmptyMatch } from '../../utils/matchUtils';
 import { calculateCurrentPlayerAverages } from '../../utils/standingsUtils';
 
-import type { SeasonGameProps } from '../../types/index.ts';
+import type { SeasonGameProps } from '../../types/index';
 
 export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
   const { currentUser, isPlayer } = useAuth();
@@ -332,7 +332,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
       game={game}
       onUpdateScore={updateMatchScore}
       onToggleAbsent={togglePlayerAbsent}
-      onNavigate={(direction: 'back' | 'next') => {
+      onNavigate={(direction: string) => {
         if (direction === 'next') {
           goToNextMatch();
         } else {

@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { leaguesApi, seasonsApi, teamsApi, gamesApi } from '../../services/api';
 import { createSeason, createTeam, validateSeason } from '../../models';
 import { generateRoundRobinSchedule } from '../../utils/scheduleUtils';
-import { calculateTeamStandings, calculatePlayerSeasonStats } from '../../utils/standingsUtils';
+import { calculateTeamStandings } from '../../utils/standingsUtils';
 import { useTranslation } from '../../contexts/LanguageContext';
 
-import type { LeagueDetailProps, League, Season } from '../../types/index.ts';
+import type { LeagueDetailProps, League, Season } from '../../types/index';
 
 export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, onViewSeason }) => {
   const { t } = useTranslation();

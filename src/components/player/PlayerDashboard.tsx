@@ -3,7 +3,7 @@ import { playersApi, leaguesApi, seasonsApi, teamsApi, gamesApi } from '../../se
 import { calculateTeamStandings } from '../../utils/standingsUtils';
 import { PlayerSeasonComparison } from './PlayerSeasonComparison';
 
-import type { PlayerDashboardProps } from '../../types/index.ts';
+import type { PlayerDashboardProps } from '../../types/index';
 
 export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNavigate }) => {
   const [player, setPlayer] = useState<any>(null);

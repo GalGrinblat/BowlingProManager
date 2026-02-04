@@ -4,7 +4,7 @@ import { createPlayer, validatePlayer } from '../../models';
 import { Pagination, usePagination } from '../common/Pagination';
 import { useTranslation } from '../../contexts/LanguageContext';
 
-import type { PlayerRegistryProps } from '../../types/index.ts';
+import type { PlayerRegistryProps } from '../../types/index';
 
 export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
   const { t } = useTranslation();
@@ -174,18 +174,6 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
-            </div>
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="active"
-                checked={formData.active}
-                onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
-                className="w-4 h-4 text-blue-600"
-              />
-              <label htmlFor="active" className="ml-2 text-sm text-gray-700">
-                {t('players.activePlayer')}
-              </label>
             </div>
             <div className="flex gap-3">
               <button

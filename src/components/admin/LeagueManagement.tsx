@@ -3,7 +3,7 @@ import { leaguesApi, seasonsApi } from '../../services/api';
 import { createLeague, validateLeague } from '../../models';
 import { useTranslation } from '../../contexts/LanguageContext';
 
-import type { LeagueManagementProps } from '../../types/index.ts';
+import type { LeagueManagementProps } from '../../types/index';
 
 export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onViewLeague }) => {
   const { t } = useTranslation();
@@ -382,7 +382,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                     onChange={(e) => setFormData({ ...formData, teamMatchPointsPerWin: Number(e.target.value) })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   />
-                  <p className="text-xs text-gray-500 mt-1">{t('leagues.teamWinPointsDesc')}</p>
+                  <p className="text-xs text-gray-500 mt-1">{t('leagues.teamMatchPointsPerWinDesc')}</p>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">

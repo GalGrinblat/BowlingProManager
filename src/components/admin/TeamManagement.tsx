@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { teamsApi, playersApi, seasonsApi } from '../../services/api';
 import { useTranslation } from '../../contexts/LanguageContext';
 
-import type { TeamManagementProps } from '../../types/index.ts';
+import type { TeamManagementProps } from '../../types/index';
 
 export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack }) => {
   const { t } = useTranslation();

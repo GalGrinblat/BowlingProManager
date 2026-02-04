@@ -3,7 +3,7 @@ import { seasonsApi, teamsApi, playersApi, gamesApi, leaguesApi } from '../../se
 import { generateRoundRobinSchedule } from '../../utils/scheduleUtils';
 import { createEmptyMatch } from '../../utils/matchUtils';
 
-import type { SeasonSetupProps } from '../../types/index.ts';
+import type { SeasonSetupProps } from '../../types/index';
 
 export const SeasonSetup: React.FC<SeasonSetupProps> = ({ seasonId, onBack }) => {
   const [season, setSeason] = useState<any>(null);

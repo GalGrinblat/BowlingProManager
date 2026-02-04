@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from '../../contexts/LanguageContext';
-import type { Game } from '../../types/index.ts';
+import type { Game } from '../../types/index';
 
 interface PreGameSetupProps {
   game: Game;
