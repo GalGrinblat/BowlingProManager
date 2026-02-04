@@ -365,14 +365,5 @@ export const utilApi = {
     Object.values(STORAGE_KEYS).forEach(key => {
       localStorage.removeItem(key);
     });
-  },
-  
-  importData: (data: Record<string, any>): void => {
-    Object.entries(data).forEach(([name, value]) => {
-      const key = STORAGE_KEYS[name as keyof typeof STORAGE_KEYS];
-      if (key && value) {
-        saveToStorage(key, value);
-      }
-    });
   }
 };

@@ -228,10 +228,9 @@ const schedule = generateRoundRobinSchedule(teamIds, numberOfRounds);
 5. **Schedule changes?** → Modify `src/utils/scheduleUtils.js`
 6. **Scoring changes?** → Update `src/utils/matchUtils.js` - test thoroughly!
 7. **Head-to-head stats?** → Update `src/utils/headToHeadUtils.js`
-8. **Export functionality?** → Update `src/utils/exportUtils.js`
-9. **Player statistics?** → Update `src/utils/statsUtils.js`
-10. **Pagination needed?** → Use `src/components/Pagination.jsx` component
-11. **Demo data changes?** → Update `src/utils/demoDataUtils.ts` AND `documentation/SEED_DEMO_DATA.md` - keep docs in sync!
+8. **Player statistics?** → Update `src/utils/statsUtils.js`
+9. **Pagination needed?** → Use `src/components/Pagination.jsx` component
+10. **Demo data changes?** → Update `src/utils/demoDataUtils.ts` AND `documentation/SEED_DEMO_DATA.md` - keep docs in sync!
 
 ## Critical Documentation Rules
 

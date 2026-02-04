@@ -15,8 +15,6 @@ export const Settings: React.FC<SettingsProps> = ({ onBack }) => {
     name: '',
     language: 'en'
   });
-  const [importFile, setImportFile] = useState<File | null>(null);
-  const [importPreview, setImportPreview] = useState<any>(null);
 
   useEffect(() => {
     loadOrganization();
@@ -39,44 +37,6 @@ export const Settings: React.FC<SettingsProps> = ({ onBack }) => {
     setLanguage(formData.language); // Update context
     setIsEditing(false);
     loadOrganization();
-  };
-
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      try {
-        const data = JSON.parse(event.target?.result as string);
-        setImportFile(file);
-        setImportPreview(data);
-      } catch (error) {
-        alert('Invalid JSON file. Please select a valid backup file.');
-        setImportFile(null);
-        setImportPreview(null);
-      }
-    };
-    reader.readAsText(file);
-  };
-
-  const handleImport = () => {
-    if (!importPreview) return;
-
-    if (confirm('This will replace all current data with the imported data. Continue?')) {
-      try {
-        utilApi.importData(importPreview);
-        alert('Data imported successfully! Reloading page...');
-        window.location.reload();
-      } catch (error) {
-        alert('Error importing data: ' + (error as Error).message);
-      }
-    }
-  };
-
-  const cancelImport = () => {
-    setImportFile(null);
-    setImportPreview(null);
   };
 
   if (!organization) return <div>Loading...</div>;
@@ -192,56 +152,6 @@ export const Settings: React.FC<SettingsProps> = ({ onBack }) => {
             )}
           </div>
         )}
-      </div>
-
-      {/* Backup & Restore */}
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('settings.backupRestore')}</h2>
-        
-        {/* Import Section */}
-        <div className="border-t pt-6">
-          <h3 className="text-lg font-semibold text-gray-700 mb-2">{t('settings.importData')}</h3>
-          <p className="text-sm text-gray-600 mb-3">
-            {t('settings.importDescription')}
-          </p>
-          
-          {!importPreview ? (
-            <div>
-              <input
-                type="file"
-                accept=".json"
-                onChange={handleFileSelect}
-                className="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-              />
-            </div>
-          ) : (
-            <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-              <h4 className="font-semibold text-blue-900 mb-2">📄 {t('settings.importPreview')}</h4>
-              <p className="text-sm text-blue-800 mb-1">{t('settings.file')}: {importFile?.name}</p>
-              <div className="text-sm text-blue-700 space-y-1 mb-4">
-                {importPreview.PLAYERS && <div>• {importPreview.PLAYERS.length || 0} {t('settings.players')}</div>}
-                {importPreview.LEAGUES && <div>• {importPreview.LEAGUES.length || 0} {t('settings.leagues')}</div>}
-                {importPreview.SEASONS && <div>• {importPreview.SEASONS.length || 0} {t('settings.seasons')}</div>}
-                {importPreview.TEAMS && <div>• {importPreview.TEAMS.length || 0} {t('settings.teams')}</div>}
-                {importPreview.GAMES && <div>• {importPreview.GAMES.length || 0} {t('settings.games')}</div>}
-              </div>
-              <div className="flex gap-3">
-                <button
-                  onClick={handleImport}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
-                >
-                  ✓ {t('settings.importButton')}
-                </button>
-                <button
-                  onClick={cancelImport}
-                  className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-semibold"
-                >
-                  {t('common.cancel')}
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
       </div>
 
       {/* Getting Started Guide (for new users) */}
