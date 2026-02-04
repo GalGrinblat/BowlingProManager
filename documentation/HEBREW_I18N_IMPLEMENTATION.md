@@ -132,7 +132,7 @@ const MyComponent = () => {
 - [ ] `LeagueDetail.jsx` - League view, season list
 - [ ] `SeasonSetup.jsx` - Team creation, player assignment
 - [ ] `SeasonDashboard.jsx` - Schedule, standings navigation
-- [ ] `SeasonGamePlayer.jsx` - Game wrapper
+- [ ] `SeasonGame.jsx` - Game wrapper
 - [ ] `TeamManagement.jsx` - Roster changes
 
 **Priority 2 - Player Portal** (2 components):

@@ -160,7 +160,7 @@ console.log('     - LeagueManagement.jsx');
 console.log('     - LeagueDetail.jsx');
 console.log('     - SeasonSetup.jsx');
 console.log('     - SeasonDashboard.jsx');
-console.log('     - SeasonGamePlayer.jsx');
+console.log('     - SeasonGame.jsx');
 console.log('     - TeamManagement.jsx');
 console.log('   Player Components:');
 console.log('     - PlayerDashboard.jsx');

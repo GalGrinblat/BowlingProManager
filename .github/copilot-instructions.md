@@ -45,11 +45,11 @@ Organization
 - **Default**: useHandicap=true, handicapBasis=160, handicapPercentage=100%
 - **Applied to**: Individual game comparisons AND match totals
 - **Dynamic Updates**: Handicaps recalculate before each game based on current season average
-  - When a game loads in SeasonGamePlayer, it checks completed games before that matchday
+  - When a game loads in SeasonGame, it checks completed games before that matchday
   - Calculates current average from all completed matches (uses `calculateCurrentPlayerAverages` from `src/utils/standingsUtils.js`)
   - If player has completed games, handicap uses current average; otherwise uses startingAverage from player registry
   - Example: Player starts at 150 avg (handicap 10), bowls 165 avg in round 1, round 2 handicap becomes 0
-- **Location**: SeasonSetup.jsx (initial games), SeasonGamePlayer.jsx (dynamic updates), models/index.js (data)
+- **Location**: SeasonSetup.jsx (initial games), SeasonGame.jsx (dynamic updates), models/index.js (data)
 
 ### Scoring System (Complex Multi-Layer)
 **Note**: Players per team, matches per game, bonus rules, and all point values are configurable per league/season.
@@ -121,7 +121,7 @@ authApi.{ getCurrentUser, login, logout, isAdmin }
 - **SeasonSetup**: Assign players to teams, generate schedule
 - **SeasonDashboard**: View schedule, standings, select games
 - **TeamManagement**: Manage roster substitutions and team changes
-- **SeasonGamePlayer**: Wrapper around MatchView for season games
+- **SeasonGame**: Wrapper around MatchView for season games
 - **Settings**: Data export/import, organization settings
 
 ### Player Portal
