@@ -98,7 +98,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
                 <div
                   key={league.id}
                   className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors cursor-pointer"
-                  onClick={() => onNavigate('league-detail', league.id)}
+                  onClick={() => onNavigate('league-detail', { leagueId: league.id })}
                 >
                   <div className="flex justify-between items-start">
                     <div>
@@ -113,7 +113,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
                           </p>
                           {nextMatchDay && (
                             <p className="text-sm text-blue-600 font-medium">
-                              📅 {t('dashboard.next')}: {formatMatchDate(nextMatchDay.date)}
+                              📅 {t('dashboard.next')}: {formatMatchDate(nextMatchDay.date || null)}
                               {nextMatchDay.postponed && <span className="text-orange-600 ml-1">({t('dashboard.postponed')})</span>}
                             </p>
                           )}
