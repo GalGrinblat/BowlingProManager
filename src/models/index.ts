@@ -50,7 +50,7 @@ export const createLeague = ({
   dayOfWeek = '',
   bonusRules = [],
   playerWinPoints = 1,
-  matchWinPoints = 1,
+  teamWinPoints = 1,
   grandTotalPoints = 2,
   active = true
 }: {
@@ -64,7 +64,7 @@ export const createLeague = ({
   dayOfWeek?: string;
   bonusRules?: BonusRule[];
   playerWinPoints?: number | string;
-  matchWinPoints?: number | string;
+  teamWinPoints?: number | string;
   grandTotalPoints?: number | string;
   active?: boolean;
 }): Omit<League, 'id' | 'createdAt'> => ({
@@ -81,7 +81,7 @@ export const createLeague = ({
     { type: 'player', condition: 'vs_average', threshold: 70, points: 2 }
   ],
   playerWinPoints: parseFloat(String(playerWinPoints)) || 1,
-  matchWinPoints: parseFloat(String(matchWinPoints)) || 1,
+  teamWinPoints: parseFloat(String(teamWinPoints)) || 1,
   grandTotalPoints: parseFloat(String(grandTotalPoints)) || 2,
   active
 });
@@ -99,7 +99,7 @@ export const createSeason = ({
   matchesPerGame = 3,
   bonusRules = [],
   playerWinPoints = 1,
-  matchWinPoints = 1,
+  teamWinPoints = 1,
   grandTotalPoints = 2,
   startDate = '',
   endDate = ''
@@ -115,7 +115,7 @@ export const createSeason = ({
   matchesPerGame?: number | string;
   bonusRules?: BonusRule[];
   playerWinPoints?: number | string;
-  matchWinPoints?: number | string;
+  teamWinPoints?: number | string;
   grandTotalPoints?: number | string;
   startDate?: string;
   endDate?: string;
@@ -131,7 +131,7 @@ export const createSeason = ({
   matchesPerGame: parseInt(String(matchesPerGame)) || 3,
   bonusRules,
   playerWinPoints: parseFloat(String(playerWinPoints)) || 1,
-  matchWinPoints: parseFloat(String(matchWinPoints)) || 1,
+  teamWinPoints: parseFloat(String(teamWinPoints)) || 1,
   grandTotalPoints: parseFloat(String(grandTotalPoints)) || 2,
   startDate: startDate || new Date().toISOString(),
   endDate,

@@ -26,7 +26,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
       { type: 'player' as 'player' | 'team', condition: 'vs_average' as 'vs_average' | 'pure_score', threshold: 70, points: 2 }
     ],
     playerWinPoints: 1,
-    matchWinPoints: 1,
+    teamWinPoints: 1,
     grandTotalPoints: 2,
     active: true
   });
@@ -86,7 +86,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
         { type: 'player', condition: 'vs_average', threshold: 70, points: 2 }
       ],
       playerWinPoints: 1,
-      matchWinPoints: 1,
+      teamWinPoints: 1,
       grandTotalPoints: 2,
       active: true
     });
@@ -111,7 +111,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
         { type: 'player', condition: 'vs_average', threshold: 70, points: 2 }
       ],
       playerWinPoints: league.playerWinPoints || 1,
-      matchWinPoints: league.matchWinPoints || 1,
+      teamWinPoints: league.teamWinPoints || 1,
       grandTotalPoints: league.grandTotalPoints || 2,
       active: league.active
     });
@@ -182,7 +182,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
         { type: 'player' as 'player' | 'team', condition: 'vs_average' as 'vs_average' | 'pure_score', threshold: 70, points: 2 }
       ],
       playerWinPoints: 1,
-      matchWinPoints: 1,
+      teamWinPoints: 1,
       grandTotalPoints: 2,
       active: true
     });
@@ -372,17 +372,17 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    {t('leagues.matchWinPoints')}
+                    {t('leagues.teamWinPoints')}
                   </label>
                   <input
                     type="number"
-                    min="0"
+                    min="0.5"
                     step="0.5"
-                    value={formData.matchWinPoints}
-                    onChange={(e) => setFormData({ ...formData, matchWinPoints: Number(e.target.value) })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={formData.teamWinPoints}
+                    onChange={(e) => setFormData({ ...formData, teamWinPoints: Number(e.target.value) })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   />
-                  <p className="text-xs text-gray-500 mt-1">{t('leagues.matchWinPointsDesc')}</p>
+                  <p className="text-xs text-gray-500 mt-1">{t('leagues.teamWinPointsDesc')}</p>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">

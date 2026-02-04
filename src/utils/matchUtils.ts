@@ -103,7 +103,7 @@ export const calculateMatchResults = (game: Game, matchIndex: number): void => {
   
   // Get configurable point values (defaults to 1 if not set)
   const playerWinPoints = game.playerWinPoints || 1;
-  const matchWinPoints = game.matchWinPoints || 1;
+  const teamWinPoints = game.teamWinPoints || 1;
   
   // Calculate individual game results with handicap
   match.games.forEach((gameResult: any, idx: number) => {
@@ -200,14 +200,14 @@ export const calculateMatchResults = (game: Game, matchIndex: number): void => {
   
   if (allScoresEntered) {
     if (match.team1.totalWithHandicap > match.team2.totalWithHandicap) {
-      match.team1.score = team1GamePoints + matchWinPoints + match.team1.bonusPoints;
+      match.team1.score = team1GamePoints + teamWinPoints + match.team1.bonusPoints;
       match.team2.score = team2GamePoints + match.team2.bonusPoints;
     } else if (match.team2.totalWithHandicap > match.team1.totalWithHandicap) {
       match.team1.score = team1GamePoints + match.team1.bonusPoints;
-      match.team2.score = team2GamePoints + matchWinPoints + match.team2.bonusPoints;
+      match.team2.score = team2GamePoints + teamWinPoints + match.team2.bonusPoints;
     } else {
-      match.team1.score = team1GamePoints + (matchWinPoints / 2) + match.team1.bonusPoints;
-      match.team2.score = team2GamePoints + (matchWinPoints / 2) + match.team2.bonusPoints;
+      match.team1.score = team1GamePoints + (teamWinPoints / 2) + match.team1.bonusPoints;
+      match.team2.score = team2GamePoints + (teamWinPoints / 2) + match.team2.bonusPoints;
     }
   } else {
     match.team1.score = team1GamePoints + match.team1.bonusPoints;

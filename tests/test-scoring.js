@@ -48,13 +48,13 @@ function calculateIndividualGameResult(team1Score, team2Score, team1Handicap, te
   }
 }
 
-function calculateMatchWinner(team1TotalPins, team2TotalPins, matchWinPoints = 1) {
+function calculateMatchWinner(team1TotalPins, team2TotalPins, teamWinPoints = 1) {
   if (team1TotalPins > team2TotalPins) {
-    return { team1Points: matchWinPoints, team2Points: 0 };
+    return { team1Points: teamWinPoints, team2Points: 0 };
   } else if (team2TotalPins > team1TotalPins) {
-    return { team1Points: 0, team2Points: matchWinPoints };
+    return { team1Points: 0, team2Points: teamWinPoints };
   } else {
-    return { team1Points: matchWinPoints / 2, team2Points: matchWinPoints / 2 };
+    return { team1Points: teamWinPoints / 2, team2Points: teamWinPoints / 2 };
   }
 }
 
@@ -254,13 +254,13 @@ const tests = [
     test: () => {
       // Simulate a complete scoring scenario
       const playerWinPoints = 2;
-      const matchWinPoints = 3;
+      const teamWinPoints = 3;
       const grandTotalPoints = 5;
       
       // Team 1 wins individual game
       const game = calculateIndividualGameResult(180, 170, 10, 15, playerWinPoints);
       // Team 1 wins match
-      const match = calculateMatchWinner(540, 520, matchWinPoints);
+      const match = calculateMatchWinner(540, 520, teamWinPoints);
       // Team 1 wins grand total
       const grand = calculateGrandTotal(1620, 1580, grandTotalPoints);
       
