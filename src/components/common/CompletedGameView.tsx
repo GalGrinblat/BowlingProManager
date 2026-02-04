@@ -1,4 +1,4 @@
-import type { CompletedGameViewProps } from '../../types/index.ts';
+import type { CompletedGameViewProps } from '../../types/index';
 
 export const CompletedGameView: React.FC<CompletedGameViewProps> = ({ game, onBack }) => {
   if (!game) return <div>Loading...</div>;

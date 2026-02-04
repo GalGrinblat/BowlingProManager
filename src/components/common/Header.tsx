@@ -1,8 +1,8 @@
 import { Trophy } from './Icons';
-import { useAuth } from '../contexts/AuthContext';
-import { useTranslation } from '../contexts/LanguageContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { useTranslation } from '../../contexts/LanguageContext';
 
-import type { HeaderProps } from '../types/index';
+import type { HeaderProps } from '../../types/index';
 
 export const Header: React.FC<HeaderProps> = ({ currentUser, onLogout }) => {
   const { playerData } = useAuth();
