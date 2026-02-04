@@ -13,7 +13,7 @@ import { SeasonGame } from './components/admin/SeasonGame';
 import { Settings } from './components/admin/Settings';
 import { TeamManagement } from './components/admin/TeamManagement';
 import { PlayerDashboard } from './components/player/PlayerDashboard';
-import { GameHistoryView } from './components/GameHistoryView';
+import { CompletedGameView } from './components/CompletedGameView';
 import './styles/globals.css';
 
 interface NavigationState {
@@ -133,7 +133,7 @@ function AppContent() {
             )}
 
             {currentView === 'game-history' && navigationState.gameId && (
-              <GameHistoryView 
+              <CompletedGameView 
                 game={navigationState.gameData}
                 onBack={() => navigateTo('season-dashboard', { seasonId: navigationState.seasonId })}
               />
@@ -167,7 +167,7 @@ function AppContent() {
             )}
 
             {currentView === 'player-game-history' && navigationState.gameId && (
-              <GameHistoryView 
+              <CompletedGameView 
                 game={navigationState.gameData}
                 onBack={() => navigateTo('player-dashboard')}
               />

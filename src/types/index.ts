@@ -327,7 +327,7 @@ export interface SummaryViewProps {
   onFinish: () => void;
 }
 
-export interface GameHistoryViewProps {
+export interface CompletedGameViewProps {
   game: any;
   onBack: () => void;
 }
