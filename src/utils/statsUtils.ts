@@ -97,7 +97,7 @@ export const calculateGameTotals = (game: Game): { team1Total: number; team2Tota
 
 export const calculateGrandTotalPoints = (game: Game): { team1: number; team2: number } => {
   // Get configurable grand total points (defaults to 2 if not set)
-  const grandTotalPoints = game.grandTotalPoints || 2;
+  const teamGamePointsPerWin = game.teamGamePointsPerWin || 2;
   
   // Check if all matches are complete (accounting for absent players)
   if (!game.team1 || !game.team2) return { team1: 0, team2: 0 };
@@ -113,11 +113,11 @@ export const calculateGrandTotalPoints = (game: Game): { team1: number; team2: n
     const team2GrandTotal = game.matches?.reduce((sum: number, m: any) => sum + m.team2.totalWithHandicap, 0) || 0;
     
     if (team1GrandTotal > team2GrandTotal) {
-      return { team1: grandTotalPoints, team2: 0 };
+      return { team1: teamGamePointsPerWin, team2: 0 };
     } else if (team2GrandTotal > team1GrandTotal) {
-      return { team1: 0, team2: grandTotalPoints };
+      return { team1: 0, team2: teamGamePointsPerWin };
     } else {
-      return { team1: grandTotalPoints / 2, team2: grandTotalPoints / 2 };
+      return { team1: teamGamePointsPerWin / 2, team2: teamGamePointsPerWin / 2 };
     }
   } else {
     return { team1: 0, team2: 0 };

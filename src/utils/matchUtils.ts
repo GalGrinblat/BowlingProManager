@@ -1,26 +1,6 @@
-import type { BonusRule, Game, PlayerMatchResult } from '../types/index.ts';
+import type { BonusRule, Game, PlayerMatchResult, GameMatch, MatchPlayer } from '../types/index.ts';
 
-interface MatchPlayer {
-  pins: number;
-  bonusPoints: number;
-}
-
-interface MatchTeam {
-  score: number;
-  totalPins: number;
-  totalWithHandicap: number;
-  bonusPoints: number;
-  players: MatchPlayer[];
-}
-
-export interface Match {
-  matchNumber: number;
-  team1: MatchTeam;
-  team2: MatchTeam;
-  playerMatches: PlayerMatchResult[];
-}
-
-export const createEmptyMatch = (matchNumber: number, playersPerTeam: number = 4): Match => {
+export const createEmptyMatch = (matchNumber: number, playersPerTeam: number = 4): GameMatch => {
   const emptyPlayers: MatchPlayer[] = Array.from({ length: playersPerTeam }, () => ({ 
     pins: 0, 
     bonusPoints: 0 

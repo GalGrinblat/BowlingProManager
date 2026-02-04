@@ -27,7 +27,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
     ],
     playerMatchPointsPerWin: 1,
     teamMatchPointsPerWin: 1,
-    grandTotalPoints: 2,
+    teamGamePointsPerWin: 2,
     active: true
   });
 
@@ -87,7 +87,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
       ],
       playerMatchPointsPerWin: 1,
       teamMatchPointsPerWin: 1,
-      grandTotalPoints: 2,
+      teamGamePointsPerWin: 2,
       active: true
     });
     setIsAdding(false);
@@ -112,7 +112,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
       ],
       playerMatchPointsPerWin: league.playerMatchPointsPerWin || 1,
       teamMatchPointsPerWin: league.teamMatchPointsPerWin || 1,
-      grandTotalPoints: league.grandTotalPoints || 2,
+      teamGamePointsPerWin: league.teamGamePointsPerWin || 2,
       active: league.active
     });
     setEditingId(league.id);
@@ -183,7 +183,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
       ],
       playerMatchPointsPerWin: 1,
       teamMatchPointsPerWin: 1,
-      grandTotalPoints: 2,
+      teamGamePointsPerWin: 2,
       active: true
     });
     setIsAdding(false);
@@ -386,17 +386,17 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    {t('leagues.grandTotalPoints')}
+                    {t('leagues.teamGamePointsPerWin')}
                   </label>
                   <input
                     type="number"
                     min="0"
                     step="0.5"
-                    value={formData.grandTotalPoints}
-                    onChange={(e) => setFormData({ ...formData, grandTotalPoints: Number(e.target.value) })}
+                    value={formData.teamGamePointsPerWin}
+                    onChange={(e) => setFormData({ ...formData, teamGamePointsPerWin: Number(e.target.value) })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
-                  <p className="text-xs text-gray-500 mt-1">{t('leagues.grandTotalPointsDesc')}</p>
+                  <p className="text-xs text-gray-500 mt-1">{t('leagues.teamGamePointsPerWinDesc')}</p>
                 </div>
               </div>
             </div>

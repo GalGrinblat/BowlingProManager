@@ -39,7 +39,7 @@
 - Review bonus rules configuration (default: +1 at avg+50, +2 at avg+70)
 - Ensure all player averages are entered correctly
 - Review absent player handling (automatically scores average - 10)
-- Verify point configuration (playerMatchPointsPerWin, teamMatchPointsPerWin, grandTotalPoints)
+- Verify point configuration (playerMatchPointsPerWin, teamMatchPointsPerWin, teamGamePointsPerWin)
 
 ### Schedule dates not appearing
 **Problem**: Match days show "TBD" instead of dates  

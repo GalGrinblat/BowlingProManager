@@ -1,4 +1,4 @@
-import type { CompletedGameViewProps } from '../types/index.ts';
+import type { CompletedGameViewProps } from '../../types/index.ts';
 
 export const CompletedGameView: React.FC<CompletedGameViewProps> = ({ game, onBack }) => {
   if (!game) return <div>Loading...</div>;
@@ -196,7 +196,7 @@ export const CompletedGameView: React.FC<CompletedGameViewProps> = ({ game, onBa
         </div>
       ))}
 
-      {/* Grand Total Points */}
+      {/* Game Total Points */}
       {(game.grandTotalScore?.team1 > 0 || game.grandTotalScore?.team2 > 0) && (
         <div className="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl shadow-lg p-6 text-white">
           <div className="flex items-center justify-between">

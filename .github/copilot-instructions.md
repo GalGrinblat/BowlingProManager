@@ -64,7 +64,7 @@ Organization
    - **Configurable**: teamMatchPointsPerWin (default: 1)
    - Draw = 50% of win points to each team
 4. **Grand Total Points**: Awarded to team with highest combined pins across all matches
-   - **Configurable**: grandTotalPoints (default: 2)
+   - **Configurable**: teamGamePointsPerWin (default: 2)
    - Draw = 50% of points to each team
 - **Location**: `src/utils/matchUtils.js`
 
@@ -276,7 +276,7 @@ The demo data documentation must always reflect what the code actually does. Upd
 ## Known Edge Cases
 
 - **Empty pin strings**: Treated as 0 in calculations, not entered in calculations until all pins filled
-- **Draws**: Always award 50% of respective win points (playerMatchPointsPerWin, teamMatchPointsPerWin, or grandTotalPoints)
+- **Draws**: Always award 50% of respective win points (playerMatchPointsPerWin, teamMatchPointsPerWin, or teamGamePointsPerWin)
 - **Incomplete matches**: Handicap totals calculated as 0 for missing pins
 - **Grand total points**: Only awarded if all matches complete with all scores entered (number of matches is configurable)
-- **Point values**: All point values (playerMatchPointsPerWin, teamMatchPointsPerWin, grandTotalPoints) are configurable per league/season with defaults (1, 1, 2)
+- **Point values**: All point values (playerMatchPointsPerWin, teamMatchPointsPerWin, teamGamePointsPerWin) are configurable per league/season with defaults (1, 1, 2)

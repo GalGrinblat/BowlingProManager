@@ -51,7 +51,7 @@ export const createLeague = ({
   bonusRules = [],
   playerMatchPointsPerWin = 1,
   teamMatchPointsPerWin = 1,
-  grandTotalPoints = 2,
+  teamGamePointsPerWin = 2,
   active = true
 }: {
   name?: string;
@@ -65,7 +65,7 @@ export const createLeague = ({
   bonusRules?: BonusRule[];
   playerMatchPointsPerWin?: number | string;
   teamMatchPointsPerWin?: number | string;
-  grandTotalPoints?: number | string;
+  teamGamePointsPerWin?: number | string;
   active?: boolean;
 }): Omit<League, 'id' | 'createdAt'> => ({
   name,
@@ -82,7 +82,7 @@ export const createLeague = ({
   ],
   playerMatchPointsPerWin: parseFloat(String(playerMatchPointsPerWin)) || 1,
   teamMatchPointsPerWin: parseFloat(String(teamMatchPointsPerWin)) || 1,
-  teamGamePointsPerWin: parseFloat(String(grandTotalPoints)) || 2,
+  teamGamePointsPerWin: parseFloat(String(teamGamePointsPerWin)) || 2,
   active
 });
 
@@ -100,7 +100,7 @@ export const createSeason = ({
   bonusRules = [],
   playerMatchPointsPerWin = 1,
   teamMatchPointsPerWin = 1,
-  grandTotalPoints = 2,
+  teamGamePointsPerWin = 2,
   startDate = '',
   endDate = ''
 }: {
@@ -116,7 +116,7 @@ export const createSeason = ({
   bonusRules?: BonusRule[];
   playerMatchPointsPerWin?: number | string;
   teamMatchPointsPerWin?: number | string;
-  grandTotalPoints?: number | string;
+  teamGamePointsPerWin?: number | string;
   startDate?: string;
   endDate?: string;
 }): Omit<Season, 'id' | 'createdAt'> => ({
@@ -132,7 +132,7 @@ export const createSeason = ({
   bonusRules,
   playerMatchPointsPerWin: parseFloat(String(playerMatchPointsPerWin)) || 1,
   teamMatchPointsPerWin: parseFloat(String(teamMatchPointsPerWin)) || 1,
-  teamGamePointsPerWin: parseFloat(String(grandTotalPoints)) || 2,
+  teamGamePointsPerWin: parseFloat(String(teamGamePointsPerWin)) || 2,
   startDate: startDate || new Date().toISOString(),
   endDate,
   status: 'setup'
