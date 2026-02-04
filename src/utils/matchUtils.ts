@@ -102,8 +102,8 @@ export const calculateMatchResults = (game: Game, matchIndex: number): void => {
   const match = game.matches[matchIndex];
   
   // Get configurable point values (defaults to 1 if not set)
-  const playerWinPoints = game.playerWinPoints || 1;
-  const teamWinPoints = game.teamWinPoints || 1;
+  const playerMatchPointsPerWin = game.playerMatchPointsPerWin || 1;
+  const teamMatchPointsPerWin = game.teamMatchPointsPerWin || 1;
   
   // Calculate individual game results with handicap
   match.games.forEach((gameResult: any, idx: number) => {
@@ -133,20 +133,20 @@ export const calculateMatchResults = (game: Game, matchIndex: number): void => {
       // Special rule: If both players are absent, it's always a draw
       if (team1Player.absent && team2Player.absent) {
         gameResult.result = 'draw';
-        gameResult.team1Points = playerWinPoints / 2;
-        gameResult.team2Points = playerWinPoints / 2;
+        gameResult.team1Points = playerMatchPointsPerWin / 2;
+        gameResult.team2Points = playerMatchPointsPerWin / 2;
       } else if (team1WithHandicap > team2WithHandicap) {
         gameResult.result = 'team1';
-        gameResult.team1Points = playerWinPoints;
+        gameResult.team1Points = playerMatchPointsPerWin;
         gameResult.team2Points = 0;
       } else if (team2WithHandicap > team1WithHandicap) {
         gameResult.result = 'team2';
         gameResult.team1Points = 0;
-        gameResult.team2Points = playerWinPoints;
+        gameResult.team2Points = playerMatchPointsPerWin;
       } else {
         gameResult.result = 'draw';
-        gameResult.team1Points = playerWinPoints / 2;
-        gameResult.team2Points = playerWinPoints / 2;
+        gameResult.team1Points = playerMatchPointsPerWin / 2;
+        gameResult.team2Points = playerMatchPointsPerWin / 2;
       }
     } else {
       gameResult.result = null;
@@ -200,14 +200,14 @@ export const calculateMatchResults = (game: Game, matchIndex: number): void => {
   
   if (allScoresEntered) {
     if (match.team1.totalWithHandicap > match.team2.totalWithHandicap) {
-      match.team1.score = team1GamePoints + teamWinPoints + match.team1.bonusPoints;
+      match.team1.score = team1GamePoints + teamMatchPointsPerWin + match.team1.bonusPoints;
       match.team2.score = team2GamePoints + match.team2.bonusPoints;
     } else if (match.team2.totalWithHandicap > match.team1.totalWithHandicap) {
       match.team1.score = team1GamePoints + match.team1.bonusPoints;
-      match.team2.score = team2GamePoints + teamWinPoints + match.team2.bonusPoints;
+      match.team2.score = team2GamePoints + teamMatchPointsPerWin + match.team2.bonusPoints;
     } else {
-      match.team1.score = team1GamePoints + (teamWinPoints / 2) + match.team1.bonusPoints;
-      match.team2.score = team2GamePoints + (teamWinPoints / 2) + match.team2.bonusPoints;
+      match.team1.score = team1GamePoints + (teamMatchPointsPerWin / 2) + match.team1.bonusPoints;
+      match.team2.score = team2GamePoints + (teamMatchPointsPerWin / 2) + match.team2.bonusPoints;
     }
   } else {
     match.team1.score = team1GamePoints + match.team1.bonusPoints;

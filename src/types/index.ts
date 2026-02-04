@@ -28,9 +28,9 @@ export interface League {
   defaultMatchesPerGame: number;
   dayOfWeek: string;
   bonusRules: BonusRule[];
-  playerWinPoints: number;
-  teamWinPoints: number;
-  grandTotalPoints: number;
+  playerMatchPointsPerWin: number;
+  teamMatchPointsPerWin: number;
+  teamGamePointsPerWin: number;
   active: boolean;
   createdAt: string;
 }
@@ -49,9 +49,9 @@ export interface Season {
   useHandicap: boolean;
   handicapPercentage: number;
   bonusRules: BonusRule[];
-  playerWinPoints: number;
-  teamWinPoints: number;
-  grandTotalPoints: number;
+  playerMatchPointsPerWin: number;
+  teamMatchPointsPerWin: number;
+  teamGamePointsPerWin: number;
   status: 'setup' | 'active' | 'completed';
   schedule?: any[];
   updatedAt?: string;
@@ -112,8 +112,8 @@ export interface Game {
   lineupStrategy?: string;
   lineupRule?: string;
   bonusRules?: any;
-  playerWinPoints?: number;
-  teamWinPoints?: number;
+  playerMatchPointsPerWin?: number;
+  teamMatchPointsPerWin?: number;
   grandTotalPoints?: any;
   grandTotalScore?: any;
   scheduledDate?: string;
@@ -396,8 +396,8 @@ export type CalculateGamePointsFn = (
     handicapBasis: number;
     handicapPercentage: number;
     bonusRules: BonusRule[];
-    playerWinPoints: number;
-    teamWinPoints: number;
+    playerMatchPointsPerWin: number;
+    teamMatchPointsPerWin: number;
     grandTotalPoints: number;
     matchesPerGame: number;
     playersPerTeam: number;

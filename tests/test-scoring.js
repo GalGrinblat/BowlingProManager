@@ -35,26 +35,26 @@ function calculateBonusPoints(score, average, isAbsent, bonusRules = null) {
   return 0;
 }
 
-function calculateIndividualGameResult(team1Score, team2Score, team1Handicap, team2Handicap, playerWinPoints = 1) {
+function calculateIndividualGameResult(team1Score, team2Score, team1Handicap, team2Handicap, playerMatchPointsPerWin = 1) {
   const team1Total = team1Score + team1Handicap;
   const team2Total = team2Score + team2Handicap;
   
   if (team1Total > team2Total) {
-    return { result: 'team1', team1Points: playerWinPoints, team2Points: 0 };
+    return { result: 'team1', team1Points: playerMatchPointsPerWin, team2Points: 0 };
   } else if (team2Total > team1Total) {
-    return { result: 'team2', team1Points: 0, team2Points: playerWinPoints };
+    return { result: 'team2', team1Points: 0, team2Points: playerMatchPointsPerWin };
   } else {
-    return { result: 'draw', team1Points: playerWinPoints / 2, team2Points: playerWinPoints / 2 };
+    return { result: 'draw', team1Points: playerMatchPointsPerWin / 2, team2Points: playerMatchPointsPerWin / 2 };
   }
 }
 
-function calculateMatchWinner(team1TotalPins, team2TotalPins, teamWinPoints = 1) {
+function calculateMatchWinner(team1TotalPins, team2TotalPins, teamMatchPointsPerWin = 1) {
   if (team1TotalPins > team2TotalPins) {
-    return { team1Points: teamWinPoints, team2Points: 0 };
+    return { team1Points: teamMatchPointsPerWin, team2Points: 0 };
   } else if (team2TotalPins > team1TotalPins) {
-    return { team1Points: 0, team2Points: teamWinPoints };
+    return { team1Points: 0, team2Points: teamMatchPointsPerWin };
   } else {
-    return { team1Points: teamWinPoints / 2, team2Points: teamWinPoints / 2 };
+    return { team1Points: teamMatchPointsPerWin / 2, team2Points: teamMatchPointsPerWin / 2 };
   }
 }
 
@@ -253,14 +253,14 @@ const tests = [
     name: 'Configurable Points - All types working together',
     test: () => {
       // Simulate a complete scoring scenario
-      const playerWinPoints = 2;
-      const teamWinPoints = 3;
+      const playerMatchPointsPerWin = 2;
+      const teamMatchPointsPerWin = 3;
       const grandTotalPoints = 5;
       
       // Team 1 wins individual game
-      const game = calculateIndividualGameResult(180, 170, 10, 15, playerWinPoints);
+      const game = calculateIndividualGameResult(180, 170, 10, 15, playerMatchPointsPerWin);
       // Team 1 wins match
-      const match = calculateMatchWinner(540, 520, teamWinPoints);
+      const match = calculateMatchWinner(540, 520, teamMatchPointsPerWin);
       // Team 1 wins grand total
       const grand = calculateGrandTotal(1620, 1580, grandTotalPoints);
       

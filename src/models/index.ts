@@ -49,8 +49,8 @@ export const createLeague = ({
   defaultMatchesPerGame = 3,
   dayOfWeek = '',
   bonusRules = [],
-  playerWinPoints = 1,
-  teamWinPoints = 1,
+  playerMatchPointsPerWin = 1,
+  teamMatchPointsPerWin = 1,
   grandTotalPoints = 2,
   active = true
 }: {
@@ -63,8 +63,8 @@ export const createLeague = ({
   defaultMatchesPerGame?: number | string;
   dayOfWeek?: string;
   bonusRules?: BonusRule[];
-  playerWinPoints?: number | string;
-  teamWinPoints?: number | string;
+  playerMatchPointsPerWin?: number | string;
+  teamMatchPointsPerWin?: number | string;
   grandTotalPoints?: number | string;
   active?: boolean;
 }): Omit<League, 'id' | 'createdAt'> => ({
@@ -80,9 +80,9 @@ export const createLeague = ({
     { type: 'player', condition: 'vs_average', threshold: 50, points: 1 },
     { type: 'player', condition: 'vs_average', threshold: 70, points: 2 }
   ],
-  playerWinPoints: parseFloat(String(playerWinPoints)) || 1,
-  teamWinPoints: parseFloat(String(teamWinPoints)) || 1,
-  grandTotalPoints: parseFloat(String(grandTotalPoints)) || 2,
+  playerMatchPointsPerWin: parseFloat(String(playerMatchPointsPerWin)) || 1,
+  teamMatchPointsPerWin: parseFloat(String(teamMatchPointsPerWin)) || 1,
+  teamGamePointsPerWin: parseFloat(String(grandTotalPoints)) || 2,
   active
 });
 
@@ -98,8 +98,8 @@ export const createSeason = ({
   handicapPercentage = 100,
   matchesPerGame = 3,
   bonusRules = [],
-  playerWinPoints = 1,
-  teamWinPoints = 1,
+  playerMatchPointsPerWin = 1,
+  teamMatchPointsPerWin = 1,
   grandTotalPoints = 2,
   startDate = '',
   endDate = ''
@@ -114,8 +114,8 @@ export const createSeason = ({
   handicapPercentage?: number | string;
   matchesPerGame?: number | string;
   bonusRules?: BonusRule[];
-  playerWinPoints?: number | string;
-  teamWinPoints?: number | string;
+  playerMatchPointsPerWin?: number | string;
+  teamMatchPointsPerWin?: number | string;
   grandTotalPoints?: number | string;
   startDate?: string;
   endDate?: string;
@@ -130,9 +130,9 @@ export const createSeason = ({
   handicapPercentage: Math.min(100, Math.max(0, parseInt(String(handicapPercentage)) || 100)),
   matchesPerGame: parseInt(String(matchesPerGame)) || 3,
   bonusRules,
-  playerWinPoints: parseFloat(String(playerWinPoints)) || 1,
-  teamWinPoints: parseFloat(String(teamWinPoints)) || 1,
-  grandTotalPoints: parseFloat(String(grandTotalPoints)) || 2,
+  playerMatchPointsPerWin: parseFloat(String(playerMatchPointsPerWin)) || 1,
+  teamMatchPointsPerWin: parseFloat(String(teamMatchPointsPerWin)) || 1,
+  teamGamePointsPerWin: parseFloat(String(grandTotalPoints)) || 2,
   startDate: startDate || new Date().toISOString(),
   endDate,
   status: 'setup'

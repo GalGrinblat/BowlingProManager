@@ -25,8 +25,8 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
       { type: 'player' as 'player' | 'team', condition: 'vs_average' as 'vs_average' | 'pure_score', threshold: 50, points: 1 },
       { type: 'player' as 'player' | 'team', condition: 'vs_average' as 'vs_average' | 'pure_score', threshold: 70, points: 2 }
     ],
-    playerWinPoints: 1,
-    teamWinPoints: 1,
+    playerMatchPointsPerWin: 1,
+    teamMatchPointsPerWin: 1,
     grandTotalPoints: 2,
     active: true
   });
@@ -85,8 +85,8 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
         { type: 'player', condition: 'vs_average', threshold: 50, points: 1 },
         { type: 'player', condition: 'vs_average', threshold: 70, points: 2 }
       ],
-      playerWinPoints: 1,
-      teamWinPoints: 1,
+      playerMatchPointsPerWin: 1,
+      teamMatchPointsPerWin: 1,
       grandTotalPoints: 2,
       active: true
     });
@@ -110,8 +110,8 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
         { type: 'player', condition: 'vs_average', threshold: 50, points: 1 },
         { type: 'player', condition: 'vs_average', threshold: 70, points: 2 }
       ],
-      playerWinPoints: league.playerWinPoints || 1,
-      teamWinPoints: league.teamWinPoints || 1,
+      playerMatchPointsPerWin: league.playerMatchPointsPerWin || 1,
+      teamMatchPointsPerWin: league.teamMatchPointsPerWin || 1,
       grandTotalPoints: league.grandTotalPoints || 2,
       active: league.active
     });
@@ -181,8 +181,8 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
         { type: 'player' as 'player' | 'team', condition: 'vs_average' as 'vs_average' | 'pure_score', threshold: 50, points: 1 },
         { type: 'player' as 'player' | 'team', condition: 'vs_average' as 'vs_average' | 'pure_score', threshold: 70, points: 2 }
       ],
-      playerWinPoints: 1,
-      teamWinPoints: 1,
+      playerMatchPointsPerWin: 1,
+      teamMatchPointsPerWin: 1,
       grandTotalPoints: 2,
       active: true
     });
@@ -358,28 +358,28 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    {t('leagues.playerWinPoints')}
+                    {t('leagues.playerMatchPointsPerWin')}
                   </label>
                   <input
                     type="number"
                     min="0"
                     step="0.5"
-                    value={formData.playerWinPoints}
-                    onChange={(e) => setFormData({ ...formData, playerWinPoints: Number(e.target.value) })}
+                    value={formData.playerMatchPointsPerWin}
+                    onChange={(e) => setFormData({ ...formData, playerMatchPointsPerWin: Number(e.target.value) })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
-                  <p className="text-xs text-gray-500 mt-1">{t('leagues.playerWinPointsDesc')}</p>
+                  <p className="text-xs text-gray-500 mt-1">{t('leagues.playerMatchPointsPerWinDesc')}</p>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    {t('leagues.teamWinPoints')}
+                    {t('leagues.teamMatchPointsPerWin')}
                   </label>
                   <input
                     type="number"
                     min="0.5"
                     step="0.5"
-                    value={formData.teamWinPoints}
-                    onChange={(e) => setFormData({ ...formData, teamWinPoints: Number(e.target.value) })}
+                    value={formData.teamMatchPointsPerWin}
+                    onChange={(e) => setFormData({ ...formData, teamMatchPointsPerWin: Number(e.target.value) })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   />
                   <p className="text-xs text-gray-500 mt-1">{t('leagues.teamWinPointsDesc')}</p>

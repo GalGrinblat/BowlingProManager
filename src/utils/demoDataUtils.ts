@@ -128,8 +128,8 @@ export const seedDemoData = (): SeedDataResult => {
           { type: 'player', condition: 'vs_average', threshold: 50, points: 1 },
           { type: 'player', condition: 'vs_average', threshold: 70, points: 2 }
         ],
-        playerWinPoints: 1,
-        teamWinPoints: 1,
+        playerMatchPointsPerWin: 1,
+        teamMatchPointsPerWin: 1,
         grandTotalPoints: 2,
         active: true
       })
@@ -150,8 +150,8 @@ export const seedDemoData = (): SeedDataResult => {
           { type: 'player', condition: 'vs_average', threshold: 50, points: 1 },
           { type: 'player', condition: 'vs_average', threshold: 70, points: 2 }
         ],
-        playerWinPoints: 1,
-        teamWinPoints: 1,
+        playerMatchPointsPerWin: 1,
+        teamMatchPointsPerWin: 1,
         grandTotalPoints: 2,
         active: true
       })
@@ -173,8 +173,8 @@ export const seedDemoData = (): SeedDataResult => {
       handicapPercentage: 90,
       matchesPerGame: 3,
       bonusRules: league1.bonusRules,
-      playerWinPoints: 1,
-      teamWinPoints: 1,
+      playerMatchPointsPerWin: 1,
+      teamMatchPointsPerWin: 1,
       grandTotalPoints: 2,
       startDate: '2025-09-08',
       endDate: '2025-12-15'
@@ -193,8 +193,8 @@ export const seedDemoData = (): SeedDataResult => {
       handicapPercentage: 100,
       matchesPerGame: 3,
       bonusRules: league2.bonusRules,
-      playerWinPoints: 1,
-      teamWinPoints: 1,
+      playerMatchPointsPerWin: 1,
+      teamMatchPointsPerWin: 1,
       grandTotalPoints: 2,
       startDate: '2025-09-10',
       endDate: '2025-12-17'

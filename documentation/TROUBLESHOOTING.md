@@ -39,7 +39,7 @@
 - Review bonus rules configuration (default: +1 at avg+50, +2 at avg+70)
 - Ensure all player averages are entered correctly
 - Review absent player handling (automatically scores average - 10)
-- Verify point configuration (playerWinPoints, teamWinPoints, grandTotalPoints)
+- Verify point configuration (playerMatchPointsPerWin, teamMatchPointsPerWin, grandTotalPoints)
 
 ### Schedule dates not appearing
 **Problem**: Match days show "TBD" instead of dates  
@@ -71,7 +71,7 @@
 - Absent players automatically score: `average - 10` pins
 - Handicap still applies to absent scores
 - Absent players cannot earn bonus points
-- When both players in a game are absent, it's always a draw (50% of playerWinPoints to each)
+- When both players in a game are absent, it's always a draw (50% of playerMatchPointsPerWin to each)
 
 ### Handicap not applying
 **Problem**: Scores don't include handicap adjustment  
