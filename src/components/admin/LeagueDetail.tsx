@@ -5,11 +5,11 @@ import { generateRoundRobinSchedule } from '../../utils/scheduleUtils';
 import { exportSeasonJSON } from '../../utils/exportUtils';
 import { calculateTeamStandings, calculatePlayerSeasonStats } from '../../utils/standingsUtils';
 
-import type { LeagueDetailProps } from '../../types/index.ts';
+import type { LeagueDetailProps, League, Season } from '../../types/index.ts';
 
 export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, onViewSeason }) => {
-  const [league, setLeague] = useState(null);
-  const [seasons, setSeasons] = useState([]);
+  const [league, setLeague] = useState<League | null>(null);
+  const [seasons, setSeasons] = useState<Season[]>([]);
   const [isCreatingSeason, setIsCreatingSeason] = useState(false);
 
   useEffect(() => {
@@ -23,14 +23,14 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
     }
     setLeague(leagueData);
     const seasonsData = seasonsApi.getByLeague(leagueId);
-    setSeasons(seasonsData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+    setSeasons(seasonsData.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
   };
 
   const handleCreateSeason = () => {
     setIsCreatingSeason(true);
   };
 
-  const handleDeleteSeason = (seasonId) => {
+  const handleDeleteSeason = (seasonId: string) => {
     const season = seasonsApi.getById(seasonId);
     const games = gamesApi.getBySeason(seasonId);
     const teams = teamsApi.getBySeason(seasonId);
@@ -175,7 +175,7 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
                     </div>
                     <div className="flex gap-2">
                       <button
-                        onClick={() => onViewSeason(season.id, 'setup')}
+                        onClick={() => onViewSeason(season.id)}
                         className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
                       >
                         Continue Setup
@@ -208,7 +208,7 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
               const standings = calculateTeamStandings(teams, games);
               const champion = standings[0];
               
-              const handleExport = (e) => {
+              const handleExport = (e: React.MouseEvent) => {
                 e.stopPropagation(); // Prevent navigation when clicking export
                 const playerStats = calculatePlayerSeasonStats(teams, games);
                 exportSeasonJSON(season, teams, games, standings, playerStats, league);
@@ -218,7 +218,7 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
                 <div
                   key={season.id}
                   className="border border-gray-200 rounded-lg p-4 hover:border-purple-300 transition-colors cursor-pointer"
-                  onClick={() => onViewSeason(season.id, 'completed')}
+                  onClick={() => onViewSeason(season.id)}
                 >
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
@@ -277,7 +277,7 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
 };
 
 // Season Creator Component
-const SeasonCreator = ({ league, onCancel, onSuccess }) => {
+const SeasonCreator = ({ league, onCancel, onSuccess }: { league: League; onCancel: () => void; onSuccess: () => void }) => {
   const [formData, setFormData] = useState({
     name: '',
     numberOfTeams: 4,
@@ -291,7 +291,7 @@ const SeasonCreator = ({ league, onCancel, onSuccess }) => {
     startDate: new Date().toISOString().split('T')[0]
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     const seasonData = createSeason({

@@ -154,6 +154,7 @@ export const seedDemoData = (): SeedDataResult => {
   const season1 = seasonsApi.create({
     leagueId: league1.id,
     name: 'Fall 2025',
+    numberOfTeams: 8,
     playersPerTeam: 4,
     numberOfRounds: 4,
     handicapBasis: 200,
@@ -172,6 +173,7 @@ export const seedDemoData = (): SeedDataResult => {
   const season2 = seasonsApi.create({
     leagueId: league2.id,
     name: 'Fall 2025',
+    numberOfTeams: 8,
     playersPerTeam: 4,
     numberOfRounds: 4,
     handicapBasis: 180,

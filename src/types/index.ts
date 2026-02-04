@@ -41,6 +41,7 @@ export interface Season {
   name: string;
   startDate: string;
   endDate: string;
+  numberOfTeams: number;
   numberOfRounds: number;
   playersPerTeam: number;
   matchesPerGame: number;
@@ -52,6 +53,8 @@ export interface Season {
   matchWinPoints: number;
   grandTotalPoints: number;
   status: 'setup' | 'active' | 'completed';
+  schedule?: any[];
+  updatedAt?: string;
   createdAt: string;
 }
 
