@@ -3,15 +3,15 @@ import { gamesApi, teamsApi, seasonsApi, playersApi } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { MatchView } from '../MatchView';
 import { SummaryView } from '../SummaryView';
-import { PreMatchSetup } from './PreMatchSetup';
+import { PreGameSetup } from './PreGameSetup';
 import { calculateMatchResults, calculateBonusPoints } from '../../utils/matchUtils';
 import { calculatePlayerStats, calculateGameTotals, calculateGrandTotalPoints } from '../../utils/statsUtils';
 import { createEmptyMatch } from '../../utils/matchUtils';
 import { calculateCurrentPlayerAverages } from '../../utils/standingsUtils';
 
-import type { SeasonGamePlayerProps } from '../../types/index.ts';
+import type { SeasonGameProps } from '../../types/index.ts';
 
-export const SeasonGamePlayer: React.FC<SeasonGamePlayerProps> = ({ gameId, onBack }) => {
+export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
   const { currentUser, isPlayer } = useAuth();
   const [game, setGame] = useState<any>(null);
   const [currentMatch, setCurrentMatch] = useState(1);
@@ -316,7 +316,7 @@ export const SeasonGamePlayer: React.FC<SeasonGamePlayerProps> = ({ gameId, onBa
 
   if (showPreMatch) {
     return (
-      <PreMatchSetup
+      <PreGameSetup
         game={game}
         onContinue={handlePreMatchContinue}
         onBack={onBack}

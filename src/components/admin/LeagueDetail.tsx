@@ -4,10 +4,12 @@ import { createSeason, createTeam, validateSeason } from '../../models';
 import { generateRoundRobinSchedule } from '../../utils/scheduleUtils';
 import { exportSeasonJSON } from '../../utils/exportUtils';
 import { calculateTeamStandings, calculatePlayerSeasonStats } from '../../utils/standingsUtils';
+import { useTranslation } from '../../contexts/LanguageContext';
 
 import type { LeagueDetailProps, League, Season } from '../../types/index.ts';
 
 export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, onViewSeason }) => {
+  const { t } = useTranslation();
   const [league, setLeague] = useState<League | null>(null);
   const [seasons, setSeasons] = useState<Season[]>([]);
   const [isCreatingSeason, setIsCreatingSeason] = useState(false);
@@ -66,7 +68,7 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
             onClick={onBack}
             className="text-gray-600 hover:text-gray-800"
           >
-            ← Back to Leagues
+            ← {t('leagues.backToLeagues')}
           </button>
         </div>
         <div className="text-center py-12">
@@ -80,17 +82,21 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <button
-          onClick={onBack}
-          className="text-gray-600 hover:text-gray-800 mb-4"
-        >
-          ← Back to Leagues
-        </button>
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">{league.name}</h1>
-        {league.description && (
-          <p className="text-gray-600">{league.description}</p>
-        )}
-        <div className="flex gap-4 mt-4 text-sm text-gray-600">
+        <div className="flex justify-between items-center mb-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">{league.name}</h1>
+            {league.description && (
+              <p className="text-gray-600">{league.description}</p>
+            )}
+          </div>
+          <button
+            onClick={onBack}
+            className="text-gray-600 hover:text-gray-800"
+          >
+            ← {t('leagues.backToLeagues')}
+          </button>
+        </div>
+        <div className="flex gap-4 text-sm text-gray-600">
           {league.dayOfWeek && <span>📅 {league.dayOfWeek}s</span>}
           <span>📊 Handicap: {league.useHandicap !== false ? `${league.defaultHandicapBasis} (${league.handicapPercentage || 100}%)` : 'Disabled'}</span>
           <span>👥 Default: {league.defaultPlayersPerTeam} players/team</span>

@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { useTranslation } from '../../contexts/LanguageContext';
 import type { Game } from '../../types/index.ts';
 
-interface PreMatchSetupProps {
+interface PreGameSetupProps {
   game: Game;
   onContinue: (updatedGame: Game) => void;
   onBack: () => void;
 }
 
-export const PreMatchSetup: React.FC<PreMatchSetupProps> = ({ game, onContinue, onBack }) => {
+export const PreGameSetup: React.FC<PreGameSetupProps> = ({ game, onContinue, onBack }) => {
   const { t } = useTranslation();
   const gameData = game as any; // Cast to bypass strict typing for runtime data structure
   const [team1Players, setTeam1Players] = useState<any[]>(gameData.team1.players);
@@ -62,7 +62,7 @@ export const PreMatchSetup: React.FC<PreMatchSetupProps> = ({ game, onContinue, 
           >
             ← {t('common.back')}
           </button>
-          <h1 className="text-3xl font-bold mb-2">{t('games.preMatchSetup')}</h1>
+          <h1 className="text-3xl font-bold mb-2">{t('games.preGameSetup')}</h1>
           <p className="text-gray-400">
             {t('games.round')} {game.round}, {t('games.matchDay')} {game.matchDay}
           </p>

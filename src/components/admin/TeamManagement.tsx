@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { teamsApi, playersApi, seasonsApi } from '../../services/api';
+import { useTranslation } from '../../contexts/LanguageContext';
 
 import type { TeamManagementProps } from '../../types/index.ts';
 
 export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack }) => {
+  const { t } = useTranslation();
   const [season, setSeason] = useState<any>(null);
   const [teams, setTeams] = useState<any[]>([]);
   const [allPlayers, setAllPlayers] = useState<any[]>([]);
@@ -87,14 +89,18 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <button
-          onClick={onBack}
-          className="text-gray-600 hover:text-gray-800 mb-4"
-        >
-          ← Back to Season
-        </button>
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Team Management</h1>
-        <p className="text-gray-600">{season.name}</p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">Team Management</h1>
+            <p className="text-gray-600">{season.name}</p>
+          </div>
+          <button
+            onClick={onBack}
+            className="text-gray-600 hover:text-gray-800"
+          >
+            ← {t('teams.backToSeason')}
+          </button>
+        </div>
       </div>
 
       {/* Info Card */}

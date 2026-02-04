@@ -9,7 +9,7 @@ import { LeagueManagement } from './components/admin/LeagueManagement';
 import { LeagueDetail } from './components/admin/LeagueDetail';
 import { SeasonSetup } from './components/admin/SeasonSetup';
 import { SeasonDashboard } from './components/admin/SeasonDashboard';
-import { SeasonGamePlayer } from './components/admin/SeasonGamePlayer';
+import { SeasonGame } from './components/admin/SeasonGame';
 import { Settings } from './components/admin/Settings';
 import { TeamManagement } from './components/admin/TeamManagement';
 import { PlayerDashboard } from './components/player/PlayerDashboard';
@@ -126,7 +126,7 @@ function AppContent() {
             )}
 
             {currentView === 'season-game' && navigationState.gameId && (
-              <SeasonGamePlayer 
+              <SeasonGame 
                 gameId={navigationState.gameId}
                 onBack={() => navigateTo('season-dashboard', { seasonId: navigationState.seasonId })}
               />
@@ -160,7 +160,7 @@ function AppContent() {
             )}
 
             {currentView === 'player-game' && navigationState.gameId && (
-              <SeasonGamePlayer 
+              <SeasonGame 
                 gameId={navigationState.gameId}
                 onBack={() => navigateTo('player-dashboard')}
               />

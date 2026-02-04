@@ -139,13 +139,7 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <button
-          onClick={onBack}
-          className="text-gray-600 hover:text-gray-800 mb-4"
-        >
-          ← Back to League
-        </button>
-        <div className="flex justify-between items-start">
+        <div className="flex justify-between items-start mb-4">
           <div>
             <div className="flex items-center gap-3 mb-2">
               <h1 className="text-3xl font-bold text-gray-800">{season.name}</h1>
@@ -162,7 +156,15 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
               <span>🔄 Round {selectedRound} of {season.numberOfRounds}</span>
             </div>
           </div>
-          <div className="flex gap-2">
+          <button
+            onClick={onBack}
+            className="text-gray-600 hover:text-gray-800"
+          >
+            ← {t('seasons.backToLeague')}
+          </button>
+        </div>
+        {(season.status === 'active' && (onManageTeams || completedGames === totalGames)) && (
+          <div className="flex gap-2 justify-end">
             {season.status === 'active' && (
               <button
                 onClick={onManageTeams}
@@ -180,7 +182,7 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
               </button>
             )}
           </div>
-        </div>
+        )}
       </div>
 
       {/* Champion Banner */}

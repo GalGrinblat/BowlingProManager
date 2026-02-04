@@ -308,7 +308,7 @@ export interface SeasonDashboardProps {
   onManageTeams: () => void;
 }
 
-export interface SeasonGamePlayerProps {
+export interface SeasonGameProps {
   gameId: string;
   onBack: () => void;
 }
