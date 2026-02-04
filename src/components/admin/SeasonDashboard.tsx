@@ -3,7 +3,7 @@ import { seasonsApi, teamsApi, gamesApi, leaguesApi } from '../../services/api';
 import { calculateTeamStandings, calculatePlayerSeasonStats } from '../../utils/standingsUtils';
 import { postponeMatchDay, formatMatchDate } from '../../utils/scheduleUtils';
 import { calculateHeadToHead, formatHeadToHead } from '../../utils/headToHeadUtils';
-import { calculateSeasonRecords, formatRecordDate } from '../../utils/recordsUtils';
+import { calculateSeasonRecords } from '../../utils/recordsUtils';
 import { useTranslation } from '../../contexts/LanguageContext';
 import { 
   exportStandingsCSV, 
@@ -17,13 +17,13 @@ import type { SeasonDashboardProps } from '../../types/index.ts';
 
 export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBack, onPlayGame, onViewGame, onManageTeams }) => {
   const { t } = useTranslation();
-  const [season, setSeason] = useState(null);
-  const [league, setLeague] = useState(null);
-  const [teams, setTeams] = useState([]);
-  const [games, setGames] = useState([]);
+  const [season, setSeason] = useState<any>(null);
+  const [league, setLeague] = useState<any>(null);
+  const [teams, setTeams] = useState<any[]>([]);
+  const [games, setGames] = useState<any[]>([]);
   const [view, setView] = useState('schedule'); // schedule, standings, players, h2h, records, records
   const [selectedRound, setSelectedRound] = useState(1);
-  const [selectedMatchDay, setSelectedMatchDay] = useState(null);
+  const [selectedMatchDay, setSelectedMatchDay] = useState<number | null>(null);
   const [showPostponeModal, setShowPostponeModal] = useState(false);
   const [postponeWeeks, setPostponeWeeks] = useState(1);
 
@@ -34,6 +34,8 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
   const loadSeasonData = () => {
     const seasonData = seasonsApi.getById(seasonId);
     setSeason(seasonData);
+    
+    if (!seasonData) return;
     
     const leagueData = leaguesApi.getById(seasonData.leagueId);
     setLeague(leagueData);
@@ -91,7 +93,7 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
     if (confirm(`Postpone Match Day ${selectedMatchDay} by ${postponeWeeks} week(s)? All subsequent match days will also shift.`)) {
       const updatedSchedule = postponeMatchDay(
         season.schedule,
-        selectedMatchDay,
+        selectedMatchDay!,
         postponeWeeks,
         league.dayOfWeek
       );
@@ -100,14 +102,14 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
       seasonsApi.update(seasonId, { schedule: updatedSchedule });
 
       // Update all games with new dates from schedule
-      updatedSchedule.forEach(daySchedule => {
+      updatedSchedule.forEach((daySchedule: any) => {
         const gamesToUpdate = games.filter(g => g.matchDay === daySchedule.matchDay);
         gamesToUpdate.forEach(game => {
           gamesApi.update(game.id, { 
-            scheduledDate: daySchedule.date,
-            postponed: daySchedule.postponed,
-            originalDate: daySchedule.originalDate
-          });
+            date: daySchedule.date,
+            postponed: daySchedule.postponed as boolean | undefined,
+            originalDate: daySchedule.originalDate as string | undefined
+          } as any);
         });
       });
 
@@ -388,7 +390,7 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
                 {matchDaysInRound.map(matchDay => {
                   const matchDayGamesForDay = roundGames.filter(g => g.matchDay === matchDay);
                   const completedInMatchDay = matchDayGamesForDay.filter(g => g.status === 'completed').length;
-                  const scheduleEntry = season.schedule?.find(s => s.matchDay === matchDay);
+                  const scheduleEntry = season.schedule?.find((s: any) => s.matchDay === matchDay);
                   const dateDisplay = scheduleEntry?.date ? formatMatchDate(scheduleEntry.date) : null;
                   const isPostponed = scheduleEntry?.postponed;
                   
@@ -760,8 +762,8 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
             
             <div className="mb-4">
               <p className="text-sm text-gray-600 mb-2">
-                Current date: {season.schedule?.find(s => s.matchDay === selectedMatchDay)?.date 
-                  ? formatMatchDate(season.schedule.find(s => s.matchDay === selectedMatchDay).date)
+                Current date: {season.schedule?.find((s: any) => s.matchDay === selectedMatchDay)?.date
+                  ? formatMatchDate(season.schedule.find((s: any) => s.matchDay === selectedMatchDay)!.date)
                   : 'Not scheduled'}
               </p>
               <p className="text-sm text-gray-600 mb-4">
@@ -780,10 +782,10 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
               />
               
-              {postponeWeeks > 0 && season.schedule?.find(s => s.matchDay === selectedMatchDay)?.date && (
-                <p className="text-sm text-green-600 mt-2">
+              {postponeWeeks > 0 && season.schedule?.find((s: any) => s.matchDay === selectedMatchDay)?.date && (
+                <p className="text-sm text-gray-500 mt-2">
                   New date: {formatMatchDate(
-                    new Date(new Date(season.schedule.find(s => s.matchDay === selectedMatchDay).date).getTime() + postponeWeeks * 7 * 24 * 60 * 60 * 1000).toISOString()
+                    new Date(new Date(season.schedule.find((s: any) => s.matchDay === selectedMatchDay)!.date).getTime() + postponeWeeks * 7 * 24 * 60 * 60 * 1000).toISOString()
                   )}
                 </p>
               )}
@@ -814,7 +816,7 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
 };
 
 // Game Card Component
-const GameCard = ({ game, team1, team2, h2h, onPlayGame, onViewGame }) => {
+const GameCard = ({ game, team1, team2, h2h, onPlayGame, onViewGame }: { game: any, team1: any, team2: any, h2h: any, onPlayGame: () => void, onViewGame: () => void }) => {
   const getStatusBadge = () => {
     switch (game.status) {
       case 'completed':
@@ -826,8 +828,8 @@ const GameCard = ({ game, team1, team2, h2h, onPlayGame, onViewGame }) => {
     }
   };
 
-  const team1TotalPoints = game.matches?.reduce((sum, m) => sum + (m.team1?.score || 0), 0) + (game.grandTotalScore?.team1 || 0);
-  const team2TotalPoints = game.matches?.reduce((sum, m) => sum + (m.team2?.score || 0), 0) + (game.grandTotalScore?.team2 || 0);
+  const team1TotalPoints = game.matches?.reduce((sum: any, m: any) => sum + (m.team1?.score || 0), 0) + (game.grandTotalScore?.team1 || 0);
+  const team2TotalPoints = game.matches?.reduce((sum: any, m: any) => sum + (m.team2?.score || 0), 0) + (game.grandTotalScore?.team2 || 0);
 
   return (
     <div className={`border rounded-lg p-4 transition-colors ${

@@ -39,7 +39,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
     loadLanguage();
 
     // Listen for storage changes (when language is updated in Settings)
-    const handleStorageChange = (e) => {
+    const handleStorageChange = (e: any) => {
       if (e.key === 'bowling_organization' || e.key === null) {
         loadLanguage();
       }
@@ -62,7 +62,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
   // Translation function with nested key support
   const t = (key: string): string => {
     const keys = key.split('.');
-    let value = translations[language];
+    let value: any = translations[language];
     
     for (const k of keys) {
       if (value && typeof value === 'object') {
@@ -74,10 +74,10 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
       }
     }
     
-    return value || key;
+    return (typeof value === 'string' ? value : key);
   };
 
-  const direction = language === 'he' ? 'rtl' : 'ltr';
+  const direction: 'ltr' | 'rtl' = language === 'he' ? 'rtl' : 'ltr';
 
   // Custom setLanguage that also updates localStorage
   const updateLanguage = (newLang: 'en' | 'he'): void => {

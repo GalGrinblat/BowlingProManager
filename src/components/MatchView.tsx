@@ -35,7 +35,7 @@ export const MatchView: React.FC<MatchViewProps> = ({ matchNumber, game, onUpdat
       {/* Players Grid */}
       <div className="bg-gray-800 rounded-lg p-4 mb-6">
         <div className="space-y-3">
-          {game.team1.players.map((player, idx) => (
+          {game.team1.players.map((player: any, idx: number) => (
             <div key={idx} className="player-row bg-gray-700 rounded-lg p-3">
               <div className="grid grid-cols-3 gap-4 items-center">
                 {/* Team 1 Player */}

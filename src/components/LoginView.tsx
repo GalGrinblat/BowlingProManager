@@ -7,7 +7,7 @@ import type { LoginViewProps } from '../types/index.ts';
 export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
   const { t } = useTranslation();
   const [selectedRole, setSelectedRole] = useState('admin');
-  const [players, setPlayers] = useState([]);
+  const [players, setPlayers] = useState<any[]>([]);
   const [selectedPlayer, setSelectedPlayer] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
 

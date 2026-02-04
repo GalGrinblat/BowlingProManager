@@ -9,8 +9,7 @@ import type {
   League,
   Season,
   Team,
-  Game,
-  User
+  Game
 } from '../types/index.ts';
 
 const STORAGE_KEYS = {
@@ -109,11 +108,10 @@ export const playersApi = {
     
     players[index] = {
       ...players[index],
-      ...updates,
-      updatedAt: new Date().toISOString()
-    };
+      ...updates
+    } as Player;
     saveToStorage(STORAGE_KEYS.PLAYERS, players);
-    return players[index];
+    return players[index] || null;
   },
   
   delete: (id: string): boolean => {
@@ -156,9 +154,9 @@ export const leaguesApi = {
     leagues[index] = {
       ...leagues[index],
       ...updates
-    };
+    } as League;
     saveToStorage(STORAGE_KEYS.LEAGUES, leagues);
-    return leagues[index];
+    return leagues[index] || null;
   },
   
   delete: (id: string): boolean => {
@@ -196,7 +194,6 @@ export const seasonsApi = {
     const seasons = seasonsApi.getAll();
     const newSeason: Season = {
       id: generateId(),
-      status: 'setup', // setup, active, completed
       ...seasonData,
       createdAt: new Date().toISOString()
     };
@@ -212,11 +209,10 @@ export const seasonsApi = {
     
     seasons[index] = {
       ...seasons[index],
-      ...updates,
-      updatedAt: new Date().toISOString()
-    };
+      ...updates
+    } as Season;
     saveToStorage(STORAGE_KEYS.SEASONS, seasons);
-    return seasons[index];
+    return seasons[index] || null;
   },
   
   delete: (id: string): boolean => {
@@ -263,11 +259,10 @@ export const teamsApi = {
     
     teams[index] = {
       ...teams[index],
-      ...updates,
-      updatedAt: new Date().toISOString()
-    };
+      ...updates
+    } as Team;
     saveToStorage(STORAGE_KEYS.TEAMS, teams);
-    return teams[index];
+    return teams[index] || null;
   },
   
   delete: (id: string): boolean => {
@@ -320,11 +315,10 @@ export const gamesApi = {
     
     games[index] = {
       ...games[index],
-      ...updates,
-      updatedAt: new Date().toISOString()
-    };
+      ...updates
+    } as Game;
     saveToStorage(STORAGE_KEYS.GAMES, games);
-    return games[index];
+    return games[index] || null;
   },
   
   delete: (id: string): boolean => {
@@ -336,19 +330,20 @@ export const gamesApi = {
 };
 
 // ===== AUTH (Simple role-based) =====
+// Note: Using AuthUser to avoid conflict with imported User type
 
-interface User {
+interface AuthUser {
   userId: string;
   role: 'admin' | 'player';
 }
 
 export const authApi = {
-  getCurrentUser: (): User | null => {
-    return getFromStorage<User>(STORAGE_KEYS.CURRENT_USER);
+  getCurrentUser: (): AuthUser | null => {
+    return getFromStorage<AuthUser>(STORAGE_KEYS.CURRENT_USER);
   },
   
-  login: (userId: string, role: 'admin' | 'player' = 'player'): User => {
-    const user: User = { userId, role };
+  login: (userId: string, role: 'admin' | 'player' = 'player'): AuthUser => {
+    const user: AuthUser = { userId, role };
     saveToStorage(STORAGE_KEYS.CURRENT_USER, user);
     return user;
   },

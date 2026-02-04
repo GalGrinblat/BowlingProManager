@@ -17,8 +17,8 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState(null);
-  const [playerData, setPlayerData] = useState(null);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [playerData, setPlayerData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {

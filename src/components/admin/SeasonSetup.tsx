@@ -6,11 +6,11 @@ import { createEmptyMatch } from '../../utils/matchUtils';
 import type { SeasonSetupProps } from '../../types/index.ts';
 
 export const SeasonSetup: React.FC<SeasonSetupProps> = ({ seasonId, onBack }) => {
-  const [season, setSeason] = useState(null);
-  const [league, setLeague] = useState(null);
-  const [teams, setTeams] = useState([]);
-  const [players, setPlayers] = useState([]);
-  const [editingTeamId, setEditingTeamId] = useState(null);
+  const [season, setSeason] = useState<any>(null);
+  const [league, setLeague] = useState<any>(null);
+  const [teams, setTeams] = useState<any[]>([]);
+  const [players, setPlayers] = useState<any[]>([]);
+  const [editingTeamId, setEditingTeamId] = useState<string | null>(null);
 
   useEffect(() => {
     loadSeasonData();
@@ -20,8 +20,10 @@ export const SeasonSetup: React.FC<SeasonSetupProps> = ({ seasonId, onBack }) =>
     const seasonData = seasonsApi.getById(seasonId);
     setSeason(seasonData);
     
-    const leagueData = leaguesApi.getById(seasonData.leagueId);
-    setLeague(leagueData);
+    if (seasonData) {
+      const leagueData = leaguesApi.getById(seasonData.leagueId);
+      setLeague(leagueData);
+    }
     
     const teamsData = teamsApi.getBySeason(seasonId);
     setTeams(teamsData);
@@ -56,7 +58,7 @@ export const SeasonSetup: React.FC<SeasonSetupProps> = ({ seasonId, onBack }) =>
       }
       
       // Check that all players exist
-      team.playerIds.forEach(playerId => {
+      team.playerIds.forEach((playerId: any) => {
         const player = players.find(p => p.id === playerId);
         if (!player) {
           validationErrors.push(`Team "${team.name || index + 1}" has an invalid player.`);
@@ -102,7 +104,7 @@ export const SeasonSetup: React.FC<SeasonSetupProps> = ({ seasonId, onBack }) =>
           const team2 = teams.find(t => t.id === match.team2Id);
           
           if (team1 && team2) {
-            const team1Players = team1.playerIds.map(id => {
+            const team1Players = team1.playerIds.map((id: any) => {
               const player = players.find(p => p.id === id);
               const playerAvg = player?.startingAverage || 0;
               let handicap = 0;
@@ -121,7 +123,7 @@ export const SeasonSetup: React.FC<SeasonSetupProps> = ({ seasonId, onBack }) =>
               };
             });
 
-            const team2Players = team2.playerIds.map(id => {
+            const team2Players = team2.playerIds.map((id: any) => {
               const player = players.find(p => p.id === id);
               const playerAvg = player?.startingAverage || 0;
               let handicap = 0;
@@ -176,6 +178,9 @@ export const SeasonSetup: React.FC<SeasonSetupProps> = ({ seasonId, onBack }) =>
               matchDay: daySchedule.matchDay,
               team1Id: team1.id,
               team2Id: team2.id,
+              matchScores: [],
+              team1TotalPoints: 0,
+              team2TotalPoints: 0,
               lineupStrategy,
               lineupRule,
               bonusRules: season.bonusRules,
@@ -265,7 +270,7 @@ export const SeasonSetup: React.FC<SeasonSetupProps> = ({ seasonId, onBack }) =>
             allTeams={teams}
             isEditing={editingTeamId === team.id}
             onEdit={() => setEditingTeamId(team.id)}
-            onSave={(updatedTeam) => {
+            onSave={(updatedTeam: any) => {
               teamsApi.update(team.id, updatedTeam);
               setEditingTeamId(null);
               loadSeasonData();
@@ -279,7 +284,7 @@ export const SeasonSetup: React.FC<SeasonSetupProps> = ({ seasonId, onBack }) =>
 };
 
 // Team Setup Card Component
-const TeamSetupCard = ({ team, season, players, allTeams, isEditing, onEdit, onSave, onCancel }) => {
+const TeamSetupCard = ({ team, season, players, allTeams, isEditing, onEdit, onSave, onCancel }: any) => {
   const [teamName, setTeamName] = useState(team.name);
   const [selectedPlayers, setSelectedPlayers] = useState(team.playerIds);
 
@@ -288,15 +293,15 @@ const TeamSetupCard = ({ team, season, players, allTeams, isEditing, onEdit, onS
   // Get players already assigned to other teams
   const assignedPlayerIds = new Set(
     allTeams
-      .filter(t => t.id !== team.id)
-      .flatMap(t => t.playerIds)
+      .filter((t: any) => t.id !== team.id)
+      .flatMap((t: any) => t.playerIds)
   );
 
-  const availablePlayers = players.filter(p => !assignedPlayerIds.has(p.id));
+  const availablePlayers = players.filter((p: any) => !assignedPlayerIds.has(p.id));
 
-  const handlePlayerToggle = (playerId) => {
+  const handlePlayerToggle = (playerId: any) => {
     if (selectedPlayers.includes(playerId)) {
-      setSelectedPlayers(selectedPlayers.filter(id => id !== playerId));
+      setSelectedPlayers(selectedPlayers.filter((id: any) => id !== playerId));
     } else if (selectedPlayers.length < season.playersPerTeam) {
       setSelectedPlayers([...selectedPlayers, playerId]);
     }
@@ -309,7 +314,7 @@ const TeamSetupCard = ({ team, season, players, allTeams, isEditing, onEdit, onS
     }
     
     // Check for duplicate team names (case-insensitive)
-    const duplicateName = allTeams.find(t => 
+    const duplicateName = allTeams.find((t: any) => 
       t.id !== team.id && 
       t.name.toLowerCase() === teamName.trim().toLowerCase()
     );
@@ -349,8 +354,8 @@ const TeamSetupCard = ({ team, season, players, allTeams, isEditing, onEdit, onS
           {team.playerIds.length === 0 ? (
             <p className="text-gray-500">No players assigned</p>
           ) : (
-            team.playerIds.map((playerId, idx) => {
-              const player = players.find(p => p.id === playerId);
+            team.playerIds.map((playerId: any, idx: any) => {
+              const player = players.find((p: any) => p.id === playerId);
               return (
                 <div key={playerId} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                   <span className="font-semibold text-gray-600">#{idx + 1}</span>
@@ -391,7 +396,7 @@ const TeamSetupCard = ({ team, season, players, allTeams, isEditing, onEdit, onS
             {availablePlayers.length === 0 ? (
               <p className="p-4 text-gray-500 text-center">No available players</p>
             ) : (
-              availablePlayers.map(player => {
+              availablePlayers.map((player: any) => {
                 const isSelected = selectedPlayers.includes(player.id);
                 const canSelect = isSelected || selectedPlayers.length < season.playersPerTeam;
                 

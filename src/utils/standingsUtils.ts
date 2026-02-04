@@ -40,8 +40,8 @@ export const calculateTeamStandings = (teams: Team[], games: Game[]): TeamStandi
     team2Standing.gamesPlayed++;
 
     // Calculate total points from matches
-    const team1MatchPoints = game.matches.reduce((sum, m) => sum + (m.team1?.score || 0), 0);
-    const team2MatchPoints = game.matches.reduce((sum, m) => sum + (m.team2?.score || 0), 0);
+    const team1MatchPoints = game.matches?.reduce((sum: number, m: any) => sum + (m.team1?.score || 0), 0) || 0;
+    const team2MatchPoints = game.matches?.reduce((sum: number, m: any) => sum + (m.team2?.score || 0), 0) || 0;
     
     // Add grand total points
     const team1TotalPoints = team1MatchPoints + (game.grandTotalPoints?.team1 || 0);
@@ -51,7 +51,7 @@ export const calculateTeamStandings = (teams: Team[], games: Game[]): TeamStandi
     team2Standing.points += team2TotalPoints;
 
     // Calculate pins
-    game.matches.forEach(match => {
+    game.matches?.forEach((match: any) => {
       if (match.team1 && match.team2) {
         team1Standing.totalPins += match.team1.totalPins || 0;
         team2Standing.totalPins += match.team2.totalPins || 0;
@@ -93,11 +93,11 @@ export const calculateTeamStandings = (teams: Team[], games: Game[]): TeamStandi
  * @returns {Array} Player stats sorted by average
  */
 export const calculatePlayerSeasonStats = (teams: Team[], games: Game[]): PlayerStats[] => {
-  const playerStats = [];
+  const playerStats: any[] = [];
   
   // Initialize player stats from teams
   teams.forEach(team => {
-    team.playerIds.forEach((playerId, index) => {
+    team.playerIds.forEach((playerId: string) => {
       playerStats.push({
         playerId,
         teamId: team.id,
@@ -119,7 +119,7 @@ export const calculatePlayerSeasonStats = (teams: Team[], games: Game[]): Player
   completedGames.forEach(game => {
     // Process team1 players
     if (game.team1 && game.team1.players) {
-      game.team1.players.forEach((player, idx) => {
+      game.team1.players.forEach((player: any, idx: number) => {
         const playerStat = playerStats.find(ps => 
           ps.teamId === game.team1Id && ps.playerName === player.name
         );
@@ -144,7 +144,7 @@ export const calculatePlayerSeasonStats = (teams: Team[], games: Game[]): Player
 
     // Process team2 players
     if (game.team2 && game.team2.players) {
-      game.team2.players.forEach((player, idx) => {
+      game.team2.players.forEach((player: any, idx: number) => {
         const playerStat = playerStats.find(ps => 
           ps.teamId === game.team2Id && ps.playerName === player.name
         );
@@ -167,10 +167,10 @@ export const calculatePlayerSeasonStats = (teams: Team[], games: Game[]): Player
     }
 
     // Calculate stats from matches
-    game.matches.forEach((match, matchIdx) => {
+    game.matches?.forEach((match: any) => {
       // Team 1 players
       if (game.team1 && game.team1.players) {
-        game.team1.players.forEach((player, playerIdx) => {
+        game.team1.players.forEach((player: any, playerIdx: number) => {
           const playerStat = playerStats.find(ps => 
             ps.teamId === game.team1Id && ps.playerName === player.name
           );
@@ -197,7 +197,7 @@ export const calculatePlayerSeasonStats = (teams: Team[], games: Game[]): Player
 
       // Team 2 players
       if (game.team2 && game.team2.players) {
-        game.team2.players.forEach((player, playerIdx) => {
+        game.team2.players.forEach((player: any, playerIdx: number) => {
           const playerStat = playerStats.find(ps => 
             ps.teamId === game.team2Id && ps.playerName === player.name
           );
@@ -225,16 +225,16 @@ export const calculatePlayerSeasonStats = (teams: Team[], games: Game[]): Player
 
     // Calculate high series (3 games) per game
     if (game.team1 && game.team1.players) {
-      game.team1.players.forEach((player, playerIdx) => {
-        const playerStat = playerStats.find(ps => 
+      game.team1.players.forEach((player: any, playerIdx: number) => {
+        const playerStat = playerStats.find((ps: any) => 
           ps.teamId === game.team1Id && ps.playerName === player.name
         );
         
         if (playerStat) {
-          const seriesTotal = game.matches.reduce((sum, match) => {
+          const seriesTotal = game.matches?.reduce((sum: number, match: any) => {
             const pins = match.team1?.players[playerIdx]?.pins;
             return sum + (parseInt(pins) || 0);
-          }, 0);
+          }, 0) || 0;
           
           if (seriesTotal > playerStat.highSeries) {
             playerStat.highSeries = seriesTotal;
@@ -244,16 +244,16 @@ export const calculatePlayerSeasonStats = (teams: Team[], games: Game[]): Player
     }
 
     if (game.team2 && game.team2.players) {
-      game.team2.players.forEach((player, playerIdx) => {
-        const playerStat = playerStats.find(ps => 
+      game.team2.players.forEach((player: any, playerIdx: number) => {
+        const playerStat = playerStats.find((ps: any) => 
           ps.teamId === game.team2Id && ps.playerName === player.name
         );
         
         if (playerStat) {
-          const seriesTotal = game.matches.reduce((sum, match) => {
+          const seriesTotal = game.matches?.reduce((sum: number, match: any) => {
             const pins = match.team2?.players[playerIdx]?.pins;
             return sum + (parseInt(pins) || 0);
-          }, 0);
+          }, 0) || 0;
           
           if (seriesTotal > playerStat.highSeries) {
             playerStat.highSeries = seriesTotal;
@@ -281,16 +281,17 @@ export const calculatePlayerSeasonStats = (teams: Team[], games: Game[]): Player
  * Returns a map of playerName -> { average, gamesPlayed }
  * Uses completed games only to determine current performance
  */
-export const calculateCurrentPlayerAverages = (teams: Team[], games: Game[]): CurrentPlayerAverages => {
+export const calculateCurrentPlayerAverages = (_teams: Team[], games: Game[]): CurrentPlayerAverages => {
+  // Note: _teams parameter kept for API consistency but not used internally
   const playerAverages: CurrentPlayerAverages = {};
   
   // Process completed games only
   const completedGames = games.filter(g => g.status === 'completed');
   
-  completedGames.forEach(game => {
+  completedGames.forEach((game: any) => {
     // Process team1 players
     if (game.team1 && game.team1.players) {
-      game.team1.players.forEach((player, playerIdx) => {
+      game.team1.players.forEach((player: any, playerIdx: number) => {
         if (!player.name) return;
         
         if (!playerAverages[player.name]) {
@@ -302,12 +303,15 @@ export const calculateCurrentPlayerAverages = (teams: Team[], games: Game[]): Cu
         }
         
         // Count pins from all matches in this game
-        game.matches.forEach(match => {
+        game.matches?.forEach((match: any) => {
           if (match.team1 && match.team1.players[playerIdx]) {
             const pins = parseInt(match.team1.players[playerIdx].pins) || 0;
             if (pins > 0 || match.team1.players[playerIdx].pins !== '') {
-              playerAverages[player.name].totalPins += pins;
-              playerAverages[player.name].gamesPlayed++;
+              const playerAvg = playerAverages[player.name];
+              if (playerAvg) {
+                playerAvg.totalPins += pins;
+                playerAvg.gamesPlayed++;
+              }
             }
           }
         });
@@ -316,7 +320,7 @@ export const calculateCurrentPlayerAverages = (teams: Team[], games: Game[]): Cu
     
     // Process team2 players
     if (game.team2 && game.team2.players) {
-      game.team2.players.forEach((player, playerIdx) => {
+      game.team2.players.forEach((player: any, playerIdx: number) => {
         if (!player.name) return;
         
         if (!playerAverages[player.name]) {
@@ -328,12 +332,15 @@ export const calculateCurrentPlayerAverages = (teams: Team[], games: Game[]): Cu
         }
         
         // Count pins from all matches in this game
-        game.matches.forEach(match => {
+        game.matches?.forEach((match: any) => {
           if (match.team2 && match.team2.players[playerIdx]) {
             const pins = parseInt(match.team2.players[playerIdx].pins) || 0;
             if (pins > 0 || match.team2.players[playerIdx].pins !== '') {
-              playerAverages[player.name].totalPins += pins;
-              playerAverages[player.name].gamesPlayed++;
+              const playerAvg = playerAverages[player.name];
+              if (playerAvg) {
+                playerAvg.totalPins += pins;
+                playerAvg.gamesPlayed++;
+              }
             }
           }
         });
@@ -344,7 +351,7 @@ export const calculateCurrentPlayerAverages = (teams: Team[], games: Game[]): Cu
   // Calculate averages
   Object.keys(playerAverages).forEach(playerName => {
     const data = playerAverages[playerName];
-    if (data.gamesPlayed > 0) {
+    if (data && data.gamesPlayed > 0) {
       data.average = Math.round(data.totalPins / data.gamesPlayed);
     }
   });

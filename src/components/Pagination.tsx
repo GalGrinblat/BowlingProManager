@@ -108,7 +108,7 @@ export const Pagination: React.FC<PaginationProps> = ({ currentPage, totalItems,
               return (
                 <button
                   key={page}
-                  onClick={() => onPageChange(page)}
+                  onClick={() => onPageChange(typeof page === 'number' ? page : parseInt(page))}
                   className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
                     currentPage === page
                       ? 'z-10 bg-blue-600 text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600'
@@ -146,7 +146,7 @@ export const Pagination: React.FC<PaginationProps> = ({ currentPage, totalItems,
 export const usePagination = (itemsPerPage = 10) => {
   const [currentPage, setCurrentPage] = React.useState(1);
 
-  const paginate = (items) => {
+  const paginate = (items: any[]) => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     return items.slice(startIndex, endIndex);

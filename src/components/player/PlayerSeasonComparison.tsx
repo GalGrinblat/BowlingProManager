@@ -9,12 +9,11 @@ import { calculatePlayerSeasonStats } from '../../utils/standingsUtils';
 import type { PlayerSeasonComparisonProps } from '../../types/index.ts';
 
 export const PlayerSeasonComparison: React.FC<PlayerSeasonComparisonProps> = ({ playerId, onBack }) => {
-  const [player, setPlayer] = useState(null);
-  const [allSeasons, setAllSeasons] = useState([]);
-  const [selectedSeasons, setSelectedSeasons] = useState([]);
-  const [comparisonData, setComparisonData] = useState([]);
-  const [selectedSeasonForChart, setSelectedSeasonForChart] = useState(null);
-  const [gameByGameData, setGameByGameData] = useState([]);
+  const [player, setPlayer] = useState<any>(null);
+  const [allSeasons, setAllSeasons] = useState<any[]>([]);
+  const [selectedSeasons, setSelectedSeasons] = useState<string[]>([]);
+  const [selectedSeasonForChart, setSelectedSeasonForChart] = useState<string | null>(null);
+  const [gameByGameData, setGameByGameData] = useState<any[]>([]);
 
   useEffect(() => {
     loadPlayerData();
@@ -26,19 +25,19 @@ export const PlayerSeasonComparison: React.FC<PlayerSeasonComparisonProps> = ({ 
 
     // Find all teams this player is on
     const allTeams = teamsApi.getAll();
-    const playerTeams = allTeams.filter(team => team.playerIds.includes(playerId));
+    const playerTeams = allTeams.filter((team: any) => team.playerIds.includes(playerId));
 
     // Get all seasons the player participated in
-    const seasonIds = [...new Set(playerTeams.map(t => t.seasonId))];
+    const seasonIds = [...new Set(playerTeams.map((t: any) => t.seasonId))];
     const seasons = seasonIds
-      .map(id => seasonsApi.getById(id))
-      .filter(Boolean)
-      .map(season => {
+      .map((id: string) => seasonsApi.getById(id))
+      .filter((s): s is any => s !== null && s !== undefined)
+      .map((season: any) => {
         const league = leaguesApi.getById(season.leagueId);
         const games = gamesApi.getBySeason(season.id);
         const teams = teamsApi.getBySeason(season.id);
         const playerStats = calculatePlayerSeasonStats(teams, games);
-        const stats = playerStats.find(ps => ps.playerName === playerData.name);
+        const stats = playerStats.find((ps: any) => ps.playerName === playerData?.name);
         
         return {
           ...season,
@@ -52,20 +51,23 @@ export const PlayerSeasonComparison: React.FC<PlayerSeasonComparisonProps> = ({ 
           }
         };
       })
-      .sort((a, b) => new Date(b.startDate) - new Date(a.startDate)); // Most recent first
+      .filter((s): s is any => s !== null)
+      .sort((a, b) => new Date(b.startDate || '').getTime() - new Date(a.startDate || '').getTime()); // Most recent first
 
     setAllSeasons(seasons);
 
     // Auto-select most recent season for comparison
     if (seasons.length > 0 && selectedSeasons.length === 0) {
-      setSelectedSeasons([seasons[0].id]);
-      setSelectedSeasonForChart(seasons[0].id);
-      loadGameByGameData(seasons[0].id);
+      if (seasons.length > 0 && seasons[0]?.id) {
+        setSelectedSeasons([seasons[0].id]);
+        setSelectedSeasonForChart(seasons[0].id);
+        loadGameByGameData(seasons[0].id);
+      }
     }
   };
 
-  const loadGameByGameData = (seasonId) => {
-    const season = allSeasons.find(s => s.id === seasonId) || seasonsApi.getById(seasonId);
+  const loadGameByGameData = (seasonId: string) => {
+    // Load season data for game-by-game analysis
     const games = gamesApi.getBySeason(seasonId);
     const teams = teamsApi.getBySeason(seasonId);
     const playerTeam = teams.find(t => t.playerIds.includes(playerId));
@@ -78,18 +80,18 @@ export const PlayerSeasonComparison: React.FC<PlayerSeasonComparisonProps> = ({ 
       return a.matchDay - b.matchDay;
     });
 
-    const gameData = [];
+    const gameData: any[] = [];
     let runningTotal = 0;
     let gamesCount = 0;
 
-    completedGames.forEach((game, idx) => {
+    completedGames.forEach((game: any) => {
       const isTeam1 = game.team1Id === playerTeam.id;
       const playerData = isTeam1 ? game.team1.players[playerIndex] : game.team2.players[playerIndex];
 
       if (!playerData) return;
 
       // Get scores from all matches in this game
-      game.matches?.forEach((match, matchIdx) => {
+      game.matches?.forEach((match: any, matchIdx: number) => {
         const matchPlayer = isTeam1 ? match.team1.players[playerIndex] : match.team2.players[playerIndex];
         if (matchPlayer && matchPlayer.pins !== '') {
           const score = playerData.absent ? parseInt(playerData.average) - 10 : parseInt(matchPlayer.pins);
@@ -112,7 +114,7 @@ export const PlayerSeasonComparison: React.FC<PlayerSeasonComparisonProps> = ({ 
     setGameByGameData(gameData);
   };
 
-  const toggleSeason = (seasonId) => {
+  const toggleSeason = (seasonId: string) => {
     if (selectedSeasons.includes(seasonId)) {
       setSelectedSeasons(selectedSeasons.filter(id => id !== seasonId));
     } else {
@@ -120,7 +122,7 @@ export const PlayerSeasonComparison: React.FC<PlayerSeasonComparisonProps> = ({ 
     }
   };
 
-  const handleSeasonChartChange = (seasonId) => {
+  const handleSeasonChartChange = (seasonId: string) => {
     setSelectedSeasonForChart(seasonId);
     loadGameByGameData(seasonId);
   };

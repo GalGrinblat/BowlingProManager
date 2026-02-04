@@ -52,7 +52,7 @@ export const generateRoundRobinSchedule = (
   }
 
   const schedule = [];
-  const teams = [...teamIds];
+  const teams: (string | null)[] = [...teamIds];
   
   // If odd number of teams, add a "bye" placeholder
   if (teams.length % 2 !== 0) {
@@ -86,26 +86,32 @@ export const generateRoundRobinSchedule = (
       // Add this match day to schedule
       if (dayMatches.length > 0) {
         // Calculate date for this match day if start date and day of week provided
-        let matchDate = null;
+        let matchDate: string | null = null;
         if (startDate && dayOfWeek) {
-          matchDate = getNextDayOfWeek(new Date(startDate), dayOfWeek, matchDayCounter - 1);
+          const dateObj = getNextDayOfWeek(new Date(startDate), dayOfWeek, matchDayCounter - 1);
+          matchDate = dateObj ? dateObj.toISOString() : null;
         }
         
         schedule.push({
           round: round + 1,
           matchDay: matchDayCounter++,
-          date: matchDate ? matchDate.toISOString() : null,
-          matches: dayMatches,
+          date: matchDate,
+          matches: dayMatches.filter((m): m is { team1Id: string; team2Id: string } => 
+            m.team1Id !== undefined && m.team2Id !== undefined
+          ),
           postponed: false
         });
       }
       
       // Rotate teams (except first team stays fixed)
-      teams.splice(1, 0, teams.pop());
+      const lastTeam = teams.pop();
+      if (lastTeam !== undefined) {
+        teams.splice(1, 0, lastTeam);
+      }
     }
   }
 
-  return schedule;
+  return schedule as ScheduleMatchDay[];
 };
 
 /**
@@ -157,10 +163,16 @@ export const validateSchedule = (schedule: ScheduleMatchDay[], teamIds: string[]
   schedule.forEach(week => {
     week.matches.forEach(match => {
       if (!teamSet.has(match.team1Id) || !teamSet.has(match.team2Id)) {
-        return { valid: false, error: 'Invalid team ID in schedule' };
+        return;
       }
-      matchCounts[match.team1Id]++;
-      matchCounts[match.team2Id]++;
+      const team1Count = matchCounts[match.team1Id];
+      const team2Count = matchCounts[match.team2Id];
+      if (team1Count !== undefined) {
+        matchCounts[match.team1Id] = team1Count + 1;
+      }
+      if (team2Count !== undefined) {
+        matchCounts[match.team2Id] = team2Count + 1;
+      }
     });
   });
   
@@ -202,7 +214,7 @@ export const getTeamSchedule = (schedule: ScheduleMatchDay[], teamId: string): A
       teamGames.push({
         round: daySchedule.round,
         matchDay: daySchedule.matchDay,
-        date: daySchedule.date,
+        date: daySchedule.date || null,
         opponentId: teamMatch.team1Id === teamId ? teamMatch.team2Id : teamMatch.team1Id,
         isHome: teamMatch.team1Id === teamId
       });
@@ -233,6 +245,7 @@ export const postponeMatchDay = (
   if (matchDayIndex === -1) return schedule;
   
   const matchDayEntry = updatedSchedule[matchDayIndex];
+  if (!matchDayEntry) return schedule;
   
   // Mark as postponed
   matchDayEntry.postponed = true;
@@ -247,10 +260,11 @@ export const postponeMatchDay = (
   
   // Shift all subsequent match days by the same delay
   for (let i = matchDayIndex + 1; i < updatedSchedule.length; i++) {
-    if (updatedSchedule[i].date && dayOfWeek) {
-      const currentDate = new Date(updatedSchedule[i].date);
+    const entry = updatedSchedule[i];
+    if (entry && entry.date && dayOfWeek) {
+      const currentDate = new Date(entry.date);
       const newDate = getNextDayOfWeek(currentDate, dayOfWeek, weeksToDelay);
-      updatedSchedule[i].date = newDate.toISOString();
+      entry.date = newDate.toISOString();
     }
   }
   

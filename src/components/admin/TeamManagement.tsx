@@ -4,12 +4,12 @@ import { teamsApi, playersApi, seasonsApi } from '../../services/api';
 import type { TeamManagementProps } from '../../types/index.ts';
 
 export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack }) => {
-  const [season, setSeason] = useState(null);
-  const [teams, setTeams] = useState([]);
-  const [allPlayers, setAllPlayers] = useState([]);
-  const [selectedTeam, setSelectedTeam] = useState(null);
+  const [season, setSeason] = useState<any>(null);
+  const [teams, setTeams] = useState<any[]>([]);
+  const [allPlayers, setAllPlayers] = useState<any[]>([]);
+  const [selectedTeam, setSelectedTeam] = useState<any>(null);
   const [editingRoster, setEditingRoster] = useState(false);
-  const [rosterChanges, setRosterChanges] = useState([]);
+  const [rosterChanges, setRosterChanges] = useState<any[]>([]);
 
   useEffect(() => {
     loadData();
@@ -26,12 +26,12 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
     setAllPlayers(playersData.filter(p => p.active));
   };
 
-  const handleEditRoster = (team) => {
+  const handleEditRoster = (team: any) => {
     setSelectedTeam(team);
     setEditingRoster(true);
   };
 
-  const handleSubstitutePlayer = (team, oldPlayerIndex, newPlayerId) => {
+  const handleSubstitutePlayer = (team: any, oldPlayerIndex: any, newPlayerId: any) => {
     const oldPlayerId = team.playerIds[oldPlayerIndex];
     const oldPlayer = allPlayers.find(p => p.id === oldPlayerId);
     const newPlayer = allPlayers.find(p => p.id === newPlayerId);
@@ -72,11 +72,11 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
     setSelectedTeam(null);
   };
 
-  const getPlayerInfo = (playerId) => {
+  const getPlayerInfo = (playerId: any) => {
     return allPlayers.find(p => p.id === playerId);
   };
 
-  const getAvailablePlayers = (team) => {
+  const getAvailablePlayers = (team: any) => {
     // Filter out players already on this team
     return allPlayers.filter(p => !team.playerIds.includes(p.id));
   };
@@ -114,7 +114,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
       {/* Teams List */}
       <div className="grid md:grid-cols-2 gap-6">
         {teams.map(team => {
-          const teamPlayers = team.playerIds.map(id => getPlayerInfo(id)).filter(Boolean);
+          const teamPlayers = team.playerIds.map((id: any) => getPlayerInfo(id)).filter(Boolean);
           const recentChanges = (team.rosterChanges || []).slice(0, 3);
 
           return (
@@ -131,7 +131,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
 
               {/* Current Roster */}
               <div className="space-y-2 mb-4">
-                {teamPlayers.map((player, idx) => (
+                {teamPlayers.map((player: any, idx: any) => (
                   <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold">
@@ -151,7 +151,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
                 <div className="border-t pt-3">
                   <h3 className="text-sm font-semibold text-gray-600 mb-2">Recent Changes</h3>
                   <div className="space-y-1">
-                    {recentChanges.map((change, idx) => (
+                    {recentChanges.map((change: any, idx: any) => (
                       <div key={idx} className="text-xs text-gray-600 bg-yellow-50 p-2 rounded">
                         <span className="font-semibold">{change.oldPlayer.name}</span>
                         {' → '}
@@ -179,7 +179,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
               </h2>
               
               <div className="space-y-4">
-                {selectedTeam.playerIds.map((playerId, idx) => {
+                {selectedTeam.playerIds.map((playerId: any, idx: any) => {
                   const currentPlayer = getPlayerInfo(playerId);
                   const availablePlayers = getAvailablePlayers(selectedTeam);
 
@@ -245,8 +245,8 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
           <h2 className="text-xl font-bold text-gray-800 mb-4">Season Roster Change History</h2>
           <div className="space-y-2">
             {teams
-              .flatMap(t => (t.rosterChanges || []).map(c => ({ ...c, teamName: t.name })))
-              .sort((a, b) => new Date(b.date) - new Date(a.date))
+              .flatMap((t: any) => (t.rosterChanges || []).map((c: any) => ({ ...c, teamName: t.name })))
+              .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
               .map((change, idx) => (
                 <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center gap-4">

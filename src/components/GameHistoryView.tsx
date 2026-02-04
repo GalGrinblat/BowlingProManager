@@ -4,12 +4,12 @@ export const GameHistoryView: React.FC<GameHistoryViewProps> = ({ game, onBack }
   if (!game) return <div>Loading...</div>;
 
   const totals = {
-    team1Total: game.matches.reduce((sum, m) => sum + (m.team1?.score || 0), 0) + (game.grandTotalPoints?.team1 || 0),
-    team2Total: game.matches.reduce((sum, m) => sum + (m.team2?.score || 0), 0) + (game.grandTotalPoints?.team2 || 0),
-    team1TotalPins: game.matches.reduce((sum, m) => sum + (m.team1?.totalPins || 0), 0),
-    team2TotalPins: game.matches.reduce((sum, m) => sum + (m.team2?.totalPins || 0), 0),
-    team1TotalWithHandicap: game.matches.reduce((sum, m) => sum + (m.team1?.totalWithHandicap || 0), 0),
-    team2TotalWithHandicap: game.matches.reduce((sum, m) => sum + (m.team2?.totalWithHandicap || 0), 0)
+    team1Total: game.matches.reduce((sum: number, m: any) => sum + (m.team1?.score || 0), 0) + (game.grandTotalPoints?.team1 || 0),
+    team2Total: game.matches.reduce((sum: number, m: any) => sum + (m.team2?.score || 0), 0) + (game.grandTotalPoints?.team2 || 0),
+    team1TotalPins: game.matches.reduce((sum: number, m: any) => sum + (m.team1?.totalPins || 0), 0),
+    team2TotalPins: game.matches.reduce((sum: number, m: any) => sum + (m.team2?.totalPins || 0), 0),
+    team1TotalWithHandicap: game.matches.reduce((sum: number, m: any) => sum + (m.team1?.totalWithHandicap || 0), 0),
+    team2TotalWithHandicap: game.matches.reduce((sum: number, m: any) => sum + (m.team2?.totalWithHandicap || 0), 0)
   };
 
   const winner = totals.team1Total > totals.team2Total ? 'team1' : 
@@ -69,7 +69,7 @@ export const GameHistoryView: React.FC<GameHistoryViewProps> = ({ game, onBack }
       </div>
 
       {/* Match by Match Breakdown */}
-      {game.matches.map((match, matchIdx) => (
+      {game.matches.map((match: any, matchIdx: number) => (
         <div key={matchIdx} className="bg-white rounded-xl shadow-lg p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-2xl font-bold text-gray-800">Match {matchIdx + 1}</h2>
@@ -82,7 +82,7 @@ export const GameHistoryView: React.FC<GameHistoryViewProps> = ({ game, onBack }
 
           {/* Player Scores */}
           <div className="space-y-3">
-            {game.team1.players.map((player, playerIdx) => {
+            {game.team1.players.map((player: any, playerIdx: number) => {
               const team1Player = match.team1?.players[playerIdx];
               const team2Player = match.team2?.players[playerIdx];
               const team1Pins = team1Player?.pins !== '' ? parseInt(team1Player?.pins || 0) : 0;

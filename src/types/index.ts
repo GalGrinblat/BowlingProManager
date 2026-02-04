@@ -103,6 +103,23 @@ export interface Game {
   status: 'pending' | 'in-progress' | 'completed';
   completedAt?: string;
   createdAt: string;
+  // Extended runtime properties (used by components)
+  matches?: any[];
+  team1?: any;
+  team2?: any;
+  matchesPerGame?: number;
+  useHandicap?: boolean;
+  lineupStrategy?: string;
+  lineupRule?: string;
+  bonusRules?: any;
+  gameWinPoints?: number;
+  matchWinPoints?: number;
+  grandTotalPoints?: any;
+  grandTotalScore?: any;
+  scheduledDate?: string;
+  postponed?: boolean;
+  originalDate?: string;
+  updatedAt?: string;
 }
 
 export interface Organization {
@@ -145,6 +162,8 @@ export interface PlayerStats {
   highGame: number;
   highSeries: number;
   seriesCount: number;
+  teamId?: string;
+  teamName?: string;
 }
 
 export interface CurrentPlayerAverage {
@@ -170,6 +189,9 @@ export interface ScheduleMatchDay {
   round: number;
   matchDay: number;
   matches: Match[];
+  date?: string;
+  postponed?: boolean;
+  originalDate?: string;
 }
 
 // ============================================================================
@@ -226,10 +248,14 @@ export interface User {
 }
 
 export interface AuthContextType {
-  user: User | null;
-  login: (role: 'admin' | 'player', playerId?: string) => void;
+  currentUser: any;
+  playerData?: any;
+  isLoading?: boolean;
+  user?: User | null;
+  login: (userId: string, role: 'admin' | 'player') => any;
   logout: () => void;
   isAdmin: () => boolean;
+  isPlayer: () => boolean;
 }
 
 // Language/Translation
@@ -271,13 +297,14 @@ export interface LeagueDetailProps {
 export interface SeasonSetupProps {
   seasonId: string;
   onBack: () => void;
-  onComplete: () => void;
 }
 
 export interface SeasonDashboardProps {
   seasonId: string;
   onBack: () => void;
   onSelectGame: (gameId: string) => void;
+  onPlayGame: (gameId: string) => void;
+  onViewGame: (gameId: string, game?: any) => void;
   onManageTeams: () => void;
 }
 
@@ -300,6 +327,7 @@ export interface PlayerDashboardProps {
   playerId: string;
   onViewGame: (gameId: string) => void;
   onViewSeasonComparison: () => void;
+  onNavigate: (view: string, params?: Record<string, any>) => void;
 }
 
 export interface PlayerSeasonComparisonProps {
@@ -309,27 +337,31 @@ export interface PlayerSeasonComparisonProps {
 
 // Game Components
 export interface MatchViewProps {
-  game: Game;
-  teams: [Team, Team];
-  onSave: (game: Game) => void;
-  onComplete: (game: Game) => void;
-  readonly?: boolean;
+  matchNumber: number;
+  game: any;
+  onUpdateScore: (matchIndex: number, team: string, playerIndex: number, value: string) => void;
+  onToggleAbsent?: (team: string, playerIndex: number) => void;
+  onNavigate: (direction: string) => void;
+  onCancel: () => void;
+  isReadOnly?: boolean;
 }
 
 export interface SummaryViewProps {
-  game: Game;
-  teams: [Team, Team];
+  game: any;
+  totals: any;
+  playerStats: any;
   onBack: () => void;
-  onEdit?: () => void;
+  onFinish: () => void;
 }
 
 export interface GameHistoryViewProps {
-  playerId: string;
+  game: any;
   onBack: () => void;
 }
 
 // Shared Components
 export interface HeaderProps {
+  currentUser: User | null;
   user: User | null;
   onLogout: () => void;
 }
@@ -342,7 +374,7 @@ export interface PaginationProps {
 }
 
 export interface LoginViewProps {
-  onLogin: (role: 'admin' | 'player', playerId?: string) => void;
+  onLogin: (userId: string, role: 'admin' | 'player') => void;
 }
 
 // ============================================================================

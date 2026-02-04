@@ -11,9 +11,7 @@ import type {
   Team,
   Game,
   ValidationResult,
-  BonusRule,
-  PlayerScore,
-  MatchScore
+  BonusRule
 } from '../types/index.ts';
 
 // ===== ORGANIZATION MODEL =====
@@ -82,9 +80,9 @@ export const createLeague = ({
     { type: 'player', condition: 'vs_average', threshold: 50, points: 1 },
     { type: 'player', condition: 'vs_average', threshold: 70, points: 2 }
   ],
-  gameWinPoints: parseFloat(gameWinPoints) || 1,
-  matchWinPoints: parseFloat(matchWinPoints) || 1,
-  grandTotalPoints: parseFloat(grandTotalPoints) || 2,
+  gameWinPoints: parseFloat(String(gameWinPoints)) || 1,
+  matchWinPoints: parseFloat(String(matchWinPoints)) || 1,
+  grandTotalPoints: parseFloat(String(grandTotalPoints)) || 2,
   active
 });
 
@@ -124,6 +122,7 @@ export const createSeason = ({
 }): Omit<Season, 'id' | 'createdAt'> => ({
   leagueId,
   name,
+  numberOfTeams: parseInt(String(numberOfTeams)) || 0,
   playersPerTeam: parseInt(String(playersPerTeam)) || 4,
   numberOfRounds: parseInt(String(numberOfRounds)) || 1,
   handicapBasis: parseInt(String(handicapBasis)) || 160,

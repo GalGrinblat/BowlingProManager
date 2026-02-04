@@ -11,8 +11,8 @@ interface PreMatchSetupProps {
 export const PreMatchSetup: React.FC<PreMatchSetupProps> = ({ game, onContinue, onBack }) => {
   const { t } = useTranslation();
   const gameData = game as any; // Cast to bypass strict typing for runtime data structure
-  const [team1Players, setTeam1Players] = useState(gameData.team1.players);
-  const [team2Players, setTeam2Players] = useState(gameData.team2.players);
+  const [team1Players, setTeam1Players] = useState<any[]>(gameData.team1.players);
+  const [team2Players, setTeam2Players] = useState<any[]>(gameData.team2.players);
 
   const lineupStrategy = gameData.lineupStrategy || 'flexible';
   const lineupRule = gameData.lineupRule || 'standard';

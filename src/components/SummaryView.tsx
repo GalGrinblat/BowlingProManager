@@ -29,7 +29,7 @@ export const SummaryView: React.FC<SummaryViewProps> = ({ game, totals, playerSt
       <div className="bg-gray-800 rounded-lg p-4 mb-6">
         <div className="bowling-title text-white text-xl mb-4">MATCH BREAKDOWN</div>
         <div className="space-y-2">
-          {game.matches.map((match, idx) => (
+          {game.matches.map((match: any, idx: number) => (
             <div key={idx} className="bg-gray-700 rounded p-3">
               <div className="grid grid-cols-3 items-center">
                 <div className="text-center">
@@ -82,7 +82,7 @@ export const SummaryView: React.FC<SummaryViewProps> = ({ game, totals, playerSt
             {game.team1.name}
           </div>
           <div className="space-y-2">
-            {playerStats.team1Stats.map((player, idx) => (
+            {playerStats.team1Stats.map((player: any, idx: number) => (
               <div key={idx} className={`bg-gray-700 rounded p-3 ${player.isAbsent ? 'opacity-60 bg-red-900' : ''}`}>
                 <div className="grid grid-cols-4 gap-3 items-center h-14">
                   <div className="col-span-2">
@@ -127,7 +127,7 @@ export const SummaryView: React.FC<SummaryViewProps> = ({ game, totals, playerSt
             {game.team2.name}
           </div>
           <div className="space-y-2">
-            {playerStats.team2Stats.map((player, idx) => (
+            {playerStats.team2Stats.map((player: any, idx: number) => (
               <div key={idx} className={`bg-gray-700 rounded p-3 ${player.isAbsent ? 'opacity-60 bg-red-900' : ''}`}>
                 <div className="grid grid-cols-4 gap-3 items-center h-14">
                   <div className="col-span-2">
