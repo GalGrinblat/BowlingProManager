@@ -21,7 +21,7 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
   const [league, setLeague] = useState<any>(null);
   const [teams, setTeams] = useState<any[]>([]);
   const [games, setGames] = useState<any[]>([]);
-  const [view, setView] = useState('schedule'); // schedule, standings, players, h2h, records, records
+  const [view, setView] = useState('schedule'); // schedule, teamStandings, playerStandings, h2h, records
   const [selectedRound, setSelectedRound] = useState(1);
   const [selectedMatchDay, setSelectedMatchDay] = useState<number | null>(null);
   const [showPostponeModal, setShowPostponeModal] = useState(false);
@@ -156,33 +156,35 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
               <span>🔄 Round {selectedRound} of {season.numberOfRounds}</span>
             </div>
           </div>
-          <button
-            onClick={onBack}
-            className="text-gray-600 hover:text-gray-800"
-          >
-            ← {t('seasons.backToLeague')}
-          </button>
-        </div>
-        {(season.status === 'active' && (onManageTeams || completedGames === totalGames)) && (
-          <div className="flex gap-2 justify-end">
+          <div className="flex flex-col items-end gap-2">
+            <button
+              onClick={onBack}
+              className="text-gray-600 hover:text-gray-800"
+            >
+              ← {t('seasons.backToLeague')}
+            </button>
             {season.status === 'active' && (
-              <button
-                onClick={onManageTeams}
-                className="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 font-semibold"
-              >
-                👥 Manage Teams
-              </button>
-            )}
-            {season.status === 'active' && completedGames === totalGames && (
-              <button
-                onClick={handleCompleteSeason}
-                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold"
-              >
-                Complete Season
-              </button>
+              <div className="flex gap-2">
+                {onManageTeams && (
+                  <button
+                    onClick={onManageTeams}
+                    className="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 font-semibold"
+                  >
+                    👥 Manage Teams
+                  </button>
+                )}
+                {completedGames === totalGames && (
+                  <button
+                    onClick={handleCompleteSeason}
+                    className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold"
+                  >
+                    Complete Season
+                  </button>
+                )}
+              </div>
             )}
           </div>
-        )}
+        </div>
       </div>
 
       {/* Champion Banner */}
@@ -237,13 +239,13 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
                 onClick={() => exportStandingsCSV(teamStandings, season.name)}
                 className="px-3 py-2 sm:px-4 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 font-semibold text-xs sm:text-sm transition-colors whitespace-nowrap"
               >
-                📊 Standings
+                📊 Team Standings
               </button>
               <button
                 onClick={() => exportPlayerStatsCSV(playerStats, season.name)}
                 className="px-3 py-2 sm:px-4 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 font-semibold text-xs sm:text-sm transition-colors whitespace-nowrap"
               >
-                👥 Players
+                👥 Player Standings
               </button>
               <button
                 onClick={() => exportGamesCSV(games, teams, season.name)}
@@ -294,14 +296,14 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
           📅 {isCompleted ? 'Game Results' : 'Schedule'}
         </button>
         <button
-          onClick={() => setView('standings')}
+          onClick={() => setView('teamStandings')}
           className={`flex-1 min-w-[120px] py-3 px-4 rounded-lg font-semibold transition-colors ${
-            view === 'standings'
+            view === 'teamStandings'
               ? 'bg-blue-600 text-white'
               : 'text-gray-600 hover:bg-gray-100'
           }`}
         >
-          🏆 {isCompleted ? 'Final Standings' : 'Standings'}
+          🏆 {isCompleted ? 'Final Team Standings' : 'Team Standings'}
         </button>
         <button
           onClick={() => setView('h2h')}
@@ -314,14 +316,14 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
           📊 Head-to-Head
         </button>
         <button
-          onClick={() => setView('players')}
+          onClick={() => setView('playerStandings')}
           className={`flex-1 min-w-[120px] py-3 px-4 rounded-lg font-semibold transition-colors ${
-            view === 'players'
+            view === 'playerStandings'
               ? 'bg-blue-600 text-white'
               : 'text-gray-600 hover:bg-gray-100'
           }`}
         >
-          👥 Player Stats
+          👥 Player Standings
         </button>
         <button
           onClick={() => setView('records')}
@@ -455,7 +457,7 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
       )}
 
       {/* Team Standings View */}
-      {view === 'standings' && (
+      {view === 'teamStandings' && (
         <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Team Standings</h2>
           <div className="overflow-x-auto -mx-4 sm:mx-0">
@@ -707,11 +709,11 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
         </div>
       )}
 
-      {/* Player Stats View */}
-      {view === 'players' && (
+      {/* Player Standings View */}
+      {view === 'playerStandings' && (
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="p-4 sm:p-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Player Statistics ({playerStats.length} players)</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">Player Standings ({playerStats.length} players)</h2>
             <div className="overflow-x-auto -mx-4 sm:mx-0">
               <div className="inline-block min-w-full align-middle">
                 <div className="overflow-hidden">
