@@ -154,61 +154,6 @@ export const Settings: React.FC<SettingsProps> = ({ onBack }) => {
         )}
       </div>
 
-      {/* Getting Started Guide (for new users) */}
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl shadow-lg p-6 border border-blue-200">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">🚀 {t('settings.gettingStarted')}</h2>
-        <p className="text-gray-700 mb-4">{t('settings.gettingStartedDesc')}</p>
-        
-        <div className="space-y-4">
-          {/* Step 1: Demo Data */}
-          <div className="bg-white rounded-lg p-4 border-l-4 border-purple-500">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">
-              1️⃣ {t('settings.step1Title')}
-            </h3>
-            <p className="text-sm text-gray-700 mb-2">{t('settings.step1Desc')}</p>
-            <p className="text-xs text-gray-600 italic">{t('settings.step1Tip')}</p>
-          </div>
-
-          {/* Step 2: Explore Features */}
-          <div className="bg-white rounded-lg p-4 border-l-4 border-blue-500">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">
-              2️⃣ {t('settings.step2Title')}
-            </h3>
-            <ul className="text-sm text-gray-700 space-y-1 ml-4 list-disc">
-              <li>{t('settings.step2Item1')}</li>
-              <li>{t('settings.step2Item2')}</li>
-              <li>{t('settings.step2Item3')}</li>
-              <li>{t('settings.step2Item4')}</li>
-            </ul>
-          </div>
-
-          {/* Step 3: Data Backup */}
-          <div className="bg-white rounded-lg p-4 border-l-4 border-green-500">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">
-              3️⃣ {t('settings.step3Title')}
-            </h3>
-            <p className="text-sm text-gray-700 mb-2">{t('settings.step3Desc')}</p>
-            <p className="text-xs text-yellow-700 bg-yellow-50 p-2 rounded">
-              ⚠️ {t('settings.step3Warning')}
-            </p>
-          </div>
-
-          {/* Step 4: Manual Setup */}
-          <div className="bg-white rounded-lg p-4 border-l-4 border-indigo-500">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">
-              4️⃣ {t('settings.step4Title')}
-            </h3>
-            <p className="text-sm text-gray-700 mb-2">{t('settings.step4Desc')}</p>
-            <ol className="text-sm text-gray-600 space-y-1 ml-4 list-decimal">
-              <li>{t('settings.step4Item1')}</li>
-              <li>{t('settings.step4Item2')}</li>
-              <li>{t('settings.step4Item3')}</li>
-              <li>{t('settings.step4Item4')}</li>
-            </ol>
-          </div>
-        </div>
-      </div>
-
       {/* System Information */}
       <div className="bg-white rounded-xl shadow-lg p-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('settings.systemInfo')}</h2>
