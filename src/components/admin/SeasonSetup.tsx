@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { seasonsApi, teamsApi, playersApi, gamesApi, leaguesApi } from '../../services/api';
 import { generateRoundRobinSchedule } from '../../utils/scheduleUtils';
 import { createEmptyMatch } from '../../utils/matchUtils';
+import { createTeam } from '../../models';
 
 import type { SeasonSetupProps } from '../../types/index';
 
@@ -26,10 +27,35 @@ export const SeasonSetup: React.FC<SeasonSetupProps> = ({ seasonId, onBack }) =>
     }
     
     const teamsData = teamsApi.getBySeason(seasonId);
+    console.log('SeasonSetup: Loading teams for season', seasonId, 'Found:', teamsData.length, 'teams');
     setTeams(teamsData);
     
     const playersData = playersApi.getAll().filter(p => p.active);
     setPlayers(playersData);
+  };
+
+  const handleCreateMissingTeams = () => {
+    if (!season) return;
+    
+    console.log('Creating teams manually. Current teams:', teams.length, 'Expected:', season.numberOfTeams);
+    
+    const teamsToCreate = season.numberOfTeams - teams.length;
+    if (teamsToCreate <= 0) {
+      alert('All teams already exist!');
+      return;
+    }
+    
+    for (let i = teams.length; i < season.numberOfTeams; i++) {
+      const teamData = createTeam({
+        seasonId: season.id,
+        name: `Team ${i + 1}`,
+        playerIds: []
+      });
+      teamsApi.create(teamData);
+    }
+    
+    alert(`Created ${teamsToCreate} teams!`);
+    loadSeasonData();
   };
 
   const handleStartSeason = () => {
@@ -258,23 +284,51 @@ export const SeasonSetup: React.FC<SeasonSetupProps> = ({ seasonId, onBack }) =>
 
       {/* Teams Setup */}
       <div className="space-y-4">
-        {teams.map(team => (
-          <TeamSetupCard
-            key={team.id}
-            team={team}
-            season={season}
-            players={players}
-            allTeams={teams}
-            isEditing={editingTeamId === team.id}
-            onEdit={() => setEditingTeamId(team.id)}
-            onSave={(updatedTeam: any) => {
-              teamsApi.update(team.id, updatedTeam);
-              setEditingTeamId(null);
-              loadSeasonData();
-            }}
-            onCancel={() => setEditingTeamId(null)}
-          />
-        ))}
+        {teams.length === 0 ? (
+          <div className="bg-white rounded-xl shadow-lg p-8 text-center">
+            <p className="text-gray-600 text-lg mb-2">No teams found for this season.</p>
+            <p className="text-gray-500 text-sm mb-4">Teams should have been created automatically. Try creating them manually:</p>
+            <button
+              onClick={handleCreateMissingTeams}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
+            >
+              Create {season.numberOfTeams} Teams
+            </button>
+          </div>
+        ) : teams.length < season.numberOfTeams ? (
+          <div className="bg-yellow-50 border border-yellow-400 rounded-xl shadow-lg p-6">
+            <p className="text-yellow-800 text-lg mb-2">⚠️ Missing Teams</p>
+            <p className="text-yellow-700 text-sm mb-4">
+              Expected {season.numberOfTeams} teams, but only {teams.length} found.
+            </p>
+            <button
+              onClick={handleCreateMissingTeams}
+              className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 font-semibold"
+            >
+              Create Missing Teams
+            </button>
+          </div>
+        ) : null}
+        
+        {teams.length > 0 && (
+          teams.map(team => (
+            <TeamSetupCard
+              key={team.id}
+              team={team}
+              season={season}
+              players={players}
+              allTeams={teams}
+              isEditing={editingTeamId === team.id}
+              onEdit={() => setEditingTeamId(team.id)}
+              onSave={(updatedTeam: any) => {
+                teamsApi.update(team.id, updatedTeam);
+                setEditingTeamId(null);
+                loadSeasonData();
+              }}
+              onCancel={() => setEditingTeamId(null)}
+            />
+          ))
+        )}
       </div>
     </div>
   );
