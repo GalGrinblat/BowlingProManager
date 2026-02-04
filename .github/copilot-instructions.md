@@ -231,6 +231,23 @@ const schedule = generateRoundRobinSchedule(teamIds, numberOfRounds);
 8. **Export functionality?** → Update `src/utils/exportUtils.js`
 9. **Player statistics?** → Update `src/utils/statsUtils.js`
 10. **Pagination needed?** → Use `src/components/Pagination.jsx` component
+11. **Demo data changes?** → Update `src/utils/demoDataUtils.ts` AND `documentation/SEED_DEMO_DATA.md` - keep docs in sync!
+
+## Critical Documentation Rules
+
+### Demo Data Documentation (MUST FOLLOW)
+**⚠️ When modifying `src/utils/demoDataUtils.ts`, you MUST update `documentation/SEED_DEMO_DATA.md`**
+
+The demo data documentation must always reflect what the code actually does. Update the doc when:
+- Changing player count or name generation
+- Modifying league configurations (handicap, bonus rules, point values)
+- Changing season dates, rounds, or settings
+- Adding/removing teams or changing team structure
+- Changing game creation logic or status
+- Modifying the return value of `seedDemoData()`
+- Adding new types of demo data
+
+**Why this matters**: Testers and users rely on this documentation to understand what demo data includes. Outdated docs cause confusion and incorrect expectations.
 
 ## Known Features & Behaviors
 
