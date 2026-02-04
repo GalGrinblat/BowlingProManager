@@ -49,7 +49,7 @@ export const createLeague = ({
   defaultMatchesPerGame = 3,
   dayOfWeek = '',
   bonusRules = [],
-  gameWinPoints = 1,
+  playerWinPoints = 1,
   matchWinPoints = 1,
   grandTotalPoints = 2,
   active = true
@@ -63,7 +63,7 @@ export const createLeague = ({
   defaultMatchesPerGame?: number | string;
   dayOfWeek?: string;
   bonusRules?: BonusRule[];
-  gameWinPoints?: number | string;
+  playerWinPoints?: number | string;
   matchWinPoints?: number | string;
   grandTotalPoints?: number | string;
   active?: boolean;
@@ -80,7 +80,7 @@ export const createLeague = ({
     { type: 'player', condition: 'vs_average', threshold: 50, points: 1 },
     { type: 'player', condition: 'vs_average', threshold: 70, points: 2 }
   ],
-  gameWinPoints: parseFloat(String(gameWinPoints)) || 1,
+  playerWinPoints: parseFloat(String(playerWinPoints)) || 1,
   matchWinPoints: parseFloat(String(matchWinPoints)) || 1,
   grandTotalPoints: parseFloat(String(grandTotalPoints)) || 2,
   active
@@ -98,7 +98,7 @@ export const createSeason = ({
   handicapPercentage = 100,
   matchesPerGame = 3,
   bonusRules = [],
-  gameWinPoints = 1,
+  playerWinPoints = 1,
   matchWinPoints = 1,
   grandTotalPoints = 2,
   startDate = '',
@@ -114,7 +114,7 @@ export const createSeason = ({
   handicapPercentage?: number | string;
   matchesPerGame?: number | string;
   bonusRules?: BonusRule[];
-  gameWinPoints?: number | string;
+  playerWinPoints?: number | string;
   matchWinPoints?: number | string;
   grandTotalPoints?: number | string;
   startDate?: string;
@@ -130,7 +130,7 @@ export const createSeason = ({
   handicapPercentage: Math.min(100, Math.max(0, parseInt(String(handicapPercentage)) || 100)),
   matchesPerGame: parseInt(String(matchesPerGame)) || 3,
   bonusRules,
-  gameWinPoints: parseFloat(String(gameWinPoints)) || 1,
+  playerWinPoints: parseFloat(String(playerWinPoints)) || 1,
   matchWinPoints: parseFloat(String(matchWinPoints)) || 1,
   grandTotalPoints: parseFloat(String(grandTotalPoints)) || 2,
   startDate: startDate || new Date().toISOString(),

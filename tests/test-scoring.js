@@ -35,16 +35,16 @@ function calculateBonusPoints(score, average, isAbsent, bonusRules = null) {
   return 0;
 }
 
-function calculateIndividualGameResult(team1Score, team2Score, team1Handicap, team2Handicap, gameWinPoints = 1) {
+function calculateIndividualGameResult(team1Score, team2Score, team1Handicap, team2Handicap, playerWinPoints = 1) {
   const team1Total = team1Score + team1Handicap;
   const team2Total = team2Score + team2Handicap;
   
   if (team1Total > team2Total) {
-    return { result: 'team1', team1Points: gameWinPoints, team2Points: 0 };
+    return { result: 'team1', team1Points: playerWinPoints, team2Points: 0 };
   } else if (team2Total > team1Total) {
-    return { result: 'team2', team1Points: 0, team2Points: gameWinPoints };
+    return { result: 'team2', team1Points: 0, team2Points: playerWinPoints };
   } else {
-    return { result: 'draw', team1Points: gameWinPoints / 2, team2Points: gameWinPoints / 2 };
+    return { result: 'draw', team1Points: playerWinPoints / 2, team2Points: playerWinPoints / 2 };
   }
 }
 
@@ -253,12 +253,12 @@ const tests = [
     name: 'Configurable Points - All types working together',
     test: () => {
       // Simulate a complete scoring scenario
-      const gameWinPoints = 2;
+      const playerWinPoints = 2;
       const matchWinPoints = 3;
       const grandTotalPoints = 5;
       
       // Team 1 wins individual game
-      const game = calculateIndividualGameResult(180, 170, 10, 15, gameWinPoints);
+      const game = calculateIndividualGameResult(180, 170, 10, 15, playerWinPoints);
       // Team 1 wins match
       const match = calculateMatchWinner(540, 520, matchWinPoints);
       // Team 1 wins grand total

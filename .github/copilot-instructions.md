@@ -55,7 +55,7 @@ Organization
 **Note**: Players per team, matches per game, bonus rules, and all point values are configurable per league/season.
 
 1. **Individual Game Points**: Compare player1 vs player1 (with handicap) across all player pairs (configurable players per team)
-   - **Configurable**: gameWinPoints (default: 1)
+   - **Configurable**: playerWinPoints (default: 1)
    - Win = configured points, Draw = 50% of win points
 2. **Bonus Points**: Per-player based on configurable bonus rules
    - Default: +1 bonus if score ≥ average + 50 pins, +2 if ≥ average + 70 pins
@@ -82,7 +82,7 @@ Organization
   - Roster substitutions tracked in team.rosterChanges array
   - Each change logged with date, old/new player info, position
   - Absent players handled per-game via "absent" checkbox (score = average - 10)
-  - When both players in a matchup are absent: always a draw, each gets 50% of gameWinPoints
+  - When both players in a matchup are absent: always a draw, each gets 50% of playerWinPoints
   - TeamManagement component provides UI for substitutions
 
 ### Standings Calculation
@@ -276,7 +276,7 @@ The demo data documentation must always reflect what the code actually does. Upd
 ## Known Edge Cases
 
 - **Empty pin strings**: Treated as 0 in calculations, not entered in calculations until all pins filled
-- **Draws**: Always award 50% of respective win points (gameWinPoints, matchWinPoints, or grandTotalPoints)
+- **Draws**: Always award 50% of respective win points (playerWinPoints, matchWinPoints, or grandTotalPoints)
 - **Incomplete matches**: Handicap totals calculated as 0 for missing pins
 - **Grand total points**: Only awarded if all matches complete with all scores entered (number of matches is configurable)
-- **Point values**: All point values (gameWinPoints, matchWinPoints, grandTotalPoints) are configurable per league/season with defaults (1, 1, 2)
+- **Point values**: All point values (playerWinPoints, matchWinPoints, grandTotalPoints) are configurable per league/season with defaults (1, 1, 2)

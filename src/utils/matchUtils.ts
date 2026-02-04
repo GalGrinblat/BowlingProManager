@@ -102,7 +102,7 @@ export const calculateMatchResults = (game: Game, matchIndex: number): void => {
   const match = game.matches[matchIndex];
   
   // Get configurable point values (defaults to 1 if not set)
-  const gameWinPoints = game.gameWinPoints || 1;
+  const playerWinPoints = game.playerWinPoints || 1;
   const matchWinPoints = game.matchWinPoints || 1;
   
   // Calculate individual game results with handicap
@@ -133,20 +133,20 @@ export const calculateMatchResults = (game: Game, matchIndex: number): void => {
       // Special rule: If both players are absent, it's always a draw
       if (team1Player.absent && team2Player.absent) {
         gameResult.result = 'draw';
-        gameResult.team1Points = gameWinPoints / 2;
-        gameResult.team2Points = gameWinPoints / 2;
+        gameResult.team1Points = playerWinPoints / 2;
+        gameResult.team2Points = playerWinPoints / 2;
       } else if (team1WithHandicap > team2WithHandicap) {
         gameResult.result = 'team1';
-        gameResult.team1Points = gameWinPoints;
+        gameResult.team1Points = playerWinPoints;
         gameResult.team2Points = 0;
       } else if (team2WithHandicap > team1WithHandicap) {
         gameResult.result = 'team2';
         gameResult.team1Points = 0;
-        gameResult.team2Points = gameWinPoints;
+        gameResult.team2Points = playerWinPoints;
       } else {
         gameResult.result = 'draw';
-        gameResult.team1Points = gameWinPoints / 2;
-        gameResult.team2Points = gameWinPoints / 2;
+        gameResult.team1Points = playerWinPoints / 2;
+        gameResult.team2Points = playerWinPoints / 2;
       }
     } else {
       gameResult.result = null;

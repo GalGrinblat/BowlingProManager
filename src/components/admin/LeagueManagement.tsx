@@ -25,7 +25,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
       { type: 'player' as 'player' | 'team', condition: 'vs_average' as 'vs_average' | 'pure_score', threshold: 50, points: 1 },
       { type: 'player' as 'player' | 'team', condition: 'vs_average' as 'vs_average' | 'pure_score', threshold: 70, points: 2 }
     ],
-    gameWinPoints: 1,
+    playerWinPoints: 1,
     matchWinPoints: 1,
     grandTotalPoints: 2,
     active: true
@@ -85,7 +85,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
         { type: 'player', condition: 'vs_average', threshold: 50, points: 1 },
         { type: 'player', condition: 'vs_average', threshold: 70, points: 2 }
       ],
-      gameWinPoints: 1,
+      playerWinPoints: 1,
       matchWinPoints: 1,
       grandTotalPoints: 2,
       active: true
@@ -110,7 +110,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
         { type: 'player', condition: 'vs_average', threshold: 50, points: 1 },
         { type: 'player', condition: 'vs_average', threshold: 70, points: 2 }
       ],
-      gameWinPoints: league.gameWinPoints || 1,
+      playerWinPoints: league.playerWinPoints || 1,
       matchWinPoints: league.matchWinPoints || 1,
       grandTotalPoints: league.grandTotalPoints || 2,
       active: league.active
@@ -181,7 +181,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
         { type: 'player' as 'player' | 'team', condition: 'vs_average' as 'vs_average' | 'pure_score', threshold: 50, points: 1 },
         { type: 'player' as 'player' | 'team', condition: 'vs_average' as 'vs_average' | 'pure_score', threshold: 70, points: 2 }
       ],
-      gameWinPoints: 1,
+      playerWinPoints: 1,
       matchWinPoints: 1,
       grandTotalPoints: 2,
       active: true
@@ -358,17 +358,17 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    {t('leagues.gameWinPoints')}
+                    {t('leagues.playerWinPoints')}
                   </label>
                   <input
                     type="number"
                     min="0"
                     step="0.5"
-                    value={formData.gameWinPoints}
-                    onChange={(e) => setFormData({ ...formData, gameWinPoints: Number(e.target.value) })}
+                    value={formData.playerWinPoints}
+                    onChange={(e) => setFormData({ ...formData, playerWinPoints: Number(e.target.value) })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
-                  <p className="text-xs text-gray-500 mt-1">{t('leagues.gameWinPointsDesc')}</p>
+                  <p className="text-xs text-gray-500 mt-1">{t('leagues.playerWinPointsDesc')}</p>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">

@@ -185,7 +185,7 @@ export const SeasonSetup: React.FC<SeasonSetupProps> = ({ seasonId, onBack }) =>
               lineupRule,
               bonusRules: season.bonusRules,
               matchesPerGame: season.matchesPerGame,
-              gameWinPoints: season.gameWinPoints || 1,
+              playerWinPoints: season.playerWinPoints || 1,
               matchWinPoints: season.matchWinPoints || 1,
               grandTotalPoints: season.grandTotalPoints || 2,
               team1: {
