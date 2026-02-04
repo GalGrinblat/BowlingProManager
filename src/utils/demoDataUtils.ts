@@ -6,6 +6,7 @@
 
 import { playersApi, leaguesApi, seasonsApi, teamsApi, gamesApi } from '../services/api';
 import { generateRoundRobinSchedule } from './scheduleUtils';
+import { createPlayer, createLeague, createSeason, createTeam } from '../models/index';
 import type { Season, Team, League } from '../types/index.ts';
 
 // Realistic first and last names
@@ -91,103 +92,114 @@ export const seedDemoData = (): SeedDataResult => {
   const isDev = import.meta.env.DEV;
   if (isDev) console.log('🎳 Seeding demo data...');
 
-  // 1. Create 40 players
-  if (isDev) console.log('Creating 40 players...');
-  const players = [];
-  for (let i = 0; i < 40; i++) {
-    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-    const average = 120 + Math.floor(Math.random() * 100); // 120-220 range
-    
-    const player = playersApi.create({
-      name: `${firstName} ${lastName}`,
-      startingAverage: average,
-      active: true
-    });
-    players.push(player);
-  }
-  if (isDev) console.log(`✅ Created ${players.length} players`);
+  try {
+    // 1. Create 40 players
+    if (isDev) console.log('Creating 40 players...');
+    const players = [];
+    for (let i = 0; i < 40; i++) {
+      const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+      const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+      const average = 120 + Math.floor(Math.random() * 100); // 120-220 range
+      
+      const player = playersApi.create(
+        createPlayer({
+          name: `${firstName} ${lastName}`,
+          startingAverage: average,
+          active: true
+        })
+      );
+      players.push(player);
+    }
+    if (isDev) console.log(`✅ Created ${players.length} players`);
 
-  // 2. Create 2 leagues
-  if (isDev) console.log('Creating 2 leagues...');
-  const league1 = leaguesApi.create({
-    name: 'Monday Night League',
-    description: 'Competitive Monday evening league',
-    defaultHandicapBasis: 200,
-    useHandicap: true,
-    handicapPercentage: 90,
-    defaultPlayersPerTeam: 4,
-    defaultMatchesPerGame: 3,
-    dayOfWeek: 'Monday',
-    bonusRules: [
-      { type: 'player', condition: 'vs_average', threshold: 50, points: 1 },
-      { type: 'player', condition: 'vs_average', threshold: 70, points: 2 }
-    ],
-    playerWinPoints: 1,
-    teamWinPoints: 1,
-    grandTotalPoints: 2,
-    active: true
-  });
+    // 2. Create 2 leagues
+    if (isDev) console.log('Creating 2 leagues...');
+    const league1 = leaguesApi.create(
+      createLeague({
+        name: 'Monday Night League',
+        description: 'Competitive Monday evening league',
+        defaultHandicapBasis: 200,
+        useHandicap: true,
+        handicapPercentage: 90,
+        defaultPlayersPerTeam: 4,
+        defaultMatchesPerGame: 3,
+        dayOfWeek: 'Monday',
+        bonusRules: [
+          { type: 'player', condition: 'vs_average', threshold: 50, points: 1 },
+          { type: 'player', condition: 'vs_average', threshold: 70, points: 2 }
+        ],
+        playerWinPoints: 1,
+        teamWinPoints: 1,
+        grandTotalPoints: 2,
+        active: true
+      })
+    );
+    if (isDev) console.log('✅ Created league 1:', league1.id);
 
-  const league2 = leaguesApi.create({
-    name: 'Thursday Night League',
-    description: 'Recreational Thursday evening league',
-    defaultHandicapBasis: 180,
-    useHandicap: true,
-    handicapPercentage: 100,
-    defaultPlayersPerTeam: 4,
-    defaultMatchesPerGame: 3,
-    dayOfWeek: 'Thursday',
-    bonusRules: [
-      { type: 'player', condition: 'vs_average', threshold: 50, points: 1 },
-      { type: 'player', condition: 'vs_average', threshold: 70, points: 2 }
-    ],
-    playerWinPoints: 1,
-    teamWinPoints: 1,
-    grandTotalPoints: 2,
-    active: true
-  });
-  if (isDev) console.log('✅ Created 2 leagues');
+    const league2 = leaguesApi.create(
+      createLeague({
+        name: 'Thursday Night League',
+        description: 'Recreational Thursday evening league',
+        defaultHandicapBasis: 180,
+        useHandicap: true,
+        handicapPercentage: 100,
+        defaultPlayersPerTeam: 4,
+        defaultMatchesPerGame: 3,
+        dayOfWeek: 'Thursday',
+        bonusRules: [
+          { type: 'player', condition: 'vs_average', threshold: 50, points: 1 },
+          { type: 'player', condition: 'vs_average', threshold: 70, points: 2 }
+        ],
+        playerWinPoints: 1,
+        teamWinPoints: 1,
+        grandTotalPoints: 2,
+        active: true
+      })
+    );
+    if (isDev) console.log('✅ Created league 2:', league2.id);
+    if (isDev) console.log('✅ Created 2 leagues');
 
   // 3. Create seasons for each league (in 'setup' status initially)
   if (isDev) console.log('Creating seasons...');
-  const season1 = seasonsApi.create({
-    leagueId: league1.id,
-    name: 'Fall 2025',
-    numberOfTeams: 8,
-    playersPerTeam: 4,
-    numberOfRounds: 4,
-    handicapBasis: 200,
-    useHandicap: true,
-    handicapPercentage: 90,
-    matchesPerGame: 3,
-    bonusRules: league1.bonusRules,
-    playerWinPoints: 1,
-    teamWinPoints: 1,
-    grandTotalPoints: 2,
-    startDate: '2025-09-08',
-    endDate: '2025-12-15',
-    status: 'setup'
-  });
+  const season1 = seasonsApi.create(
+    createSeason({
+      leagueId: league1.id,
+      name: 'Fall 2025',
+      numberOfTeams: 8,
+      playersPerTeam: 4,
+      numberOfRounds: 4,
+      handicapBasis: 200,
+      useHandicap: true,
+      handicapPercentage: 90,
+      matchesPerGame: 3,
+      bonusRules: league1.bonusRules,
+      playerWinPoints: 1,
+      teamWinPoints: 1,
+      grandTotalPoints: 2,
+      startDate: '2025-09-08',
+      endDate: '2025-12-15'
+    })
+  );
 
-  const season2 = seasonsApi.create({
-    leagueId: league2.id,
-    name: 'Fall 2025',
-    numberOfTeams: 8,
-    playersPerTeam: 4,
-    numberOfRounds: 4,
-    handicapBasis: 180,
-    useHandicap: true,
-    handicapPercentage: 100,
-    matchesPerGame: 3,
-    bonusRules: league2.bonusRules,
-    playerWinPoints: 1,
-    teamWinPoints: 1,
-    grandTotalPoints: 2,
-    startDate: '2025-09-10',
-    endDate: '2025-12-17',
-    status: 'setup'
-  });
+  const season2 = seasonsApi.create(
+    createSeason({
+      leagueId: league2.id,
+      name: 'Fall 2025',
+      numberOfTeams: 8,
+      playersPerTeam: 4,
+      numberOfRounds: 4,
+      handicapBasis: 180,
+      useHandicap: true,
+      handicapPercentage: 100,
+      matchesPerGame: 3,
+      bonusRules: league2.bonusRules,
+      playerWinPoints: 1,
+      teamWinPoints: 1,
+      grandTotalPoints: 2,
+      startDate: '2025-09-10',
+      endDate: '2025-12-17'
+    })
+  );
   if (isDev) console.log('✅ Created 2 seasons');
 
   // 4. Create 8 teams per league (16 total teams)
@@ -201,12 +213,13 @@ export const seedDemoData = (): SeedDataResult => {
   // Season 1 teams (first 32 players)
   for (let i = 0; i < 8; i++) {
     const teamPlayers = shuffledPlayers.slice(i * 4, (i * 4) + 4);
-    const team = teamsApi.create({
-      seasonId: season1.id,
-      name: teamNames[i]!,
-      playerIds: teamPlayers.map(p => p.id),
-      rosterChanges: []
-    });
+    const team = teamsApi.create(
+      createTeam({
+        seasonId: season1.id,
+        name: teamNames[i]!,
+        playerIds: teamPlayers.map(p => p.id)
+      })
+    );
     season1Teams.push(team);
   }
 
@@ -214,12 +227,13 @@ export const seedDemoData = (): SeedDataResult => {
   const season2Players = [...shuffledPlayers.slice(24)].sort(() => Math.random() - 0.5);
   for (let i = 0; i < 8; i++) {
     const teamPlayers = season2Players.slice(i * 4, (i * 4) + 4);
-    const team = teamsApi.create({
-      seasonId: season2.id,
-      name: teamNames[i + 8] || `Team ${String.fromCharCode(65 + i)}`,
-      playerIds: teamPlayers.map(p => p.id),
-      rosterChanges: []
-    });
+    const team = teamsApi.create(
+      createTeam({
+        seasonId: season2.id,
+        name: teamNames[i + 8] || `Team ${String.fromCharCode(65 + i)}`,
+        playerIds: teamPlayers.map(p => p.id)
+      })
+    );
     season2Teams.push(team);
   }
   if (isDev) console.log('✅ Created 16 teams (8 per league)');
@@ -241,4 +255,8 @@ export const seedDemoData = (): SeedDataResult => {
     teams: 16,
     completedGames: 0 // Games created in pending status for manual entry
   };
+  } catch (error) {
+    console.error('❌ Error seeding demo data:', error);
+    throw error;
+  }
 };

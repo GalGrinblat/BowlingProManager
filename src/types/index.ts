@@ -198,35 +198,35 @@ export interface ScheduleMatchDay {
 // Scoring & Match Calculation Types
 // ============================================================================
 
-export interface IndividualGameResult {
+export interface PlayerMatchResult {
+  player1Score: number;
+  player2Score: number;
+  player1Points: number;
+  player2Points: number;
+  player1BonusPoints: number;
+  player2BonusPoints: number;
+}
+
+export interface TeamMatchResult {
   team1Score: number;
   team2Score: number;
   team1Points: number;
   team2Points: number;
-  team1BonusPoints: number;
-  team2BonusPoints: number;
 }
 
-export interface MatchResult {
-  team1TotalScore: number;
-  team2TotalScore: number;
-  team1MatchPoints: number;
-  team2MatchPoints: number;
-}
-
-export interface GrandTotalResult {
-  team1GrandTotal: number;
-  team2GrandTotal: number;
-  team1GrandTotalPoints: number;
-  team2GrandTotalPoints: number;
+export interface TeamGameResult {
+  team1Score: number;
+  team2Score: number;
+  team1Points: number;
+  team2Points: number;
 }
 
 export interface GamePointsBreakdown {
-  individualGames: IndividualGameResult[];
-  matches: MatchResult[];
-  grandTotal: GrandTotalResult;
-  team1TotalPoints: number;
-  team2TotalPoints: number;
+  playerMatches: PlayerMatchResult[];
+  teamMatches: TeamMatchResult[];
+  teamGame: TeamGameResult;
+  team1Points: number;
+  team2Points: number;
 }
 
 // ============================================================================
