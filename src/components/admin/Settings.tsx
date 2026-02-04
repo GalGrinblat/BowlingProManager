@@ -43,18 +43,6 @@ export const Settings: React.FC<SettingsProps> = ({ onBack }) => {
     loadOrganization();
   };
 
-  const handleExport = () => {
-    const data = utilApi.exportData();
-    const dataStr = JSON.stringify(data, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `bowling-backup-${new Date().toISOString().split('T')[0]}.json`;
-    link.click();
-    URL.revokeObjectURL(url);
-  };
-
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -232,20 +220,6 @@ export const Settings: React.FC<SettingsProps> = ({ onBack }) => {
       <div className="bg-white rounded-xl shadow-lg p-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('settings.backupRestore')}</h2>
         
-        {/* Export Section */}
-        <div className="mb-6">
-          <h3 className="text-lg font-semibold text-gray-700 mb-2">{t('settings.exportData')}</h3>
-          <p className="text-sm text-gray-600 mb-3">
-            {t('settings.exportDescription')}
-          </p>
-          <button
-            onClick={handleExport}
-            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold"
-          >
-            📥 {t('settings.exportButton')}
-          </button>
-        </div>
-
         {/* Import Section */}
         <div className="border-t pt-6">
           <h3 className="text-lg font-semibold text-gray-700 mb-2">{t('settings.importData')}</h3>

@@ -367,14 +367,6 @@ export const utilApi = {
     });
   },
   
-  exportData: (): Record<string, any> => {
-    const data: Record<string, any> = {};
-    Object.entries(STORAGE_KEYS).forEach(([name, key]) => {
-      data[name] = getFromStorage(key);
-    });
-    return data;
-  },
-  
   importData: (data: Record<string, any>): void => {
     Object.entries(data).forEach(([name, value]) => {
       const key = STORAGE_KEYS[name as keyof typeof STORAGE_KEYS];

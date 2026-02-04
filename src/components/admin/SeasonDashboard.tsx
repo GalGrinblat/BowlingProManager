@@ -5,13 +5,6 @@ import { postponeMatchDay, formatMatchDate } from '../../utils/scheduleUtils';
 import { calculateHeadToHead, formatHeadToHead } from '../../utils/headToHeadUtils';
 import { calculateSeasonRecords } from '../../utils/recordsUtils';
 import { useTranslation } from '../../contexts/LanguageContext';
-import { 
-  exportStandingsCSV, 
-  exportPlayerStatsCSV, 
-  exportGamesCSV, 
-  exportSeasonJSON, 
-  exportAllSeasonData 
-} from '../../utils/exportUtils';
 
 import type { SeasonDashboardProps } from '../../types/index.ts';
 
@@ -227,49 +220,6 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
       </div>
 
       {/* Export Section */}
-      {completedGames > 0 && (
-        <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h3 className="text-lg font-bold text-gray-800 mb-1">Export Season Data</h3>
-              <p className="text-sm text-gray-600">Download standings, player stats, and game results</p>
-            </div>
-            <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
-              <button
-                onClick={() => exportStandingsCSV(teamStandings, season.name)}
-                className="px-3 py-2 sm:px-4 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 font-semibold text-xs sm:text-sm transition-colors whitespace-nowrap"
-              >
-                📊 Team Standings
-              </button>
-              <button
-                onClick={() => exportPlayerStatsCSV(playerStats, season.name)}
-                className="px-3 py-2 sm:px-4 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 font-semibold text-xs sm:text-sm transition-colors whitespace-nowrap"
-              >
-                👥 Player Standings
-              </button>
-              <button
-                onClick={() => exportGamesCSV(games, teams, season.name)}
-                className="px-3 py-2 sm:px-4 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 font-semibold text-xs sm:text-sm transition-colors whitespace-nowrap"
-              >
-                🎳 Games
-              </button>
-              <button
-                onClick={() => exportSeasonJSON(season, teams, games, teamStandings, playerStats, league)}
-                className="px-3 py-2 sm:px-4 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 font-semibold text-xs sm:text-sm transition-colors whitespace-nowrap"
-              >
-                📦 JSON
-              </button>
-              <button
-                onClick={() => exportAllSeasonData(season, teams, games, teamStandings, playerStats, league)}
-                className="col-span-2 sm:col-span-1 px-3 py-2 sm:px-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 font-semibold text-xs sm:text-sm transition-all shadow-md whitespace-nowrap"
-              >
-                ⬇️ Download All
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Archive Notice for Completed Seasons */}
       {isCompleted && (
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
