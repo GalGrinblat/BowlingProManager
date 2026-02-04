@@ -6,15 +6,18 @@ import { useTranslation } from '../../contexts/LanguageContext';
 import type { SettingsProps } from '../../types/index.ts';
 
 export const Settings: React.FC<SettingsProps> = ({ onBack }) => {
-  const { t, language, setLanguage } = useTranslation();
-  const [organization, setOrganization] = useState(null);
+  const { t, setLanguage } = useTranslation();
+  const [organization, setOrganization] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    language: 'en' | 'he';
+  }>({
     name: '',
     language: 'en'
   });
-  const [importFile, setImportFile] = useState(null);
-  const [importPreview, setImportPreview] = useState(null);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [importPreview, setImportPreview] = useState<any>(null);
   const [isSeeding, setIsSeeding] = useState(false);
 
   useEffect(() => {
@@ -52,14 +55,14 @@ export const Settings: React.FC<SettingsProps> = ({ onBack }) => {
     URL.revokeObjectURL(url);
   };
 
-  const handleFileSelect = (e) => {
-    const file = e.target.files[0];
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
     reader.onload = (event) => {
       try {
-        const data = JSON.parse(event.target.result);
+        const data = JSON.parse(event.target?.result as string);
         setImportFile(file);
         setImportPreview(data);
       } catch (error) {
@@ -80,7 +83,7 @@ export const Settings: React.FC<SettingsProps> = ({ onBack }) => {
         alert('Data imported successfully! Reloading page...');
         window.location.reload();
       } catch (error) {
-        alert('Error importing data: ' + error.message);
+        alert('Error importing data: ' + (error as Error).message);
       }
     }
   };
@@ -104,7 +107,7 @@ export const Settings: React.FC<SettingsProps> = ({ onBack }) => {
               `Reloading page...`);
         window.location.reload();
       } catch (error) {
-        alert('Error seeding demo data: ' + error.message);
+        alert('Error seeding demo data: ' + (error as Error).message);
         setIsSeeding(false);
       }
     }
@@ -116,14 +119,18 @@ export const Settings: React.FC<SettingsProps> = ({ onBack }) => {
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <button
-          onClick={onBack}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-800 mb-4 text-lg font-semibold"
-        >
-          <span>←</span> {t('common.back')}
-        </button>
-        <h1 className="text-3xl font-bold text-gray-800">{t('settings.title')}</h1>
-        <p className="text-gray-600 mt-2">{t('settings.organizationSettings')}</p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('settings.title')}</h1>
+            <p className="text-gray-600">{t('settings.organizationSettings')}</p>
+          </div>
+          <button
+            onClick={onBack}
+            className="text-gray-600 hover:text-gray-800"
+          >
+            ← {t('players.backToDashboard')}
+          </button>
+        </div>
       </div>
 
       {/* Organization Info */}
@@ -160,7 +167,7 @@ export const Settings: React.FC<SettingsProps> = ({ onBack }) => {
               </label>
               <select
                 value={formData.language}
-                onChange={(e) => setFormData({ ...formData, language: e.target.value })}
+                onChange={(e) => setFormData({ ...formData, language: e.target.value as 'en' | 'he' })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               >
                 <option value="en">{t('settings.english')}</option>
@@ -258,7 +265,7 @@ export const Settings: React.FC<SettingsProps> = ({ onBack }) => {
           ) : (
             <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
               <h4 className="font-semibold text-blue-900 mb-2">📄 {t('settings.importPreview')}</h4>
-              <p className="text-sm text-blue-800 mb-1">{t('settings.file')}: {importFile.name}</p>
+              <p className="text-sm text-blue-800 mb-1">{t('settings.file')}: {importFile?.name}</p>
               <div className="text-sm text-blue-700 space-y-1 mb-4">
                 {importPreview.PLAYERS && <div>• {importPreview.PLAYERS.length || 0} {t('settings.players')}</div>}
                 {importPreview.LEAGUES && <div>• {importPreview.LEAGUES.length || 0} {t('settings.leagues')}</div>}

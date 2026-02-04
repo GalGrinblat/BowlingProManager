@@ -7,9 +7,9 @@ import type { LeagueManagementProps } from '../../types/index.ts';
 
 export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onViewLeague }) => {
   const { t } = useTranslation();
-  const [leagues, setLeagues] = useState([]);
+  const [leagues, setLeagues] = useState<any[]>([]);
   const [isAdding, setIsAdding] = useState(false);
-  const [editingId, setEditingId] = useState(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -19,11 +19,11 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
     defaultPlayersPerTeam: 4,
     defaultMatchesPerGame: 3,
     dayOfWeek: '',
-    lineupStrategy: 'flexible',
-    lineupRule: 'standard',
+    lineupStrategy: 'flexible' as 'flexible' | 'rule-based',
+    lineupRule: 'standard' as 'standard' | 'high-low' | 'low-high',
     bonusRules: [
-      { type: 'player', condition: 'vs_average', threshold: 50, points: 1 },
-      { type: 'player', condition: 'vs_average', threshold: 70, points: 2 }
+      { type: 'player' as 'player' | 'team', condition: 'vs_average' as 'vs_average' | 'pure_score', threshold: 50, points: 1 },
+      { type: 'player' as 'player' | 'team', condition: 'vs_average' as 'vs_average' | 'pure_score', threshold: 70, points: 2 }
     ],
     gameWinPoints: 1,
     matchWinPoints: 1,
@@ -39,7 +39,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
     setLeagues(leaguesApi.getAll());
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     const leagueData = createLeague(formData);
@@ -77,7 +77,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
       useHandicap: true,
       handicapPercentage: 100,
       defaultPlayersPerTeam: 4,
-      defaultMatchesPerTeam: 3,
+      defaultMatchesPerGame: 3,
       dayOfWeek: '',
       lineupStrategy: 'flexible',
       lineupRule: 'standard',
@@ -94,7 +94,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
     loadLeagues();
   };
 
-  const handleEdit = (league) => {
+  const handleEdit = (league: any) => {
     setFormData({
       name: league.name,
       description: league.description || '',
@@ -119,7 +119,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
     setIsAdding(true);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = (id: string) => {
     const league = leagues.find(l => l.id === id);
     const seasons = seasonsApi.getByLeague(id);
     
@@ -127,7 +127,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
       const activeSeasons = seasons.filter(s => s.status === 'active');
       const setupSeasons = seasons.filter(s => s.status === 'setup');
       
-      let message = `${t('leagues.cannotDelete')} "${league.name}" (${seasons.length}):\n\n`;
+      let message = `${t('leagues.cannotDelete')} "${league?.name}" (${seasons.length}):\n\n`;
       if (activeSeasons.length > 0) {
         message += `• ${activeSeasons.length} ${t('seasons.activeSeasons')}\n`;
       }
@@ -140,14 +140,14 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
       return;
     }
     
-    if (confirm(`${t('leagues.deleteConfirm')} "${league.name}"?\n\n${t('leagues.deleteAction')}`)) {
+    if (confirm(`${t('leagues.deleteConfirm')} "${league?.name}"?\n\n${t('leagues.deleteAction')}`)) {
       leaguesApi.delete(id);
       loadLeagues();
       alert(t('leagues.leagueDeleted'));
     }
   };
 
-  const toggleActive = (league) => {
+  const toggleActive = (league: any) => {
     if (league.active) {
       // Archiving an active league
       if (confirm(`📦 ${t('leagues.archiveConfirm')} "${league.name}"?\n\n${t('leagues.archiveDesc')}`)) {
@@ -175,10 +175,15 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
       defaultPlayersPerTeam: 4,
       defaultMatchesPerGame: 3,
       dayOfWeek: '',
+      lineupStrategy: 'flexible' as 'flexible' | 'rule-based',
+      lineupRule: 'standard' as 'standard' | 'high-low' | 'low-high',
       bonusRules: [
-        { type: 'player', condition: 'vs_average', threshold: 50, points: 1 },
-        { type: 'player', condition: 'vs_average', threshold: 70, points: 2 }
+        { type: 'player' as 'player' | 'team', condition: 'vs_average' as 'vs_average' | 'pure_score', threshold: 50, points: 1 },
+        { type: 'player' as 'player' | 'team', condition: 'vs_average' as 'vs_average' | 'pure_score', threshold: 70, points: 2 }
       ],
+      gameWinPoints: 1,
+      matchWinPoints: 1,
+      grandTotalPoints: 2,
       active: true
     });
     setIsAdding(false);
@@ -199,7 +204,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
           </div>
           <button
             onClick={onBack}
-            className="px-4 py-2 text-gray-600 hover:text-gray-800"
+            className="text-gray-600 hover:text-gray-800"
           >
             ← {t('players.backToDashboard')}
           </button>
@@ -236,7 +241,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder={t('leagues.briefDescription')}
-                  rows="3"
+                  rows={3}
                 />
               </div>
             </div>
@@ -253,7 +258,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                   min="1"
                   max="10"
                   value={formData.defaultPlayersPerTeam}
-                  onChange={(e) => setFormData({ ...formData, defaultPlayersPerTeam: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, defaultPlayersPerTeam: Number(e.target.value) })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
                 <p className="text-xs text-gray-500 mt-1">{t('leagues.canChangePerSeason')}</p>
@@ -267,7 +272,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                   min="1"
                   max="5"
                   value={formData.defaultMatchesPerGame}
-                  onChange={(e) => setFormData({ ...formData, defaultMatchesPerGame: e.target.value })}
+                  onChange={(e) => setFormData({ ...formData, defaultMatchesPerGame: Number(e.target.value) })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
                 <p className="text-xs text-gray-500 mt-1">{t('leagues.matchesInGame')}</p>
@@ -309,7 +314,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                   </label>
                   <select
                     value={formData.lineupStrategy}
-                    onChange={(e) => setFormData({ ...formData, lineupStrategy: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, lineupStrategy: e.target.value as 'flexible' | 'rule-based' })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     <option value="flexible">{t('leagues.lineupFlexible')}</option>
@@ -318,7 +323,6 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                   </select>
                   <p className="text-xs text-gray-500 mt-1">
                     {formData.lineupStrategy === 'flexible' && t('leagues.lineupFlexibleDesc')}
-                    {formData.lineupStrategy === 'fixed' && t('leagues.lineupFixedDesc')}
                     {formData.lineupStrategy === 'rule-based' && t('leagues.lineupRuleBasedDesc')}
                   </p>
                 </div>
@@ -330,7 +334,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                     </label>
                     <select
                       value={formData.lineupRule}
-                      onChange={(e) => setFormData({ ...formData, lineupRule: e.target.value })}
+                      onChange={(e) => setFormData({ ...formData, lineupRule: e.target.value as 'standard' | 'high-low' | 'low-high' })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="standard">{t('leagues.rankingStandard')}</option>
@@ -338,7 +342,6 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                     </select>
                     <p className="text-xs text-gray-500 mt-1">
                       {formData.lineupRule === 'standard' && t('leagues.rankingStandardDesc')}
-                      {formData.lineupRule === 'balanced' && t('leagues.rankingBalancedDesc')}
                     </p>
                   </div>
                 )}
@@ -362,7 +365,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                     min="0"
                     step="0.5"
                     value={formData.gameWinPoints}
-                    onChange={(e) => setFormData({ ...formData, gameWinPoints: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, gameWinPoints: Number(e.target.value) })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                   <p className="text-xs text-gray-500 mt-1">{t('leagues.gameWinPointsDesc')}</p>
@@ -376,7 +379,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                     min="0"
                     step="0.5"
                     value={formData.matchWinPoints}
-                    onChange={(e) => setFormData({ ...formData, matchWinPoints: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, matchWinPoints: Number(e.target.value) })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                   <p className="text-xs text-gray-500 mt-1">{t('leagues.matchWinPointsDesc')}</p>
@@ -390,7 +393,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                     min="0"
                     step="0.5"
                     value={formData.grandTotalPoints}
-                    onChange={(e) => setFormData({ ...formData, grandTotalPoints: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, grandTotalPoints: Number(e.target.value) })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                   <p className="text-xs text-gray-500 mt-1">{t('leagues.grandTotalPointsDesc')}</p>
@@ -427,7 +430,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                     min="0"
                     max="300"
                     value={formData.defaultHandicapBasis}
-                    onChange={(e) => setFormData({ ...formData, defaultHandicapBasis: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, defaultHandicapBasis: Number(e.target.value) })}
                     disabled={!formData.useHandicap}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                   />
@@ -442,7 +445,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                     min="0"
                     max="100"
                     value={formData.handicapPercentage}
-                    onChange={(e) => setFormData({ ...formData, handicapPercentage: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, handicapPercentage: Number(e.target.value) })}
                     disabled={!formData.useHandicap}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
                   />
@@ -487,10 +490,12 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                           value={rule.type}
                           onChange={(e) => {
                             const updated = [...formData.bonusRules];
-                            updated[index].type = e.target.value;
-                            // Force condition to pure_score when switching to team
-                            if (e.target.value === 'team') {
-                              updated[index].condition = 'pure_score';
+                            if (updated[index]) {
+                              updated[index].type = e.target.value as 'player' | 'team';
+                              // Reset condition to vs_average if switching to team
+                              if (e.target.value === 'team') {
+                                updated[index].condition = 'pure_score';
+                              }
                             }
                             setFormData({ ...formData, bonusRules: updated });
                           }}
@@ -507,7 +512,9 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                           value={rule.condition}
                           onChange={(e) => {
                             const updated = [...formData.bonusRules];
-                            updated[index].condition = e.target.value;
+                            if (updated[index]) {
+                              updated[index].condition = e.target.value as 'vs_average' | 'pure_score';
+                            }
                             setFormData({ ...formData, bonusRules: updated });
                           }}
                           className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
@@ -531,7 +538,9 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                           value={rule.threshold}
                           onChange={(e) => {
                             const updated = [...formData.bonusRules];
-                            updated[index].threshold = parseInt(e.target.value) || 0;
+                            if (updated[index]) {
+                              updated[index].threshold = parseInt(e.target.value) || 0;
+                            }
                             setFormData({ ...formData, bonusRules: updated });
                           }}
                           className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
@@ -547,7 +556,9 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                           value={rule.points}
                           onChange={(e) => {
                             const updated = [...formData.bonusRules];
-                            updated[index].points = parseInt(e.target.value) || 1;
+                            if (updated[index]) {
+                              updated[index].points = parseInt(e.target.value) || 1;
+                            }
                             setFormData({ ...formData, bonusRules: updated });
                           }}
                           className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"

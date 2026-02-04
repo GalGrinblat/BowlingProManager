@@ -64,7 +64,7 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
         <div className="flex items-center gap-4 mb-6">
           <button
             onClick={onBack}
-            className="px-4 py-2 text-gray-600 hover:text-gray-800"
+            className="text-gray-600 hover:text-gray-800"
           >
             ← Back to Leagues
           </button>

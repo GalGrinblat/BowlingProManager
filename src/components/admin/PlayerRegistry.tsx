@@ -8,9 +8,9 @@ import type { PlayerRegistryProps } from '../../types/index.ts';
 
 export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
   const { t } = useTranslation();
-  const [players, setPlayers] = useState([]);
+  const [players, setPlayers] = useState<any[]>([]);
   const [isAdding, setIsAdding] = useState(false);
-  const [editingId, setEditingId] = useState(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     startingAverage: '',
@@ -30,7 +30,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
     setPlayers(playersApi.getAll());
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     const playerData = createPlayer(formData);
@@ -66,7 +66,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
     loadPlayers();
   };
 
-  const handleEdit = (player) => {
+  const handleEdit = (player: any) => {
     setFormData({
       name: player.name,
       startingAverage: player.startingAverage || '',
@@ -76,7 +76,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
     setIsAdding(true);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = (id: string) => {
     const player = playersApi.getById(id);
     
     // Check if player is assigned to any teams
@@ -134,7 +134,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
           </div>
           <button
             onClick={onBack}
-            className="px-4 py-2 text-gray-600 hover:text-gray-800"
+            className="text-gray-600 hover:text-gray-800"
           >
             ← {t('players.backToDashboard')}
           </button>
@@ -233,7 +233,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
           <p className="text-gray-500 text-center py-8">{t('players.noActivePlayers')}</p>
         ) : (
           <div className="p-6 space-y-2">
-            {paginatedActivePlayers.map(player => (
+            {paginatedActivePlayers.map((player: any) => (
               <div
                 key={player.id}
                 className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors"
@@ -281,7 +281,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
             </h2>
           </div>
           <div className="p-6 space-y-2">
-            {paginatedInactivePlayers.map(player => (
+            {paginatedInactivePlayers.map((player: any) => (
               <div
                 key={player.id}
                 className="border border-gray-200 rounded-lg p-4 bg-gray-50"
