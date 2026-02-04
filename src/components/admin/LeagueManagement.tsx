@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { leaguesApi, seasonsApi } from '../../services/api';
 import { createLeague, validateLeague } from '../../models';
 import { useTranslation } from '../../contexts/LanguageContext';
+import { MAX_BOWLING_SCORE } from '../../constants/bowling';
 
-import type { LeagueManagementProps } from '../../types/index';
+import type { LeagueManagementProps, BonusRule } from '../../types/index';
 
 export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onViewLeague }) => {
   const { t } = useTranslation();
@@ -21,10 +22,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
     dayOfWeek: '',
     lineupStrategy: 'flexible' as 'flexible' | 'rule-based',
     lineupRule: 'standard' as 'standard' | 'high-low' | 'low-high',
-    bonusRules: [
-      { type: 'player' as 'player' | 'team', condition: 'vs_average' as 'vs_average' | 'pure_score', threshold: 50, points: 1 },
-      { type: 'player' as 'player' | 'team', condition: 'vs_average' as 'vs_average' | 'pure_score', threshold: 70, points: 2 }
-    ],
+    bonusRules: [] as BonusRule[],
     playerMatchPointsPerWin: 1,
     teamMatchPointsPerWin: 1,
     teamGamePointsPerWin: 2,
@@ -81,10 +79,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
       dayOfWeek: '',
       lineupStrategy: 'flexible',
       lineupRule: 'standard',
-      bonusRules: [
-        { type: 'player', condition: 'vs_average', threshold: 50, points: 1 },
-        { type: 'player', condition: 'vs_average', threshold: 70, points: 2 }
-      ],
+      bonusRules: [],
       playerMatchPointsPerWin: 1,
       teamMatchPointsPerWin: 1,
       teamGamePointsPerWin: 2,
@@ -106,10 +101,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
       dayOfWeek: league.dayOfWeek || '',
       lineupStrategy: league.lineupStrategy || 'flexible',
       lineupRule: league.lineupRule || 'standard',
-      bonusRules: league.bonusRules || [
-        { type: 'player', condition: 'vs_average', threshold: 50, points: 1 },
-        { type: 'player', condition: 'vs_average', threshold: 70, points: 2 }
-      ],
+      bonusRules: league.bonusRules || [],
       playerMatchPointsPerWin: league.playerMatchPointsPerWin || 1,
       teamMatchPointsPerWin: league.teamMatchPointsPerWin || 1,
       teamGamePointsPerWin: league.teamGamePointsPerWin || 2,
@@ -177,10 +169,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
       dayOfWeek: '',
       lineupStrategy: 'flexible' as 'flexible' | 'rule-based',
       lineupRule: 'standard' as 'standard' | 'high-low' | 'low-high',
-      bonusRules: [
-        { type: 'player' as 'player' | 'team', condition: 'vs_average' as 'vs_average' | 'pure_score', threshold: 50, points: 1 },
-        { type: 'player' as 'player' | 'team', condition: 'vs_average' as 'vs_average' | 'pure_score', threshold: 70, points: 2 }
-      ],
+      bonusRules: [],
       playerMatchPointsPerWin: 1,
       teamMatchPointsPerWin: 1,
       teamGamePointsPerWin: 2,
@@ -428,7 +417,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                   <input
                     type="number"
                     min="0"
-                    max="300"
+                    max={MAX_BOWLING_SCORE}
                     value={formData.defaultHandicapBasis}
                     onChange={(e) => setFormData({ ...formData, defaultHandicapBasis: Number(e.target.value) })}
                     disabled={!formData.useHandicap}
@@ -534,7 +523,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                         <input
                           type="number"
                           min="0"
-                          max="300"
+                          max={MAX_BOWLING_SCORE}
                           value={rule.threshold}
                           onChange={(e) => {
                             const updated = [...formData.bonusRules];

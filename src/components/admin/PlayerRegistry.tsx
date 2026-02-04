@@ -3,7 +3,7 @@ import { playersApi, teamsApi, seasonsApi } from '../../services/api';
 import { createPlayer, validatePlayer } from '../../models';
 import { Pagination, usePagination } from '../common/Pagination';
 import { useTranslation } from '../../contexts/LanguageContext';
-
+import { MAX_BOWLING_SCORE } from '../../constants/bowling';
 import type { PlayerRegistryProps } from '../../types/index';
 
 export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
@@ -168,7 +168,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
                 <input
                   type="number"
                   min="0"
-                  max="300"
+                  max={MAX_BOWLING_SCORE}
                   value={formData.startingAverage}
                   onChange={(e) => setFormData({ ...formData, startingAverage: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"

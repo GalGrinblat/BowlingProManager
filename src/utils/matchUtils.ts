@@ -46,14 +46,11 @@ export const calculateBonusPoints = (
   const scoreNum = typeof score === 'string' ? parseInt(score) : score;
   const avgNum = typeof average === 'string' ? parseInt(average) : average;
   
-  // Use custom bonus rules if provided, otherwise use default
-  const rules: BonusRule[] = bonusRules || [
-    { type: 'player', condition: 'vs_average', threshold: 70, points: 2 },
-    { type: 'player', condition: 'vs_average', threshold: 50, points: 1 }
-  ];
+  // Use bonus rules if provided
+  if (!bonusRules || bonusRules.length === 0) return 0;
   
   // Filter for player bonuses only and sort by points descending to award highest first
-  const playerRules = rules
+  const playerRules = bonusRules
     .filter(r => r.type === 'player')
     .sort((a, b) => b.points - a.points);
   

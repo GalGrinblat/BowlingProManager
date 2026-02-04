@@ -4,6 +4,7 @@ import { createSeason, createTeam, validateSeason } from '../../models';
 import { generateRoundRobinSchedule } from '../../utils/scheduleUtils';
 import { calculateTeamStandings } from '../../utils/standingsUtils';
 import { useTranslation } from '../../contexts/LanguageContext';
+import { MAX_BOWLING_SCORE } from '../../constants/bowling';
 
 import type { LeagueDetailProps, League, Season } from '../../types/index';
 
@@ -699,7 +700,7 @@ const SeasonCreator = ({ league, onCancel, onSuccess }: { league: League; onCanc
               <input
                 type="number"
                 min="0"
-                max="300"
+                max={MAX_BOWLING_SCORE}
                 value={formData.handicapBasis}
                 onChange={(e) => setFormData({ ...formData, handicapBasis: parseInt(e.target.value) })}
                 disabled={!formData.useHandicap}

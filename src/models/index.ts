@@ -13,6 +13,7 @@ import type {
   ValidationResult,
   BonusRule
 } from '../types/index';
+import { MAX_BOWLING_SCORE, DEFAULT_HANDICAP_BASIS, DEFAULT_HANDICAP_PERCENTAGE } from '../constants/bowling';
 
 // ===== ORGANIZATION MODEL =====
 export const createOrganization = ({
@@ -42,9 +43,9 @@ export const createPlayer = ({
 export const createLeague = ({
   name = '',
   description = '',
-  defaultHandicapBasis = 160,
+  defaultHandicapBasis = DEFAULT_HANDICAP_BASIS,
   useHandicap = true,
-  handicapPercentage = 100,
+  handicapPercentage = DEFAULT_HANDICAP_PERCENTAGE,
   defaultPlayersPerTeam = 4,
   defaultMatchesPerGame = 3,
   dayOfWeek = '',
@@ -70,16 +71,13 @@ export const createLeague = ({
 }): Omit<League, 'id' | 'createdAt'> => ({
   name,
   description,
-  defaultHandicapBasis: parseInt(String(defaultHandicapBasis)) || 160,
+  defaultHandicapBasis: parseInt(String(defaultHandicapBasis)) || DEFAULT_HANDICAP_BASIS,
   useHandicap: useHandicap !== false,
-  handicapPercentage: Math.min(100, Math.max(0, parseInt(String(handicapPercentage)) || 100)),
+  handicapPercentage: Math.min(DEFAULT_HANDICAP_PERCENTAGE, Math.max(0, parseInt(String(handicapPercentage)) || DEFAULT_HANDICAP_PERCENTAGE)),
   defaultPlayersPerTeam: parseInt(String(defaultPlayersPerTeam)) || 4,
   defaultMatchesPerGame: parseInt(String(defaultMatchesPerGame)) || 3,
   dayOfWeek,
-  bonusRules: bonusRules.length > 0 ? bonusRules : [
-    { type: 'player', condition: 'vs_average', threshold: 50, points: 1 },
-    { type: 'player', condition: 'vs_average', threshold: 70, points: 2 }
-  ],
+  bonusRules,
   playerMatchPointsPerWin: parseFloat(String(playerMatchPointsPerWin)) || 1,
   teamMatchPointsPerWin: parseFloat(String(teamMatchPointsPerWin)) || 1,
   teamGamePointsPerWin: parseFloat(String(teamGamePointsPerWin)) || 2,
@@ -93,9 +91,9 @@ export const createSeason = ({
   numberOfTeams = 0,
   playersPerTeam = 4,
   numberOfRounds = 1,
-  handicapBasis = 160,
+  handicapBasis = DEFAULT_HANDICAP_BASIS,
   useHandicap = true,
-  handicapPercentage = 100,
+  handicapPercentage = DEFAULT_HANDICAP_PERCENTAGE,
   matchesPerGame = 3,
   bonusRules = [],
   playerMatchPointsPerWin = 1,
@@ -125,9 +123,9 @@ export const createSeason = ({
   numberOfTeams: parseInt(String(numberOfTeams)) || 0,
   playersPerTeam: parseInt(String(playersPerTeam)) || 4,
   numberOfRounds: parseInt(String(numberOfRounds)) || 1,
-  handicapBasis: parseInt(String(handicapBasis)) || 160,
+  handicapBasis: parseInt(String(handicapBasis)) || DEFAULT_HANDICAP_BASIS,
   useHandicap: useHandicap !== false,
-  handicapPercentage: Math.min(100, Math.max(0, parseInt(String(handicapPercentage)) || 100)),
+  handicapPercentage: Math.min(DEFAULT_HANDICAP_PERCENTAGE, Math.max(0, parseInt(String(handicapPercentage)) || DEFAULT_HANDICAP_PERCENTAGE)),
   matchesPerGame: parseInt(String(matchesPerGame)) || 3,
   bonusRules,
   playerMatchPointsPerWin: parseFloat(String(playerMatchPointsPerWin)) || 1,
@@ -183,8 +181,8 @@ export const validatePlayer = (player: Partial<Player>): ValidationResult => {
   if (!player.name || player.name.trim() === '') {
     return { valid: false, error: 'Player name is required' };
   }
-  if (player.startingAverage !== undefined && (player.startingAverage < 0 || player.startingAverage > 300)) {
-    return { valid: false, error: 'Starting average must be between 0 and 300' };
+  if (player.startingAverage !== undefined && (player.startingAverage < 0 || player.startingAverage > MAX_BOWLING_SCORE)) {
+    return { valid: false, error: `Starting average must be between 0 and ${MAX_BOWLING_SCORE}` };
   }
   return { valid: true };
 };
@@ -193,8 +191,8 @@ export const validateLeague = (league: Partial<League>): ValidationResult => {
   if (!league.name || league.name.trim() === '') {
     return { valid: false, error: 'League name is required' };
   }
-  if (league.defaultHandicapBasis !== undefined && (league.defaultHandicapBasis < 0 || league.defaultHandicapBasis > 300)) {
-    return { valid: false, error: 'Handicap basis must be between 0 and 300' };
+  if (league.defaultHandicapBasis !== undefined && (league.defaultHandicapBasis < 0 || league.defaultHandicapBasis > MAX_BOWLING_SCORE)) {
+    return { valid: false, error: `Handicap basis must be between 0 and ${MAX_BOWLING_SCORE}` };
   }
   if (league.defaultPlayersPerTeam !== undefined && (league.defaultPlayersPerTeam < 1 || league.defaultPlayersPerTeam > 10)) {
     return { valid: false, error: 'Players per team must be between 1 and 10' };
