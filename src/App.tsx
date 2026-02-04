@@ -111,7 +111,7 @@ function AppContent() {
               <SeasonDashboard 
                 seasonId={navigationState.seasonId}
                 onBack={() => navigateTo('league-detail', { leagueId: navigationState.leagueId })}
-                onSelectGame={(gameId: string) => navigateTo('season-game', { gameId })}
+
                 onPlayGame={(gameId: string) => navigateTo('season-game', { gameId })}
                 onViewGame={(gameId: string, game?: any) => navigateTo('game-history', { gameId, gameData: game })}
                 onManageTeams={() => navigateTo('team-management', { seasonId: navigationState.seasonId })}

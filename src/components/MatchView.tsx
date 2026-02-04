@@ -120,12 +120,12 @@ export const MatchView: React.FC<MatchViewProps> = ({ matchNumber, game, onUpdat
                   <div className="bg-gray-900 rounded-lg p-2 border border-gray-600">
                     <div className="text-xs text-gray-400 mb-1">POINTS</div>
                     <div className="flex items-center justify-center gap-2">
-                      <span className={`font-bold text-lg ${match.games[idx].result === 'team1' ? 'text-green-400' : 'text-gray-500'}`}>
-                        {match.games[idx].team1Points}
+                      <span className={`font-bold text-lg ${match.playerMatches[idx].result === 'team1' ? 'text-green-400' : 'text-gray-500'}`}>
+                        {match.playerMatches[idx].team1Points}
                       </span>
                       <span className="text-gray-600">-</span>
-                      <span className={`font-bold text-lg ${match.games[idx].result === 'team2' ? 'text-green-400' : 'text-gray-500'}`}>
-                        {match.games[idx].team2Points}
+                      <span className={`font-bold text-lg ${match.playerMatches[idx].result === 'team2' ? 'text-green-400' : 'text-gray-500'}`}>
+                        {match.playerMatches[idx].team2Points}
                       </span>
                     </div>
                   </div>

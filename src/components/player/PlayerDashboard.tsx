@@ -185,10 +185,10 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
           }
 
           // Calculate points scored
-          if (match.games && match.games[playerIndex]) {
+          if (match.playerMatches && match.playerMatches[playerIndex]) {
             const points = isOnTeam1 
-              ? match.games[playerIndex].team1Points 
-              : match.games[playerIndex].team2Points;
+              ? match.playerMatches[playerIndex].team1Points 
+              : match.playerMatches[playerIndex].team2Points;
             stats.totalPoints += points;
             stats.byLeague[leagueName].points += points;
             seriesPoints += points;

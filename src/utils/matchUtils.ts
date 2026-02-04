@@ -13,7 +13,7 @@ interface MatchTeam {
   players: MatchPlayer[];
 }
 
-interface Match {
+export interface Match {
   matchNumber: number;
   team1: MatchTeam;
   team2: MatchTeam;
@@ -26,15 +26,11 @@ export const createEmptyMatch = (matchNumber: number, playersPerTeam: number = 4
     bonusPoints: 0 
   }));
   
-  const emptyGames: PlayerMatchResult[] = Array.from({ length: playersPerTeam }, (_, i) => ({ 
+  const emptyPlayerMatches: PlayerMatchResult[] = Array.from({ length: playersPerTeam }, (_, i) => ({ 
     player: i + 1, 
-    result: null, 
-    player1Score: 0, 
-    player2Score: 0,
-    player1Points: 0,
-    player2Points: 0,
-    player1BonusPoints: 0,
-    player2BonusPoints: 0
+    result: null,
+    team1Points: 0,
+    team2Points: 0
   }));
   
   return {
@@ -53,7 +49,7 @@ export const createEmptyMatch = (matchNumber: number, playersPerTeam: number = 4
       bonusPoints: 0,
       players: [...emptyPlayers]
     },
-    playerMatches: emptyGames
+    playerMatches: emptyPlayerMatches
   };
 };
 
@@ -100,13 +96,15 @@ export const calculateBonusPoints = (
 export const calculateMatchResults = (game: Game, matchIndex: number): void => {
   if (!game.matches) return;
   const match = game.matches[matchIndex];
+  if (!match) return;
   
   // Get configurable point values (defaults to 1 if not set)
   const playerMatchPointsPerWin = game.playerMatchPointsPerWin || 1;
   const teamMatchPointsPerWin = game.teamMatchPointsPerWin || 1;
   
   // Calculate individual game results with handicap
-  match.games.forEach((gameResult: any, idx: number) => {
+  match.playerMatches.forEach((gameResult: any, idx: number) => {
+    if (!game.team1 || !game.team2) return;
     const team1Player = game.team1.players[idx];
     const team2Player = game.team2.players[idx];
     
@@ -119,15 +117,15 @@ export const calculateMatchResults = (game: Game, matchIndex: number): void => {
     }
     
     // If player is absent, use average - 10; otherwise use entered pins (or 0)
-    const team1Score = team1Player.absent ? parseInt(team1Player.average) - 10 : (match.team1.players[idx].pins || 0);
-    const team2Score = team2Player.absent ? parseInt(team2Player.average) - 10 : (match.team2.players[idx].pins || 0);
+    const team1Score = team1Player.absent ? team1Player.average - 10 : (match.team1.players[idx]?.pins || 0);
+    const team2Score = team2Player.absent ? team2Player.average - 10 : (match.team2.players[idx]?.pins || 0);
     
     const team1WithHandicap = team1Score + team1Player.handicap;
     const team2WithHandicap = team2Score + team2Player.handicap;
     
     // Only calculate if both players have scores (entered or absent)
-    const team1HasScore = team1Player.absent || match.team1.players[idx].pins > 0;
-    const team2HasScore = team2Player.absent || match.team2.players[idx].pins > 0;
+    const team1HasScore = team1Player.absent || (match.team1.players[idx]?.pins || 0) > 0;
+    const team2HasScore = team2Player.absent || (match.team2.players[idx]?.pins || 0) > 0;
     
     if (team1HasScore && team2HasScore) {
       // Special rule: If both players are absent, it's always a draw
@@ -156,27 +154,28 @@ export const calculateMatchResults = (game: Game, matchIndex: number): void => {
   });
 
   // Calculate totals
+  if (!game.team1 || !game.team2) return;
   match.team1.totalPins = game.team1.players.reduce((sum: number, p: any, idx: number) => {
     if (!p || !match.team1.players[idx]) return sum;
-    const score = p.absent ? parseInt(p.average) - 10 : (match.team1.players[idx].pins || 0);
+    const score = p.absent ? p.average - 10 : (match.team1.players[idx].pins || 0);
     return sum + score;
   }, 0);
   
   match.team2.totalPins = game.team2.players.reduce((sum: number, p: any, idx: number) => {
     if (!p || !match.team2.players[idx]) return sum;
-    const score = p.absent ? parseInt(p.average) - 10 : (match.team2.players[idx].pins || 0);
+    const score = p.absent ? p.average - 10 : (match.team2.players[idx].pins || 0);
     return sum + score;
   }, 0);
   
   match.team1.totalWithHandicap = game.team1.players.reduce((sum: number, p: any, idx: number) => {
     if (!p || !match.team1.players[idx]) return sum;
-    const score = p.absent ? parseInt(p.average) - 10 : (match.team1.players[idx].pins || 0);
+    const score = p.absent ? p.average - 10 : (match.team1.players[idx].pins || 0);
     return sum + score + p.handicap;
   }, 0);
   
   match.team2.totalWithHandicap = game.team2.players.reduce((sum: number, p: any, idx: number) => {
     if (!p || !match.team2.players[idx]) return sum;
-    const score = p.absent ? parseInt(p.average) - 10 : (match.team2.players[idx].pins || 0);
+    const score = p.absent ? p.average - 10 : (match.team2.players[idx].pins || 0);
     return sum + score + p.handicap;
   }, 0);
 
@@ -188,14 +187,21 @@ export const calculateMatchResults = (game: Game, matchIndex: number): void => {
   let team1GamePoints = 0;
   let team2GamePoints = 0;
   
-  match.games.forEach((gameResult: any) => {
+  match.playerMatches.forEach((gameResult: any) => {
     team1GamePoints += gameResult.team1Points;
     team2GamePoints += gameResult.team2Points;
   });
 
   // Calculate total points (game points + total bonus + performance bonus)
-  const team1AllScoresEntered = game.team1.players.every((p: any, idx: number) => !p || (p.absent || match.team1.players[idx]?.pins > 0));
-  const team2AllScoresEntered = game.team2.players.every((p: any, idx: number) => !p || (p.absent || match.team2.players[idx]?.pins > 0));
+  if (!game.team1 || !game.team2) return;
+  const team1AllScoresEntered = game.team1.players.every((p: any, idx: number) => {
+    const matchPlayer = match.team1.players[idx];
+    return !p || (p.absent || (matchPlayer?.pins || 0) > 0);
+  });
+  const team2AllScoresEntered = game.team2.players.every((p: any, idx: number) => {
+    const matchPlayer = match.team2.players[idx];
+    return !p || (p.absent || (matchPlayer?.pins || 0) > 0);
+  });
   const allScoresEntered = team1AllScoresEntered && team2AllScoresEntered;
   
   if (allScoresEntered) {
@@ -218,7 +224,9 @@ export const calculateMatchResults = (game: Game, matchIndex: number): void => {
 export const validateMatch = (currentGame: Game, matchIndex: number): boolean => {
   if (!currentGame.matches) return false;
   const match = currentGame.matches[matchIndex];
-  const team1Valid = currentGame.team1.players.every((p: any, idx: number) => !p || (p.absent || match.team1.players[idx]?.pins > 0));
-  const team2Valid = currentGame.team2.players.every((p: any, idx: number) => !p || (p.absent || match.team2.players[idx]?.pins > 0));
+  if (!match) return false;
+  if (!currentGame.team1 || !currentGame.team2) return false;
+  const team1Valid = currentGame.team1.players.every((p: any, idx: number) => !p || (p.absent || (match.team1.players[idx]?.pins || 0) > 0));
+  const team2Valid = currentGame.team2.players.every((p: any, idx: number) => !p || (p.absent || (match.team2.players[idx]?.pins || 0) > 0));
   return team1Valid && team2Valid;
 };

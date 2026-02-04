@@ -2,6 +2,8 @@
 // Core Data Types
 // ============================================================================
 
+import type { Match as GameMatch } from '../utils/matchUtils';
+
 export interface Player {
   id: string;
   name: string;
@@ -76,18 +78,17 @@ export interface Team {
   createdAt: string;
 }
 
-export interface PlayerScore {
+export interface GamePlayer {
   playerId: string;
-  playerName: string;
-  scores: string[];
-  handicap: number;
+  name: string;
   average: number;
-  absent: boolean;
+  handicap: number;
+  absent?: boolean;
 }
 
-export interface MatchScore {
-  team1Players: PlayerScore[];
-  team2Players: PlayerScore[];
+export interface GameTeam {
+  name: string;
+  players: GamePlayer[];
 }
 
 export interface Game {
@@ -97,16 +98,13 @@ export interface Game {
   matchDay: number;
   team1Id: string;
   team2Id: string;
-  matchScores: MatchScore[];
-  team1TotalPoints: number;
-  team2TotalPoints: number;
   status: 'pending' | 'in-progress' | 'completed';
   completedAt?: string;
   createdAt: string;
   // Extended runtime properties (used by components)
-  matches?: any[];
-  team1?: any;
-  team2?: any;
+  matches?: GameMatch[];
+  team1?: GameTeam;
+  team2?: GameTeam;
   matchesPerGame?: number;
   useHandicap?: boolean;
   lineupStrategy?: string;
@@ -199,32 +197,8 @@ export interface ScheduleMatchDay {
 // ============================================================================
 
 export interface PlayerMatchResult {
-  player1Score: number;
-  player2Score: number;
-  player1Points: number;
-  player2Points: number;
-  player1BonusPoints: number;
-  player2BonusPoints: number;
-}
-
-export interface TeamMatchResult {
-  team1Score: number;
-  team2Score: number;
-  team1Points: number;
-  team2Points: number;
-}
-
-export interface TeamGameResult {
-  team1Score: number;
-  team2Score: number;
-  team1Points: number;
-  team2Points: number;
-}
-
-export interface GamePointsBreakdown {
-  playerMatches: PlayerMatchResult[];
-  teamMatches: TeamMatchResult[];
-  teamGame: TeamGameResult;
+  player: number;
+  result: 'team1' | 'team2' | 'draw' | null;
   team1Points: number;
   team2Points: number;
 }
@@ -302,7 +276,6 @@ export interface SeasonSetupProps {
 export interface SeasonDashboardProps {
   seasonId: string;
   onBack: () => void;
-  onSelectGame: (gameId: string) => void;
   onPlayGame: (gameId: string) => void;
   onViewGame: (gameId: string, game?: any) => void;
   onManageTeams: () => void;
@@ -375,34 +348,6 @@ export interface PaginationProps {
 export interface LoginViewProps {
   onLogin: (userId: string, role: 'admin' | 'player') => void;
 }
-
-// ============================================================================
-// Utility Function Types
-// ============================================================================
-
-export type CalculateHandicapFn = (
-  average: number,
-  basis: number,
-  percentage: number,
-  useHandicap: boolean
-) => number;
-
-export type CalculateGamePointsFn = (
-  game: Game,
-  teams: [Team, Team],
-  playersMap: Map<string, Player>,
-  config: {
-    useHandicap: boolean;
-    handicapBasis: number;
-    handicapPercentage: number;
-    bonusRules: BonusRule[];
-    playerMatchPointsPerWin: number;
-    teamMatchPointsPerWin: number;
-    grandTotalPoints: number;
-    matchesPerGame: number;
-    playersPerTeam: number;
-  }
-) => GamePointsBreakdown;
 
 // ============================================================================
 // Export Utils

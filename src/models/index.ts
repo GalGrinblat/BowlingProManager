@@ -173,9 +173,6 @@ export const createGame = ({
   matchDay,
   team1Id,
   team2Id,
-  matchScores: [],
-  team1TotalPoints: 0,
-  team2TotalPoints: 0,
   status: 'pending',
   completedAt: undefined
 });

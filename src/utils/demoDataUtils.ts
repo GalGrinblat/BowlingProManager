@@ -64,10 +64,7 @@ const startSeasonWithGames = (season: Season, teams: Team[], league: League): Se
           round: daySchedule.round,
           matchDay: daySchedule.matchDay,
           team1Id: team1.id,
-          team2Id: team2.id,
-          matchScores: [], // Will be populated when scores are entered
-          team1TotalPoints: 0,
-          team2TotalPoints: 0
+          team2Id: team2.id
         });
       }
     });

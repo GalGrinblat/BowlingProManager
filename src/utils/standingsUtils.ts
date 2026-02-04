@@ -129,7 +129,7 @@ export const calculatePlayerSeasonStats = (teams: Team[], games: Game[]): Player
           playerStats.push({
             playerId: `${game.team1Id}-${idx}`,
             teamId: game.team1Id,
-            teamName: game.team1.name,
+            teamName: game.team1?.name || '',
             playerName: player.name,
             gamesPlayed: 0,
             totalPins: 0,
@@ -153,7 +153,7 @@ export const calculatePlayerSeasonStats = (teams: Team[], games: Game[]): Player
           playerStats.push({
             playerId: `${game.team2Id}-${idx}`,
             teamId: game.team2Id,
-            teamName: game.team2.name,
+            teamName: game.team2?.name || '',
             playerName: player.name,
             gamesPlayed: 0,
             totalPins: 0,
@@ -187,8 +187,8 @@ export const calculatePlayerSeasonStats = (teams: Team[], games: Game[]): Player
                 playerStat.highGame = pins;
               }
               
-              if (match.games && match.games[playerIdx]) {
-                playerStat.pointsScored += match.games[playerIdx].team1Points || 0;
+              if (match.playerMatches && match.playerMatches[playerIdx]) {
+                playerStat.pointsScored += match.playerMatches[playerIdx].team1Points || 0;
               }
             }
           }
@@ -214,8 +214,8 @@ export const calculatePlayerSeasonStats = (teams: Team[], games: Game[]): Player
                 playerStat.highGame = pins;
               }
               
-              if (match.games && match.games[playerIdx]) {
-                playerStat.pointsScored += match.games[playerIdx].team2Points || 0;
+              if (match.playerMatches && match.playerMatches[playerIdx]) {
+                playerStat.pointsScored += match.playerMatches[playerIdx].team2Points || 0;
               }
             }
           }

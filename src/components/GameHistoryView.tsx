@@ -87,7 +87,7 @@ export const GameHistoryView: React.FC<GameHistoryViewProps> = ({ game, onBack }
               const team2Player = match.team2?.players[playerIdx];
               const team1Pins = team1Player?.pins !== '' ? parseInt(team1Player?.pins || 0) : 0;
               const team2Pins = team2Player?.pins !== '' ? parseInt(team2Player?.pins || 0) : 0;
-              const gameResult = match.games?.[playerIdx];
+              const gameResult = match.playerMatches?.[playerIdx];
 
               return (
                 <div key={playerIdx} className="bg-gray-50 rounded-lg p-4">
