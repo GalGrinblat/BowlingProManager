@@ -151,7 +151,7 @@ export const SeasonSetup: React.FC<SeasonSetupProps> = ({ seasonId, onBack }) =>
 
             const team2Players = team2.playerIds.map((id: any) => {
               const player = players.find(p => p.id === id);
-              const playerAvg = player?.startingAverage || 0;
+              const playerAvg = 0;
               let handicap = 0;
               
               if (season.useHandicap && playerAvg < season.handicapBasis) {
@@ -411,7 +411,7 @@ const TeamSetupCard = ({ team, season, players, allTeams, isEditing, onEdit, onS
                 <div key={playerId} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                   <span className="font-semibold text-gray-600">#{idx + 1}</span>
                   <span className="font-semibold text-gray-800">{player?.name || 'Unknown'}</span>
-                  <span className="text-sm text-gray-500">Avg: {player?.startingAverage || 0}</span>
+                  <span className="text-sm text-gray-500">Avg:0</span>
                 </div>
               );
             })
@@ -474,7 +474,7 @@ const TeamSetupCard = ({ team, season, players, allTeams, isEditing, onEdit, onS
                       <div>
                         <span className="font-semibold text-gray-800">{player.name}</span>
                         <span className="text-sm text-gray-500 ml-3">
-                          Avg: {player.startingAverage || 0}
+                          Avg: 0
                         </span>
                       </div>
                     </div>

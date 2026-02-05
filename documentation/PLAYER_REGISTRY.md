@@ -234,7 +234,6 @@ const inactivePagination = usePagination(20);
 t('players.title')                  // "Player Registry"
 t('players.addPlayer')              // "Add Player"
 t('players.editPlayer')             // "Edit Player"
-t('players.startingAverage')        // "Starting Average"
 t('players.activePlayers')          // "Active Players"
 t('players.inactivePlayers')        // "Inactive Players"
 t('players.duplicateName')          // Duplicate error message

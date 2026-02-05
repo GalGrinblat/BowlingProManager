@@ -47,7 +47,7 @@ Organization
 - **Dynamic Updates**: Handicaps recalculate before each game based on current season average
   - When a game loads in SeasonGame, it checks completed games before that matchday
   - Calculates current average from all completed matches (uses `calculateCurrentPlayerAverages` from `src/utils/standingsUtils.js`)
-  - If player has completed games, handicap uses current average; otherwise uses startingAverage from player registry
+  - If player has completed games, handicap uses current average; otherwise uses 0
   - Example: Player starts at 150 avg (handicap 10), bowls 165 avg in round 1, round 2 handicap becomes 0
 - **Location**: SeasonSetup.jsx (initial games), SeasonGame.jsx (dynamic updates), models/index.js (data)
 
