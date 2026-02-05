@@ -31,30 +31,40 @@ Organization
 - ✅ **Delete Player**: Remove players with safety checks
 - ✅ **Active/Inactive Status**: Mark players as active or inactive
 
-### 2. **Search & Filter**
+### 2. **Import/Export** 🆕
+- ✅ **Export to CSV**: Download all players as CSV file
+- ✅ **Export to JSON**: Download all players as JSON file
+- ✅ **Import from CSV**: Bulk add players from CSV file
+- ✅ **Import from JSON**: Bulk add players from JSON file
+- ✅ **Import Validation**: Preview and validate before importing
+- ✅ **Duplicate Detection**: Automatically skip duplicate players
+- ✅ **Error Reporting**: See detailed errors for invalid rows
+- ✅ **Future-Proof**: Automatically handles new fields as they're added
+
+### 3. **Search & Filter**
 - ✅ **Real-time Search**: Search players by name (case-insensitive)
 - ✅ **Status Filtering**: Separate lists for active and inactive players
 - ✅ **Pagination**: 20 players per page for both active and inactive lists
 
-### 3. **Data Validation**
+### 4. **Data Validation**
 - ✅ **Name Validation**: Required, non-empty
 - ✅ **Duplicate Prevention**: Case-insensitive duplicate name detection
 - ✅ **Referential Integrity**: Cannot delete players assigned to teams
 
-### 4. **Safety Features**
+### 5. **Safety Features**
 - ✅ **Assignment Checking**: Prevents deletion of players assigned to teams
 - ✅ **Detailed Warnings**: Shows which seasons/teams the player is assigned to
 - ✅ **Inactive Alternative**: Suggests marking inactive instead of deleting
 - ✅ **Confirmation Dialogs**: Requires explicit confirmation for destructive actions
 
-### 5. **UI/UX Features**
+### 6. **UI/UX Features**
 - ✅ **Responsive Design**: Works on desktop and mobile
 - ✅ **Inline Editing**: Edit form appears in same view
 - ✅ **Visual Status**: Different styling for active vs inactive players
 - ✅ **Player Count**: Real-time count of total players
 - ✅ **Internationalization**: Full Hebrew (RTL) and English support
 
-### 6. **Integration Points**
+### 7. **Integration Points**
 - ✅ **Login System**: Players can be selected as users for player portal
 - ✅ **Season Setup**: Active players available for team assignment
 - ✅ **Team Management**: Used for roster substitutions
@@ -136,6 +146,39 @@ playersApi.delete(id: string): boolean                     // Delete player
 3. Save changes
 4. Inactive players move to "Inactive Players" section
 5. Inactive players hidden from season setup
+
+### Exporting Players
+1. Click "Export CSV" or "Export JSON" button
+2. File downloads automatically with timestamp
+3. CSV format: Compatible with Excel and spreadsheet applications
+4. JSON format: Machine-readable, includes all fields
+
+### Importing Players
+1. Click "Import File" button
+2. Select a CSV or JSON file
+3. Review the import preview modal:
+   - See valid players that will be imported
+   - View errors for invalid rows
+   - Duplicates are highlighted (will be skipped)
+4. Click "Import X Players" to confirm
+5. System creates all valid, non-duplicate players
+
+**CSV Format Example:**
+```csv
+name,active
+John Doe,true
+Jane Smith,true
+Bob Johnson,false
+```
+
+**JSON Format Example:**
+```json
+[
+  { "name": "John Doe", "active": true },
+  { "name": "Jane Smith", "active": true },
+  { "name": "Bob Johnson", "active": false }
+]
+```
 
 ## Component Architecture
 
@@ -228,11 +271,10 @@ Located in: `tests/test-validation.js`
 ### Current Limitations
 1. **No Player Statistics**: Registry shows player name only, not calculated stats
 2. **No Historical View**: Cannot see player's past league participation from registry
-3. **No Bulk Operations**: Cannot import/export players separately
+3. **Import Duplicates**: Import skips duplicates but doesn't offer update option
 4. **No Contact Info**: No email, phone, or other contact fields
 5. **No Player Notes**: Cannot add notes or comments about players
 6. **No Profile Pictures**: No avatar or photo support
-7. **No Multi-Selection**: Cannot perform batch operations
 
 ### Edge Cases Handled
 - ✅ Empty player list (shows appropriate message)
@@ -330,28 +372,7 @@ Located in: `tests/test-validation.js`
 
 ### Medium Priority Enhancements
 
-#### 5. **Player Import/Export** ⭐
-**Goal**: Bulk player management via CSV/JSON
-
-**Features**:
-- Export player list to CSV/JSON
-- Import players from CSV/JSON
-- Validation during import
-- Duplicate handling options
-- Import preview before applying
-- Error reporting for failed imports
-
-**Implementation**:
-- Add import/export buttons
-- Create CSV parser
-- Validate import data
-- Show preview modal
-- Apply batch operations
-- Generate error report
-
-**Estimated Effort**: Medium (2-3 days)
-
-#### 6. **Player Merging** ⭐
+#### 5. **Player Merging** ⭐
 **Goal**: Combine duplicate player records
 
 **Features**:
@@ -372,7 +393,7 @@ Located in: `tests/test-validation.js`
 **Estimated Effort**: Large (4-5 days)
 **Risk**: High - affects data integrity
 
-#### 7. **Player Groups/Tags** ⭐
+#### 6. **Player Groups/Tags** ⭐
 **Goal**: Categorize players for easier management
 
 **Features**:
@@ -394,7 +415,7 @@ Located in: `tests/test-validation.js`
 
 ### Low Priority / Nice-to-Have
 
-#### 8. **Player Avatar/Photo**
+#### 7. **Player Avatar/Photo**
 **Goal**: Visual identification of players
 
 **Features**:
@@ -407,7 +428,7 @@ Located in: `tests/test-validation.js`
 **Estimated Effort**: Medium (2-3 days)
 **Dependencies**: File upload system
 
-#### 9. **Player Activity Timeline**
+#### 8. **Player Activity Timeline**
 **Goal**: Visual history of player activities
 
 **Features**:
@@ -420,7 +441,7 @@ Located in: `tests/test-validation.js`
 
 **Estimated Effort**: Large (4-5 days)
 
-#### 10. **Player Comparison Tool**
+#### 9. **Player Comparison Tool**
 **Goal**: Compare multiple players side-by-side
 
 **Features**:
@@ -434,7 +455,7 @@ Located in: `tests/test-validation.js`
 **Estimated Effort**: Medium (3 days)
 **Note**: Partial implementation exists in PlayerSeasonComparison component
 
-#### 11. **Player Notes & History**
+#### 10. **Player Notes & History**
 **Goal**: Track player-specific information
 
 **Features**:
@@ -446,19 +467,6 @@ Located in: `tests/test-validation.js`
 - Note timestamps
 
 **Estimated Effort**: Small (1-2 days)
-
-#### 12. **Batch Operations**
-**Goal**: Perform actions on multiple players at once
-
-**Features**:
-- Multi-select checkboxes
-- Bulk activate/deactivate
-- Bulk delete (with safety checks)
-- Bulk tag assignment
-- Bulk export
-- Select all/none options
-
-**Estimated Effort**: Medium (2 days)
 
 ## Integration Considerations
 
@@ -541,6 +549,8 @@ The Player Registry is a **mature, well-tested component** with solid CRUD opera
 
 **Recent Changes**:
 - ✅ **Removed Starting Average Field** (February 2026): Simplified player model by removing the starting average field. Player averages are now calculated dynamically from actual game performance. Initial handicaps for new players default to maximum handicap (based on handicap basis) until they complete their first game.
+- ✅ **Added Import/Export Feature** (February 2026): Added CSV and JSON import/export functionality with validation, preview, and duplicate detection. Import/export utilities extracted to `src/utils/importExportUtils.ts` for reuse across the application.
+- ✅ **Added Import/Export** (February 2026): Added CSV and JSON import/export functionality with validation, error reporting, and duplicate detection. Designed to be future-proof by automatically handling any new fields added to the Player model.
 
 **Strengths**:
 - ✅ Robust validation and error handling

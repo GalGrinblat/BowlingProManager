@@ -3,6 +3,13 @@ import { playersApi, teamsApi, seasonsApi } from '../../services/api';
 import { createPlayer, validatePlayer } from '../../models';
 import { Pagination, usePagination } from '../common/Pagination';
 import { useTranslation } from '../../contexts/LanguageContext';
+import { 
+  exportToCSV, 
+  exportToJSON, 
+  parseJSONImport, 
+  parseCSVImport,
+  booleanConverter 
+} from '../../utils/importExportUtils';
 import type { PlayerRegistryProps } from '../../types/index';
 
 export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
@@ -15,6 +22,9 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
     active: true
   });
   const [searchTerm, setSearchTerm] = useState('');
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [importData, setImportData] = useState<any[]>([]);
+  const [importErrors, setImportErrors] = useState<string[]>([]);
   
   // Pagination state
   const activePagination = usePagination(20); // 20 players per page
@@ -104,6 +114,138 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
     setEditingId(null);
   };
 
+  // Export functions
+  const handleExportCSV = () => {
+    exportToCSV(players, 'players');
+  };
+
+  const handleExportJSON = () => {
+    exportToJSON(players, 'players');
+  };
+
+  // Import functions
+  const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const content = event.target?.result as string;
+        
+        if (file.name.endsWith('.json')) {
+          handleParseJSONImport(content);
+        } else if (file.name.endsWith('.csv')) {
+          handleParseCSVImport(content);
+        } else {
+          alert('Please upload a CSV or JSON file');
+        }
+      } catch (error) {
+        alert(`Error reading file: ${error}`);
+      }
+    };
+    reader.readAsText(file);
+    
+    // Reset file input
+    e.target.value = '';
+  };
+
+  const handleParseJSONImport = (content: string) => {
+    try {
+      const result = parseJSONImport(
+        content,
+        (item) => {
+          // Ensure required fields exist
+          if (!item.name) {
+            return { valid: false, error: 'Missing required field \'name\'' };
+          }
+          // Set defaults for missing optional fields
+          if (item.active === undefined) {
+            item.active = true;
+          }
+          return validatePlayer(item);
+        }
+      );
+
+      setImportData(result.validData);
+      setImportErrors(result.errors);
+      setShowImportModal(true);
+    } catch (error) {
+      alert(String(error));
+    }
+  };
+
+  const handleParseCSVImport = (content: string) => {
+    try {
+      const result = parseCSVImport(
+        content,
+        (item) => {
+          // Ensure required fields
+          if (!item.name) {
+            return { valid: false, error: 'Missing required field \'name\'' };
+          }
+          // Set defaults
+          if (item.active === undefined) {
+            item.active = true;
+          }
+          return validatePlayer(item);
+        },
+        ['id', 'createdAt'],
+        {
+          active: booleanConverter // Convert string 'true'/'false' to boolean
+        }
+      );
+
+      setImportData(result.validData);
+      setImportErrors(result.errors);
+      setShowImportModal(true);
+    } catch (error) {
+      alert(String(error));
+    }
+  };
+
+  const handleConfirmImport = () => {
+    let successCount = 0;
+    let duplicateCount = 0;
+
+    importData.forEach(playerData => {
+      // Check for duplicates
+      const existingPlayer = players.find(p => 
+        p.name.toLowerCase() === playerData.name.toLowerCase()
+      );
+
+      if (existingPlayer) {
+        duplicateCount++;
+        return;
+      }
+
+      playersApi.create(playerData);
+      successCount++;
+    });
+
+    setShowImportModal(false);
+    setImportData([]);
+    setImportErrors([]);
+    loadPlayers();
+
+    let message = `✅ Import complete!\n\n`;
+    message += `• ${successCount} player(s) imported\n`;
+    if (duplicateCount > 0) {
+      message += `• ${duplicateCount} duplicate(s) skipped\n`;
+    }
+    if (importErrors.length > 0) {
+      message += `• ${importErrors.length} error(s) (see modal for details)`;
+    }
+
+    alert(message);
+  };
+
+  const handleCancelImport = () => {
+    setShowImportModal(false);
+    setImportData([]);
+    setImportErrors([]);
+  };
+
   const filteredPlayers = players.filter(p =>
     p.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -175,21 +317,60 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
           </form>
         </div>
       ) : (
-        <div className="flex justify-between items-center">
-          <input
-            type="text"
-            placeholder={t('players.searchPlayers')}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-          <button
-            onClick={() => setIsAdding(true)}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
-          >
-            + {t('players.addPlayer')}
-          </button>
-        </div>
+        <>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <input
+              type="text"
+              placeholder={t('players.searchPlayers')}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+            <div className="flex gap-2 flex-wrap">
+              <button
+                onClick={() => setIsAdding(true)}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
+              >
+                + {t('players.addPlayer')}
+              </button>
+            </div>
+          </div>
+
+          {/* Import/Export Section */}
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <h3 className="text-lg font-bold text-gray-800 mb-4">Import/Export Players</h3>
+            <div className="flex flex-wrap gap-3">
+              <div className="flex gap-2">
+                <button
+                  onClick={handleExportCSV}
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold flex items-center gap-2"
+                >
+                  📥 Export CSV
+                </button>
+                <button
+                  onClick={handleExportJSON}
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold flex items-center gap-2"
+                >
+                  📥 Export JSON
+                </button>
+              </div>
+              <div>
+                <label className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-semibold cursor-pointer flex items-center gap-2 inline-block">
+                  📤 Import File
+                  <input
+                    type="file"
+                    accept=".csv,.json"
+                    onChange={handleImportFile}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+            </div>
+            <p className="text-sm text-gray-600 mt-3">
+              💡 Export your player list to CSV or JSON format. Import from CSV or JSON to add multiple players at once.
+            </p>
+          </div>
+        </>
       )}
 
       {/* Active Players List */}
@@ -275,6 +456,110 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
             itemsPerPage={inactivePagination.itemsPerPage}
             onPageChange={inactivePagination.setCurrentPage}
           />
+        </div>
+      )}
+
+      {/* Import Preview Modal */}
+      {showImportModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-2xl font-bold text-gray-800">Import Preview</h2>
+              <p className="text-gray-600 mt-1">
+                Review the players to be imported. Duplicates will be skipped.
+              </p>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-6">
+              {/* Errors */}
+              {importErrors.length > 0 && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <h3 className="font-bold text-red-800 mb-2">⚠️ Errors Found ({importErrors.length})</h3>
+                  <div className="text-sm text-red-700 space-y-1 max-h-40 overflow-y-auto">
+                    {importErrors.map((error, idx) => (
+                      <div key={idx}>• {error}</div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Valid Players */}
+              {importData.length > 0 && (
+                <div className="mb-4">
+                  <h3 className="font-bold text-gray-800 mb-3">
+                    ✅ Valid Players ({importData.length})
+                  </h3>
+                  <div className="space-y-2 max-h-96 overflow-y-auto">
+                    {importData.map((player, idx) => {
+                      const isDuplicate = players.some(p => 
+                        p.name.toLowerCase() === player.name.toLowerCase()
+                      );
+                      
+                      return (
+                        <div
+                          key={idx}
+                          className={`p-3 border rounded-lg ${
+                            isDuplicate 
+                              ? 'bg-yellow-50 border-yellow-300' 
+                              : 'bg-gray-50 border-gray-200'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <span className="font-semibold text-gray-800">{player.name}</span>
+                              <span className="text-sm text-gray-600 ml-3">
+                                Status: {player.active ? '✅ Active' : '❌ Inactive'}
+                              </span>
+                              {/* Display any additional fields */}
+                              {Object.entries(player).map(([key, value]) => {
+                                if (key === 'name' || key === 'active' || key === 'id' || key === 'createdAt') return null;
+                                return (
+                                  <span key={key} className="text-sm text-gray-600 ml-3">
+                                    {key}: {String(value)}
+                                  </span>
+                                );
+                              })}
+                            </div>
+                            {isDuplicate && (
+                              <span className="text-xs px-2 py-1 bg-yellow-200 text-yellow-800 rounded">
+                                Duplicate - will skip
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {importData.length === 0 && importErrors.length === 0 && (
+                <div className="text-center text-gray-500 py-8">
+                  No valid players found in the import file.
+                </div>
+              )}
+            </div>
+
+            <div className="p-6 border-t border-gray-200 flex justify-end gap-3">
+              <button
+                onClick={handleCancelImport}
+                className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-semibold"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmImport}
+                disabled={importData.length === 0}
+                className={`px-6 py-2 rounded-lg font-semibold ${
+                  importData.length === 0
+                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                }`}
+              >
+                Import {importData.length} Player{importData.length !== 1 ? 's' : ''}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
