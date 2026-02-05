@@ -202,7 +202,11 @@ export const parseCSVLine = (line: string): string[] => {
  * Helper function to download a file
  */
 const downloadFile = (content: string, filename: string, mimeType: string): void => {
-  const blob = new Blob([content], { type: mimeType });
+  // Add UTF-8 BOM for CSV files so Excel can properly display Hebrew/Unicode characters
+  const BOM = '\uFEFF';
+  const contentWithBOM = mimeType.includes('csv') ? BOM + content : content;
+  
+  const blob = new Blob([contentWithBOM], { type: mimeType });
   const link = document.createElement('a');
   const url = URL.createObjectURL(blob);
   link.setAttribute('href', url);
@@ -225,5 +229,6 @@ const getTimestamp = (): string => {
  * Boolean converter for CSV imports
  */
 export const booleanConverter = (value: string): boolean => {
-  return value === 'true' || value === '1' || value === 'yes';
+  const lowerValue = value.toLowerCase().trim();
+  return lowerValue === 'true' || lowerValue === '1' || lowerValue === 'yes';
 };
