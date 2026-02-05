@@ -2,6 +2,16 @@
 
 A comprehensive bowling league management system built with React, Vite, and Tailwind CSS. Features multi-league support, season tracking, automated scheduling with dates, configurable bonus rules, optional percentage-based handicap system, and an n-match scoring system (configurable matches per game) with multi-layered bonus points.
 
+## Table of Contents
+
+- [Features](#features)
+- [Scoring Rules](#scoring-rules)
+- [How to Run](#how-to-run)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
+- [Documentation](#documentation)
+- [License](#license)
+
 ## Features
 
 ### Current Features ✅
@@ -23,6 +33,7 @@ A comprehensive bowling league management system built with React, Vite, and Tai
 - Head-to-head statistics and matchup tracking
 - Season comparison view with performance charts
 - Data import/export (CSV/JSON)
+- Full internationalization support (English & Hebrew with RTL)
 
 ### Future Enhancements 🚀
 - Advanced statistics (strike rates, spare conversion, consistency metrics)
@@ -221,12 +232,31 @@ Quick fixes:
 
 ## Contributing
 
-This project is currently in active development. To contribute:
-1. Fork the repository
-2. Create a feature branch
-3. Follow existing code patterns
-4. Test thoroughly with different league configurations
-5. Submit pull request with detailed description
+We welcome contributions! See [CONTRIBUTING.md](documentation/CONTRIBUTING.md) for details on:
+- Development setup
+- Code standards
+- Testing requirements
+- Pull request process
+
+## Documentation
+
+### Core Documentation
+- **[Documentation Index](documentation/INDEX.md)** - Master guide to all documentation
+- **[Architecture Guide](documentation/ARCHITECTURE.md)** - System design and patterns
+- **[Testing Guide](documentation/TESTING.md)** - Test suite documentation
+- **[Troubleshooting](documentation/TROUBLESHOOTING.md)** - Common issues and solutions
+
+### For Developers
+- **[Contributing Guide](documentation/CONTRIBUTING.md)** - How to contribute
+- **[Start of Day](documentation/START_OF_DAY.md)** - Daily workflow
+- **[AI Agent Instructions](.github/copilot-instructions.md)** - Detailed architecture for AI
+
+### For Testers
+- **[Tester Guide](documentation/TESTER_GUIDE.md)** - Manual testing guide
+- **[Demo Data Guide](documentation/SEED_DEMO_DATA.md)** - Understanding demo data
+
+### For Deployers
+- **[Deployment Guide](documentation/DEPLOYMENT.md)** - Deploy to Vercel
 
 ## License
 
