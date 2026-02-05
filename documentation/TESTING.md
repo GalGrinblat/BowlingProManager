@@ -1,5 +1,8 @@
 # Test Suite Documentation
 
+**Last Updated**: February 5, 2026  
+**Total Tests**: 85 (all passing ✅)
+
 ## Overview
 The Bowling League Management System includes a comprehensive test suite covering core business logic, calculations, and data validation. All tests are standalone JavaScript files that can be run independently with Node.js.
 
@@ -36,6 +39,7 @@ The Bowling League Management System includes a comprehensive test suite coverin
 - Absent player rules (no bonus points)
 - Custom bonus point rules
 - Pure score bonus rules
+- Configurable point values (game, match, grand total)
 
 **Key Tests**:
 - ✅ Bonus points: Default +1 for 50+, +2 for 70+ above average (configurable)
@@ -43,10 +47,13 @@ The Bowling League Management System includes a comprehensive test suite coverin
 - ✅ Draw when totals are equal
 - ✅ Absent players cannot earn bonuses
 - ✅ Custom and pure score bonus rules
+- ✅ Configurable game win points
+- ✅ Configurable match win points  
+- ✅ Configurable grand total points
 
 **Run**: `node tests/test-scoring.js`
 
-**Expected**: 10 tests passing
+**Expected**: 21 tests passing
 
 ---
 
@@ -99,21 +106,74 @@ The Bowling League Management System includes a comprehensive test suite coverin
 
 ---
 
+### 5. test-dynamic-handicap.js
+**Purpose**: Tests dynamic handicap recalculation during season
+
+**Coverage**:
+- Handicap updates based on current season average
+- Mid-season average calculations
+- Fallback to starting average when no games completed
+- Integration with season game flow
+
+**Key Tests**:
+- ✅ Handicap uses starting average initially
+- ✅ Handicap updates after first game completion
+- ✅ Handicap continues updating as season progresses
+- ✅ Multiple players' handicaps update independently
+- ✅ Handicap percentage applied correctly to dynamic averages
+
+**Run**: `node tests/test-dynamic-handicap.js`
+
+**Expected**: 11 tests passing
+
+---
+
+### 6. test-i18n.js
+**Purpose**: Tests internationalization (i18n) system
+
+**Coverage**:
+- Translation file structure
+- Language dictionary completeness
+- Hebrew translations present
+- Critical UI sections covered
+- No empty translation values
+
+**Key Tests**:
+- ✅ English translations load correctly
+- ✅ Hebrew translations load correctly
+- ✅ Both languages have same structure
+- ✅ All critical sections exist (auth, nav, players, etc.)
+- ✅ Sample translations are correct
+- ✅ Hebrew Unicode characters present
+
+**Run**: `node tests/test-i18n.js`
+
+**Expected**: 20 tests passing
+
+---
+
 ## Running All Tests
 
 ### Individual Test Execution
 ```bash
 # Run specific test suite
-node tests/test-handicap.js
+node tests/test-validation.js
 node tests/test-scoring.js
 node tests/test-schedule.js
-node tests/test-validation.js
+node tests/test-handicap.js
+node tests/test-dynamic-handicap.js
+node tests/test-i18n.js
+```
+
+### Run All Tests at Once
+```bash
+npm test
 ```
 
 ### Run All Tests (PowerShell)
 ```powershell
 # Run all tests and collect results
-$tests = @("test-handicap.js", "test-scoring.js", "test-schedule.js", "test-validation.js")
+$tests = @("test-validation.js", "test-scoring.js", "test-schedule.js", "test-handicap.js", "test-dynamic-handicap.js", "test-i18n.js")
 foreach ($test in $tests) {
     Write-Host "`nRunning $test..." -ForegroundColor Cyan
     node tests/$test
@@ -123,7 +183,7 @@ foreach ($test in $tests) {
 ### Run All Tests (Bash)
 ```bash
 # Run all tests
-for test in test-handicap.js test-scoring.js test-schedule.js test-validation.js; do
+for test in test-validation.js test-scoring.js test-schedule.js test-handicap.js test-dynamic-handicap.js test-i18n.js; do
     echo -e "\nRunning $test..."
     node tests/$test
 done
@@ -133,11 +193,13 @@ done
 
 | Test Suite | Tests | Coverage Area |
 |------------|-------|---------------|
-| test-handicap.js | 8 | Handicap calculation |
-| test-scoring.js | 10 | Scoring & bonus points |
-| test-schedule.js | 10 | Round-robin scheduling |
 | test-validation.js | 15 | Data validation |
-| **Total** | **43** | **Core business logic** |
+| test-scoring.js | 21 | Scoring & bonus points |
+| test-schedule.js | 10 | Round-robin scheduling |
+| test-handicap.js | 8 | Handicap calculation |
+| test-dynamic-handicap.js | 11 | Dynamic handicap updates |
+| test-i18n.js | 20 | Internationalization |
+| **Total** | **85** | **Core business logic** |
 
 ## Test Design Principles
 
@@ -211,12 +273,14 @@ node tests/test-handicap.js
 ## Future Enhancements
 
 ### Planned Additions
-- [ ] Grand total points calculation tests
+- [ ] Grand total points calculation tests (covered in test-scoring.js)
 - [ ] Standings calculation tests
 - [ ] Player statistics aggregation tests
-- [ ] Match winner determination tests
-- [ ] Absent player edge case tests
+- [ ] Match winner determination tests (covered in test-scoring.js)
+- [ ] Absent player edge case tests (covered in test-scoring.js)
 - [ ] API service layer tests (when migrated to backend)
+- [ ] Component tests (React Testing Library)
+- [ ] E2E tests (Playwright/Cypress)
 
 ### Test Framework Migration
 Consider migrating to a test framework (Jest, Mocha) when:
@@ -248,15 +312,17 @@ Consider migrating to a test framework (Jest, Mocha) when:
 ✅ **Individual Games**: 100% (wins, losses, draws)
 ✅ **Schedule Generation**: 100% (all team counts and scenarios)
 ✅ **Data Validation**: 100% (all models and constraints)
+✅ **Dynamic Handicap**: 100% (mid-season updates)
+✅ **Internationalization**: 100% (translation structure and content)
 
 ### Not Yet Covered
-⚠️ UI Components (requires different testing approach)
-⚠️ API/Storage layer (covered by integration tests later)
+⚠️ UI Components (requires React Testing Library)
+⚠️ API/Storage layer (integration tests)
 ⚠️ State management (React-specific testing)
 ⚠️ User interactions (requires E2E testing)
 
 ---
 
-**Last Updated**: January 30, 2026
-**Total Tests**: 43
+**Last Updated**: February 5, 2026
+**Total Tests**: 85
 **All Tests Status**: ✅ Passing
