@@ -228,13 +228,13 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
     setImportErrors([]);
     loadPlayers();
 
-    let message = `✅ Import complete!\n\n`;
-    message += `• ${successCount} player(s) imported\n`;
+    let message = `✅ ${t('players.importComplete')}\n\n`;
+    message += `• ${successCount} ${t('players.playersImported')}\n`;
     if (duplicateCount > 0) {
-      message += `• ${duplicateCount} duplicate(s) skipped\n`;
+      message += `• ${duplicateCount} ${t('players.duplicatesSkipped')}\n`;
     }
     if (importErrors.length > 0) {
-      message += `• ${importErrors.length} error(s) (see modal for details)`;
+      message += `• ${importErrors.length} ${t('players.errorsDetails')}`;
     }
 
     alert(message);
@@ -338,25 +338,25 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
 
           {/* Import/Export Section */}
           <div className="bg-white rounded-xl shadow-lg p-6">
-            <h3 className="text-lg font-bold text-gray-800 mb-4">Import/Export Players</h3>
+            <h3 className="text-lg font-bold text-gray-800 mb-4">{t('players.importExport')}</h3>
             <div className="flex flex-wrap gap-3">
               <div className="flex gap-2">
                 <button
                   onClick={handleExportCSV}
                   className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold flex items-center gap-2"
                 >
-                  📥 Export CSV
+                  📥 {t('players.exportCSV')}
                 </button>
                 <button
                   onClick={handleExportJSON}
                   className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold flex items-center gap-2"
                 >
-                  📥 Export JSON
+                  📥 {t('players.exportJSON')}
                 </button>
               </div>
               <div>
                 <label className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-semibold cursor-pointer flex items-center gap-2 inline-block">
-                  📤 Import File
+                  📤 {t('players.importFile')}
                   <input
                     type="file"
                     accept=".csv,.json"
@@ -367,7 +367,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
               </div>
             </div>
             <p className="text-sm text-gray-600 mt-3">
-              💡 Export your player list to CSV or JSON format. Import from CSV or JSON to add multiple players at once.
+              💡 {t('players.importExportHelp')}
             </p>
           </div>
         </>
@@ -464,9 +464,9 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
             <div className="p-6 border-b border-gray-200">
-              <h2 className="text-2xl font-bold text-gray-800">Import Preview</h2>
+              <h2 className="text-2xl font-bold text-gray-800">{t('players.importPreview')}</h2>
               <p className="text-gray-600 mt-1">
-                Review the players to be imported. Duplicates will be skipped.
+                {t('players.importPreviewDesc')}
               </p>
             </div>
 
@@ -474,7 +474,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
               {/* Errors */}
               {importErrors.length > 0 && (
                 <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <h3 className="font-bold text-red-800 mb-2">⚠️ Errors Found ({importErrors.length})</h3>
+                  <h3 className="font-bold text-red-800 mb-2">⚠️ {t('players.errorsFound')} (<span className="ltr-content">{importErrors.length}</span>)</h3>
                   <div className="text-sm text-red-700 space-y-1 max-h-40 overflow-y-auto">
                     {importErrors.map((error, idx) => (
                       <div key={idx}>• {error}</div>
@@ -487,7 +487,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
               {importData.length > 0 && (
                 <div className="mb-4">
                   <h3 className="font-bold text-gray-800 mb-3">
-                    ✅ Valid Players ({importData.length})
+                    ✅ {t('players.validPlayers')} (<span className="ltr-content">{importData.length}</span>)
                   </h3>
                   <div className="space-y-2 max-h-96 overflow-y-auto">
                     {importData.map((player, idx) => {
@@ -508,7 +508,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
                             <div>
                               <span className="font-semibold text-gray-800">{player.name}</span>
                               <span className="text-sm text-gray-600 ml-3">
-                                Status: {player.active ? '✅ Active' : '❌ Inactive'}
+                                Status: {player.active ? `✅ ${t('players.statusActive')}` : `❌ ${t('players.statusInactive')}`}
                               </span>
                               {/* Display any additional fields */}
                               {Object.entries(player).map(([key, value]) => {
@@ -522,7 +522,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
                             </div>
                             {isDuplicate && (
                               <span className="text-xs px-2 py-1 bg-yellow-200 text-yellow-800 rounded">
-                                Duplicate - will skip
+                                {t('players.duplicate')}
                               </span>
                             )}
                           </div>
@@ -535,7 +535,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
 
               {importData.length === 0 && importErrors.length === 0 && (
                 <div className="text-center text-gray-500 py-8">
-                  No valid players found in the import file.
+                  {t('players.noValidPlayers')}
                 </div>
               )}
             </div>
@@ -545,7 +545,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
                 onClick={handleCancelImport}
                 className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-semibold"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 onClick={handleConfirmImport}
@@ -556,7 +556,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
                     : 'bg-blue-600 text-white hover:bg-blue-700'
                 }`}
               >
-                Import {importData.length} Player{importData.length !== 1 ? 's' : ''}
+                {t('players.importPlayers')} <span className="ltr-content">{importData.length}</span> {importData.length !== 1 ? t('players.playerPlural') : t('players.playerSingular')}
               </button>
             </div>
           </div>
