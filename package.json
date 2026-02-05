@@ -9,18 +9,46 @@
     "vercel-build": "npm ci && npm run build",
     "preview": "vite preview",
     "test": "node tests/test-validation.js && node tests/test-scoring.js && node tests/test-schedule.js && node tests/test-handicap.js && node tests/test-dynamic-handicap.js && node tests/test-i18n.js",
-    "check": "node scripts/start-of-day.js"
+    "check": "node scripts/start-of-day.js",
+    "lint": "eslint . --ext .ts,.tsx --report-unused-disable-directives --max-warnings 0",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css,md}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,css,md}\"",
+    "type-check": "tsc --noEmit",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{css,md}": [
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@eslint/js": "^9.39.2",
     "@types/react": "^18.3.27",
     "@types/react-dom": "^18.3.5",
+    "@typescript-eslint/eslint-plugin": "^8.54.0",
+    "@typescript-eslint/parser": "^8.54.0",
     "@vitejs/plugin-react": "^4.0.0",
     "autoprefixer": "^10.4.14",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.5",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.5.0",
+    "globals": "^17.3.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "postcss": "^8.4.24",
+    "prettier": "^3.8.1",
     "tailwindcss": "^3.3.0",
     "typescript": "^5.9.3",
     "vite": "^4.3.9"

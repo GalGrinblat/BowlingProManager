@@ -5,6 +5,7 @@ A comprehensive bowling league management system built with React, Vite, and Tai
 ## Features
 
 ### Current Features ✅
+
 - Multi-league organization with centralized player registry
 - Configurable league rules (handicap basis, percentage, team size, match count)
 - Flexible bonus rules system (player/team bonuses, customizable thresholds)
@@ -25,6 +26,7 @@ A comprehensive bowling league management system built with React, Vite, and Tai
 - Data import/export (CSV/JSON)
 
 ### Future Enhancements 🚀
+
 - Advanced statistics (strike rates, spare conversion, consistency metrics)
 - Playoff bracket generation for top teams
 - Export to PDF format
@@ -36,6 +38,7 @@ A comprehensive bowling league management system built with React, Vite, and Tai
 - Mobile app (React Native)
 
 ### Multi-League Organization
+
 - **Organization Management**: Single organization with multiple leagues
 - **Player Registry**: Centralized player database shared across all leagues
 - **League Configuration**:
@@ -47,6 +50,7 @@ A comprehensive bowling league management system built with React, Vite, and Tai
 - **Season Management**: Multiple seasons per league with independent configurations
 
 ### Advanced Scheduling
+
 - **Automated Round-Robin**: Generate complete schedules for any number of teams
 - **Date Integration**: Match days automatically scheduled based on league day and start date
 - **Postponement System**: Postpone match days with automatic cascading of subsequent dates
@@ -54,6 +58,7 @@ A comprehensive bowling league management system built with React, Vite, and Tai
 - **Visual Indicators**: Shows next upcoming match day on dashboard
 
 ### Configurable Bonus Rules
+
 - **Rule Types**:
   - **Player Bonuses**: Individual performance rewards
   - **Team Bonuses**: Supported by data model (UI coming soon)
@@ -64,12 +69,14 @@ A comprehensive bowling league management system built with React, Vite, and Tai
 - **Default Rules**: +1 at avg+50, +2 at avg+70
 
 ### Team Management
+
 - **Team Setup**: Assign players from registry to teams
 - **Roster Changes**: Track player substitutions with change history
 - **Absent Players**: Mark players absent per-game (auto-scores as average - 10)
 - **Flexible Size**: Configure team size per league (default 4 players)
 
 ### Comprehensive Standings
+
 - **Team Standings**:
   - Points, wins/losses/draws
   - Total pins (with and without handicap)
@@ -82,25 +89,23 @@ A comprehensive bowling league management system built with React, Vite, and Tai
 - **Real-time Updates**: Standings calculate automatically after each game
 
 ### Game Scoring System
-- **Team Setup**: 
+
+- **Team Setup**:
   - Teams assigned from player registry
   - Player averages from registry
   - Absent player handling (auto-scores as average - 10)
   - Optional handicap system with percentage control (0-100%)
   - Configurable handicap basis per league/season
-  
-- **Dynamic Match Scoring**: 
+- **Dynamic Match Scoring**:
   - Configurable number of matches (1-5, default 3)
   - Individual game tracking (configurable players per team, default 4)
   - Real-time score entry with validation (0-300 pins)
   - Live calculation of pins with handicap
   - Visual winner indicators per game
-  
-- **Multi-Layer Bonus Points**: 
+- **Multi-Layer Bonus Points**:
   - Configurable bonus rules per league
   - Default: +1 at avg+50, +2 at avg+70
   - Team and player bonuses supported
-  
 - **Comprehensive Statistics**:
   - Individual player totals and game averages
   - Team statistics (total pins, pins with handicap)
@@ -108,17 +113,18 @@ A comprehensive bowling league management system built with React, Vite, and Tai
   - Absent player tracking in summaries
 
 ### Authentication & Roles
+
 - **Admin Role**: Full CRUD on players, leagues, seasons, teams; record games
 - **Player Role**: View personal stats, enter scores for own games, compare season performance
 - **Simple Login**: Role-based authentication via AuthContext
 
 ### Data Persistence
+
 - **localStorage API**: DB-agnostic abstraction layer
 - **Easy Migration**: Switch to backend database by updating API service
 - **CRUD Operations**: Full create, read, update, delete for all entities
 - **Season Export**: Export standings, player stats, and games to CSV/JSON
-  
-- **Responsive Design**: 
+- **Responsive Design**:
   - Mobile-friendly interface
   - Dark theme scoring cards with gradients
   - Animated transitions between views
@@ -127,6 +133,7 @@ A comprehensive bowling league management system built with React, Vite, and Tai
 ## Scoring Rules
 
 ### Per-Match Scoring (All values configurable)
+
 1. **Individual Game Points** (configurable players per team, default 4):
    - Each player competes against their rank counterpart (1 vs 1, 2 vs 2, etc.)
    - Score = pins + handicap
@@ -148,12 +155,14 @@ A comprehensive bowling league management system built with React, Vite, and Tai
    - Match Points = Game Points + Bonus Points + Match Winner Points
 
 ### Grand Total Points (configurable)
+
 - After all matches complete:
   - **Configurable**: Grand Total Points (default: 2)
   - Awarded to team with highest combined pins with handicap across all matches
   - Draw = 50% of grand total points to each team if tied
 
 ### Absent Player Rules
+
 - Absent players automatically score: `average - 10` pins
 - Handicap still applies to absent player scores
 - Absent players cannot earn bonus points
@@ -161,6 +170,7 @@ A comprehensive bowling league management system built with React, Vite, and Tai
 - Can be marked absent during setup or per-game
 
 ### Handicap Calculation
+
 - **Optional**: Can be enabled/disabled per league
 - **Percentage-Based**: Configure handicap as a percentage of the difference
 - **Formula**: `handicap = Math.round((basis - average) * (percentage / 100))`
@@ -172,13 +182,17 @@ A comprehensive bowling league management system built with React, Vite, and Tai
 ## How to Run
 
 ### Start of Day Routine ☀️
+
 Before starting work each day, run the health check:
+
 ```bash
 npm run check
 ```
+
 This checks for errors, warnings, TODOs, and project health. See [START_OF_DAY.md](START_OF_DAY.md) for details.
 
 ### Development Setup
+
 ```bash
 # Install dependencies
 npm install
@@ -191,9 +205,21 @@ npm run build
 
 # Preview production build
 npm run preview
+
+# Type checking
+npm run type-check
+
+# Linting
+npm run lint           # Check for issues
+npm run lint:fix       # Auto-fix issues
+
+# Code formatting
+npm run format         # Format all files
+npm run format:check   # Check formatting
 ```
 
 ### First-Time Setup
+
 1. Start the dev server: `npm run dev`
 2. Open browser to `http://localhost:5173/BowlingAppAi/`
 3. Login as admin (role: 'admin')
@@ -203,10 +229,14 @@ npm run preview
 7. Generate schedule and start recording games
 
 ### Technology Stack
+
 - **React 18** - UI framework
 - **Vite 4.5** - Build tool and dev server
+- **TypeScript 5** - Type-safe JavaScript
 - **Tailwind CSS 3** - Utility-first styling
 - **PostCSS** - CSS processing
+- **ESLint** - Code quality and linting
+- **Prettier** - Code formatting
 - **localStorage** - Data persistence (easily replaceable)
 
 ## Troubleshooting
@@ -214,14 +244,40 @@ npm run preview
 For common issues and solutions, see [TROUBLESHOOTING.md](documentation/TROUBLESHOOTING.md).
 
 Quick fixes:
+
 - **Blank page**: Check browser console (F12) for errors
 - **Dev server won't start**: `Stop-Process -Name node -Force; npm run dev`
 - **Data lost**: Don't use private/incognito mode, use Export feature regularly
 - **Scoring issues**: Verify handicap settings and bonus rules configuration
+- **Linting errors**: Run `npm run lint:fix` to auto-fix issues
+- **Formatting issues**: Run `npm run format` to format all files
+
+## Development Guidelines
+
+### TypeScript Best Practices
+
+See [TYPESCRIPT_BEST_PRACTICES.md](documentation/TYPESCRIPT_BEST_PRACTICES.md) for:
+
+- Type safety guidelines
+- Code quality standards
+- Common patterns and anti-patterns
+- Development workflow
+
+### Code Quality
+
+This project uses:
+
+- **ESLint** for code quality enforcement
+- **Prettier** for consistent formatting
+- **Husky** for pre-commit hooks
+- **TypeScript strict mode** for type safety
+
+Pre-commit hooks automatically run linting and formatting on staged files.
 
 ## Contributing
 
 This project is currently in active development. To contribute:
+
 1. Fork the repository
 2. Create a feature branch
 3. Follow existing code patterns

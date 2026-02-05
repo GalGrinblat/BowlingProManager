@@ -1,0 +1,21 @@
+# Build outputs
+dist
+dist-ssr
+*.local
+
+# Dependencies
+node_modules
+
+# Logs
+*.log
+
+# Cache
+.cache
+
+# Test directories  
+coverage
+
+# Config files that should maintain specific formatting
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
