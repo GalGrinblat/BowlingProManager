@@ -132,7 +132,7 @@ export const SeasonSetup: React.FC<SeasonSetupProps> = ({ seasonId, onBack }) =>
           if (team1 && team2) {
             const team1Players = team1.playerIds.map((id: any) => {
               const player = players.find(p => p.id === id);
-              const playerAvg = player?.startingAverage || 0;
+              const playerAvg = 0;  // Default to 0, will be calculated from actual games
               let handicap = 0;
               
               if (season.useHandicap && playerAvg < season.handicapBasis) {

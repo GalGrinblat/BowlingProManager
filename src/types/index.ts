@@ -22,7 +22,6 @@ export interface Organization {
 export interface Player {
   id: string;
   name: string;
-  startingAverage: number;
   active: boolean;
   createdAt: DateString;
 }

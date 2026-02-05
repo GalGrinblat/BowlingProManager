@@ -238,18 +238,6 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white rounded-xl shadow-lg p-6">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-blue-100 rounded-lg">
-              <span className="text-2xl">📊</span>
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">Starting Average</p>
-              <p className="text-2xl font-bold text-gray-800">{player.startingAverage || 0}</p>
-            </div>
-          </div>
-        </div>
-        
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <div className="flex items-center gap-3">
             <div className="p-3 bg-green-100 rounded-lg">
               <span className="text-2xl">🏆</span>
             </div>

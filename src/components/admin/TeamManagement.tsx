@@ -145,7 +145,6 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
                       </div>
                       <div>
                         <div className="font-semibold text-gray-800">{player.name}</div>
-                        <div className="text-xs text-gray-500">Avg: {player.startingAverage}</div>
                       </div>
                     </div>
                   </div>
@@ -198,7 +197,6 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
                           </div>
                           <div>
                             <div className="font-semibold text-gray-800">{currentPlayer?.name}</div>
-                            <div className="text-xs text-gray-500">Avg: {currentPlayer?.startingAverage}</div>
                           </div>
                         </div>
                       </div>
@@ -219,7 +217,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
                           <option value="">Select player...</option>
                           {availablePlayers.map(player => (
                             <option key={player.id} value={player.id}>
-                              {player.name} (Avg: {player.startingAverage})
+                              {player.name}
                             </option>
                           ))}
                         </select>

@@ -370,7 +370,7 @@ const SeasonCreator = ({ league, onCancel, onSuccess }: { league: League; onCanc
         if (team1 && team2) {
           const team1Players = team1.playerIds.map((id: any, index: number) => {
             const player = availablePlayers.find(p => p.id === id);
-            const playerAvg = player?.startingAverage || 0;
+            const playerAvg = 0;  // Default to 0, will be calculated from actual games
             let handicap = 0;
             
             if (formData.useHandicap && playerAvg < formData.handicapBasis) {
@@ -390,7 +390,7 @@ const SeasonCreator = ({ league, onCancel, onSuccess }: { league: League; onCanc
 
           const team2Players = team2.playerIds.map((id: any, index: number) => {
             const player = availablePlayers.find(p => p.id === id);
-            const playerAvg = player?.startingAverage || 0;
+            const playerAvg = 0;  // Default to 0, will be calculated from actual games
             let handicap = 0;
             
             if (formData.useHandicap && playerAvg < formData.handicapBasis) {
@@ -554,9 +554,8 @@ const SeasonCreator = ({ league, onCancel, onSuccess }: { league: League; onCanc
                             disabled={!team.playerIds.includes(player.id) && team.playerIds.length >= formData.playersPerTeam}
                             className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
                           />
-                          <span className="text-sm flex-1">
+                          <span className="text-sm flex-1\">
                             {player.name}
-                            <span className="text-gray-500 text-xs ml-1">(avg: {player.startingAverage})</span>
                           </span>
                         </label>
                       ))

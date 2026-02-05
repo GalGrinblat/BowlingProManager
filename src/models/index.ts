@@ -27,15 +27,12 @@ export const createOrganization = ({
 // ===== PLAYER MODEL =====
 export const createPlayer = ({
   name = '',
-  startingAverage = 0,
   active = true
 }: {
   name?: string;
-  startingAverage?: number | string;
   active?: boolean;
 }): Omit<Player, 'id' | 'createdAt'> => ({
   name,
-  startingAverage: parseInt(String(startingAverage)) || 0,
   active
 });
 
@@ -180,9 +177,6 @@ export const createGame = ({
 export const validatePlayer = (player: Partial<Player>): ValidationResult => {
   if (!player.name || player.name.trim() === '') {
     return { valid: false, error: 'Player name is required' };
-  }
-  if (player.startingAverage !== undefined && (player.startingAverage < 0 || player.startingAverage > MAX_BOWLING_SCORE)) {
-    return { valid: false, error: `Starting average must be between 0 and ${MAX_BOWLING_SCORE}` };
   }
   return { valid: true };
 };

@@ -7,9 +7,6 @@ function validatePlayer(player) {
   if (!player.name || player.name.trim() === '') {
     return { valid: false, error: 'Player name is required' };
   }
-  if (player.startingAverage < 0 || player.startingAverage > 300) {
-    return { valid: false, error: 'Starting average must be between 0 and 300' };
-  }
   return { valid: true };
 }
 
@@ -66,7 +63,7 @@ const tests = [
   {
     name: 'Player - Valid player',
     test: () => {
-      const result = validatePlayer({ name: 'John Doe', startingAverage: 180 });
+      const result = validatePlayer({ name: 'John Doe' });
       return result.valid === true;
     },
     expected: 'valid',
@@ -75,29 +72,11 @@ const tests = [
   {
     name: 'Player - Empty name',
     test: () => {
-      const result = validatePlayer({ name: '', startingAverage: 180 });
+      const result = validatePlayer({ name: '' });
       return result.valid === false && result.error.includes('name is required');
     },
     expected: 'invalid',
     description: 'Should reject empty player name'
-  },
-  {
-    name: 'Player - Average too high',
-    test: () => {
-      const result = validatePlayer({ name: 'John Doe', startingAverage: 350 });
-      return result.valid === false && result.error.includes('0 and 300');
-    },
-    expected: 'invalid',
-    description: 'Should reject average above 300'
-  },
-  {
-    name: 'Player - Negative average',
-    test: () => {
-      const result = validatePlayer({ name: 'John Doe', startingAverage: -10 });
-      return result.valid === false && result.error.includes('0 and 300');
-    },
-    expected: 'invalid',
-    description: 'Should reject negative average'
   },
   {
     name: 'League - Valid league',

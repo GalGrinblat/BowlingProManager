@@ -3,7 +3,6 @@ import { playersApi, teamsApi, seasonsApi } from '../../services/api';
 import { createPlayer, validatePlayer } from '../../models';
 import { Pagination, usePagination } from '../common/Pagination';
 import { useTranslation } from '../../contexts/LanguageContext';
-import { MAX_BOWLING_SCORE } from '../../constants/bowling';
 import type { PlayerRegistryProps } from '../../types/index';
 
 export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
@@ -13,7 +12,6 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
-    startingAverage: '',
     active: true
   });
   const [searchTerm, setSearchTerm] = useState('');
@@ -61,7 +59,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
       alert(`✅ "${playerData.name}" ${t('players.created')}`);
     }
 
-    setFormData({ name: '', startingAverage: '', active: true });
+    setFormData({ name: '', active: true });
     setIsAdding(false);
     loadPlayers();
   };
@@ -69,7 +67,6 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
   const handleEdit = (player: any) => {
     setFormData({
       name: player.name,
-      startingAverage: player.startingAverage || '',
       active: player.active
     });
     setEditingId(player.id);
@@ -102,7 +99,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
   };
 
   const handleCancel = () => {
-    setFormData({ name: '', startingAverage: '', active: true });
+    setFormData({ name: '', active: true });
     setIsAdding(false);
     setEditingId(null);
   };
@@ -148,32 +145,17 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
             {editingId ? t('players.editPlayer') : t('players.addNewPlayer')}
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  {t('common.name')} *
-                </label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  {t('players.startingAverage')}
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  max={MAX_BOWLING_SCORE}
-                  value={formData.startingAverage}
-                  onChange={(e) => setFormData({ ...formData, startingAverage: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                {t('common.name')} *
+              </label>
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                required
+              />
             </div>
             <div className="flex gap-3">
               <button
@@ -229,9 +211,6 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
                 <div className="flex justify-between items-start">
                   <div>
                     <h3 className="font-semibold text-gray-800">{player.name}</h3>
-                    <div className="text-sm text-gray-600 mt-1">
-                      <div>📊 {t('players.startingAverage')}: <span className="ltr-content">{player.startingAverage || t('players.notSet')}</span></div>
-                    </div>
                   </div>
                   <div className="flex gap-2">
                     <button
@@ -277,9 +256,6 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
                 <div className="flex justify-between items-start">
                   <div>
                     <h3 className="font-semibold text-gray-600">{player.name}</h3>
-                    <div className="text-sm text-gray-500 mt-1">
-                      {t('players.startingAverage')}: <span className="ltr-content">{player.startingAverage || t('players.notSet')}</span>
-                    </div>
                   </div>
                   <div className="flex gap-2">
                     <button

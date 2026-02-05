@@ -103,9 +103,6 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin }) => {
                       <div className="flex items-center justify-between">
                         <div>
                           <span className="font-semibold text-gray-800">{player.name}</span>
-                          <span className="text-sm text-gray-500 ml-3">
-                            Avg: {player.startingAverage || 0}
-                          </span>
                         </div>
                         {selectedPlayer === player.id && (
                           <span className="text-purple-600">✓</span>

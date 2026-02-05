@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { gamesApi, teamsApi, seasonsApi, playersApi } from '../../services/api';
+import { gamesApi, teamsApi, seasonsApi } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { MatchView } from '../common/MatchView';
 import { SummaryView } from '../common/SummaryView';
@@ -77,22 +77,18 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
       // Calculate current player averages from completed games
       const currentAverages = calculateCurrentPlayerAverages(teams, completedGames);
       
-      // Get all players to look up starting averages
-      const allPlayers = playersApi.getAll();
-      
       // Update team1 player averages and handicaps
       if (gameData.team1 && gameData.team1.players) {
         gameData.team1.players = gameData.team1.players.map((player: any) => {
-          // Use current average if player has played games, otherwise use starting average
+          // Use current average if player has played games, otherwise default to 0
           const currentAvg = currentAverages[player.name];
           let playerAvg;
           
           if (currentAvg && currentAvg.gamesPlayed > 0) {
             playerAvg = currentAvg.average;
           } else {
-            // No games played yet, use starting average from player registry
-            const registryPlayer = allPlayers.find(p => p.name === player.name);
-            playerAvg = registryPlayer?.startingAverage || player.average;
+            // No games played yet, default to 0
+            playerAvg = 0;
           }
           
           // Recalculate handicap
@@ -113,16 +109,15 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
       // Update team2 player averages and handicaps
       if (gameData.team2 && gameData.team2.players) {
         gameData.team2.players = gameData.team2.players.map((player: any) => {
-          // Use current average if player has played games, otherwise use starting average
+          // Use current average if player has played games, otherwise default to 0
           const currentAvg = currentAverages[player.name];
           let playerAvg;
           
           if (currentAvg && currentAvg.gamesPlayed > 0) {
             playerAvg = currentAvg.average;
           } else {
-            // No games played yet, use starting average from player registry
-            const registryPlayer = allPlayers.find(p => p.name === player.name);
-            playerAvg = registryPlayer?.startingAverage || player.average;
+            // No games played yet, default to 0
+            playerAvg = 0;
           }
           
           // Recalculate handicap
