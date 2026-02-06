@@ -325,7 +325,6 @@ const en: TranslationDictionary = {
     createMissingTeams: 'Create Missing Teams',
     setupIncomplete: 'Setup incomplete',
     selectPlayers: 'Select {{count}} Players ({{selected}} selected)',
-    noAvailablePlayers: 'No available players',
     teamNameRequired: 'Team name is required',
     duplicateTeamName: 'A team named "{{name}}" already exists. Please use a different name.',
     selectExactPlayers: 'Please select exactly {{count}} players',

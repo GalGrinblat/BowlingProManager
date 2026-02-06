@@ -323,7 +323,6 @@ const he: TranslationDictionary = {
     createMissingTeams: 'צור קבוצות חסרות',
     setupIncomplete: 'הקמה לא הושלמה',
     selectPlayers: 'בחר {{count}} שחקנים ({{selected}} נבחרו)',
-    noAvailablePlayers: 'אין שחקנים זמינים',
     teamNameRequired: 'שם קבוצה הוא חובה',
     duplicateTeamName: 'קבוצה בשם "{{name}}" כבר קיימת. אנא השתמש בשם אחר.',
     selectExactPlayers: 'אנא בחר בדיוק {{count}} שחקנים',
