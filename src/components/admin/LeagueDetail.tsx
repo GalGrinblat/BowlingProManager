@@ -110,7 +110,7 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
             onClick={handleCreateSeason}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
           >
-            + Create New Season
+            + {t('seasons.createSeason')}
           </button>
         </div>
       )}
@@ -132,7 +132,7 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
         <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white">
           <div className="flex justify-between items-start">
             <div>
-              <div className="text-sm font-semibold mb-1">ACTIVE SEASON</div>
+              <div className="text-sm font-semibold mb-1">{t('seasons.active').toUpperCase()}</div>
               <h2 className="text-2xl font-bold mb-2">{activeSeason.name}</h2>
               <div className="flex gap-4 text-sm">
                 <span>🏆 {activeSeason.numberOfTeams} teams</span>
@@ -144,7 +144,7 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
               onClick={() => onViewSeason(activeSeason.id)}
               className="px-4 py-2 bg-white text-green-600 rounded-lg hover:bg-green-50 font-semibold"
             >
-              View Season →
+              {t('seasons.viewSeason')} →
             </button>
           </div>
         </div>
@@ -153,7 +153,7 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
       {/* Setup Seasons */}
       {setupSeasons.length > 0 && (
         <div className="bg-white rounded-xl shadow-lg p-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Seasons in Setup</h2>
+          <h2 className="text-xl font-bold text-gray-800 mb-4">{t('seasons.seasonsInSetup')}</h2>
           <div className="space-y-3">
             {setupSeasons.map(season => {
               const teams = teamsApi.getBySeason(season.id);
@@ -175,7 +175,7 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
                       </div>
                       {!isComplete && (
                         <div className="mt-2 text-sm text-orange-600">
-                          ⚠️ Setup incomplete - teams need to be configured
+                          ⚠️ {t('seasons.setupIncompleteWarning')}
                         </div>
                       )}
                     </div>
@@ -184,13 +184,13 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
                         onClick={() => onViewSeason(season.id)}
                         className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
                       >
-                        Continue Setup
+                        {t('seasons.continueSetup')}
                       </button>
                       <button
                         onClick={() => handleDeleteSeason(season.id)}
                         className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200"
                       >
-                        Delete
+                        {t('common.delete')}
                       </button>
                     </div>
                   </div>
@@ -204,7 +204,7 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
       {/* Completed Seasons */}
       {completedSeasons.length > 0 && (
         <div className="bg-white rounded-xl shadow-lg p-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Season Archives</h2>
+          <h2 className="text-xl font-bold text-gray-800 mb-4">{t('seasons.seasonArchives')}</h2>
           <div className="space-y-3">
             {completedSeasons.map(season => {
               const teams = teamsApi.getBySeason(season.id);
@@ -225,7 +225,7 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
                       <div className="flex items-center gap-3 mb-2">
                         <h3 className="text-lg font-semibold text-gray-800">{season.name}</h3>
                         <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold">
-                          COMPLETED
+                          {t('seasons.completed').toUpperCase()}
                         </span>
                       </div>
                       {champion && (
@@ -255,8 +255,8 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
       {seasons.length === 0 && !isCreatingSeason && (
         <div className="bg-white rounded-xl shadow-lg p-12 text-center">
           <div className="text-6xl mb-4">🏆</div>
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">No Seasons Yet</h3>
-          <p className="text-gray-600 mb-6">Create your first season to get started</p>
+          <h3 className="text-xl font-semibold text-gray-800 mb-2">{t('seasons.noSeasonsYet')}</h3>
+          <p className="text-gray-600 mb-6">{t('seasons.createFirstSeason')}</p>
         </div>
       )}
     </div>
@@ -265,6 +265,7 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
 
 // Season Creator Component
 const SeasonCreator = ({ league, onCancel, onSuccess }: { league: League; onCancel: () => void; onSuccess: () => void }) => {
+  const { t } = useTranslation();
   const [step, setStep] = useState<1 | 2>(1);
   const [formData, setFormData] = useState({
     name: '',
@@ -509,8 +510,8 @@ const SeasonCreator = ({ league, onCancel, onSuccess }: { league: League; onCanc
   if (step === 2) {
     return (
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">Configure Teams</h2>
-        <p className="text-gray-600 mb-6">Assign players to each team ({formData.playersPerTeam} players per team)</p>
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('seasons.configureTeams')}</h2>
+        <p className="text-gray-600 mb-6">{t('seasons.assignPlayersDesc').replace('{{count}}', String(formData.playersPerTeam))}</p>
         
         <div className="space-y-6 max-h-[600px] overflow-y-auto">
           {teams.map((team, teamIndex) => {
@@ -521,7 +522,7 @@ const SeasonCreator = ({ league, onCancel, onSuccess }: { league: League; onCanc
               <div key={teamIndex} className="border rounded-lg p-4">
                 <div className="mb-3">
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Team {teamIndex + 1} Name *
+                    {t('teams.name')} {teamIndex + 1} *
                   </label>
                   <input
                     type="text"
@@ -534,11 +535,11 @@ const SeasonCreator = ({ league, onCancel, onSuccess }: { league: League; onCanc
                 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Players ({team.playerIds.length}/{formData.playersPerTeam})
+                    {t('common.players')} ({team.playerIds.length}/{formData.playersPerTeam})
                   </label>
                   <div className="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto border rounded p-2">
                     {availableForThisTeam.length === 0 ? (
-                      <p className="col-span-2 text-gray-500 text-sm">No available players</p>
+                      <p className="col-span-2 text-gray-500 text-sm">{t('seasons.noAvailablePlayers')}</p>
                     ) : (
                       availableForThisTeam.map(player => (
                         <label
@@ -573,21 +574,21 @@ const SeasonCreator = ({ league, onCancel, onSuccess }: { league: League; onCanc
             onClick={() => setStep(1)}
             className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-semibold"
           >
-            ← Back
+            ← {t('common.back')}
           </button>
           <button
             type="button"
             onClick={handleFinalSubmit}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
           >
-            Create Season
+            {t('seasons.createSeason')}
           </button>
           <button
             type="button"
             onClick={onCancel}
             className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-semibold"
           >
-            Cancel
+            {t('common.cancel')}
           </button>
         </div>
       </div>
@@ -596,12 +597,12 @@ const SeasonCreator = ({ league, onCancel, onSuccess }: { league: League; onCanc
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-6">
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">Create New Season - Step 1</h2>
+      <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('seasons.createSeasonStep1')}</h2>
       <form onSubmit={handleStepOneSubmit} className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="md:col-span-2">
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Season Name *
+              {t('seasons.seasonName')} *
             </label>
             <input
               type="text"
@@ -614,7 +615,7 @@ const SeasonCreator = ({ league, onCancel, onSuccess }: { league: League; onCanc
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Number of Teams *
+              {t('seasons.numberOfTeams')} *
             </label>
             <input
               type="number"
@@ -628,7 +629,7 @@ const SeasonCreator = ({ league, onCancel, onSuccess }: { league: League; onCanc
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Players per Team *
+              {t('seasons.playersPerTeam')} *
             </label>
             <input
               type="number"
@@ -642,7 +643,7 @@ const SeasonCreator = ({ league, onCancel, onSuccess }: { league: League; onCanc
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Number of Rounds *
+              {t('seasons.numberOfRounds')} *
             </label>
             <input
               type="number"
@@ -654,12 +655,12 @@ const SeasonCreator = ({ league, onCancel, onSuccess }: { league: League; onCanc
               required
             />
             <p className="text-xs text-gray-500 mt-1">
-              Each team plays all others per round
+              {t('seasons.roundExplanation')}
             </p>
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Matches per Game
+              {t('seasons.matchesPerGame')}
             </label>
             <input
               type="number"
@@ -670,14 +671,14 @@ const SeasonCreator = ({ league, onCancel, onSuccess }: { league: League; onCanc
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
             <p className="text-xs text-gray-500 mt-1">
-              Number of matches in each game
+              {t('seasons.matchesExplanation')}
             </p>
           </div>
         </div>
         
         {/* Handicap Settings Section */}
         <div className="border-t pt-4 mt-4">
-          <h3 className="text-lg font-bold text-gray-800 mb-3">Handicap Settings</h3>
+          <h3 className="text-lg font-bold text-gray-800 mb-3">{t('leagues.handicapSettings')}</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
@@ -688,13 +689,13 @@ const SeasonCreator = ({ league, onCancel, onSuccess }: { league: League; onCanc
                   onChange={(e) => setFormData({ ...formData, useHandicap: e.target.checked })}
                   className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
                 />
-                <span className="text-sm font-semibold text-gray-700">Use Handicap</span>
+                <span className="text-sm font-semibold text-gray-700">{t('leagues.useHandicap')}</span>
               </label>
-              <p className="text-xs text-gray-500 mt-1">Enable or disable handicap</p>
+              <p className="text-xs text-gray-500 mt-1">{t('leagues.handicapToggleDesc')}</p>
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Handicap Basis
+                {t('leagues.handicapBasis')}
               </label>
               <input
                 type="number"
@@ -705,11 +706,11 @@ const SeasonCreator = ({ league, onCancel, onSuccess }: { league: League; onCanc
                 disabled={!formData.useHandicap}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
-              <p className="text-xs text-gray-500 mt-1">Pin basis for calculation</p>
+              <p className="text-xs text-gray-500 mt-1">{t('leagues.handicapBasisDesc')}</p>
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Handicap Percentage
+                {t('leagues.handicapPercentage')}
               </label>
               <input
                 type="number"
@@ -721,7 +722,7 @@ const SeasonCreator = ({ league, onCancel, onSuccess }: { league: League; onCanc
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
               <p className="text-xs text-gray-500 mt-1">
-                Percentage of difference from basis
+                {t('leagues.handicapPercentageDesc')}
               </p>
             </div>
           </div>
@@ -729,7 +730,7 @@ const SeasonCreator = ({ league, onCancel, onSuccess }: { league: League; onCanc
         
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Start Date
+            {t('seasons.startDate')}
           </label>
           <input
             type="date"
@@ -744,14 +745,14 @@ const SeasonCreator = ({ league, onCancel, onSuccess }: { league: League; onCanc
             type="submit"
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
           >
-            Next: Configure Teams →
+            {t('seasons.nextConfigureTeams')} →
           </button>
           <button
             type="button"
             onClick={onCancel}
             className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-semibold"
           >
-            Cancel
+            {t('common.cancel')}
           </button>
         </div>
       </form>

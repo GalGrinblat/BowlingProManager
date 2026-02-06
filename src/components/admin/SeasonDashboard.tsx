@@ -58,11 +58,11 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
     const incompleteGames = games.filter(g => g.status !== 'completed');
     
     if (incompleteGames.length > 0) {
-      alert(`Cannot complete season. ${incompleteGames.length} game(s) are not completed.`);
+      alert(t('seasons.cannotCompleteIncomplete').replace('{{count}}', String(incompleteGames.length)));
       return;
     }
 
-    if (confirm('Complete this season? This will finalize all results and standings.')) {
+    if (confirm(t('seasons.confirmComplete'))) {
       seasonsApi.update(seasonId, { status: 'completed' });
       loadSeasonData();
     }
@@ -70,7 +70,7 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
 
   const handlePostponeMatchDay = () => {
     if (!league.dayOfWeek) {
-      alert('Cannot postpone: League has no day of week configured.');
+      alert(t('seasons.cannotPostponeNoDay'));
       return;
     }
 
@@ -79,11 +79,11 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
     const hasCompletedGames = matchDayGamesToCheck.some(g => g.status === 'completed');
     
     if (hasCompletedGames) {
-      alert('Cannot postpone: Some games in this match day are already completed.');
+      alert(t('seasons.cannotPostponeCompleted'));
       return;
     }
 
-    if (confirm(`Postpone Match Day ${selectedMatchDay} by ${postponeWeeks} week(s)? All subsequent match days will also shift.`)) {
+    if (confirm(t('seasons.confirmPostpone').replace('{{matchDay}}', String(selectedMatchDay)).replace('{{weeks}}', String(postponeWeeks)))) {
       const updatedSchedule = postponeMatchDay(
         season.schedule,
         selectedMatchDay!,
@@ -112,7 +112,7 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
     }
   };
 
-  if (!season || !league) return <div>Loading...</div>;
+  if (!season || !league) return <div>{t('seasons.loading')}</div>;
 
   const teamStandings = calculateTeamStandings(teams, games);
   const playerStats = calculatePlayerSeasonStats(teams, games);
@@ -138,15 +138,15 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
               <h1 className="text-3xl font-bold text-gray-800">{season.name}</h1>
               {isCompleted && (
                 <span className="px-3 py-1 bg-green-100 text-green-700 rounded-lg text-sm font-semibold">
-                  COMPLETED
+                  {t('seasons.completed')}
                 </span>
               )}
             </div>
             <p className="text-gray-600">{league.name}</p>
             <div className="flex gap-4 mt-4 text-sm text-gray-600">
-              <span>🏆 {teams.length} teams</span>
-              <span>🎳 {completedGames}/{totalGames} games complete</span>
-              <span>🔄 Round {selectedRound} of {season.numberOfRounds}</span>
+              <span>🏆 {t('seasons.teamsCount').replace('{{count}}', String(teams.length))}</span>
+              <span>🎳 {t('seasons.gamesComplete').replace('{{completed}}', String(completedGames)).replace('{{total}}', String(totalGames))}</span>
+              <span>🔄 {t('seasons.roundOf').replace('{{current}}', String(selectedRound)).replace('{{total}}', String(season.numberOfRounds))}</span>
             </div>
           </div>
           <div className="flex flex-col items-end gap-2">
@@ -163,7 +163,7 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
                     onClick={onManageTeams}
                     className="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 font-semibold"
                   >
-                    👥 Manage Teams
+                    👥 {t('seasons.manageTeams')}
                   </button>
                 )}
                 {completedGames === totalGames && (
@@ -171,7 +171,7 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
                     onClick={handleCompleteSeason}
                     className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold"
                   >
-                    Complete Season
+                    {t('seasons.completeSeason')}
                   </button>
                 )}
               </div>
@@ -185,20 +185,20 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
         <div className="bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-500 rounded-xl shadow-lg p-8 text-white">
           <div className="text-center">
             <div className="text-6xl mb-4">🏆</div>
-            <h2 className="text-4xl font-bold mb-2">Season Champion</h2>
+            <h2 className="text-4xl font-bold mb-2">{t('seasons.champion')}</h2>
             <h3 className="text-3xl font-bold mb-4">{champion.teamName}</h3>
             <div className="flex justify-center gap-8 text-lg">
               <div>
                 <div className="text-2xl font-bold">{champion.points}</div>
-                <div className="text-sm opacity-90">Points</div>
+                <div className="text-sm opacity-90">{t('common.points')}</div>
               </div>
               <div>
                 <div className="text-2xl font-bold">{champion.wins}-{champion.losses}-{champion.draws}</div>
-                <div className="text-sm opacity-90">W-L-D</div>
+                <div className="text-sm opacity-90">{t('seasons.wld')}</div>
               </div>
               <div>
                 <div className="text-2xl font-bold">{champion.totalPinsWithHandicap.toLocaleString()}</div>
-                <div className="text-sm opacity-90">Total Pins</div>
+                <div className="text-sm opacity-90">{t('seasons.totalPins')}</div>
               </div>
             </div>
           </div>
@@ -208,7 +208,7 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
       {/* Progress Bar */}
       <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">
         <div className="flex justify-between items-center mb-2">
-          <h2 className="text-xl font-bold">Season Progress</h2>
+          <h2 className="text-xl font-bold">{t('seasons.seasonProgress')}</h2>
           <span className="text-sm font-semibold">{Math.round(progressPercent)}%</span>
         </div>
         <div className="bg-blue-400 rounded-full h-3">
@@ -226,8 +226,8 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
           <div className="flex items-center gap-3">
             <span className="text-2xl">📚</span>
             <div>
-              <p className="font-semibold text-blue-800">Season Archive</p>
-              <p className="text-sm text-blue-600">This season has been completed. You can view all results and statistics below.</p>
+              <p className="font-semibold text-blue-800">{t('seasons.seasonArchive')}</p>
+              <p className="text-sm text-blue-600">{t('seasons.seasonArchiveDesc')}</p>
             </div>
           </div>
         </div>
@@ -243,7 +243,7 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
               : 'text-gray-600 hover:bg-gray-100'
           }`}
         >
-          📅 {isCompleted ? 'Game Results' : 'Schedule'}
+          📅 {isCompleted ? t('seasons.gameResults') : t('seasons.schedule')}
         </button>
         <button
           onClick={() => setView('teamStandings')}
@@ -253,7 +253,7 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
               : 'text-gray-600 hover:bg-gray-100'
           }`}
         >
-          🏆 {isCompleted ? 'Final Team Standings' : 'Team Standings'}
+          🏆 {isCompleted ? t('seasons.finalTeamStandings') : t('seasons.teamStandings')}
         </button>
         <button
           onClick={() => setView('h2h')}
@@ -263,7 +263,7 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
               : 'text-gray-600 hover:bg-gray-100'
           }`}
         >
-          📊 Head-to-Head
+          📊 {t('seasons.headToHead')}
         </button>
         <button
           onClick={() => setView('playerStandings')}
@@ -273,7 +273,7 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
               : 'text-gray-600 hover:bg-gray-100'
           }`}
         >
-          👥 Player Standings
+          👥 {t('seasons.playerStandings')}
         </button>
         <button
           onClick={() => setView('records')}
@@ -283,7 +283,7 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
               : 'text-gray-600 hover:bg-gray-100'
           }`}
         >
-          🏅 Season Records
+          🏅 {t('seasons.seasonRecords')}
         </button>
       </div>
 
@@ -292,7 +292,7 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
         <div className="space-y-4">
           {/* Round Selector */}
           <div className="bg-white rounded-xl shadow-lg p-4">
-            <h3 className="text-sm font-semibold text-gray-600 mb-2">Select Round</h3>
+            <h3 className="text-sm font-semibold text-gray-600 mb-2">{t('seasons.selectRound')}</h3>
             <div className="flex gap-2 flex-wrap">
               {Array.from({ length: season.numberOfRounds }, (_, i) => i + 1).map(round => {
                 const roundGamesForRound = games.filter(g => g.round === round);
@@ -319,7 +319,7 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
-                    Round {round} ({completedInRound}/{roundGamesForRound.length})
+                    {t('schedule.round')} {round} ({completedInRound}/{roundGamesForRound.length})
                   </button>
                 );
               })}
@@ -330,13 +330,13 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
           {matchDaysInRound.length > 0 && (
             <div className="bg-white rounded-xl shadow-lg p-4">
               <div className="flex justify-between items-center mb-2">
-                <h3 className="text-sm font-semibold text-gray-600">Select Match Day</h3>
+                <h3 className="text-sm font-semibold text-gray-600">{t('seasons.selectMatchDay')}</h3>
                 {season.status === 'active' && selectedMatchDay && (
                   <button
                     onClick={() => setShowPostponeModal(true)}
                     className="px-3 py-1 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 font-semibold text-xs"
                   >
-                    📅 Postpone
+                    📅 {t('seasons.postpone')}
                   </button>
                 )}
               </div>
@@ -360,7 +360,7 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       } ${isPostponed ? 'ring-2 ring-orange-400' : ''}`}
                     >
-                      <div>Match Day {matchDay}</div>
+                      <div>{t('seasons.matchDay')} {matchDay}</div>
                       {dateDisplay && (
                         <div className="text-xs mt-1 opacity-90">
                           {isPostponed && '⚠️ '}{dateDisplay}
@@ -377,10 +377,10 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
           {/* Games List */}
           <div className="bg-white rounded-xl shadow-lg p-6">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              Round {selectedRound} - Match Day {selectedMatchDay}
+              {t('schedule.round')} {selectedRound} - {t('seasons.matchDay')} {selectedMatchDay}
             </h2>
             {matchDayGames.length === 0 ? (
-              <p className="text-gray-500 text-center py-4">No games in this match day</p>
+              <p className="text-gray-500 text-center py-4">{t('seasons.noGamesInMatchDay')}</p>
             ) : (
               <div className="space-y-3">
                 {matchDayGames.map(game => {
@@ -409,21 +409,21 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
       {/* Team Standings View */}
       {view === 'teamStandings' && (
         <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Team Standings</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('seasons.teamStandings')}</h2>
           <div className="overflow-x-auto -mx-4 sm:mx-0">
             <div className="inline-block min-w-full align-middle">
               <div className="overflow-hidden">
                 <table className="min-w-full">
                   <thead className="bg-gray-100">
                     <tr className="text-left">
-                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm">Rank</th>
-                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm">Team</th>
-                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm">GP</th>
-                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm">W</th>
-                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm">L</th>
-                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm hidden sm:table-cell">D</th>
-                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm">Points</th>
-                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm hidden md:table-cell">Pins</th>
+                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm">{t('seasons.rank')}</th>
+                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm">{t('seasons.team')}</th>
+                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm">{t('seasons.gamesPlayed')}</th>
+                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm">{t('common.wins')}</th>
+                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm">{t('common.losses')}</th>
+                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm hidden sm:table-cell">{t('common.draws')}</th>
+                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm">{t('seasons.points')}</th>
+                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm hidden md:table-cell">{t('seasons.pins')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -454,8 +454,8 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
       {/* Head-to-Head View */}
       {view === 'h2h' && (
         <div className="bg-white rounded-xl shadow-lg p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Head-to-Head Records</h2>
-          <p className="text-gray-600 mb-6">All team matchup records for this season</p>
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('seasons.headToHeadRecords')}</h2>
+          <p className="text-gray-600 mb-6">{t('seasons.headToHeadDesc')}</p>
           <div className="space-y-6">
             {teams.map(team => {
               // Get all opponents this team has played
@@ -471,8 +471,8 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
                       if (h2h.gamesPlayed === 0) {
                         return (
                           <div key={opponent.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                            <span className="text-gray-600">vs {opponent.name}</span>
-                            <span className="text-sm text-gray-500 italic">No matchups yet</span>
+                            <span className="text-gray-600">{t('seasons.vs')} {opponent.name}</span>
+                            <span className="text-sm text-gray-500 italic">{t('seasons.noMatchupsYet')}</span>
                           </div>
                         );
                       }
@@ -489,7 +489,7 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
                           'bg-gray-50 border border-gray-200'
                         }`}>
                           <div className="flex-1">
-                            <div className="font-semibold text-gray-800">vs {opponent.name}</div>
+                            <div className="font-semibold text-gray-800">{t('seasons.vs')} {opponent.name}</div>
                             <div className="text-sm text-gray-600 mt-1">
                               {formatHeadToHead(h2h, team.name, opponent.name)}
                             </div>
@@ -503,7 +503,7 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
                               {teamWins}-{opponentWins}{h2h.ties > 0 ? `-${h2h.ties}` : ''}
                             </div>
                             <div className="text-xs text-gray-500 mt-1">
-                              Avg: {h2h.team1AvgPoints.toFixed(1)} pts
+                              {t('seasons.avg')}: {h2h.team1AvgPoints.toFixed(1)} {t('seasons.pts')}
                             </div>
                           </div>
                         </div>
@@ -663,21 +663,21 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
       {view === 'playerStandings' && (
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="p-4 sm:p-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Player Standings ({playerStats.length} players)</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('seasons.playerStandings')} ({playerStats.length} {t('nav.players').toLowerCase()})</h2>
             <div className="overflow-x-auto -mx-4 sm:mx-0">
               <div className="inline-block min-w-full align-middle">
                 <div className="overflow-hidden">
                   <table className="min-w-full">
                     <thead className="bg-gray-100">
                       <tr className="text-left">
-                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm">Rank</th>
-                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm">Player</th>
-                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm hidden lg:table-cell">Team</th>
-                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm">GP</th>
-                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm">Avg</th>
-                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm hidden sm:table-cell">High</th>
-                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm hidden md:table-cell">Series</th>
-                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm hidden lg:table-cell">Pins</th>
+                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm">{t('seasons.rank')}</th>
+                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm">{t('seasons.player')}</th>
+                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm hidden lg:table-cell">{t('seasons.team')}</th>
+                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm">{t('seasons.gamesPlayed')}</th>
+                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm">{t('seasons.avg')}</th>
+                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm hidden sm:table-cell">{t('seasons.high')}</th>
+                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm hidden md:table-cell">{t('seasons.series')}</th>
+                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm hidden lg:table-cell">{t('seasons.pins')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -712,20 +712,20 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
       {showPostponeModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full">
-            <h3 className="text-xl font-bold text-gray-800 mb-4">Postpone Match Day {selectedMatchDay}</h3>
+            <h3 className="text-xl font-bold text-gray-800 mb-4">{t('seasons.postponeMatchDay').replace('{{matchDay}}', String(selectedMatchDay))}</h3>
             
             <div className="mb-4">
               <p className="text-sm text-gray-600 mb-2">
-                Current date: {season.schedule?.find((s: any) => s.matchDay === selectedMatchDay)?.date
+                {t('seasons.currentDate')}: {season.schedule?.find((s: any) => s.matchDay === selectedMatchDay)?.date
                   ? formatMatchDate(season.schedule.find((s: any) => s.matchDay === selectedMatchDay)!.date)
-                  : 'Not scheduled'}
+                  : t('seasons.notScheduled')}
               </p>
               <p className="text-sm text-gray-600 mb-4">
-                All subsequent match days will also be delayed by the same amount.
+                {t('seasons.subsequentShift')}
               </p>
               
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Postpone by how many weeks?
+                {t('seasons.postponeByWeeks')}
               </label>
               <input
                 type="number"
@@ -738,7 +738,7 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
               
               {postponeWeeks > 0 && season.schedule?.find((s: any) => s.matchDay === selectedMatchDay)?.date && (
                 <p className="text-sm text-gray-500 mt-2">
-                  New date: {formatMatchDate(
+                  {t('seasons.newDate')}: {formatMatchDate(
                     new Date(new Date(season.schedule.find((s: any) => s.matchDay === selectedMatchDay)!.date).getTime() + postponeWeeks * 7 * 24 * 60 * 60 * 1000).toISOString()
                   )}
                 </p>
@@ -750,7 +750,7 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
                 onClick={handlePostponeMatchDay}
                 className="flex-1 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 font-semibold"
               >
-                Postpone
+                {t('seasons.postpone')}
               </button>
               <button
                 onClick={() => {
@@ -759,7 +759,7 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
                 }}
                 className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-semibold"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
             </div>
           </div>
@@ -771,14 +771,16 @@ export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBa
 
 // Game Card Component
 const GameCard = ({ game, team1, team2, h2h, onPlayGame, onViewGame }: { game: any, team1: any, team2: any, h2h: any, onPlayGame: () => void, onViewGame: () => void }) => {
+  const { t } = useTranslation();
+  
   const getStatusBadge = () => {
     switch (game.status) {
       case 'completed':
-        return <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold">Completed</span>;
+        return <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold">{t('games.completed')}</span>;
       case 'in-progress':
-        return <span className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-semibold">In Progress</span>;
+        return <span className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-semibold">{t('games.inProgress')}</span>;
       default:
-        return <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-semibold">Pending</span>;
+        return <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-semibold">{t('games.pending')}</span>;
     }
   };
 
@@ -797,7 +799,7 @@ const GameCard = ({ game, team1, team2, h2h, onPlayGame, onViewGame }: { game: a
       {h2h && h2h.gamesPlayed > 0 && (
         <div className="mb-3 pb-3 border-b border-gray-300">
           <div className="flex items-center gap-2 text-sm text-gray-600">
-            <span className="font-semibold">📊 Series Record:</span>
+            <span className="font-semibold">📊 {t('games.seriesRecord')}:</span>
             <span>{formatHeadToHead(h2h, team1?.name, team2?.name)}</span>
           </div>
         </div>
@@ -808,7 +810,7 @@ const GameCard = ({ game, team1, team2, h2h, onPlayGame, onViewGame }: { game: a
           <div className="flex items-center justify-between mb-2">
             <div className="flex-1">
               <div className="flex items-center gap-3">
-                <span className="font-bold text-gray-800 text-lg">{team1?.name || 'Team 1'}</span>
+                <span className="font-bold text-gray-800 text-lg">{team1?.name || t('games.team1Default')}</span>
                 {game.status === 'completed' && (
                   <span className="text-2xl font-bold text-blue-600">{team1TotalPoints}</span>
                 )}
@@ -817,7 +819,7 @@ const GameCard = ({ game, team1, team2, h2h, onPlayGame, onViewGame }: { game: a
             {getStatusBadge()}
           </div>
           <div className="flex items-center gap-3">
-            <span className="font-bold text-gray-800 text-lg">{team2?.name || 'Team 2'}</span>
+            <span className="font-bold text-gray-800 text-lg">{team2?.name || t('games.team2Default')}</span>
             {game.status === 'completed' && (
               <span className="text-2xl font-bold text-blue-600">{team2TotalPoints}</span>
             )}
@@ -829,14 +831,14 @@ const GameCard = ({ game, team1, team2, h2h, onPlayGame, onViewGame }: { game: a
               onClick={onViewGame}
               className="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 font-semibold"
             >
-              View Results
+              {t('games.viewResults')}
             </button>
           ) : (
             <button
               onClick={onPlayGame}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
             >
-              {game.status === 'in-progress' ? 'Continue' : 'Start Game'}
+              {game.status === 'in-progress' ? t('games.continue') : t('games.startGame')}
             </button>
           )}
         </div>

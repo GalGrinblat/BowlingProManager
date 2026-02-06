@@ -37,6 +37,9 @@ export const Settings: React.FC<SettingsProps> = ({ onBack }) => {
     setLanguage(formData.language); // Update context
     setIsEditing(false);
     loadOrganization();
+    
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new Event('languageChanged'));
   };
 
   if (!organization) return <div>Loading...</div>;

@@ -269,7 +269,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('players.title')}</h1>
-            <p className="text-gray-600">{t('players.totalPlayers')}: <span className="ltr-content">{players.length}</span> </p>
+            <p className="text-gray-600">{t('players.totalPlayers').replace('{{count}}', String(players.length))}</p>
           </div>
           <button
             onClick={onBack}

@@ -3,10 +3,12 @@ import { seasonsApi, teamsApi, playersApi, gamesApi, leaguesApi } from '../../se
 import { generateRoundRobinSchedule } from '../../utils/scheduleUtils';
 import { createEmptyMatch } from '../../utils/matchUtils';
 import { createTeam } from '../../models';
+import { useTranslation } from '../../contexts/LanguageContext';
 
 import type { SeasonSetupProps } from '../../types/index';
 
 export const SeasonSetup: React.FC<SeasonSetupProps> = ({ seasonId, onBack }) => {
+  const { t } = useTranslation();
   const [season, setSeason] = useState<any>(null);
   const [league, setLeague] = useState<any>(null);
   const [teams, setTeams] = useState<any[]>([]);
@@ -41,7 +43,7 @@ export const SeasonSetup: React.FC<SeasonSetupProps> = ({ seasonId, onBack }) =>
     
     const teamsToCreate = season.numberOfTeams - teams.length;
     if (teamsToCreate <= 0) {
-      alert('All teams already exist!');
+      alert(t('seasons.allTeamsExist'));
       return;
     }
     
@@ -54,7 +56,7 @@ export const SeasonSetup: React.FC<SeasonSetupProps> = ({ seasonId, onBack }) =>
       teamsApi.create(teamData);
     }
     
-    alert(`Created ${teamsToCreate} teams!`);
+    alert(t('seasons.teamsCreated').replace('{{count}}', String(teamsToCreate)));
     loadSeasonData();
   };
 
@@ -64,30 +66,30 @@ export const SeasonSetup: React.FC<SeasonSetupProps> = ({ seasonId, onBack }) =>
     
     // Check team count
     if (teams.length !== season.numberOfTeams) {
-      validationErrors.push(`Expected ${season.numberOfTeams} teams, but only ${teams.length} configured.`);
+      validationErrors.push(t('seasons.expectedTeamsCount').replace('{{expected}}', String(season.numberOfTeams)).replace('{{actual}}', String(teams.length)));
     }
     
     // Validate each team
     teams.forEach((team, index) => {
       if (!team.name || team.name.trim() === '') {
-        validationErrors.push(`Team ${index + 1} has no name.`);
+        validationErrors.push(t('seasons.teamNoName').replace('{{number}}', String(index + 1)));
       }
       
       if (team.playerIds.length !== season.playersPerTeam) {
-        validationErrors.push(`Team "${team.name || index + 1}" needs ${season.playersPerTeam} players but has ${team.playerIds.length}.`);
+        validationErrors.push(t('seasons.teamNeedsPlayers').replace('{{name}}', team.name || String(index + 1)).replace('{{expected}}', String(season.playersPerTeam)).replace('{{actual}}', String(team.playerIds.length)));
       }
       
       // Check for duplicate players within a team
       const uniquePlayers = new Set(team.playerIds);
       if (uniquePlayers.size !== team.playerIds.length) {
-        validationErrors.push(`Team "${team.name || index + 1}" has duplicate players.`);
+        validationErrors.push(t('seasons.teamDuplicatePlayers').replace('{{name}}', team.name || String(index + 1)));
       }
       
       // Check that all players exist
       team.playerIds.forEach((playerId: any) => {
         const player = players.find(p => p.id === playerId);
         if (!player) {
-          validationErrors.push(`Team "${team.name || index + 1}" has an invalid player.`);
+          validationErrors.push(t('seasons.teamInvalidPlayer').replace('{{name}}', team.name || String(index + 1)));
         }
       });
     });
@@ -100,15 +102,15 @@ export const SeasonSetup: React.FC<SeasonSetupProps> = ({ seasonId, onBack }) =>
         const player = players.find(p => p.id === id);
         return player?.name || 'Unknown';
       });
-      validationErrors.push(`Players cannot be on multiple teams: ${playerNames.join(', ')}`);
+      validationErrors.push(t('seasons.playersOnMultipleTeams').replace('{{players}}', playerNames.join(', ')));
     }
     
     if (validationErrors.length > 0) {
-      alert('❌ Cannot start season. Please fix these issues:\n\n' + validationErrors.map((e, i) => `${i + 1}. ${e}`).join('\n'));
+      alert(t('seasons.cannotStartErrors') + '\n\n' + validationErrors.map((e, i) => `${i + 1}. ${e}`).join('\n'));
       return;
     }
 
-    if (confirm('Start this season? Teams and schedule will be locked after starting.')) {
+    if (confirm(t('seasons.confirmStart'))) {
       // Generate schedule with actual team IDs
       const teamIds = teams.map(t => t.id);
       const schedule = generateRoundRobinSchedule(
@@ -226,12 +228,12 @@ export const SeasonSetup: React.FC<SeasonSetupProps> = ({ seasonId, onBack }) =>
         });
       });
 
-      alert('Season started! Games have been created.');
+      alert(t('seasons.seasonStarted'));
       onBack();
     }
   };
 
-  if (!season || !league) return <div>Loading...</div>;
+  if (!season || !league) return <div>{t('seasons.loading')}</div>;
 
   const isSetupComplete = teams.length === season.numberOfTeams && 
                          teams.every(t => t.playerIds.length === season.playersPerTeam && t.name.trim());
@@ -244,7 +246,7 @@ export const SeasonSetup: React.FC<SeasonSetupProps> = ({ seasonId, onBack }) =>
           onClick={onBack}
           className="text-gray-600 hover:text-gray-800 mb-4"
         >
-          ← Back to League
+          ← {t('common.back')}
         </button>
         <h1 className="text-3xl font-bold text-gray-800 mb-2">{season.name}</h1>
         <p className="text-gray-600">{league.name}</p>
@@ -252,13 +254,13 @@ export const SeasonSetup: React.FC<SeasonSetupProps> = ({ seasonId, onBack }) =>
           <span>🏆 {season.numberOfTeams} teams</span>
           <span>👥 {season.playersPerTeam} players/team</span>
           <span>🔄 {season.numberOfRounds} round{season.numberOfRounds !== 1 ? 's' : ''}</span>
-          <span>📊 Handicap: {season.useHandicap ? `${season.handicapBasis} (${season.handicapPercentage}%)` : 'Disabled'}</span>
+          <span>📊 {t('leagues.handicap')}: {season.useHandicap ? `${season.handicapBasis} (${season.handicapPercentage}%)` : t('common.disabled')}</span>
         </div>
       </div>
 
       {/* Setup Progress */}
       <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white">
-        <h2 className="text-xl font-bold mb-2">Setup Progress</h2>
+        <h2 className="text-xl font-bold mb-2">{t('seasons.setupProgress')}</h2>
         <div className="flex items-center gap-4">
           <div className="flex-1 bg-blue-400 rounded-full h-3">
             <div
@@ -269,7 +271,7 @@ export const SeasonSetup: React.FC<SeasonSetupProps> = ({ seasonId, onBack }) =>
             />
           </div>
           <span className="text-sm font-semibold">
-            {teams.filter(t => t.playerIds.length === season.playersPerTeam).length} / {season.numberOfTeams} teams complete
+            {t('seasons.teamsComplete').replace('{{complete}}', String(teams.filter(t => t.playerIds.length === season.playersPerTeam).length)).replace('{{total}}', String(season.numberOfTeams))}
           </span>
         </div>
         {isSetupComplete && (
@@ -277,7 +279,7 @@ export const SeasonSetup: React.FC<SeasonSetupProps> = ({ seasonId, onBack }) =>
             onClick={handleStartSeason}
             className="mt-4 px-6 py-2 bg-white text-blue-600 rounded-lg hover:bg-blue-50 font-semibold"
           >
-            Start Season →
+            {t('seasons.startSeason')} →
           </button>
         )}
       </div>
@@ -286,26 +288,26 @@ export const SeasonSetup: React.FC<SeasonSetupProps> = ({ seasonId, onBack }) =>
       <div className="space-y-4">
         {teams.length === 0 ? (
           <div className="bg-white rounded-xl shadow-lg p-8 text-center">
-            <p className="text-gray-600 text-lg mb-2">No teams found for this season.</p>
-            <p className="text-gray-500 text-sm mb-4">Teams should have been created automatically. Try creating them manually:</p>
+            <p className="text-gray-600 text-lg mb-2">{t('seasons.noTeamsFound')}</p>
+            <p className="text-gray-500 text-sm mb-4">{t('seasons.createTeamsManually')}</p>
             <button
               onClick={handleCreateMissingTeams}
               className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
             >
-              Create {season.numberOfTeams} Teams
+              {t('seasons.createTeams').replace('{{count}}', String(season.numberOfTeams))}
             </button>
           </div>
         ) : teams.length < season.numberOfTeams ? (
           <div className="bg-yellow-50 border border-yellow-400 rounded-xl shadow-lg p-6">
-            <p className="text-yellow-800 text-lg mb-2">⚠️ Missing Teams</p>
+            <p className="text-yellow-800 text-lg mb-2">⚠️ {t('seasons.missingTeams')}</p>
             <p className="text-yellow-700 text-sm mb-4">
-              Expected {season.numberOfTeams} teams, but only {teams.length} found.
+              {t('seasons.expectedTeamsCount').replace('{{expected}}', String(season.numberOfTeams)).replace('{{actual}}', String(teams.length))}
             </p>
             <button
               onClick={handleCreateMissingTeams}
               className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 font-semibold"
             >
-              Create Missing Teams
+              {t('seasons.createMissingTeams')}
             </button>
           </div>
         ) : null}
@@ -336,6 +338,7 @@ export const SeasonSetup: React.FC<SeasonSetupProps> = ({ seasonId, onBack }) =>
 
 // Team Setup Card Component
 const TeamSetupCard = ({ team, season, players, allTeams, isEditing, onEdit, onSave, onCancel }: any) => {
+  const { t } = useTranslation();
   const [teamName, setTeamName] = useState(team.name);
   const [selectedPlayers, setSelectedPlayers] = useState(team.playerIds);
 
@@ -360,7 +363,7 @@ const TeamSetupCard = ({ team, season, players, allTeams, isEditing, onEdit, onS
 
   const handleSave = () => {
     if (!teamName.trim()) {
-      alert('❌ Team name is required');
+      alert(t('seasons.teamNameRequired'));
       return;
     }
     
@@ -371,12 +374,12 @@ const TeamSetupCard = ({ team, season, players, allTeams, isEditing, onEdit, onS
     );
     
     if (duplicateName) {
-      alert(`❌ A team named "${duplicateName.name}" already exists. Please use a different name.`);
+      alert(t('seasons.duplicateTeamName').replace('{{name}}', duplicateName.name));
       return;
     }
     
     if (selectedPlayers.length !== season.playersPerTeam) {
-      alert(`❌ Please select exactly ${season.playersPerTeam} players`);
+      alert(t('seasons.selectExactPlayers').replace('{{count}}', String(season.playersPerTeam)));
       return;
     }
     onSave({ name: teamName, playerIds: selectedPlayers });
@@ -391,27 +394,27 @@ const TeamSetupCard = ({ team, season, players, allTeams, isEditing, onEdit, onS
               {team.name || `Team ${allTeams.indexOf(team) + 1}`}
             </h3>
             {!isComplete && (
-              <span className="text-sm text-orange-600">⚠️ Setup incomplete</span>
+              <span className="text-sm text-orange-600">⚠️ {t('seasons.setupIncomplete')}</span>
             )}
           </div>
           <button
             onClick={onEdit}
             className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 font-semibold"
           >
-            Edit Team
+            {t('teams.edit')}
           </button>
         </div>
         <div className="space-y-2">
           {team.playerIds.length === 0 ? (
-            <p className="text-gray-500">No players assigned</p>
+            <p className="text-gray-500">{t('teams.noPlayers')}</p>
           ) : (
             team.playerIds.map((playerId: any, idx: any) => {
               const player = players.find((p: any) => p.id === playerId);
               return (
                 <div key={playerId} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                   <span className="font-semibold text-gray-600">#{idx + 1}</span>
-                  <span className="font-semibold text-gray-800">{player?.name || 'Unknown'}</span>
-                  <span className="text-sm text-gray-500">Avg:0</span>
+                  <span className="font-semibold text-gray-800">{player?.name || t('common.unknown')}</span>
+                  <span className="text-sm text-gray-500">{t('players.average')}:0</span>
                 </div>
               );
             })
@@ -424,28 +427,28 @@ const TeamSetupCard = ({ team, season, players, allTeams, isEditing, onEdit, onS
   return (
     <div className="bg-white rounded-xl shadow-lg p-6 border-2 border-blue-400">
       <h3 className="text-xl font-bold text-gray-800 mb-4">
-        Edit Team
+        {t('teams.edit')}
       </h3>
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Team Name
+            {t('teams.name')}
           </label>
           <input
             type="text"
             value={teamName}
             onChange={(e) => setTeamName(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Enter team name"
+            placeholder={t('teams.namePlaceholder')}
           />
         </div>
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Select {season.playersPerTeam} Players ({selectedPlayers.length} selected)
+            {t('seasons.selectPlayers').replace('{{count}}', String(season.playersPerTeam)).replace('{{selected}}', String(selectedPlayers.length))}
           </label>
           <div className="max-h-96 overflow-y-auto border border-gray-300 rounded-lg">
             {availablePlayers.length === 0 ? (
-              <p className="p-4 text-gray-500 text-center">No available players</p>
+              <p className="p-4 text-gray-500 text-center">{t('seasons.noAvailablePlayers')}</p>
             ) : (
               availablePlayers.map((player: any) => {
                 const isSelected = selectedPlayers.includes(player.id);
@@ -474,7 +477,7 @@ const TeamSetupCard = ({ team, season, players, allTeams, isEditing, onEdit, onS
                       <div>
                         <span className="font-semibold text-gray-800">{player.name}</span>
                         <span className="text-sm text-gray-500 ml-3">
-                          Avg: 0
+                          {t('players.average')}: 0
                         </span>
                       </div>
                     </div>
@@ -489,13 +492,13 @@ const TeamSetupCard = ({ team, season, players, allTeams, isEditing, onEdit, onS
             onClick={handleSave}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
           >
-            Save Team
+            {t('common.save')}
           </button>
           <button
             onClick={onCancel}
             className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-semibold"
           >
-            Cancel
+            {t('common.cancel')}
           </button>
         </div>
       </div>

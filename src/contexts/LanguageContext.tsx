@@ -38,6 +38,11 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
     // Load initially
     loadLanguage();
 
+    // Listen for custom language change events
+    const handleLanguageChange = () => {
+      loadLanguage();
+    };
+
     // Listen for storage changes (when language is updated in Settings)
     const handleStorageChange = (e: any) => {
       if (e.key === 'bowling_organization' || e.key === null) {
@@ -46,9 +51,11 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
     };
 
     window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('languageChanged', handleLanguageChange);
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('languageChanged', handleLanguageChange);
     };
   }, []);
 
