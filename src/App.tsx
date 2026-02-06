@@ -7,8 +7,8 @@ import { AdminDashboard } from './components/admin/AdminDashboard';
 import { PlayerRegistry } from './components/admin/PlayerRegistry';
 import { LeagueManagement } from './components/admin/LeagueManagement';
 import { LeagueDetail } from './components/admin/LeagueDetail';
-import { SeasonSetup } from './components/admin/SeasonSetup';
-import { SeasonDashboard } from './components/admin/SeasonDashboard';
+import { SeasonCreator } from './components/admin/SeasonCreator';
+import { SeasonDetail } from './components/admin/SeasonDetail';
 import { SeasonGame } from './components/admin/SeasonGame';
 import { Settings } from './components/admin/Settings';
 import { TeamManagement } from './components/admin/TeamManagement';
@@ -95,20 +95,26 @@ function AppContent() {
                 leagueId={navigationState.leagueId}
                 onBack={() => navigateTo('leagues')}
                 onViewSeason={(seasonId: string) => {
-                  navigateTo('season-dashboard', { seasonId });
+                  navigateTo('season-detail', { seasonId });
+                }}
+                onCreateSeason={(leagueId: string) => {
+                  navigateTo('season-creator', { leagueId });
                 }}
               />
             )}
 
-            {currentView === 'season-setup' && navigationState.seasonId && (
-              <SeasonSetup 
-                seasonId={navigationState.seasonId}
+            {currentView === 'season-creator' && navigationState.leagueId && (
+              <SeasonCreator 
+                leagueId={navigationState.leagueId}
                 onBack={() => navigateTo('league-detail', { leagueId: navigationState.leagueId })}
+                onSuccess={(seasonId: string) => {
+                  navigateTo('season-detail', { leagueId: navigationState.leagueId, seasonId });
+                }}
               />
             )}
 
-            {currentView === 'season-dashboard' && navigationState.seasonId && (
-              <SeasonDashboard 
+            {currentView === 'season-detail' && navigationState.seasonId && (
+              <SeasonDetail 
                 seasonId={navigationState.seasonId}
                 onBack={() => navigateTo('league-detail', { leagueId: navigationState.leagueId })}
 
@@ -121,21 +127,21 @@ function AppContent() {
             {currentView === 'team-management' && navigationState.seasonId && (
               <TeamManagement 
                 seasonId={navigationState.seasonId}
-                onBack={() => navigateTo('season-dashboard', { seasonId: navigationState.seasonId })}
+                onBack={() => navigateTo('season-detail', { seasonId: navigationState.seasonId })}
               />
             )}
 
             {currentView === 'season-game' && navigationState.gameId && (
               <SeasonGame 
                 gameId={navigationState.gameId}
-                onBack={() => navigateTo('season-dashboard', { seasonId: navigationState.seasonId })}
+                onBack={() => navigateTo('season-detail', { seasonId: navigationState.seasonId })}
               />
             )}
 
             {currentView === 'game-history' && navigationState.gameId && (
               <CompletedGameView 
                 game={navigationState.gameData}
-                onBack={() => navigateTo('season-dashboard', { seasonId: navigationState.seasonId })}
+                onBack={() => navigateTo('season-detail', { seasonId: navigationState.seasonId })}
               />
             )}
 

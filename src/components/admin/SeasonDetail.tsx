@@ -6,9 +6,9 @@ import { calculateHeadToHead, formatHeadToHead } from '../../utils/headToHeadUti
 import { calculateSeasonRecords } from '../../utils/recordsUtils';
 import { useTranslation } from '../../contexts/LanguageContext';
 
-import type { SeasonDashboardProps } from '../../types/index';
+import type { SeasonDetailProps } from '../../types/index';
 
-export const SeasonDashboard: React.FC<SeasonDashboardProps> = ({ seasonId, onBack, onPlayGame, onViewGame, onManageTeams }) => {
+export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, onPlayGame, onViewGame, onManageTeams }) => {
   const { t } = useTranslation();
   const [season, setSeason] = useState<any>(null);
   const [league, setLeague] = useState<any>(null);

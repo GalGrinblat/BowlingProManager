@@ -591,21 +591,6 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
                         </div>
                       );
                     })}
-                    
-                    {league.seasons.filter((s: any) => s.status === 'setup').map((season: any) => {
-                      const playerTeam = league.playerTeams.find((t: any) => t.seasonId === season.id);
-                      return (
-                        <div key={season.id} className="flex items-center gap-3 text-sm">
-                          <span className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded font-semibold">
-                            Setup
-                          </span>
-                          <span className="font-semibold text-gray-700">{season.name}</span>
-                          {playerTeam && (
-                            <span className="text-gray-500">• Team: {playerTeam.name}</span>
-                          )}
-                        </div>
-                      );
-                    })}
                   </div>
                 </div>
               ))}

@@ -117,14 +117,10 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
     
     if (seasons.length > 0) {
       const activeSeasons = seasons.filter(s => s.status === 'active');
-      const setupSeasons = seasons.filter(s => s.status === 'setup');
       
       let message = `${t('leagues.cannotDelete')} "${league?.name}" (${seasons.length}):\n\n`;
       if (activeSeasons.length > 0) {
         message += `• ${activeSeasons.length} ${t('seasons.activeSeasons')}\n`;
-      }
-      if (setupSeasons.length > 0) {
-        message += `• ${setupSeasons.length} ${t('seasons.setupSeasons')}\n`;
       }
       message += `\n${t('leagues.completeOrDelete')}`;
       

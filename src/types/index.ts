@@ -322,16 +322,18 @@ export interface LeagueDetailProps {
   leagueId: string;
   onBack: () => void;
   onViewSeason: (seasonId: string) => void;
+  onCreateSeason: (leagueId: string) => void;
 }
 
-/** Props for SeasonSetup - Configure teams and generate schedule for new season */
-export interface SeasonSetupProps {
-  seasonId: string;
+/** Props for SeasonCreator - Create new season with team configuration */
+export interface SeasonCreatorProps {
+  leagueId: string;
   onBack: () => void;
+  onSuccess: (seasonId: string) => void;
 }
 
-/** Props for SeasonDashboard - View season schedule, standings, and games */
-export interface SeasonDashboardProps {
+/** Props for SeasonDetail - View season schedule, standings, and games */
+export interface SeasonDetailProps {
   seasonId: string;
   onBack: () => void;
   onPlayGame: (gameId: string) => void;

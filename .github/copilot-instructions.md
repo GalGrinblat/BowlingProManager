@@ -119,7 +119,7 @@ authApi.{ getCurrentUser, login, logout, isAdmin }
 - **LeagueManagement**: Create/edit leagues with rules
 - **LeagueDetail**: View league, seasons, navigate
 - **SeasonSetup**: Assign players to teams, generate schedule
-- **SeasonDashboard**: View schedule, standings, select games
+- **SeasonDetail**: View schedule, standings, select games
 - **TeamManagement**: Manage roster substitutions and team changes
 - **SeasonGame**: Wrapper around MatchView for season games
 - **Settings**: Data export/import, organization settings
@@ -136,7 +136,7 @@ authApi.{ getCurrentUser, login, logout, isAdmin }
 ### View Navigation & State Management
 ```
 Admin Flow:
-dashboard → players/leagues → league-detail → season-setup → season-dashboard → season-game → (MatchView)
+dashboard → players/leagues → league-detail → season-creator → season-detail → season-game → (MatchView)
 
 State: navigationState = { leagueId, seasonId, gameId }
 Navigation: navigateTo(view, params)
