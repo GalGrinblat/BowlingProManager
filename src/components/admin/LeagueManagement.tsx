@@ -3,6 +3,7 @@ import { leaguesApi, seasonsApi } from '../../services/api';
 import { createLeague, validateLeague } from '../../models';
 import { useTranslation } from '../../contexts/LanguageContext';
 import { MAX_BOWLING_SCORE } from '../../constants/bowling';
+import { HandicapSettingsForm } from './HandicapSettingsForm';
 
 import type { LeagueManagementProps, BonusRule } from '../../types/index';
 
@@ -287,46 +288,46 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
 
             {/* Player Matchup Strategy Section */}
             <div className="border-t pt-4 mt-4">
-              <h3 className="text-lg font-bold text-gray-800 mb-3">{t('leagues.lineupStrategyTitle')}</h3>
+              <h3 className="text-lg font-bold text-gray-800 mb-3">{t('leagues.lineup.strategyTitle')}</h3>
               <p className="text-sm text-gray-600 mb-3">
-                {t('leagues.lineupStrategyDesc')}
+                {t('leagues.lineup.strategyDesc')}
               </p>
               
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    {t('leagues.lineupStrategyLabel')}
+                    {t('leagues.lineup.strategyLabel')}
                   </label>
                   <select
                     value={formData.lineupStrategy}
                     onChange={(e) => setFormData({ ...formData, lineupStrategy: e.target.value as 'flexible' | 'rule-based' })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <option value="flexible">{t('leagues.lineupFlexible')}</option>
-                    <option value="fixed">{t('leagues.lineupFixed')}</option>
-                    <option value="rule-based">{t('leagues.lineupRuleBased')}</option>
+                    <option value="flexible">{t('leagues.lineup.flexible')}</option>
+                    <option value="fixed">{t('leagues.lineup.fixed')}</option>
+                    <option value="rule-based">{t('leagues.lineup.ruleBased')}</option>
                   </select>
                   <p className="text-xs text-gray-500 mt-1">
-                    {formData.lineupStrategy === 'flexible' && t('leagues.lineupFlexibleDesc')}
-                    {formData.lineupStrategy === 'rule-based' && t('leagues.lineupRuleBasedDesc')}
+                    {formData.lineupStrategy === 'flexible' && t('leagues.lineup.flexibleDesc')}
+                    {formData.lineupStrategy === 'rule-based' && t('leagues.lineup.ruleBasedDesc')}
                   </p>
                 </div>
 
                 {formData.lineupStrategy === 'rule-based' && (
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      {t('leagues.rankingRuleLabel')}
+                      {t('leagues.lineup.rankingRuleLabel')}
                     </label>
                     <select
                       value={formData.lineupRule}
                       onChange={(e) => setFormData({ ...formData, lineupRule: e.target.value as 'standard' | 'high-low' | 'low-high' })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
-                      <option value="standard">{t('leagues.rankingStandard')}</option>
-                      <option value="balanced">{t('leagues.rankingBalanced')}</option>
+                      <option value="standard">{t('leagues.lineup.standard')}</option>
+                      <option value="balanced">{t('leagues.lineup.balanced')}</option>
                     </select>
                     <p className="text-xs text-gray-500 mt-1">
-                      {formData.lineupRule === 'standard' && t('leagues.rankingStandardDesc')}
+                      {formData.lineupRule === 'standard' && t('leagues.lineup.standardDesc')}
                     </p>
                   </div>
                 )}
@@ -335,15 +336,15 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
 
             {/* Point Configuration Section */}
             <div className="border-t pt-4 mt-4">
-              <h3 className="text-lg font-bold text-gray-800 mb-3">{t('leagues.pointsConfig')}</h3>
+              <h3 className="text-lg font-bold text-gray-800 mb-3">{t('leagues.points.config')}</h3>
               <p className="text-sm text-gray-600 mb-3">
-                {t('leagues.pointsConfigDesc')}
+                {t('leagues.points.configDesc')}
               </p>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    {t('leagues.playerMatchPointsPerWin')}
+                    {t('leagues.points.playerMatchPerWin')}
                   </label>
                   <input
                     type="number"
@@ -353,11 +354,11 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                     onChange={(e) => setFormData({ ...formData, playerMatchPointsPerWin: Number(e.target.value) })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
-                  <p className="text-xs text-gray-500 mt-1">{t('leagues.playerMatchPointsPerWinDesc')}</p>
+                  <p className="text-xs text-gray-500 mt-1">{t('leagues.points.playerMatchPerWinDesc')}</p>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    {t('leagues.teamMatchPointsPerWin')}
+                    {t('leagues.points.teamMatchPerWin')}
                   </label>
                   <input
                     type="number"
@@ -367,11 +368,11 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                     onChange={(e) => setFormData({ ...formData, teamMatchPointsPerWin: Number(e.target.value) })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   />
-                  <p className="text-xs text-gray-500 mt-1">{t('leagues.teamMatchPointsPerWinDesc')}</p>
+                  <p className="text-xs text-gray-500 mt-1">{t('leagues.points.teamMatchPerWinDesc')}</p>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    {t('leagues.teamGamePointsPerWin')}
+                    {t('leagues.points.teamGamePerWin')}
                   </label>
                   <input
                     type="number"
@@ -381,70 +382,27 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                     onChange={(e) => setFormData({ ...formData, teamGamePointsPerWin: Number(e.target.value) })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
-                  <p className="text-xs text-gray-500 mt-1">{t('leagues.teamGamePointsPerWinDesc')}</p>
+                  <p className="text-xs text-gray-500 mt-1">{t('leagues.points.teamGamePerWinDesc')}</p>
                 </div>
               </div>
             </div>
 
             {/* Handicap Settings Section */}
-            <div className="border-t pt-4 mt-4">
-              <h3 className="text-lg font-bold text-gray-800 mb-3">{t('leagues.handicapSettings')}</h3>
-              <p className="text-sm text-gray-600 mb-3">
-                {t('leagues.handicapSettingsDesc')}
-              </p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="flex items-center space-x-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={formData.useHandicap}
-                      onChange={(e) => setFormData({ ...formData, useHandicap: e.target.checked })}
-                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-                    />
-                    <span className="text-sm font-semibold text-gray-700">{t('leagues.useHandicap')}</span>
-                  </label>
-                  <p className="text-xs text-gray-500 mt-1">{t('leagues.enableDisableHandicap')}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    {t('leagues.handicapBasis')}
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    max={MAX_BOWLING_SCORE}
-                    value={formData.defaultHandicapBasis}
-                    onChange={(e) => setFormData({ ...formData, defaultHandicapBasis: Number(e.target.value) })}
-                    disabled={!formData.useHandicap}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">{t('leagues.pinBasisCalculation')}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    {t('leagues.handicapPercentage')}
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    value={formData.handicapPercentage}
-                    onChange={(e) => setFormData({ ...formData, handicapPercentage: Number(e.target.value) })}
-                    disabled={!formData.useHandicap}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    {t('leagues.percentageExplanation')}
-                  </p>
-                </div>
-              </div>
-            </div>
+            <HandicapSettingsForm
+              useHandicap={formData.useHandicap}
+              handicapBasis={formData.defaultHandicapBasis}
+              handicapPercentage={formData.handicapPercentage}
+              onUseHandicapChange={(value) => setFormData({ ...formData, useHandicap: value })}
+              onHandicapBasisChange={(value) => setFormData({ ...formData, defaultHandicapBasis: value })}
+              onHandicapPercentageChange={(value) => setFormData({ ...formData, handicapPercentage: value })}
+              basisFieldName="defaultHandicapBasis"
+              showDescription={true}
+            />
 
             {/* Bonus Rules Section */}
             <div className="border-t pt-4 mt-4">
               <div className="flex justify-between items-center mb-3">
-                <h3 className="text-lg font-bold text-gray-800">{t('leagues.bonusRules')}</h3>
+                <h3 className="text-lg font-bold text-gray-800">{t('leagues.bonus.rules')}</h3>
                 <button
                   type="button"
                   onClick={() => {
@@ -458,11 +416,11 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                   }}
                   className="px-3 py-1 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 font-semibold text-sm"
                 >
-                  + {t('leagues.addRule')}
+                  + {t('leagues.bonus.addRule')}
                 </button>
               </div>
               <p className="text-sm text-gray-600 mb-3">
-                {t('leagues.bonusRulesDesc')}
+                {t('leagues.bonus.rulesDesc')}
               </p>
               
               <div className="space-y-3">
@@ -470,7 +428,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                   <div key={index} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
                     <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
                       <div>
-                        <label className="block text-xs font-semibold text-gray-600 mb-1">{t('leagues.applyTo')}</label>
+                        <label className="block text-xs font-semibold text-gray-600 mb-1">{t('leagues.bonus.applyTo')}</label>
                         <select
                           value={rule.type}
                           onChange={(e) => {
@@ -492,7 +450,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                       </div>
                       
                       <div>
-                        <label className="block text-xs font-semibold text-gray-600 mb-1">{t('leagues.condition')}</label>
+                        <label className="block text-xs font-semibold text-gray-600 mb-1">{t('leagues.bonus.condition')}</label>
                         <select
                           value={rule.condition}
                           onChange={(e) => {
@@ -506,15 +464,15 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                           disabled={rule.type === 'team'}
                         >
                           {rule.type === 'player' && (
-                            <option value="vs_average">{t('leagues.scoreVsAverage')}</option>
+                            <option value="vs_average">{t('leagues.bonus.scoreVsAverage')}</option>
                           )}
-                          <option value="pure_score">{t('leagues.score')}</option>
+                          <option value="pure_score">{t('leagues.bonus.score')}</option>
                         </select>
                       </div>
                       
                       <div>
                         <label className="block text-xs font-semibold text-gray-600 mb-1">
-                          {rule.condition === 'vs_average' ? t('leagues.aboveAvg') : t('leagues.score')}
+                          {rule.condition === 'vs_average' ? t('leagues.bonus.aboveAvg') : t('leagues.bonus.score')}
                         </label>
                         <input
                           type="number"
@@ -559,15 +517,15 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                           }}
                           className="w-full px-2 py-1.5 bg-red-100 text-red-700 rounded hover:bg-red-200 font-semibold text-sm"
                         >
-                          {t('leagues.removeRule')}
+                          {t('leagues.bonus.removeRule')}
                         </button>
                       </div>
                     </div>
                     
                     <div className="mt-2 text-xs text-gray-600">
                       {rule.type === 'player' ? `👤 ${t('leagues.player')}` : `👥 ${t('leagues.team')}`} {t('common.points')}: <strong className="ltr-content">+{rule.points}</strong> {rule.condition === 'vs_average' 
-                        ? `(${rule.threshold}+ ${t('leagues.aboveAvg')})`
-                        : `(${rule.threshold}+ ${t('leagues.score')})`
+                        ? `(${rule.threshold}+ ${t('leagues.bonus.aboveAvg')})`
+                        : `(${rule.threshold}+ ${t('leagues.bonus.score')})`
                       }
                     </div>
                   </div>
@@ -575,7 +533,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                 
                 {formData.bonusRules.length === 0 && (
                   <div className="text-center py-4 text-gray-500 text-sm">
-                    {t('leagues.bonusRulesDesc')}
+                    {t('leagues.bonus.rulesDesc')}
                   </div>
                 )}
               </div>
@@ -640,7 +598,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                       )}
                       <div className="flex gap-4 mt-2 text-sm text-gray-500">
                         {league.dayOfWeek && <span>📅 {t(`days.${league.dayOfWeek.toLowerCase()}`)}s</span>}
-                        <span>📊 {t('leagues.useHandicap')}: <span className="ltr-content">{league.useHandicap !== false ? `${league.defaultHandicapBasis} (${league.handicapPercentage || 100}%)` : t('leagues.handicapDisabled')}</span></span>
+                        <span>📊 {t('leagues.handicap.use')}: <span className="ltr-content">{league.useHandicap !== false ? `${league.defaultHandicapBasis} (${league.handicapPercentage || 100}%)` : t('leagues.handicap.disabled')}</span></span>
                         <span>👥 <span className="ltr-content">{league.defaultPlayersPerTeam}</span> {t('leagues.playersPerTeam')}</span>
                         <span>🎳 <span className="ltr-content">{seasons.length}</span> {seasons.length === 1 ? t('leagues.season') : t('leagues.seasons')}</span>
                       </div>
