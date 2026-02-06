@@ -394,7 +394,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
             <div className="border-t pt-4 mt-4">
               <h3 className="text-lg font-bold text-gray-800 mb-3">{t('leagues.handicapSettings')}</h3>
               <p className="text-sm text-gray-600 mb-3">
-                {t('leagues.pointsConfigDesc')}
+                {t('leagues.handicapSettingsDesc')}
               </p>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -518,7 +518,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                       
                       <div>
                         <label className="block text-xs font-semibold text-gray-600 mb-1">
-                          {rule.condition === 'vs_average' ? t('leagues.aboveAvg') : t('leagues.minScore')}
+                          {rule.condition === 'vs_average' ? t('leagues.aboveAvg') : t('leagues.score')}
                         </label>
                         <input
                           type="number"
