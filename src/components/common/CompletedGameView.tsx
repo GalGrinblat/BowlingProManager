@@ -25,18 +25,18 @@ export const CompletedGameView: React.FC<CompletedGameViewProps> = ({ game, onBa
           onClick={onBack}
           className="flex items-center gap-2 text-gray-600 hover:text-gray-800 mb-4 text-lg font-semibold"
         >
-          <span>{t('common.leftArrow')}</span> Back
+          <span>{t('common.leftArrow')}</span> {t('common.back')}
         </button>
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800">Game History</h1>
+            <h1 className="text-3xl font-bold text-gray-800">{t('gameHistory.title')}</h1>
             <p className="text-sm text-gray-500 mt-1">
-              Round {game.round} • Match Day {game.matchDay} • Completed {new Date(game.completedAt).toLocaleDateString()}
+              {t('schedule.round')} {game.round} • {t('seasons.matchDay')} {game.matchDay} • {t('playerDashboard.completedOn')} {new Date(game.completedAt).toLocaleDateString()}
             </p>
           </div>
           {winner !== 'tie' && (
             <span className="px-4 py-2 bg-green-100 text-green-700 rounded-lg font-bold text-lg">
-              🏆 {winner === 'team1' ? game.team1.name : game.team2.name} Wins!
+              🏆 {winner === 'team1' ? game.team1.name : game.team2.name} {t('gameHistory.wins')}!
             </span>
           )}
         </div>
@@ -44,7 +44,7 @@ export const CompletedGameView: React.FC<CompletedGameViewProps> = ({ game, onBa
 
       {/* Final Score Card */}
       <div className="bg-gradient-to-br from-purple-500 to-blue-600 rounded-xl shadow-lg p-6 text-white">
-        <h2 className="text-xl font-bold mb-4 text-center">Final Score</h2>
+        <h2 className="text-xl font-bold mb-4 text-center">{t('gameHistory.finalScore')}</h2>
         <div className="grid grid-cols-3 gap-4 items-center">
           <div className="text-center">
             <div className={`text-3xl font-bold ${winner === 'team1' ? 'text-yellow-300' : ''}`}>
@@ -52,11 +52,11 @@ export const CompletedGameView: React.FC<CompletedGameViewProps> = ({ game, onBa
             </div>
             <div className="text-lg font-semibold mt-2">{game.team1.name}</div>
             <div className="text-sm opacity-80 mt-1">
-              {totals.team1TotalWithHandicap} pins (w/hdc)
+              {totals.team1TotalWithHandicap} {t('gameHistory.pinsWithHandicap')}
             </div>
           </div>
           
-          <div className="text-center text-2xl font-bold">VS</div>
+          <div className="text-center text-2xl font-bold">{t('seasons.vs')}</div>
           
           <div className="text-center">
             <div className={`text-3xl font-bold ${winner === 'team2' ? 'text-yellow-300' : ''}`}>
@@ -64,7 +64,7 @@ export const CompletedGameView: React.FC<CompletedGameViewProps> = ({ game, onBa
             </div>
             <div className="text-lg font-semibold mt-2">{game.team2.name}</div>
             <div className="text-sm opacity-80 mt-1">
-              {totals.team2TotalWithHandicap} pins (w/hdc)
+              {totals.team2TotalWithHandicap} {t('gameHistory.pinsWithHandicap')}
             </div>
           </div>
         </div>
@@ -74,7 +74,7 @@ export const CompletedGameView: React.FC<CompletedGameViewProps> = ({ game, onBa
       {game.matches.map((match: any, matchIdx: number) => (
         <div key={matchIdx} className="bg-white rounded-xl shadow-lg p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold text-gray-800">Match {matchIdx + 1}</h2>
+            <h2 className="text-2xl font-bold text-gray-800">{t('gameHistory.match')} {matchIdx + 1}</h2>
             <div className="flex gap-4">
               <span className="text-lg font-bold text-orange-600">{game.team1.name}: {match.team1?.score || 0}</span>
               <span className="text-gray-400">-</span>
@@ -102,10 +102,10 @@ export const CompletedGameView: React.FC<CompletedGameViewProps> = ({ game, onBa
                       <div className="flex-1">
                         <div className="font-semibold text-gray-800">{player.name}</div>
                         <div className="text-xs text-gray-500">
-                          {team1Pins} + {player.handicap} hdc = {team1Pins + player.handicap}
+                          {team1Pins} + {player.handicap} {t('gameHistory.hdc')} = {team1Pins + player.handicap}
                           {team1Player?.bonusPoints > 0 && (
                             <span className="text-yellow-600 font-bold ml-2">
-                              +{team1Player.bonusPoints} bonus
+                              +{team1Player.bonusPoints} {t('gameHistory.bonus')}
                             </span>
                           )}
                         </div>
@@ -116,17 +116,17 @@ export const CompletedGameView: React.FC<CompletedGameViewProps> = ({ game, onBa
                     <div className="text-center">
                       {gameResult?.result === 'team1' && (
                         <span className="px-3 py-1 bg-orange-100 text-orange-700 rounded font-bold text-sm">
-                          Win (1.0)
+                          {t('gameHistory.win')} (1.0)
                         </span>
                       )}
                       {gameResult?.result === 'team2' && (
                         <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded font-bold text-sm">
-                          Loss (0.0)
+                          {t('gameHistory.loss')} (0.0)
                         </span>
                       )}
                       {gameResult?.result === 'draw' && (
                         <span className="px-3 py-1 bg-gray-200 text-gray-700 rounded font-bold text-sm">
-                          Draw (0.5)
+                          {t('gameHistory.draw')} (0.5)
                         </span>
                       )}
                     </div>
@@ -136,10 +136,10 @@ export const CompletedGameView: React.FC<CompletedGameViewProps> = ({ game, onBa
                       <div className="flex-1 text-right">
                         <div className="font-semibold text-gray-800">{game.team2.players[playerIdx].name}</div>
                         <div className="text-xs text-gray-500">
-                          {team2Pins} + {game.team2.players[playerIdx].handicap} hdc = {team2Pins + game.team2.players[playerIdx].handicap}
+                          {team2Pins} + {game.team2.players[playerIdx].handicap} {t('gameHistory.hdc')} = {team2Pins + game.team2.players[playerIdx].handicap}
                           {team2Player?.bonusPoints > 0 && (
                             <span className="text-yellow-600 font-bold ml-2">
-                              +{team2Player.bonusPoints} bonus
+                              +{team2Player.bonusPoints} {t('gameHistory.bonus')}
                             </span>
                           )}
                         </div>
@@ -159,37 +159,37 @@ export const CompletedGameView: React.FC<CompletedGameViewProps> = ({ game, onBa
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <div className="flex justify-between mb-1">
-                  <span className="text-gray-600">Total Pins:</span>
+                  <span className="text-gray-600">{t('gameHistory.totalPins')}:</span>
                   <span className="font-semibold">{match.team1?.totalPins || 0}</span>
                 </div>
                 <div className="flex justify-between mb-1">
-                  <span className="text-gray-600">With Handicap:</span>
+                  <span className="text-gray-600">{t('gameHistory.withHandicap')}:</span>
                   <span className="font-semibold">{match.team1?.totalWithHandicap || 0}</span>
                 </div>
                 <div className="flex justify-between mb-1">
-                  <span className="text-gray-600">Bonus Points:</span>
+                  <span className="text-gray-600">{t('gameHistory.bonusPoints')}:</span>
                   <span className="font-semibold text-yellow-600">+{match.team1?.bonusPoints || 0}</span>
                 </div>
                 <div className="flex justify-between text-lg font-bold text-orange-600 pt-2 border-t">
-                  <span>Match Score:</span>
+                  <span>{t('gameHistory.matchScore')}:</span>
                   <span>{match.team1?.score || 0}</span>
                 </div>
               </div>
               <div>
                 <div className="flex justify-between mb-1">
-                  <span className="text-gray-600">Total Pins:</span>
+                  <span className="text-gray-600">{t('gameHistory.totalPins')}:</span>
                   <span className="font-semibold">{match.team2?.totalPins || 0}</span>
                 </div>
                 <div className="flex justify-between mb-1">
-                  <span className="text-gray-600">With Handicap:</span>
+                  <span className="text-gray-600">{t('gameHistory.withHandicap')}:</span>
                   <span className="font-semibold">{match.team2?.totalWithHandicap || 0}</span>
                 </div>
                 <div className="flex justify-between mb-1">
-                  <span className="text-gray-600">Bonus Points:</span>
+                  <span className="text-gray-600">{t('gameHistory.bonusPoints')}:</span>
                   <span className="font-semibold text-yellow-600">+{match.team2?.bonusPoints || 0}</span>
                 </div>
                 <div className="flex justify-between text-lg font-bold text-blue-600 pt-2 border-t">
-                  <span>Match Score:</span>
+                  <span>{t('gameHistory.matchScore')}:</span>
                   <span>{match.team2?.score || 0}</span>
                 </div>
               </div>
@@ -203,19 +203,19 @@ export const CompletedGameView: React.FC<CompletedGameViewProps> = ({ game, onBa
         <div className="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl shadow-lg p-6 text-white">
           <div className="flex items-center justify-between">
             <div className="text-center flex-1">
-              <div className="text-sm opacity-90 mb-1">Grand Total Points</div>
+              <div className="text-sm opacity-90 mb-1">{t('gameHistory.grandTotalPoints')}</div>
               <div className="text-3xl font-bold">+{game.grandTotalPoints.team1}</div>
               <div className="text-sm opacity-90 mt-1">{game.team1.name}</div>
             </div>
             <div className="text-4xl">🏆</div>
             <div className="text-center flex-1">
-              <div className="text-sm opacity-90 mb-1">Grand Total Points</div>
+              <div className="text-sm opacity-90 mb-1">{t('gameHistory.grandTotalPoints')}</div>
               <div className="text-3xl font-bold">+{game.grandTotalPoints.team2}</div>
               <div className="text-sm opacity-90 mt-1">{game.team2.name}</div>
             </div>
           </div>
           <div className="text-center text-sm opacity-90 mt-4">
-            2 points awarded to team with highest combined pins across all 3 matches
+            {t('gameHistory.grandTotalDesc').replace('{{count}}', game.matches.length.toString())}
           </div>
         </div>
       )}

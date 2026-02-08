@@ -454,8 +454,28 @@ const he: TranslationDictionary = {
     seasonChampion: 'אלוף העונה',
     yourTeam: 'הקבוצה שלך',
     record: 'רקורד',
-    totalPins: 'סיכות סה"כ',
+    totalPins: 'סה"כ פינים',
     completedOn: 'הושלם',
+  },
+
+  // תצוגת היסטוריית משחק
+  gameHistory: {
+    title: 'היסטוריית משחק',
+    finalScore: 'תוצאה סופית',
+    wins: 'ניצחונות',
+    pinsWithHandicap: 'פינים (עם הנדיקאפ)',
+    match: 'משחק',
+    win: 'ניצחון',
+    loss: 'הפסד',
+    draw: 'תיקו',
+    hdc: 'הנדיקאפ',
+    bonus: 'בונוס',
+    totalPins: 'סה"כ פינים',
+    withHandicap: 'עם הנדיקאפ',
+    bonusPoints: 'נקודות בונוס',
+    matchScore: 'ניקוד משחק',
+    grandTotalPoints: 'נקודות סה"כ כלליות',
+    grandTotalDesc: '2 נקודות מוענקות לקבוצה עם הפינים המשולבים הגבוהים ביותר בכל {{count}} המשחקים',
   },
 
   // לוח משחקים

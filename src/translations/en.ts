@@ -453,6 +453,26 @@ const en: TranslationDictionary = {
     completedOn: 'Completed',
   },
 
+  // Game History View
+  gameHistory: {
+    title: 'Game History',
+    finalScore: 'Final Score',
+    wins: 'Wins',
+    pinsWithHandicap: 'pins (w/hdc)',
+    match: 'Match',
+    win: 'Win',
+    loss: 'Loss',
+    draw: 'Draw',
+    hdc: 'hdc',
+    bonus: 'bonus',
+    totalPins: 'Total Pins',
+    withHandicap: 'With Handicap',
+    bonusPoints: 'Bonus Points',
+    matchScore: 'Match Score',
+    grandTotalPoints: 'Grand Total Points',
+    grandTotalDesc: '2 points awarded to team with highest combined pins across all {{count}} matches',
+  },
+
   // Schedule
   schedule: {
     round: 'Round',
