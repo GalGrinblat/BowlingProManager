@@ -60,15 +60,13 @@ export function calculateSeasonRecords(teams: any[], games: any[]): SeasonRecord
         if (!matchPlayer || player.absent) return;
 
         const pins = parseInt(matchPlayer.pins) || 0;
-        const handicap = player.handicap || 0;
-        const totalScore = pins + handicap;
         
-        // Add to team game total
-        team1GameTotal += totalScore;
+        // Add to team game total (pure score only)
+        team1GameTotal += pins;
 
-        // Track highest match score
+        // Track highest match score (pure score only)
         highestMatchScores.push({
-          value: totalScore,
+          value: pins,
           playerName: player.name,
           teamName: team1.name,
           matchDay: game.matchDay,
@@ -76,7 +74,7 @@ export function calculateSeasonRecords(teams: any[], games: any[]): SeasonRecord
           round: game.round
         });
 
-        // Track player series (sum all matches for this player)
+        // Track player series (sum all matches for this player - pure score only)
         if (matchIndex === game.matches.length - 1) {
           let playerSeries = 0;
           game.matches.forEach((m: any) => {
@@ -84,8 +82,7 @@ export function calculateSeasonRecords(teams: any[], games: any[]): SeasonRecord
             const gp = game.team1.players?.[playerIndex];
             if (mp && gp && !gp.absent && mp.pins !== '') {
               const p = parseInt(mp.pins) || 0;
-              const h = gp.handicap || 0;
-              playerSeries += p + h;
+              playerSeries += p;
             }
           });
           
@@ -110,15 +107,13 @@ export function calculateSeasonRecords(teams: any[], games: any[]): SeasonRecord
         if (!matchPlayer || player.absent) return;
 
         const pins = parseInt(matchPlayer.pins) || 0;
-        const handicap = player.handicap || 0;
-        const totalScore = pins + handicap;
         
-        // Add to team game total
-        team2GameTotal += totalScore;
+        // Add to team game total (pure score only)
+        team2GameTotal += pins;
 
-        // Track highest match score
+        // Track highest match score (pure score only)
         highestMatchScores.push({
-          value: totalScore,
+          value: pins,
           playerName: player.name,
           teamName: team2.name,
           matchDay: game.matchDay,
@@ -126,7 +121,7 @@ export function calculateSeasonRecords(teams: any[], games: any[]): SeasonRecord
           round: game.round
         });
 
-        // Track player series
+        // Track player series (pure score only)
         if (matchIndex === game.matches.length - 1) {
           let playerSeries = 0;
           game.matches.forEach((m: any) => {
@@ -134,8 +129,7 @@ export function calculateSeasonRecords(teams: any[], games: any[]): SeasonRecord
             const gp = game.team2.players?.[playerIndex];
             if (mp && gp && !gp.absent && mp.pins !== '') {
               const p = parseInt(mp.pins) || 0;
-              const h = gp.handicap || 0;
-              playerSeries += p + h;
+              playerSeries += p;
             }
           });
           
@@ -152,14 +146,13 @@ export function calculateSeasonRecords(teams: any[], games: any[]): SeasonRecord
         }
       });
 
-      // Track highest team match scores
+      // Track highest team match scores (pure score only)
       let team1MatchTotal = 0;
       match.team1.players?.forEach((mp: any, idx: number) => {
         const player = game.team1.players?.[idx];
         if (mp && player && !player.absent && mp.pins !== '') {
           const pins = parseInt(mp.pins) || 0;
-          const handicap = player.handicap || 0;
-          team1MatchTotal += pins + handicap;
+          team1MatchTotal += pins;
         }
       });
 
@@ -168,8 +161,7 @@ export function calculateSeasonRecords(teams: any[], games: any[]): SeasonRecord
         const player = game.team2.players?.[idx];
         if (mp && player && !player.absent && mp.pins !== '') {
           const pins = parseInt(mp.pins) || 0;
-          const handicap = player.handicap || 0;
-          team2MatchTotal += pins + handicap;
+          team2MatchTotal += pins;
         }
       });
 
