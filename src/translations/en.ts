@@ -168,7 +168,7 @@ const en: TranslationDictionary = {
     games: 'games',
     rounds: 'rounds',
     round: 'round',
-    handicapDisplay: 'Handicap: {{percentage}}% of {{basis}}',
+    handicapDisplay: 'Handicap: {{percentage}}% to {{basis}}',
     leagueNotFound: 'League not found. It may have been deleted.',
     
     // Archive operations

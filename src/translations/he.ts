@@ -171,7 +171,7 @@ const he: TranslationDictionary = {
     games: 'משחקים',
     rounds: 'סבבים',
     round: 'סבב',
-    handicapDisplay: 'הנדיקאפ: {{percentage}}% מ-{{basis}}',
+    handicapDisplay: 'הנדיקאפ: {{percentage}}% ל-{{basis}}',
     leagueNotFound: 'ליגה לא נמצאה. ייתכן שהיא נמחקה.',
     
     // פעולות ארכיון
