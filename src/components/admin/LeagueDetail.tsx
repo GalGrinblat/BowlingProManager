@@ -39,7 +39,7 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
           </button>
         </div>
         <div className="text-center py-12">
-          <p className="text-gray-500">League not found. It may have been deleted.</p>
+          <p className="text-gray-500">{t('leagues.leagueNotFound')}</p>
         </div>
       </div>
     );
@@ -64,10 +64,10 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
           </button>
         </div>
         <div className="flex gap-4 text-sm text-gray-600">
-          {league.dayOfWeek && <span>📅 {league.dayOfWeek}s</span>}
-          <span>👥 {league.defaultPlayersPerTeam} players/team</span>
-          <span>🎳 {league.defaultMatchesPerGame || 3} matches/game</span>
-          {league.useHandicap && <span>⚖️ Handicap: {league.handicapPercentage || 100}% of {league.defaultHandicapBasis}</span>}
+          {league.dayOfWeek && <span>📅 {t(`days.${league.dayOfWeek.toLowerCase()}Plural`)}</span>}
+          <span>👥 <span className="ltr-content">{league.defaultPlayersPerTeam}</span> {t('leagues.playersPerTeam')}</span>
+          <span>🎳 <span className="ltr-content">{league.defaultMatchesPerGame || 3}</span> {t('leagues.matchesPerGame')}</span>
+          {league.useHandicap && <span>⚖️ {t('leagues.handicapDisplay').replace('{{percentage}}', String(league.handicapPercentage || 100)).replace('{{basis}}', String(league.defaultHandicapBasis))}</span>}
         </div>
       </div>
 
@@ -89,9 +89,9 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
               <div className="text-sm font-semibold mb-1">{t('seasons.active').toUpperCase()}</div>
               <h2 className="text-2xl font-bold mb-2">{activeSeason.name}</h2>
               <div className="flex gap-4 text-sm">
-                <span>🏆 {activeSeason.numberOfTeams} teams</span>
-                <span>🔄 {activeSeason.numberOfRounds} round{activeSeason.numberOfRounds !== 1 ? 's' : ''}</span>
-                <span>👥 {activeSeason.playersPerTeam} players/team</span>
+                <span>🏆 <span className="ltr-content">{activeSeason.numberOfTeams}</span> {t('leagues.teams')}</span>
+                <span>🔄 <span className="ltr-content">{activeSeason.numberOfRounds}</span> {activeSeason.numberOfRounds !== 1 ? t('leagues.rounds') : t('leagues.round')}</span>
+                <span>👥 <span className="ltr-content">{activeSeason.playersPerTeam}</span> {t('leagues.playersPerTeam')}</span>
               </div>
             </div>
             <button
@@ -139,9 +139,9 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
                         </div>
                       )}
                       <div className="flex gap-4 text-sm text-gray-600">
-                        <span>👥 {teams.length} teams</span>
-                        <span>🎳 {games.length} games</span>
-                        <span>📅 {new Date(season.startDate).toLocaleDateString()}</span>
+                        <span>👥 <span className="ltr-content">{teams.length}</span> {t('leagues.teams')}</span>
+                        <span>🎳 <span className="ltr-content">{games.length}</span> {t('leagues.games')}</span>
+                        <span>📅 <span className="ltr-content">{new Date(season.startDate).toLocaleDateString()}</span></span>
                         {season.updatedAt && (
                           <span>✓ {new Date(season.updatedAt).toLocaleDateString()}</span>
                         )}

@@ -597,7 +597,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                         <p className="text-sm text-gray-600 mt-1">{league.description}</p>
                       )}
                       <div className="flex gap-4 mt-2 text-sm text-gray-500">
-                        {league.dayOfWeek && <span>📅 {t(`days.${league.dayOfWeek.toLowerCase()}`)}s</span>}
+                        {league.dayOfWeek && <span>📅 {t(`days.${league.dayOfWeek.toLowerCase()}Plural`)}</span>}
                         <span>📊 {t('leagues.handicap.use')}: <span className="ltr-content">{league.useHandicap !== false ? `${league.defaultHandicapBasis} (${league.handicapPercentage || 100}%)` : t('leagues.handicap.disabled')}</span></span>
                         <span>👥 <span className="ltr-content">{league.defaultPlayersPerTeam}</span> {t('leagues.playersPerTeam')}</span>
                         <span>🎳 <span className="ltr-content">{seasons.length}</span> {seasons.length === 1 ? t('leagues.season') : t('leagues.seasons')}</span>
@@ -669,7 +669,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                     <div>
                       <h3 className="font-semibold text-gray-600">{league.name}</h3>
                       <div className="text-sm text-gray-500 mt-1">
-                        {league.dayOfWeek && <span>{t(`days.${league.dayOfWeek.toLowerCase()}`)}s • </span>}
+                        {league.dayOfWeek && <span>{t(`days.${league.dayOfWeek.toLowerCase()}Plural`)} • </span>}
                         <span className="ltr-content">{seasons.length}</span> {seasons.length === 1 ? t('leagues.season') : t('leagues.seasons')}
                       </div>
                     </div>

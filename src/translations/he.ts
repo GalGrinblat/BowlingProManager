@@ -218,6 +218,13 @@ const he: TranslationDictionary = {
     season: 'עונה',
     seasons: 'עונות',
     playersPerTeam: 'שחקנים/קבוצה',
+    matchesPerGame: 'משחקים/מפגש',
+    teams: 'קבוצות',
+    games: 'משחקים',
+    rounds: 'סבבים',
+    round: 'סבב',
+    handicapDisplay: 'הנדיקאפ: {{percentage}}% מ-{{basis}}',
+    leagueNotFound: 'ליגה לא נמצאה. ייתכן שהיא נמחקה.',
     
     // פעולות ארכיון
     archiveLeague: 'העבר לארכיון',
@@ -601,7 +608,14 @@ const he: TranslationDictionary = {
     wednesday: 'רביעי',
     thursday: 'חמישי',
     friday: 'שישי',
-    saturday: 'שבת',
+    saturday: 'שבת',    
+    sundayPlural: 'ימי ראשון',
+    mondayPlural: 'ימי שני',
+    tuesdayPlural: 'ימי שלישי',
+    wednesdayPlural: 'ימי רביעי',
+    thursdayPlural: 'ימי חמישי',
+    fridayPlural: 'ימי שישי',
+    saturdayPlural: 'שבתות',  
   },
 
   // הודעות שגיאה

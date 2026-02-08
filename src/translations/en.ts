@@ -220,6 +220,13 @@ const en: TranslationDictionary = {
     season: 'season',
     seasons: 'seasons',
     playersPerTeam: 'players/team',
+    matchesPerGame: 'matches/game',
+    teams: 'teams',
+    games: 'games',
+    rounds: 'rounds',
+    round: 'round',
+    handicapDisplay: 'Handicap: {{percentage}}% of {{basis}}',
+    leagueNotFound: 'League not found. It may have been deleted.',
     
     // Archive operations
     archiveLeague: 'Archive League',
@@ -606,6 +613,13 @@ const en: TranslationDictionary = {
     thursday: 'Thursday',
     friday: 'Friday',
     saturday: 'Saturday',
+    sundayPlural: 'Sundays',
+    mondayPlural: 'Mondays',
+    tuesdayPlural: 'Tuesdays',
+    wednesdayPlural: 'Wednesdays',
+    thursdayPlural: 'Thursdays',
+    fridayPlural: 'Fridays',
+    saturdayPlural: 'Saturdays',
   },
 
   // Error messages

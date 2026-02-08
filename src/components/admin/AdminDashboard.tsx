@@ -123,7 +123,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
                     <div className="text-right text-sm text-gray-500">
                       <div className="ltr-content">{seasons.length} {seasons.length !== 1 ? t('dashboard.seasons') : t('dashboard.season')}</div>
                       <div className="text-xs mt-1">
-                        {league.dayOfWeek && <div>{league.dayOfWeek}s</div>}
+                        {league.dayOfWeek && <div>{t(`days.${league.dayOfWeek.toLowerCase()}Plural`)}</div>}
                         <span className="ltr-content">{league.defaultPlayersPerTeam} {t('dashboard.playersPerTeam')}</span>
                       </div>
                     </div>
