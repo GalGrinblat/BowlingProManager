@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { playersApi, leaguesApi, seasonsApi, teamsApi, gamesApi } from '../../services/api';
 import { calculateTeamStandings } from '../../utils/standingsUtils';
-import { PlayerSeasonComparison } from './PlayerSeasonComparison';
 import { useTranslation } from '../../contexts/LanguageContext';
 
 import type { PlayerDashboardProps } from '../../types/index';
@@ -10,7 +9,6 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
   const { t } = useTranslation();
   const [player, setPlayer] = useState<any>(null);
   const [playerLeagues, setPlayerLeagues] = useState<any[]>([]);
-  const [upcomingGames, setUpcomingGames] = useState<any[]>([]);
   const [recentCompletedGames, setRecentCompletedGames] = useState<any[]>([]);
   const [completedSeasons, setCompletedSeasons] = useState<any[]>([]);
   const [view, setView] = useState('dashboard'); // dashboard, stats, leagues, history
@@ -53,24 +51,8 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
 
     setPlayerLeagues(leagues);
 
-    // Get upcoming games (incomplete games where player is participating)
-    const allGames = gamesApi.getAll();
-    const playerGames = allGames.filter(game => {
-      const team1 = teamsApi.getById(game.team1Id);
-      const team2 = teamsApi.getById(game.team2Id);
-      return (team1?.playerIds.includes(playerId) || team2?.playerIds.includes(playerId)) &&
-             game.status !== 'completed';
-    });
-
-    // Sort by match day
-    const sortedGames = playerGames.sort((a, b) => {
-      if (a.round !== b.round) return a.round - b.round;
-      return (a.matchDay || 0) - (b.matchDay || 0);
-    });
-
-    setUpcomingGames(sortedGames.slice(0, 5)); // Show next 5 games
-
     // Get recent completed games
+    const allGames = gamesApi.getAll();
     const completedPlayerGames = allGames.filter(game => {
       const team1 = teamsApi.getById(game.team1Id);
       const team2 = teamsApi.getById(game.team2Id);
@@ -149,15 +131,19 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
       const season = seasonsApi.getById(game.seasonId);
       const league = season ? leaguesApi.getById(season.leagueId) : null;
       const leagueName = league?.name || 'Unknown League';
+      const leagueId = league?.id || 'unknown';
 
       if (!stats.byLeague[leagueName]) {
         stats.byLeague[leagueName] = {
+          leagueId,
+          seasonId: game.seasonId,
           gamesPlayed: 0,
           totalPins: 0,
           average: 0,
           highGame: 0,
           highSeries: 0,
-          points: 0
+          points: 0,
+          rank: 0
         };
       }
 
@@ -216,7 +202,66 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
       const leagueStats = stats.byLeague[leagueName];
       if (leagueStats.gamesPlayed > 0) {
         leagueStats.average = Math.round(leagueStats.totalPins / leagueStats.gamesPlayed);
+        leagueStats.pointsPerGame = (leagueStats.points / leagueStats.gamesPlayed).toFixed(2);
+      } else {
+        leagueStats.pointsPerGame = '0.00';
       }
+      
+      // Calculate rank within the league
+      // Get all teams and games for this league's seasons
+      const seasonGames = gamesApi.getBySeason(leagueStats.seasonId);
+      const seasonTeams = teamsApi.getBySeason(leagueStats.seasonId);
+      
+      // Calculate all players' averages in this season
+      const allPlayerAverages: { playerName: string; average: number }[] = [];
+      
+      seasonTeams.forEach(team => {
+        const teamPlayerStats: Record<string, { pins: number; games: number }> = {};
+        
+        seasonGames.filter(g => g.status === 'completed').forEach(game => {
+          const isTeam1 = game.team1Id === team.id;
+          const isTeam2 = game.team2Id === team.id;
+          
+          if (!isTeam1 && !isTeam2) return;
+          
+          game.matches?.forEach((match: any) => {
+            const teamMatch = isTeam1 ? match.team1 : match.team2;
+            if (teamMatch && teamMatch.players) {
+              teamMatch.players.forEach((player: any) => {
+                if (!teamPlayerStats[player.name]) {
+                  teamPlayerStats[player.name] = { pins: 0, games: 0 };
+                }
+                const pins = parseInt(player.pins) || 0;
+                if (player.pins !== '') {
+                  const stats = teamPlayerStats[player.name];
+                  if (stats) {
+                    stats.pins += pins;
+                    stats.games++;
+                  }
+                }
+              });
+            }
+          });
+        });
+        
+        Object.entries(teamPlayerStats).forEach(([playerName, data]) => {
+          if (data.games > 0) {
+            allPlayerAverages.push({
+              playerName,
+              average: Math.round(data.pins / data.games)
+            });
+          }
+        });
+      });
+      
+      // Sort by average descending
+      allPlayerAverages.sort((a, b) => b.average - a.average);
+      
+      // Find current player's rank
+      const playerData = playersApi.getById(playerId);
+      const playerName = playerData?.name;
+      const playerRankEntry = allPlayerAverages.findIndex(p => p.playerName === playerName);
+      leagueStats.rank = playerRankEntry !== -1 ? playerRankEntry + 1 : 0;
     });
 
     setPlayerStats(stats);
@@ -228,11 +273,11 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-gradient-to-r from-purple-500 to-blue-600 rounded-xl shadow-lg p-6 text-white">
-        <h1 className="text-3xl font-bold mb-2">Welcome, {player.name}!</h1>
-        <p className="text-purple-100">Player Dashboard</p>
+        <h1 className="text-3xl font-bold mb-2">{t('playerDashboard.welcome')}, {player.name}!</h1>
+        <p className="text-purple-100">{t('playerDashboard.playerDashboard')}</p>
         <div className="flex gap-4 mt-4 text-sm">
-          <span>🎳 {playerLeagues.length} Active League{playerLeagues.length !== 1 ? 's' : ''}</span>
-          <span>📅 {upcomingGames.length} Upcoming Game{upcomingGames.length !== 1 ? 's' : ''}</span>
+          <span>🎳 {playerLeagues.length} {playerLeagues.length === 1 ? t('playerDashboard.activeLeagues') : t('playerDashboard.activeLeaguesPlural')}</span>
+          <span>📊 {recentCompletedGames.length} {recentCompletedGames.length === 1 ? t('playerDashboard.recentGame') : t('playerDashboard.recentGamesPlural')}</span>
         </div>
       </div>
 
@@ -244,7 +289,7 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
               <span className="text-2xl">🏆</span>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Active Leagues</p>
+              <p className="text-sm text-gray-600">{playerLeagues.length === 1 ? t('playerDashboard.activeLeagues') : t('playerDashboard.activeLeaguesPlural')}</p>
               <p className="text-2xl font-bold text-gray-800">{playerLeagues.length}</p>
             </div>
           </div>
@@ -256,7 +301,7 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
               <span className="text-2xl">👥</span>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Teams</p>
+              <p className="text-sm text-gray-600">{t('playerDashboard.teams')}</p>
               <p className="text-2xl font-bold text-gray-800">
                 {playerLeagues.reduce((sum, l) => sum + l.playerTeams.length, 0)}
               </p>
@@ -275,7 +320,7 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
               : 'text-gray-600 hover:bg-gray-100'
           }`}
         >
-          🏠 Dashboard
+          🏠 {t('playerDashboard.dashboard')}
         </button>
         <button
           onClick={() => setView('stats')}
@@ -285,27 +330,7 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
               : 'text-gray-600 hover:bg-gray-100'
           }`}
         >
-          📊 My Stats
-        </button>
-        <button
-          onClick={() => setView('comparison')}
-          className={`flex-1 min-w-[90px] py-2 sm:py-3 px-2 sm:px-4 rounded-lg font-semibold text-xs sm:text-base transition-colors whitespace-nowrap ${
-            view === 'comparison'
-              ? 'bg-purple-600 text-white'
-              : 'text-gray-600 hover:bg-gray-100'
-          }`}
-        >
-          📈 Compare
-        </button>
-        <button
-          onClick={() => setView('leagues')}
-          className={`flex-1 min-w-[90px] py-2 sm:py-3 px-2 sm:px-4 rounded-lg font-semibold text-xs sm:text-base transition-colors whitespace-nowrap ${
-            view === 'leagues'
-              ? 'bg-purple-600 text-white'
-              : 'text-gray-600 hover:bg-gray-100'
-          }`}
-        >
-          🏆 My Leagues
+          📊 {t('playerDashboard.myStats')}
         </button>
         <button
           onClick={() => setView('history')}
@@ -315,90 +340,17 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
               : 'text-gray-600 hover:bg-gray-100'
           }`}
         >
-          📚 History
+          📚 {t('playerDashboard.history')}
         </button>
       </div>
 
       {/* Dashboard View */}
       {view === 'dashboard' && (
         <>
-          {/* Upcoming Games */}
-          {upcomingGames.length > 0 && (
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <div className="mb-4">
-                <h2 className="text-2xl font-bold text-gray-800">Upcoming Games</h2>
-                <p className="text-sm text-gray-600 mt-1">
-                  💡 Click on any game to enter scores for your team!
-                </p>
-              </div>
-              <div className="space-y-3">
-                {upcomingGames.map(game => {
-                  const season = seasonsApi.getById(game.seasonId);
-                  const league = season ? leaguesApi.getById(season.leagueId) : null;
-                  const team1 = teamsApi.getById(game.team1Id);
-                  const team2 = teamsApi.getById(game.team2Id);
-                  const isTeam1 = team1?.playerIds.includes(playerId);
-                  
-                  return (
-                    <div
-                      key={game.id}
-                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
-                      onClick={() => onNavigate('player-game', { gameId: game.id })}
-                    >
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xs font-semibold text-purple-600 bg-purple-100 px-2 py-1 rounded">
-                            {league?.name}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            Round {game.round} • Match Day {game.matchDay}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <span className={`font-semibold ${isTeam1 ? 'text-blue-600' : 'text-gray-700'}`}>
-                            {game.team1?.name || team1?.name}
-                          </span>
-                          <span className="text-gray-400 font-bold">vs</span>
-                          <span className={`font-semibold ${!isTeam1 ? 'text-blue-600' : 'text-gray-700'}`}>
-                            {game.team2?.name || team2?.name}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {game.status === 'in-progress' && (
-                          <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded font-semibold">
-                            In Progress
-                          </span>
-                        )}
-                        {game.status === 'pending' && (
-                          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded font-semibold">
-                            📝 Ready to Score
-                          </span>
-                        )}
-                        <span className="text-blue-600 font-semibold">Enter Scores {t('common.rightArrow')}</span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* No Upcoming Games Message */}
-          {upcomingGames.length === 0 && playerLeagues.length > 0 && (
-            <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl shadow-lg p-6 text-center">
-              <p className="text-2xl mb-2">🎳</p>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">All Caught Up!</h3>
-              <p className="text-gray-600">
-                No upcoming games right now. When your next game is scheduled, you'll see it here and can enter scores yourself!
-              </p>
-            </div>
-          )}
-
           {/* Recent Completed Games */}
           {recentCompletedGames.length > 0 && (
             <div className="bg-white rounded-xl shadow-lg p-6">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">Recent Completed Games</h2>
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('playerDashboard.recentCompletedGames')}</h2>
               <div className="space-y-3">
                 {recentCompletedGames.map(game => {
                   const season = seasonsApi.getById(game.seasonId);
@@ -445,28 +397,39 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
                       <div className="flex items-center gap-2">
                         {playerEntered && (
                           <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded font-semibold" title="You entered this score">
-                            📝 Self-Entered
+                            📝 {t('playerDashboard.selfEntered')}
                           </span>
                         )}
                         {playerWon ? (
                           <span className="text-xs bg-green-100 text-green-700 px-3 py-1 rounded font-semibold">
-                            Won
+                            {t('playerDashboard.won')}
                           </span>
                         ) : team1TotalPoints === team2TotalPoints ? (
                           <span className="text-xs bg-gray-200 text-gray-700 px-3 py-1 rounded font-semibold">
-                            Tie
+                            {t('playerDashboard.tie')}
                           </span>
                         ) : (
                           <span className="text-xs bg-red-100 text-red-700 px-3 py-1 rounded font-semibold">
-                            Lost
+                            {t('playerDashboard.lost')}
                           </span>
                         )}
-                        <span className="text-purple-600 font-semibold">View {t('common.rightArrow')}</span>
+                        <span className="text-purple-600 font-semibold">{t('common.view')} {t('common.rightArrow')}</span>
                       </div>
                     </div>
                   );
                 })}
               </div>
+            </div>
+          )}
+
+          {/* No Completed Games Message */}
+          {recentCompletedGames.length === 0 && playerLeagues.length > 0 && (
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl shadow-lg p-8 text-center">
+              <p className="text-4xl mb-3">🎳</p>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('playerDashboard.noGamesCompletedYet')}</h3>
+              <p className="text-gray-600">
+                {t('playerDashboard.noGamesCompletedDesc')}
+              </p>
             </div>
           )}
         </>
@@ -477,33 +440,23 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
         <div className="space-y-6">
           {/* Overall Stats */}
           <div className="bg-white rounded-xl shadow-lg p-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Overall Statistics</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('playerDashboard.overallStatistics')}</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center p-4 bg-blue-50 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">Games Played</p>
+                <p className="text-sm text-gray-600 mb-1">{t('playerDashboard.gamesPlayed')}</p>
                 <p className="text-3xl font-bold text-blue-600">{playerStats.totalGames}</p>
               </div>
               <div className="text-center p-4 bg-green-50 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">Average</p>
+                <p className="text-sm text-gray-600 mb-1">{t('common.average')}</p>
                 <p className="text-3xl font-bold text-green-600">{playerStats.average}</p>
               </div>
               <div className="text-center p-4 bg-purple-50 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">High Game</p>
+                <p className="text-sm text-gray-600 mb-1">{t('playerDashboard.highGame')}</p>
                 <p className="text-3xl font-bold text-purple-600">{playerStats.highGame}</p>
               </div>
               <div className="text-center p-4 bg-orange-50 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">High Series</p>
+                <p className="text-sm text-gray-600 mb-1">{t('playerDashboard.highSeries')}</p>
                 <p className="text-3xl font-bold text-orange-600">{playerStats.highSeries}</p>
-              </div>
-            </div>
-            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Total Pins</span>
-                <span className="text-2xl font-bold text-gray-800">{playerStats.totalPins.toLocaleString()}</span>
-              </div>
-              <div className="flex justify-between items-center mt-2">
-                <span className="text-gray-600">Total Points Scored</span>
-                <span className="text-2xl font-bold text-gray-800">{playerStats.totalPoints}</span>
               </div>
             </div>
           </div>
@@ -511,31 +464,39 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
           {/* Stats by League */}
           {Object.keys(playerStats.byLeague).length > 0 && (
             <div className="bg-white rounded-xl shadow-lg p-6">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">Statistics by League</h2>
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('playerDashboard.statisticsByLeague')}</h2>
               <div className="space-y-4">
                 {Object.entries(playerStats.byLeague).map(([leagueName, stats]: [string, any]) => (
                   <div key={leagueName} className="border border-gray-200 rounded-lg p-4">
                     <h3 className="text-lg font-bold text-gray-800 mb-3">{leagueName}</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
+                      <div className="text-center p-3 bg-yellow-50 rounded">
+                        <p className="text-xs text-gray-600 mb-1">{t('seasons.rank')}</p>
+                        <p className="text-xl font-bold text-yellow-700">#{stats.rank || '-'}</p>
+                      </div>
                       <div className="text-center p-3 bg-gray-50 rounded">
-                        <p className="text-xs text-gray-600 mb-1">Games</p>
+                        <p className="text-xs text-gray-600 mb-1">{t('playerDashboard.games')}</p>
                         <p className="text-xl font-bold text-gray-800">{stats.gamesPlayed}</p>
                       </div>
                       <div className="text-center p-3 bg-gray-50 rounded">
-                        <p className="text-xs text-gray-600 mb-1">Average</p>
+                        <p className="text-xs text-gray-600 mb-1">{t('common.average')}</p>
                         <p className="text-xl font-bold text-gray-800">{stats.average}</p>
                       </div>
                       <div className="text-center p-3 bg-gray-50 rounded">
-                        <p className="text-xs text-gray-600 mb-1">High Game</p>
+                        <p className="text-xs text-gray-600 mb-1">{t('playerDashboard.highGame')}</p>
                         <p className="text-xl font-bold text-gray-800">{stats.highGame}</p>
                       </div>
                       <div className="text-center p-3 bg-gray-50 rounded">
-                        <p className="text-xs text-gray-600 mb-1">High Series</p>
+                        <p className="text-xs text-gray-600 mb-1">{t('playerDashboard.highSeries')}</p>
                         <p className="text-xl font-bold text-gray-800">{stats.highSeries}</p>
                       </div>
                       <div className="text-center p-3 bg-gray-50 rounded">
-                        <p className="text-xs text-gray-600 mb-1">Points</p>
+                        <p className="text-xs text-gray-600 mb-1">{t('common.points')}</p>
                         <p className="text-xl font-bold text-gray-800">{stats.points}</p>
+                      </div>
+                      <div className="text-center p-3 bg-blue-50 rounded">
+                        <p className="text-xs text-gray-600 mb-1">{t('playerDashboard.pointsPerGame')}</p>
+                        <p className="text-xl font-bold text-blue-700">{stats.pointsPerGame || '0.00'}</p>
                       </div>
                     </div>
                   </div>
@@ -547,55 +508,8 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
           {playerStats.totalGames === 0 && (
             <div className="bg-white rounded-xl shadow-lg p-12 text-center">
               <span className="text-6xl mb-4 block">📊</span>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">No Statistics Yet</h3>
-              <p className="text-gray-600">Complete some games to see your statistics here.</p>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Leagues View */}
-      {view === 'leagues' && (
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">My Leagues</h2>
-          {playerLeagues.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">You are not registered in any leagues yet.</p>
-          ) : (
-            <div className="space-y-4">
-              {playerLeagues.map(league => (
-                <div
-                  key={league.id}
-                  className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors cursor-pointer"
-                  onClick={() => onNavigate('player-league', { leagueId: league.id })}
-                >
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <h3 className="text-xl font-bold text-gray-800">{league.name}</h3>
-                      {league.description && (
-                        <p className="text-sm text-gray-600 mt-1">{league.description}</p>
-                      )}
-                    </div>
-                    <span className="text-blue-600 font-semibold">View {t('common.rightArrow')}</span>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    {league.activeSeasons.map((season: any) => {
-                      const playerTeam = league.playerTeams.find((t: any) => t.seasonId === season.id);
-                      return (
-                        <div key={season.id} className="flex items-center gap-3 text-sm">
-                          <span className="px-2 py-1 bg-green-100 text-green-700 rounded font-semibold">
-                            Active
-                          </span>
-                          <span className="font-semibold text-gray-700">{season.name}</span>
-                          {playerTeam && (
-                            <span className="text-gray-500">• Team: {playerTeam.name}</span>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
+              <h3 className="text-xl font-bold text-gray-800 mb-2">{t('playerDashboard.noStatisticsYet')}</h3>
+              <p className="text-gray-600">{t('playerDashboard.noStatisticsDesc')}</p>
             </div>
           )}
         </div>
@@ -604,12 +518,12 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
       {/* History View */}
       {view === 'history' && (
         <div className="bg-white rounded-xl shadow-lg p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Season History</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('playerDashboard.seasonHistory')}</h2>
           {completedSeasons.length === 0 ? (
             <div className="text-center py-12">
               <span className="text-6xl mb-4 block">📚</span>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">No Completed Seasons</h3>
-              <p className="text-gray-600">You haven't participated in any completed seasons yet.</p>
+              <h3 className="text-xl font-bold text-gray-800 mb-2">{t('playerDashboard.noCompletedSeasons')}</h3>
+              <p className="text-gray-600">{t('playerDashboard.noCompletedSeasonsDesc')}</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -636,9 +550,9 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
                       <div className="flex items-center gap-2">
                         <span className="text-2xl">🏆</span>
                         <div>
-                          <p className="text-xs text-gray-600">Season Champion</p>
+                          <p className="text-xs text-gray-600">{t('playerDashboard.seasonChampion')}</p>
                           <p className="font-bold text-gray-800">{season.champion.teamName}</p>
-                          <p className="text-sm text-gray-600">{season.champion.points} points • {season.champion.wins}-{season.champion.losses}-{season.champion.draws}</p>
+                          <p className="text-sm text-gray-600">{season.champion.points} {t('common.pts')} • {season.champion.wins}-{season.champion.losses}-{season.champion.draws}</p>
                         </div>
                       </div>
                     </div>
@@ -650,30 +564,30 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-2xl">👥</span>
                         <div>
-                          <p className="text-xs text-gray-600">Your Team</p>
+                          <p className="text-xs text-gray-600">{t('playerDashboard.yourTeam')}</p>
                           <p className="font-bold text-gray-800">{season.playerTeam.name}</p>
                         </div>
                       </div>
                       <div className="grid grid-cols-4 gap-3 text-center">
                         <div>
-                          <p className="text-xs text-gray-600">Rank</p>
+                          <p className="text-xs text-gray-600">{t('seasons.rank')}</p>
                           <p className="text-lg font-bold text-blue-600">
                             #{season.playerTeamStanding.teamId === season.champion?.teamId ? '1 🏆' : 
                               completedSeasons.findIndex(s => s.id === season.id) + 1}
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-600">Points</p>
+                          <p className="text-xs text-gray-600">{t('common.points')}</p>
                           <p className="text-lg font-bold text-gray-800">{season.playerTeamStanding.points}</p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-600">Record</p>
+                          <p className="text-xs text-gray-600">{t('playerDashboard.record')}</p>
                           <p className="text-sm font-semibold text-gray-800">
                             {season.playerTeamStanding.wins}-{season.playerTeamStanding.losses}-{season.playerTeamStanding.draws}
                           </p>
                         </div>
                         <div>
-                          <p className="text-xs text-gray-600">Total Pins</p>
+                          <p className="text-xs text-gray-600">{t('playerDashboard.totalPins')}</p>
                           <p className="text-lg font-bold text-gray-800">{season.playerTeamStanding.totalPinsWithHandicap.toLocaleString()}</p>
                         </div>
                       </div>
@@ -693,14 +607,6 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
             </div>
           )}
         </div>
-      )}
-
-      {/* Season Comparison View */}
-      {view === 'comparison' && (
-        <PlayerSeasonComparison 
-          playerId={playerId}
-          onBack={() => setView('dashboard')}
-        />
       )}
     </div>
   );
