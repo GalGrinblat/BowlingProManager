@@ -6,6 +6,7 @@ import { calculateHeadToHead, formatHeadToHead } from '../../utils/headToHeadUti
 import { calculateSeasonRecords } from '../../utils/recordsUtils';
 import { useTranslation } from '../../contexts/LanguageContext';
 import { exportSeason, downloadExportFile, readImportFile, importLeagueOrSeason } from '../../utils/leagueImportExportUtils';
+import { PrintMatchDay } from './PrintMatchDay';
 
 import type { SeasonDetailProps } from '../../types/index';
 
@@ -19,6 +20,7 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
   const [selectedRound, setSelectedRound] = useState(1);
   const [selectedMatchDay, setSelectedMatchDay] = useState<number | null>(null);
   const [showPostponeModal, setShowPostponeModal] = useState(false);
+  const [showPrintModal, setShowPrintModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [postponeWeeks, setPostponeWeeks] = useState(1);
 
@@ -391,14 +393,24 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
             <div className="bg-white rounded-xl shadow-lg p-4">
               <div className="flex justify-between items-center mb-2">
                 <h3 className="text-sm font-semibold text-gray-600">{t('seasons.selectMatchDay')}</h3>
-                {season.status === 'active' && selectedMatchDay && (
-                  <button
-                    onClick={() => setShowPostponeModal(true)}
-                    className="px-3 py-1 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 font-semibold text-xs"
-                  >
-                    📅 {t('seasons.postpone')}
-                  </button>
-                )}
+                <div className="flex gap-2">
+                  {selectedMatchDay && (
+                    <button
+                      onClick={() => setShowPrintModal(true)}
+                      className="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 font-semibold text-xs"
+                    >
+                      🖨️ {t('common.print')}
+                    </button>
+                  )}
+                  {season.status === 'active' && selectedMatchDay && (
+                    <button
+                      onClick={() => setShowPostponeModal(true)}
+                      className="px-3 py-1 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 font-semibold text-xs"
+                    >
+                      📅 {t('seasons.postpone')}
+                    </button>
+                  )}
+                </div>
               </div>
               <div className="flex gap-2 flex-wrap">
                 {matchDaysInRound.map(matchDay => {
@@ -766,6 +778,15 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
             </div>
           </div>
         </div>
+      )}
+
+      {/* Print Match Day Modal */}
+      {showPrintModal && selectedMatchDay && (
+        <PrintMatchDay
+          seasonId={seasonId}
+          matchDay={selectedMatchDay}
+          onClose={() => setShowPrintModal(false)}
+        />
       )}
 
       {/* Postpone Modal */}

@@ -353,6 +353,13 @@ export interface TeamManagementProps {
   onBack: () => void;
 }
 
+/** Props for PrintMatchDay - Printable matchday sheet with team rosters and player info */
+export interface PrintMatchDayProps {
+  seasonId: string;
+  matchDay: number;
+  onClose: () => void;
+}
+
 /** Props for Settings - Organization settings and data export/import */
 export interface SettingsProps {
   onBack: () => void;

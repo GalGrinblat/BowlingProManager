@@ -23,6 +23,15 @@ const en: TranslationDictionary = {
     active: 'Active',
     team: 'Team',
     deleteWarning: 'This action cannot be undone.',
+    print: 'Print',
+    close: 'Close',
+    roster: 'Roster',
+    handicap: 'Handicap',
+    notes: 'Notes',
+    printedOn: 'Printed on',
+    total: 'Total',
+    pts: 'pts',
+    completed: 'Completed',
   },
 
   // Authentication
@@ -262,6 +271,7 @@ const en: TranslationDictionary = {
     roundOf: 'Round {{current}} of {{total}}',
     activeSeasons: 'active season(s)',
     viewSeason: 'View Season',
+    printMatchDay: 'Print Match Day',
     seasonArchives: 'Season Archives',
     exportSeason: 'Export Season',
     exportSeasonDesc: 'Download a complete backup of this season with all teams and games',
@@ -409,6 +419,7 @@ const en: TranslationDictionary = {
   schedule: {
     round: 'Round',
     bye: 'Bye',
+    match: 'Match',
   },
 
   // Days of week

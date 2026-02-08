@@ -7,7 +7,9 @@ const he: TranslationDictionary = {
     cancel: 'בטל',
     delete: 'מחק',
     edit: 'ערוך',
-    back: 'חזור',    next: 'הבא',    view: 'צפה',
+    back: 'חזור',
+    next: 'הבא',
+    view: 'צפה',
     leftArrow: '→',
     rightArrow: '←',
     name: 'שם',
@@ -21,6 +23,15 @@ const he: TranslationDictionary = {
     active: 'פעיל',
     team: 'קבוצה',
     deleteWarning: 'פעולה זו אינה ניתנת לביטול.',
+    print: 'הדפס',
+    close: 'סגור',
+    roster: 'סגל',
+    handicap: 'הנדיקאפ',
+    notes: 'הערות',
+    printedOn: 'הודפס בתאריך',
+    total: 'סה"כ',
+    pts: 'נק',
+    completed: 'הושלם',
   },
 
   // אימות
@@ -170,8 +181,8 @@ const he: TranslationDictionary = {
     matchesPerGame: 'משחקים/מפגש',
     teams: 'קבוצות',
     games: 'משחקים',
-    rounds: 'סבבים',
-    round: 'סבב',
+    rounds: 'סיבובים',
+    round: 'סיבוב',
     handicapDisplay: 'הנדיקאפ: {{percentage}}% ל-{{basis}}',
     leagueNotFound: 'ליגה לא נמצאה. ייתכן שהיא נמחקה.',
     
@@ -211,7 +222,7 @@ const he: TranslationDictionary = {
     backToLeague: 'חזרה לליגה',
     seasonName: 'שם עונה',
     startDate: 'תאריך התחלה',
-    numberOfRounds: 'מספר סבבים',
+    numberOfRounds: 'מספר סיבובים',
     completed: 'הושלם',
     completeSeason: 'השלם עונה',
     teams: 'קבוצות',
@@ -234,7 +245,7 @@ const he: TranslationDictionary = {
     headToHead: 'התמודדות ישירות',
     playerStandings: 'טבלת שחקנים',
     seasonRecords: 'שיאי עונה',
-    selectRound: 'בחר סבב',
+    selectRound: 'בחר סיבוב',
     selectMatchDay: 'בחר מחזור',
     postpone: 'דחה',
     matchDay: 'מחזור',
@@ -262,9 +273,10 @@ const he: TranslationDictionary = {
     manageTeams: 'נהל קבוצות',
     teamsCount: '{{count}} קבוצות',
     gamesComplete: '{{completed}}/{{total}} משחקים הושלמו',
-    roundOf: 'סבב {{current}} מתוך {{total}}',
+    roundOf: 'סיבוב {{current}} מתוך {{total}}',
     activeSeasons: 'עונות פעילות',
     viewSeason: 'צפה בעונה',
+    printMatchDay: 'הדפס מחזור',
     seasonArchives: 'ארכיון עונות',
     exportSeason: 'ייצא עונה',
     exportSeasonDesc: 'הורד גיבוי מלא של העונה עם כל הקבוצות והמשחקים',
@@ -279,7 +291,7 @@ const he: TranslationDictionary = {
     numberOfTeams: 'מספר קבוצות',
     playersPerTeam: 'שחקנים לקבוצה',
     matchesPerGame: 'מספר משחקים במחזור',
-    roundExplanation: 'כל קבוצה משחקת נגד כל הקבוצות בכל סבב',
+    roundExplanation: 'כל קבוצה משחקת נגד כל הקבוצות בכל סיבוב',
     matchesExplanation: 'מספר המשחקים בכל מחזור',
     configureTeams: 'הגדרת קבוצות',
     assignPlayersDesc: 'הקצה שחקנים לכל קבוצה ({{count}} שחקנים לקבוצה)',
@@ -309,7 +321,7 @@ const he: TranslationDictionary = {
   // ניקוד משחק
   games: {
     matchDay: 'יום משחק',
-    round: 'סבב',
+    round: 'סיבוב',
     handicap: 'הנדיקפ',
     absent: 'נעדר',
     pending: 'ממתין',
@@ -410,8 +422,9 @@ const he: TranslationDictionary = {
 
   // לוח משחקים
   schedule: {
-    round: 'סבב',
+    round: 'סיבוב',
     bye: 'חופשי',
+    match: 'משחק',
   },
 
   // ימים בשבוע
