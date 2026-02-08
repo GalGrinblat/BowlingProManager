@@ -44,7 +44,7 @@ export const calculateBonusPoints = (
   
   if (score === '' || average === '') return 0;
   const scoreNum = typeof score === 'string' ? parseInt(score) : score;
-  const avgNum = typeof average === 'string' ? parseInt(average) : average;
+  const avgNum = typeof average === 'string' ? parseFloat(average) : average;
   
   // Use bonus rules if provided
   if (!bonusRules || bonusRules.length === 0) return 0;

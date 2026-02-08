@@ -398,9 +398,10 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
                         type="number"
                         min="0"
                         max="300"
+                        step="0.1"
                         value={player.average}
                         onChange={(e) => {
-                          const newAvg = parseInt(e.target.value) || 0;
+                          const newAvg = parseFloat(e.target.value) || 0;
                           setPlayerAverages(prev => ({
                             ...prev,
                             [player.playerId]: newAvg

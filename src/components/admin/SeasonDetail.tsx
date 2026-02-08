@@ -11,7 +11,7 @@ import { PrintMatchDay } from './PrintMatchDay';
 import type { SeasonDetailProps } from '../../types/index';
 
 export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, onPlayGame, onViewGame, onManageTeams }) => {
-  const { t } = useTranslation();
+  const { t, direction, isRTL } = useTranslation();
   const [season, setSeason] = useState<any>(null);
   const [league, setLeague] = useState<any>(null);
   const [teams, setTeams] = useState<any[]>([]);
@@ -485,11 +485,11 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
           <div className="overflow-x-auto -mx-4 sm:mx-0">
             <div className="inline-block min-w-full align-middle">
               <div className="overflow-hidden">
-                <table className="min-w-full">
+                <table className="min-w-full" dir={direction}>
                   <thead className="bg-gray-100">
-                    <tr className="text-left">
-                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm">{t('seasons.rank')}</th>
-                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm">{t('common.team')}</th>
+                    <tr>
+                      <th className={`px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm ${isRTL ? 'text-right' : 'text-left'}`}>{t('seasons.rank')}</th>
+                      <th className={`px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm ${isRTL ? 'text-right' : 'text-left'}`}>{t('common.team')}</th>
                       <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm">{t('seasons.gamesPlayed')}</th>
                       <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm">{t('common.wins')}</th>
                       <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm">{t('common.losses')}</th>
@@ -739,16 +739,16 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
             <div className="overflow-x-auto -mx-4 sm:mx-0">
               <div className="inline-block min-w-full align-middle">
                 <div className="overflow-hidden">
-                  <table className="min-w-full">
+                  <table className="min-w-full" dir={direction}>
                     <thead className="bg-gray-100">
-                      <tr className="text-left">
-                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm">{t('seasons.rank')}</th>
-                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm">{t('common.player')}</th>
-                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm hidden lg:table-cell">{t('common.team')}</th>
+                      <tr>
+                        <th className={`px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm ${isRTL ? 'text-right' : 'text-left'}`}>{t('seasons.rank')}</th>
+                        <th className={`px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm ${isRTL ? 'text-right' : 'text-left'}`}>{t('common.player')}</th>
+                        <th className={`px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm hidden lg:table-cell ${isRTL ? 'text-right' : 'text-left'}`}>{t('common.team')}</th>
                         <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm">{t('seasons.gamesPlayed')}</th>
                         <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm">{t('seasons.avg')}</th>
-                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm hidden sm:table-cell">{t('seasons.high')}</th>
-                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm hidden md:table-cell">{t('seasons.series')}</th>
+                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm hidden sm:table-cell">{t('seasons.highGame')}</th>
+                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm hidden md:table-cell">{t('seasons.highSeries')}</th>
                         <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm hidden lg:table-cell">{t('seasons.pins')}</th>
                       </tr>
                     </thead>
@@ -763,7 +763,7 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
                             <td className="px-3 sm:px-4 py-3 text-gray-600 text-sm hidden lg:table-cell">{stat.teamName}</td>
                             <td className="px-3 sm:px-4 py-3 text-center text-gray-600 text-sm">{stat.gamesPlayed}</td>
                             <td className="px-3 sm:px-4 py-3 text-center">
-                              <span className="font-bold text-blue-600 text-base sm:text-lg">{stat.average}</span>
+                              <span className="font-bold text-blue-600 text-base sm:text-lg">{stat.average.toFixed(1)}</span>
                             </td>
                             <td className="px-3 sm:px-4 py-3 text-center text-purple-600 font-semibold text-sm hidden sm:table-cell">{stat.highGame}</td>
                             <td className="px-3 sm:px-4 py-3 text-center text-green-600 font-semibold text-sm hidden md:table-cell">{stat.highSeries}</td>

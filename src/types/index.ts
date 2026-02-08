@@ -186,6 +186,7 @@ export interface LanguageContextType {
   setLanguage: (lang: 'en' | 'he') => void;
   t: (key: string) => string;
   direction: 'ltr' | 'rtl';
+  isRTL: boolean;
 }
 
 /** NavigationState - Current view and entity IDs for app navigation */

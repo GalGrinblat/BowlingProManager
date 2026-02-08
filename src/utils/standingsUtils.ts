@@ -266,7 +266,7 @@ export const calculatePlayerSeasonStats = (teams: Team[], games: Game[]): Player
   // Calculate averages
   playerStats.forEach(ps => {
     if (ps.gamesPlayed > 0) {
-      ps.average = Math.round(ps.totalPins / ps.gamesPlayed);
+      ps.average = ps.totalPins / ps.gamesPlayed;
     }
   });
 
@@ -352,7 +352,7 @@ export const calculateCurrentPlayerAverages = (_teams: Team[], games: Game[]): C
   Object.keys(playerAverages).forEach(playerName => {
     const data = playerAverages[playerName];
     if (data && data.gamesPlayed > 0) {
-      data.average = Math.round(data.totalPins / data.gamesPlayed);
+      data.average = data.totalPins / data.gamesPlayed;
     }
   });
   

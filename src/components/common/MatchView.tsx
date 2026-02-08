@@ -45,7 +45,7 @@ export const MatchView: React.FC<MatchViewProps> = ({ matchNumber, game, onUpdat
                   <div className="flex-1 min-w-0">
                     <div className="font-semibold text-white text-sm truncate">{player.name}</div>
                     <div className="text-xs text-gray-400">
-                      Avg: {player.average} | HC: {game.useHandicap === false ? 'N/A' : player.handicap}
+                      Avg: {typeof player.average === 'number' ? player.average.toFixed(1) : player.average} | HC: {game.useHandicap === false ? 'N/A' : player.handicap}
                       {player.absent && <span className="text-red-400 font-bold ml-1">(ABSENT)</span>}
                     </div>
                   </div>
@@ -198,7 +198,7 @@ export const MatchView: React.FC<MatchViewProps> = ({ matchNumber, game, onUpdat
                   <div className="flex-1 min-w-0">
                     <div className="font-semibold text-white text-sm text-right truncate">{game.team2.players[idx].name}</div>
                     <div className="text-xs text-gray-400 text-right">
-                      Avg: {game.team2.players[idx].average} | HC: {game.useHandicap === false ? 'N/A' : game.team2.players[idx].handicap}
+                      Avg: {typeof game.team2.players[idx].average === 'number' ? game.team2.players[idx].average.toFixed(1) : game.team2.players[idx].average} | HC: {game.useHandicap === false ? 'N/A' : game.team2.players[idx].handicap}
                       {game.team2.players[idx].absent && <span className="text-red-400 font-bold ml-1">(ABSENT)</span>}
                     </div>
                   </div>

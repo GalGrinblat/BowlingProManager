@@ -195,13 +195,13 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
 
     // Calculate averages
     if (stats.totalGames > 0) {
-      stats.average = Math.round(stats.totalPins / stats.totalGames);
+      stats.average = stats.totalPins / stats.totalGames;
     }
 
     Object.keys(stats.byLeague).forEach(leagueName => {
       const leagueStats = stats.byLeague[leagueName];
       if (leagueStats.gamesPlayed > 0) {
-        leagueStats.average = Math.round(leagueStats.totalPins / leagueStats.gamesPlayed);
+        leagueStats.average = leagueStats.totalPins / leagueStats.gamesPlayed;
         leagueStats.pointsPerGame = (leagueStats.points / leagueStats.gamesPlayed).toFixed(2);
       } else {
         leagueStats.pointsPerGame = '0.00';
@@ -248,7 +248,7 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
           if (data.games > 0) {
             allPlayerAverages.push({
               playerName,
-              average: Math.round(data.pins / data.games)
+              average: data.pins / data.games
             });
           }
         });
@@ -448,7 +448,7 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
               </div>
               <div className="text-center p-4 bg-green-50 rounded-lg">
                 <p className="text-sm text-gray-600 mb-1">{t('common.average')}</p>
-                <p className="text-3xl font-bold text-green-600">{playerStats.average}</p>
+                <p className="text-3xl font-bold text-green-600">{playerStats.average.toFixed(1)}</p>
               </div>
               <div className="text-center p-4 bg-purple-50 rounded-lg">
                 <p className="text-sm text-gray-600 mb-1">{t('playerDashboard.highGame')}</p>
@@ -480,7 +480,7 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
                       </div>
                       <div className="text-center p-3 bg-gray-50 rounded">
                         <p className="text-xs text-gray-600 mb-1">{t('common.average')}</p>
-                        <p className="text-xl font-bold text-gray-800">{stats.average}</p>
+                        <p className="text-xl font-bold text-gray-800">{stats.average.toFixed(1)}</p>
                       </div>
                       <div className="text-center p-3 bg-gray-50 rounded">
                         <p className="text-xs text-gray-600 mb-1">{t('playerDashboard.highGame')}</p>

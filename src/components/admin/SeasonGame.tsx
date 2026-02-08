@@ -237,7 +237,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
       calculateBonusPoints(pinsValue, playerAverage, isAbsent, game.bonusRules);
     
     calculateMatchResults(updated, matchIndex);
-    calculateGrandTotalPoints(updated);
+    updated.grandTotalPoints = calculateGrandTotalPoints(updated);
     
     // Update game status
     const allMatchesComplete = updated.matches.every((m: any) => {
@@ -424,13 +424,13 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
                           )}
                         </div>
                         <div className="text-sm text-gray-400 mt-1">
-                          {t('common.average')}: <span className="text-white font-medium">{player.average}</span>
+                          {t('common.average')}: <span className="text-white font-medium">{typeof player.average === 'number' ? player.average.toFixed(1) : player.average}</span>
                           {' • '}
                           {t('games.handicap')}: <span className="text-white font-medium">{player.handicap}</span>
                         </div>
                         {player.absent && (
                           <div className="text-xs text-red-400 mt-1">
-                            {t('games.willUse')}: {parseInt(player.average) - 10} {t('games.pinsPerGame')}
+                            {t('games.willUse')}: {Math.round(player.average) - 10} {t('games.pinsPerGame')}
                           </div>
                         )}
                       </div>
@@ -478,13 +478,13 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
                           )}
                         </div>
                         <div className="text-sm text-gray-400 mt-1">
-                          {t('common.average')}: <span className="text-white font-medium">{player.average}</span>
+                          {t('common.average')}: <span className="text-white font-medium">{typeof player.average === 'number' ? player.average.toFixed(1) : player.average}</span>
                           {' • '}
                           {t('games.handicap')}: <span className="text-white font-medium">{player.handicap}</span>
                         </div>
                         {player.absent && (
                           <div className="text-xs text-red-400 mt-1">
-                            {t('games.willUse')}: {parseInt(player.average) - 10} {t('games.pinsPerGame')}
+                            {t('games.willUse')}: {Math.round(player.average) - 10} {t('games.pinsPerGame')}
                           </div>
                         )}
                       </div>
