@@ -54,7 +54,7 @@ console.log('   Should have all required sections\n');
 
 const requiredSections = [
   'common', 'auth', 'nav', 'players', 'leagues', 'seasons',
-  'teams', 'games', 'standings', 'settings', 'dashboard'
+  'teams', 'games', 'settings', 'dashboard', 'schedule', 'days', 'records'
 ];
 
 const enSections = Object.keys(translations.en);
@@ -78,8 +78,8 @@ console.log('   Should have correct Hebrew translations\n');
 
 const sampleTests = [
   { path: 'common.save', en: 'Save', he: 'שמור' },
-  { path: 'auth.login', en: 'Login', he: 'התחבר' },
-  { path: 'nav.dashboard', en: 'Dashboard', he: 'לוח בקרה' },
+  { path: 'auth.logout', en: 'Logout', he: 'התנתק' },
+  { path: 'nav.players', en: 'Players', he: 'שחקנים' },
   { path: 'players.title', en: 'Player Registry', he: 'רישום שחקנים' },
 ];
 
