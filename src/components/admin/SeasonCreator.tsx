@@ -146,7 +146,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
             const playerAvg = 0;  // Default to 0, will be calculated from actual games
             let handicap = 0;
             
-            if (formData.useHandicap && playerAvg < formData.handicapBasis) {
+            if (formData.useHandicap && playerAvg > 0 && playerAvg < formData.handicapBasis) {
               const diff = formData.handicapBasis - playerAvg;
               handicap = Math.round(diff * (formData.handicapPercentage / 100));
             }
@@ -166,7 +166,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
             const playerAvg = 0;  // Default to 0, will be calculated from actual games
             let handicap = 0;
             
-            if (formData.useHandicap && playerAvg < formData.handicapBasis) {
+            if (formData.useHandicap && playerAvg > 0 && playerAvg < formData.handicapBasis) {
               const diff = formData.handicapBasis - playerAvg;
               handicap = Math.round(diff * (formData.handicapPercentage / 100));
             }

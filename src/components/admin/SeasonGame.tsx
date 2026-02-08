@@ -98,7 +98,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
           
           // Recalculate handicap
           let handicap = 0;
-          if (season && season.useHandicap && playerAvg < season.handicapBasis) {
+          if (season && season.useHandicap && playerAvg > 0 && playerAvg < season.handicapBasis) {
             const diff = season.handicapBasis - playerAvg;
             handicap = Math.round(diff * (season.handicapPercentage / 100));
           }
@@ -127,7 +127,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
           
           // Recalculate handicap
           let handicap = 0;
-          if (season && season.useHandicap && playerAvg < season.handicapBasis) {
+          if (season && season.useHandicap && playerAvg > 0 && playerAvg < season.handicapBasis) {
             const diff = season.handicapBasis - playerAvg;
             handicap = Math.round(diff * (season.handicapPercentage / 100));
           }
