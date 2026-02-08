@@ -1,6 +1,8 @@
+import { useTranslation } from '../../contexts/LanguageContext';
 import type { CompletedGameViewProps } from '../../types/index';
 
 export const CompletedGameView: React.FC<CompletedGameViewProps> = ({ game, onBack }) => {
+  const { t } = useTranslation();
   if (!game) return <div>Loading...</div>;
 
   const totals = {
@@ -23,7 +25,7 @@ export const CompletedGameView: React.FC<CompletedGameViewProps> = ({ game, onBa
           onClick={onBack}
           className="flex items-center gap-2 text-gray-600 hover:text-gray-800 mb-4 text-lg font-semibold"
         >
-          <span>←</span> Back
+          <span>{t('common.leftArrow')}</span> Back
         </button>
         <div className="flex items-center justify-between mb-4">
           <div>

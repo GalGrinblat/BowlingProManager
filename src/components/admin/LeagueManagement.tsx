@@ -192,7 +192,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
             onClick={onBack}
             className="text-gray-600 hover:text-gray-800"
           >
-            ← {t('players.backToDashboard')}
+            {t('common.leftArrow')} {t('players.backToDashboard')}
           </button>
         </div>
       </div>

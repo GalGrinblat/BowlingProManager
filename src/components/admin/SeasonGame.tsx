@@ -325,7 +325,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
             onClick={onBack}
             className="text-gray-600 hover:text-gray-800 mb-4"
           >
-            ← Back
+            {t('common.leftArrow')} Back
           </button>
           <div className="text-center py-12">
             <span className="text-6xl mb-4 block">🚫</span>
@@ -366,7 +366,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
               onClick={onBack}
               className="text-blue-400 hover:text-blue-300 mb-4 flex items-center gap-2"
             >
-              ← {t('common.back')}
+              {t('common.leftArrow')} {t('common.back')}
             </button>
             <h1 className="text-3xl font-bold mb-2">{t('games.preGameSetup')}</h1>
             <p className="text-gray-400">
@@ -511,7 +511,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
               onClick={handlePreMatchContinue}
               className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-bold text-lg transition-colors"
             >
-              {t('games.continueToMatch')} →
+              {t('games.continueToMatch')} {t('common.rightArrow')}
             </button>
           </div>
         </div>

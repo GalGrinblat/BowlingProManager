@@ -193,7 +193,7 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
               onClick={onBack}
               className="text-gray-600 hover:text-gray-800"
             >
-              ← {t('seasons.backToLeague')}
+              {t('common.leftArrow')} {t('seasons.backToLeague')}
             </button>
             {season.status === 'active' && (
               <div className="flex gap-2">

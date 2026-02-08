@@ -98,7 +98,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
             onClick={onBack}
             className="text-gray-600 hover:text-gray-800"
           >
-            ← {t('teams.backToSeason')}
+            {t('common.leftArrow')} {t('teams.backToSeason')}
           </button>
         </div>
       </div>
@@ -159,7 +159,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
                     {recentChanges.map((change: any, idx: any) => (
                       <div key={idx} className="text-xs text-gray-600 bg-yellow-50 p-2 rounded">
                         <span className="font-semibold">{change.oldPlayer.name}</span>
-                        {' → '}
+                        {' '}{t('common.rightArrow')}{' '}
                         <span className="font-semibold">{change.newPlayer.name}</span>
                         <span className="text-gray-500 ml-2">
                           ({new Date(change.date).toLocaleDateString()})
@@ -261,7 +261,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
                       </div>
                       <div className="text-sm text-gray-600">
                         <span className="font-medium">{change.oldPlayer.name}</span>
-                        {' → '}
+                        {' '}{t('common.rightArrow')}{' '}
                         <span className="font-medium">{change.newPlayer.name}</span>
                         <span className="text-gray-400 ml-2">
                           (Position {change.position + 1})

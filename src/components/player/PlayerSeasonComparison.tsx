@@ -139,7 +139,7 @@ export const PlayerSeasonComparison: React.FC<PlayerSeasonComparisonProps> = ({ 
           onClick={onBack}
           className="text-gray-600 hover:text-gray-800 mb-4"
         >
-          ← Back
+          {t('common.leftArrow')} Back
         </button>
         <h1 className="text-3xl font-bold text-gray-800 mb-2">Season Comparison</h1>
         <p className="text-gray-600">{player.name} - Performance Analysis</p>

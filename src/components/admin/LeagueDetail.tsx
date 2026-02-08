@@ -74,7 +74,7 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
             onClick={onBack}
             className="text-gray-600 hover:text-gray-800"
           >
-            ← {t('leagues.backToLeagues')}
+            {t('common.leftArrow')} {t('leagues.backToLeagues')}
           </button>
         </div>
         <div className="text-center py-12">
@@ -99,7 +99,7 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
             onClick={onBack}
             className="text-gray-600 hover:text-gray-800"
           >
-            ← {t('leagues.backToLeagues')}
+            {t('common.leftArrow')} {t('leagues.backToLeagues')}
           </button>
         </div>
         <div className="flex gap-4 text-sm text-gray-600">
@@ -160,7 +160,7 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
               onClick={() => onViewSeason(activeSeason.id)}
               className="px-4 py-2 bg-white text-green-600 rounded-lg hover:bg-green-50 font-semibold"
             >
-              {t('seasons.viewSeason')} →
+              {t('seasons.viewSeason')} {t('common.rightArrow')}
             </button>
           </div>
         </div>

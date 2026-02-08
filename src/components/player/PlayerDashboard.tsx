@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { playersApi, leaguesApi, seasonsApi, teamsApi, gamesApi } from '../../services/api';
 import { calculateTeamStandings } from '../../utils/standingsUtils';
 import { PlayerSeasonComparison } from './PlayerSeasonComparison';
+import { useTranslation } from '../../contexts/LanguageContext';
 
 import type { PlayerDashboardProps } from '../../types/index';
 
 export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNavigate }) => {
+  const { t } = useTranslation();
   const [player, setPlayer] = useState<any>(null);
   const [playerLeagues, setPlayerLeagues] = useState<any[]>([]);
   const [upcomingGames, setUpcomingGames] = useState<any[]>([]);
@@ -373,7 +375,7 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
                             📝 Ready to Score
                           </span>
                         )}
-                        <span className="text-blue-600 font-semibold">Enter Scores →</span>
+                        <span className="text-blue-600 font-semibold">Enter Scores {t('common.rightArrow')}</span>
                       </div>
                     </div>
                   );
@@ -459,7 +461,7 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
                             Lost
                           </span>
                         )}
-                        <span className="text-purple-600 font-semibold">View →</span>
+                        <span className="text-purple-600 font-semibold">View {t('common.rightArrow')}</span>
                       </div>
                     </div>
                   );
@@ -573,7 +575,7 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
                         <p className="text-sm text-gray-600 mt-1">{league.description}</p>
                       )}
                     </div>
-                    <span className="text-blue-600 font-semibold">View →</span>
+                    <span className="text-blue-600 font-semibold">View {t('common.rightArrow')}</span>
                   </div>
                   
                   <div className="space-y-2">
