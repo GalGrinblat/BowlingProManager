@@ -201,7 +201,7 @@ const he: TranslationDictionary = {
     },
     
     // סטטוס ותצוגה
-    totalLeagues: 'סה"כ ליגות',
+    totalLeagues: 'סה"כ {{count}} ליגות',
     activeLeagues: 'ליגות פעילות',
     archivedLeagues: 'ליגות בארכיון',
     noActiveLeagues: 'אין ליגות פעילות',

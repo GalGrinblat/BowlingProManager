@@ -186,7 +186,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('leagues.title')}</h1>
-            <p className="text-gray-600"><span className="ltr-content">{leagues.length}</span> {t('leagues.totalLeagues')}</p>
+            <p className="text-gray-600">{t('leagues.totalLeagues').replace('{{count}}', String(leagues.length))}</p>
           </div>
           <button
             onClick={onBack}

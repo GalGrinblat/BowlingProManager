@@ -201,7 +201,7 @@ const en: TranslationDictionary = {
     },
     
     // Status and display
-    totalLeagues: 'total leagues',
+    totalLeagues: '{{count}} total leagues',
     activeLeagues: 'Active Leagues',
     archivedLeagues: 'Archived Leagues',
     noActiveLeagues: 'No active leagues',
