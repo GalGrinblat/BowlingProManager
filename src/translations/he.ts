@@ -183,8 +183,16 @@ const he: TranslationDictionary = {
     restoreDesc: 'פעולה זו תחזיר את הליגה לרשימת הליגות הפעילות שלך.',
     archived: 'הועברה לארכיון',
     restored: 'שוחזרה',
-    
-    // הודעות
+        // ייצוא/ייבוא
+    exportLeague: 'ייצא ליגה',
+    exportLeagueDesc: 'הורד גיבוי מלא של הליגה עם כל העונות, הקבוצות והמשחקים',
+    exportSuccess: 'הליגה יוצאה בהצלחה',
+    importLeague: 'ייבא ליגה',
+    importLeagueDesc: 'שחזר ליגה מקובץ גיבוי',
+    importSuccess: 'הליגה יובאה בהצלחה',
+    importError: 'נכשל בייבוא הליגה',
+    selectFile: 'בחר קובץ',
+        // הודעות
     leagueCreated: 'הליגה נוצרה בהצלחה!',
     leagueUpdated: 'הליגה עודכנה בהצלחה!',
     leagueDeleted: 'הליגה נמחקה בהצלחה.',
@@ -257,6 +265,13 @@ const he: TranslationDictionary = {
     activeSeasons: 'עונות פעילות',
     viewSeason: 'צפה בעונה',
     seasonArchives: 'ארכיון עונות',
+    exportSeason: 'ייצא עונה',
+    exportSeasonDesc: 'הורד גיבוי מלא של העונה עם כל הקבוצות והמשחקים',
+    exportSuccess: 'העונה יוצאה בהצלחה',
+    importSeason: 'ייבא עונה',
+    importSeasonDesc: 'שחזר עונה מקובץ גיבוי',
+    importSuccess: 'העונה יובאה בהצלחה',
+    importError: 'נכשל ביייבוא העונה',
     noSeasonsYet: 'עדיין אין עונות',
     createFirstSeason: 'צור את העונה הראשונה שלך כדי להתחיל',
     createSeasonStep1: 'צור עונה חדשה - שלב 1',

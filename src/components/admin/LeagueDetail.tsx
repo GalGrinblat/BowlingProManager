@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { leaguesApi, seasonsApi, teamsApi, gamesApi } from '../../services/api';
 import { calculateTeamStandings } from '../../utils/standingsUtils';
 import { useTranslation } from '../../contexts/LanguageContext';
+import { exportLeague, downloadExportFile, readImportFile, importLeagueOrSeason } from '../../utils/leagueImportExportUtils';
 
 import type { LeagueDetailProps, League, Season } from '../../types/index';
 
@@ -9,6 +10,7 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
   const { t } = useTranslation();
   const [league, setLeague] = useState<League | null>(null);
   const [seasons, setSeasons] = useState<Season[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     loadLeagueData();
@@ -26,6 +28,43 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
 
   const activeSeason = seasons.find(s => s.status === 'active');
   const completedSeasons = seasons.filter(s => s.status === 'completed');
+
+  const handleExportLeague = () => {
+    const exportData = exportLeague(leagueId);
+    if (exportData) {
+      const filename = `${league?.name.replace(/[^a-z0-9]/gi, '_')}_${new Date().toISOString().split('T')[0]}.json`;
+      downloadExportFile(exportData, filename);
+      alert(t('leagues.exportSuccess'));
+    }
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImportFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const importData = await readImportFile(file);
+      const result = importLeagueOrSeason(importData);
+      
+      if (result.success) {
+        alert(t('leagues.importSuccess'));
+        window.location.reload(); // Reload to show imported data
+      } else {
+        alert(`${t('leagues.importError')}: ${result.error}`);
+      }
+    } catch (error) {
+      alert(`${t('leagues.importError')}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+    
+    // Reset input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   if (!league) {
     return (
@@ -73,12 +112,35 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
 
       {/* Action Bar */}
       <div className="bg-white rounded-xl shadow-lg p-4">
-        <button
-          onClick={() => onCreateSeason(leagueId)}
-          className="w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 px-6 rounded-lg hover:from-blue-600 hover:to-blue-700 font-semibold shadow-md hover:shadow-lg transition-all"
-        >
-          + {t('seasons.createSeason')}
-        </button>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <button
+            onClick={() => onCreateSeason(leagueId)}
+            className="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 px-6 rounded-lg hover:from-blue-600 hover:to-blue-700 font-semibold shadow-md hover:shadow-lg transition-all"
+          >
+            + {t('seasons.createSeason')}
+          </button>
+          <button
+            onClick={handleExportLeague}
+            className="bg-gradient-to-r from-green-500 to-green-600 text-white py-3 px-6 rounded-lg hover:from-green-600 hover:to-green-700 font-semibold shadow-md hover:shadow-lg transition-all"
+            title={t('leagues.exportLeagueDesc')}
+          >
+            📥 {t('leagues.exportLeague')}
+          </button>
+          <button
+            onClick={handleImportClick}
+            className="bg-gradient-to-r from-purple-500 to-purple-600 text-white py-3 px-6 rounded-lg hover:from-purple-600 hover:to-purple-700 font-semibold shadow-md hover:shadow-lg transition-all"
+            title={t('leagues.importLeagueDesc')}
+          >
+            📤 {t('leagues.importLeague')}
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json"
+            onChange={handleImportFile}
+            className="hidden"
+          />
+        </div>
       </div>
 
       {/* Active Season */}

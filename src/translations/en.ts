@@ -181,6 +181,16 @@ const en: TranslationDictionary = {
     archived: 'archived',
     restored: 'restored',
     
+    // Export/Import
+    exportLeague: 'Export League',
+    exportLeagueDesc: 'Download a complete backup of this league with all seasons, teams, and games',
+    exportSuccess: 'League exported successfully',
+    importLeague: 'Import League',
+    importLeagueDesc: 'Restore a league from a backup file',
+    importSuccess: 'League imported successfully',
+    importError: 'Failed to import league',
+    selectFile: 'Select File',
+    
     // Messages
     leagueCreated: 'League created successfully!',
     leagueUpdated: 'League updated successfully!',
@@ -250,6 +260,13 @@ const en: TranslationDictionary = {
     activeSeasons: 'active season(s)',
     viewSeason: 'View Season',
     seasonArchives: 'Season Archives',
+    exportSeason: 'Export Season',
+    exportSeasonDesc: 'Download a complete backup of this season with all teams and games',
+    exportSuccess: 'Season exported successfully',
+    importSeason: 'Import Season',
+    importSeasonDesc: 'Restore a season from a backup file',
+    importSuccess: 'Season imported successfully',
+    importError: 'Failed to import season',
     noSeasonsYet: 'No Seasons Yet',
     createFirstSeason: 'Create your first season to get started',
     createSeasonStep1: 'Create New Season - Step 1',

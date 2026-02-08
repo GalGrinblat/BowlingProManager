@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { seasonsApi, teamsApi, gamesApi, leaguesApi } from '../../services/api';
 import { calculateTeamStandings, calculatePlayerSeasonStats } from '../../utils/standingsUtils';
 import { postponeMatchDay, formatMatchDate } from '../../utils/scheduleUtils';
 import { calculateHeadToHead, formatHeadToHead } from '../../utils/headToHeadUtils';
 import { calculateSeasonRecords } from '../../utils/recordsUtils';
 import { useTranslation } from '../../contexts/LanguageContext';
+import { exportSeason, downloadExportFile, readImportFile, importLeagueOrSeason } from '../../utils/leagueImportExportUtils';
 
 import type { SeasonDetailProps } from '../../types/index';
 
@@ -18,6 +19,7 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
   const [selectedRound, setSelectedRound] = useState(1);
   const [selectedMatchDay, setSelectedMatchDay] = useState<number | null>(null);
   const [showPostponeModal, setShowPostponeModal] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [postponeWeeks, setPostponeWeeks] = useState(1);
 
   useEffect(() => {
@@ -112,6 +114,43 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
     }
   };
 
+  const handleExportSeason = () => {
+    const exportData = exportSeason(seasonId);
+    if (exportData) {
+      const filename = `${season.name.replace(/[^a-z0-9]/gi, '_')}_${new Date().toISOString().split('T')[0]}.json`;
+      downloadExportFile(exportData, filename);
+      alert(t('seasons.exportSuccess'));
+    }
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImportFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const importData = await readImportFile(file);
+      const result = importLeagueOrSeason(importData);
+      
+      if (result.success) {
+        alert(t('seasons.importSuccess'));
+        window.location.reload(); // Reload to show imported data
+      } else {
+        alert(`${t('seasons.importError')}: ${result.error}`);
+      }
+    } catch (error) {
+      alert(`${t('seasons.importError')}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+    
+    // Reset input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   if (!season || !league) return <div>{t('seasons.loading')}</div>;
 
   const teamStandings = calculateTeamStandings(teams, games);
@@ -166,6 +205,27 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
                     👥 {t('seasons.manageTeams')}
                   </button>
                 )}
+                <button
+                  onClick={handleExportSeason}
+                  className="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 font-semibold"
+                  title={t('seasons.exportSeasonDesc')}
+                >
+                  📥 {t('seasons.exportSeason')}
+                </button>
+                <button
+                  onClick={handleImportClick}
+                  className="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 font-semibold"
+                  title={t('seasons.importSeasonDesc')}
+                >
+                  📤 {t('seasons.importSeason')}
+                </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".json"
+                  onChange={handleImportFile}
+                  className="hidden"
+                />
                 {completedGames === totalGames && (
                   <button
                     onClick={handleCompleteSeason}
