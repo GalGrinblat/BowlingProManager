@@ -10,7 +10,7 @@ import type { SeasonCreatorProps } from '../../types/index';
 export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, onSuccess }) => {
   const { t } = useTranslation();
   const [league, setLeague] = useState<any>(null);
-  const [step, setStep] = useState<1 | 2>(1);
+  const [step, setStep] = useState<1 | 2 | 3>(1);
 
   // Load league data
   useEffect(() => {
@@ -54,6 +54,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
   
   const [teams, setTeams] = useState<Array<{ name: string; playerIds: string[] }>>([]);
   const [availablePlayers] = useState(() => playersApi.getAll().filter(p => p.active));
+  const [playerAverages, setPlayerAverages] = useState<Record<string, number>>({});
 
   // Initialize teams when numberOfTeams changes
   React.useEffect(() => {
@@ -67,6 +68,49 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
   const handleStepOneSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setStep(2);
+  };
+
+  const handleStepTwoSubmit = () => {
+    // Validate teams
+    const validationErrors = [];
+    
+    teams.forEach((team, index) => {
+      if (!team.name.trim()) {
+        validationErrors.push(`Team ${index + 1} needs a name`);
+      }
+      if (team.playerIds.length !== formData.playersPerTeam) {
+        validationErrors.push(`${team.name || `Team ${index + 1}`} needs exactly ${formData.playersPerTeam} players`);
+      }
+    });
+    
+    // Check for duplicate players across teams
+    const allPlayerIds = teams.flatMap(t => t.playerIds);
+    const duplicates = allPlayerIds.filter((id, index) => allPlayerIds.indexOf(id) !== index);
+    if (duplicates.length > 0) {
+      const playerNames = [...new Set(duplicates)].map(id => 
+        availablePlayers.find(p => p.id === id)?.name || 'Unknown'
+      );
+      validationErrors.push(`Players cannot be on multiple teams: ${playerNames.join(', ')}`);
+    }
+    
+    if (validationErrors.length > 0) {
+      alert('❌ Please fix these issues:\n\n' + validationErrors.join('\n'));
+      return;
+    }
+
+    // Initialize player averages from registry
+    const initialAverages: Record<string, number> = {};
+    allPlayerIds.forEach(playerId => {
+      if (!playerAverages[playerId]) {
+        // Default to 0 - users can edit in step 3
+        initialAverages[playerId] = 0;
+      } else {
+        initialAverages[playerId] = playerAverages[playerId];
+      }
+    });
+    setPlayerAverages(initialAverages);
+    
+    setStep(3);
   };
 
   const handleFinalSubmit = () => {
@@ -143,7 +187,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
         if (team1 && team2) {
           const team1Players = team1.playerIds.map((id: any, index: number) => {
             const player = availablePlayers.find(p => p.id === id);
-            const playerAvg = 0;  // Default to 0, will be calculated from actual games
+            const playerAvg = playerAverages[id] || 0;  // Use custom average from step 3
             let handicap = 0;
             
             if (formData.useHandicap && playerAvg > 0 && playerAvg < formData.handicapBasis) {
@@ -163,7 +207,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
 
           const team2Players = team2.playerIds.map((id: any, index: number) => {
             const player = availablePlayers.find(p => p.id === id);
-            const playerAvg = 0;  // Default to 0, will be calculated from actual games
+            const playerAvg = playerAverages[id] || 0;  // Use custom average from step 3
             let handicap = 0;
             
             if (formData.useHandicap && playerAvg > 0 && playerAvg < formData.handicapBasis) {
@@ -288,6 +332,117 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
     );
   }
 
+  if (step === 3) {
+    // Get all players across teams with their team names
+    const allPlayersWithTeams = teams.flatMap(team => 
+      team.playerIds.map(playerId => {
+        const player = availablePlayers.find(p => p.id === playerId);
+        return {
+          playerId,
+          playerName: player?.name || 'Unknown',
+          teamName: team.name,
+          average: playerAverages[playerId] || 0
+        };
+      })
+    );
+
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('seasons.createSeason')}</h1>
+              <p className="text-gray-600">{league.name}</p>
+            </div>
+            <button
+              onClick={onBack}
+              className="text-gray-600 hover:text-gray-800"
+            >
+              {t('common.leftArrow')} {t('seasons.backToLeague')}
+            </button>
+          </div>
+        </div>
+
+        {/* Step 3: Review and Edit Player Averages */}
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('seasons.reviewPlayerAverages')}</h2>
+          <p className="text-gray-600 mb-6">{t('seasons.reviewPlayerAveragesDesc')}</p>
+          
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {t('seasons.playerName')}
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {t('common.team')}
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    {t('seasons.average')}
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {allPlayersWithTeams.map((player) => (
+                  <tr key={player.playerId} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {player.playerName}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {player.teamName}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <input
+                        type="number"
+                        min="0"
+                        max="300"
+                        value={player.average}
+                        onChange={(e) => {
+                          const newAvg = parseInt(e.target.value) || 0;
+                          setPlayerAverages(prev => ({
+                            ...prev,
+                            [player.playerId]: newAvg
+                          }));
+                        }}
+                        className="w-24 px-3 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          
+          <div className="flex gap-3 mt-6">
+            <button
+              type="button"
+              onClick={() => setStep(2)}
+              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-semibold"
+            >
+              {t('common.leftArrow')} {t('common.back')}
+            </button>
+            <button
+              type="button"
+              onClick={handleFinalSubmit}
+              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold"
+            >
+              {t('seasons.createSeason')}
+            </button>
+            <button
+              type="button"
+              onClick={onBack}
+              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-semibold"
+            >
+              {t('common.cancel')}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (step === 2) {
     return (
       <div className="space-y-6">
@@ -302,7 +457,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
               onClick={onBack}
               className="text-gray-600 hover:text-gray-800"
             >
-              ← {t('seasons.backToLeague')}
+              {t('common.leftArrow')} {t('seasons.backToLeague')}
             </button>
           </div>
         </div>
@@ -373,14 +528,14 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
               onClick={() => setStep(1)}
               className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-semibold"
             >
-              ← {t('common.back')}
+              {t('common.leftArrow')} {t('common.back')}
             </button>
             <button
               type="button"
-              onClick={handleFinalSubmit}
+              onClick={handleStepTwoSubmit}
               className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
             >
-              {t('seasons.createSeason')}
+              {t('common.next')} {t('common.rightArrow')}
             </button>
             <button
               type="button"
@@ -408,7 +563,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
             onClick={onBack}
             className="text-gray-600 hover:text-gray-800"
           >
-            ← {t('seasons.backToLeague')}
+            {t('common.leftArrow')} {t('seasons.backToLeague')}
           </button>
         </div>
       </div>
@@ -523,7 +678,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
               type="submit"
               className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
             >
-              {t('seasons.nextConfigureTeams')} →
+              {t('seasons.nextConfigureTeams')} {t('common.rightArrow')}
             </button>
             <button
               type="button"
