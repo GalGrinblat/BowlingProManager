@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { seasonsApi, teamsApi, gamesApi, leaguesApi, playersApi } from '../../services/api';
-import { calculateTeamStandings, calculatePlayerSeasonStats, calculateCurrentPlayerAverages } from '../../utils/standingsUtils';
+import { calculateTeamStandings, calculateCurrentPlayerAverages } from '../../utils/standingsUtils';
 import { calculateHeadToHead } from '../../utils/headToHeadUtils';
 import { formatMatchDate } from '../../utils/scheduleUtils';
 import { useTranslation } from '../../contexts/LanguageContext';
@@ -20,7 +20,6 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
   const [games, setGames] = useState<any[]>([]);
   const [matchDayGames, setMatchDayGames] = useState<any[]>([]);
   const [teamStandings, setTeamStandings] = useState<any[]>([]);
-  const [playerStats, setPlayerStats] = useState<any[]>([]);
   const [currentAverages, setCurrentAverages] = useState<any>({});
 
   useEffect(() => {
@@ -48,9 +47,6 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
     const standings = calculateTeamStandings(teamsData, gamesData);
     setTeamStandings(standings);
 
-    const stats = calculatePlayerSeasonStats(teamsData, gamesData);
-    setPlayerStats(stats);
-
     // Calculate current averages (up to this matchday)
     const previousGames = gamesData.filter(g => 
       g.status === 'completed' && g.matchDay < matchDay
@@ -67,7 +63,6 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
     return team.playerIds.map((playerId: string) => {
       const player = playersApi.getById(playerId);
       const playerName = player?.name || 'Unknown';
-      const stats = playerStats.find(s => s.playerId === playerId);
       const currentAvg = currentAverages[playerName]?.average || 0;
       const currentGamesPlayed = currentAverages[playerName]?.gamesPlayed || 0;
       
@@ -242,7 +237,7 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
                                   <div className={`font-semibold ${isRTL ? 'text-right' : 'text-left'}`}>{idx + 1}. {player.name}</div>
                                 </td>
                                 <td className="text-center px-2 py-2 font-semibold">
-                                  {player.average > 0 ? Math.round(player.average) : '-'}
+                                  {player.average > 0 ? player.average.toFixed(1) : '-'}
                                 </td>
                                 <td className="text-center px-2 py-2 text-blue-600 font-bold">
                                   {player.handicap > 0 ? player.handicap : '-'}
@@ -257,7 +252,7 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
                             <tr>
                               <td className={`px-2 py-2 font-semibold ${isRTL ? 'text-right' : 'text-left'}`}>{t('common.total')}</td>
                               <td className="text-center px-2 py-2 font-bold">
-                                {Math.round(team1Players.reduce((sum: number, p: any) => sum + p.average, 0) / team1Players.length || 0)}
+                                {(team1Players.reduce((sum: number, p: any) => sum + p.average, 0) / team1Players.length || 0).toFixed(1)}
                               </td>
                               <td className="text-center px-2 py-2 font-bold text-blue-600">
                                 {team1Players.reduce((sum: number, p: any) => sum + p.handicap, 0)}
@@ -289,7 +284,7 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
                                   <div className={`font-semibold ${isRTL ? 'text-right' : 'text-left'}`}>{idx + 1}. {player.name}</div>
                                 </td>
                                 <td className="text-center px-2 py-2 font-semibold">
-                                  {player.average > 0 ? Math.round(player.average) : '-'}
+                                  {player.average > 0 ? player.average.toFixed(1) : '-'}
                                 </td>
                                 <td className="text-center px-2 py-2 text-purple-600 font-bold">
                                   {player.handicap > 0 ? player.handicap : '-'}
@@ -304,7 +299,7 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
                             <tr>
                               <td className={`px-2 py-2 font-semibold ${isRTL ? 'text-right' : 'text-left'}`}>{t('common.total')}</td>
                               <td className="text-center px-2 py-2 font-bold">
-                                {Math.round(team2Players.reduce((sum: number, p: any) => sum + p.average, 0) / team2Players.length || 0)}
+                                {(team2Players.reduce((sum: number, p: any) => sum + p.average, 0) / team2Players.length || 0).toFixed(1)}
                               </td>
                               <td className="text-center px-2 py-2 font-bold text-purple-600">
                                 {team2Players.reduce((sum: number, p: any) => sum + p.handicap, 0)}
@@ -332,8 +327,16 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
       {/* Print Styles */}
       <style>{`
         @media print {
-          * {
+          body {
+            margin: 0 !important;
+            padding: 0 !important;
+            print-color-adjust: exact;
+            -webkit-print-color-adjust: exact;
+          }
+          
+          body * {
             visibility: hidden;
+            position: static !important;
           }
           
           .print-modal-root,
@@ -348,19 +351,10 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
             width: 100% !important;
             height: auto !important;
             overflow: visible !important;
-            z-index: 1 !important;
           }
           
           .no-print {
             display: none !important;
-          }
-          
-          .fixed {
-            position: static !important;
-          }
-          
-          .overflow-auto {
-            overflow: visible !important;
           }
           
           .print-content {
@@ -376,11 +370,6 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
           
           .match-section:last-child {
             page-break-after: auto;
-          }
-          
-          body {
-            print-color-adjust: exact;
-            -webkit-print-color-adjust: exact;
           }
           
           @page {
