@@ -129,7 +129,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
       return;
     }
     
-    if (confirm(`${t('leagues.deleteConfirm')} "${league?.name}"?\n\n${t('leagues.deleteAction')}`)) {
+    if (confirm(`${t('leagues.deleteConfirm')} "${league?.name}"?\n\n${t('common.deleteWarning')}`)) {
       leaguesApi.delete(id);
       loadLeagues();
       alert(t('leagues.leagueDeleted'));
@@ -444,8 +444,8 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                           }}
                           className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
                         >
-                          <option value="player">{t('leagues.player')}</option>
-                          <option value="team">{t('leagues.team')}</option>
+                          <option value="player">{t('common.player')}</option>
+                          <option value="team">{t('common.team')}</option>
                         </select>
                       </div>
                       
@@ -523,7 +523,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                     </div>
                     
                     <div className="mt-2 text-xs text-gray-600">
-                      {rule.type === 'player' ? `👤 ${t('leagues.player')}` : `👥 ${t('leagues.team')}`} {t('common.points')}: <strong className="ltr-content">+{rule.points}</strong> {rule.condition === 'vs_average' 
+                      {rule.type === 'player' ? `👤 ${t('common.player')}` : `👥 ${t('common.team')}`} {t('common.points')}: <strong className="ltr-content">+{rule.points}</strong> {rule.condition === 'vs_average' 
                         ? `(${rule.threshold}+ ${t('leagues.bonus.aboveAvg')})`
                         : `(${rule.threshold}+ ${t('leagues.bonus.score')})`
                       }
@@ -604,7 +604,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                       </div>
                       {activeSeason && (
                         <div className="mt-2 inline-block px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">
-                          {t('leagues.activeStatus')}: {activeSeason.name}
+                          {t('common.active')}: {activeSeason.name}
                         </div>
                       )}
                     </div>

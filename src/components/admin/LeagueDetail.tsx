@@ -86,7 +86,7 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
         <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white">
           <div className="flex justify-between items-start">
             <div>
-              <div className="text-sm font-semibold mb-1">{t('seasons.active').toUpperCase()}</div>
+              <div className="text-sm font-semibold mb-1">{t('common.active').toUpperCase()}</div>
               <h2 className="text-2xl font-bold mb-2">{activeSeason.name}</h2>
               <div className="flex gap-4 text-sm">
                 <span>🏆 <span className="ltr-content">{activeSeason.numberOfTeams}</span> {t('leagues.teams')}</span>

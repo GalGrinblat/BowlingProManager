@@ -101,7 +101,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
       return;
     }
     
-    if (confirm(`⚠️ ${t('players.deleteConfirm')} "${player?.name}"?\n\n${t('players.deleteAction')}`)) {
+    if (confirm(`⚠️ ${t('players.deleteConfirm')} "${player?.name}"?\n\n${t('common.deleteWarning')}`)) {
       playersApi.delete(id);
       alert(`✅ "${player?.name}" ${t('players.deleted')}`);
       loadPlayers();
@@ -556,7 +556,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
                     : 'bg-blue-600 text-white hover:bg-blue-700'
                 }`}
               >
-                {t('players.importPlayers')} <span className="ltr-content">{importData.length}</span> {importData.length !== 1 ? t('players.playerPlural') : t('players.playerSingular')}
+                {t('players.importPlayers')} <span className="ltr-content">{importData.length}</span> {importData.length !== 1 ? t('common.players') : t('common.player')}
               </button>
             </div>
           </div>

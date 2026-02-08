@@ -16,6 +16,10 @@ const he: TranslationDictionary = {
     losses: 'הפסדים',
     draws: 'תיקו',
     players: 'שחקנים',
+    player: 'שחקן',
+    active: 'פעיל',
+    team: 'קבוצה',
+    deleteWarning: 'פעולה זו אינה ניתנת לביטול.',
   },
 
   // אימות
@@ -26,11 +30,6 @@ const he: TranslationDictionary = {
     selectRole: 'בחר תפקיד',
     loginAs: 'התחבר בתור',
     welcome: 'ברוך הבא',
-  },
-
-  // ניווט
-  nav: {
-    players: 'שחקנים',
   },
 
   // רישום שחקנים
@@ -51,7 +50,7 @@ const he: TranslationDictionary = {
     cannotDeleteAssigned: 'לא ניתן למחוק שחקן כי הוא משובץ לקבוצות',
     removeFromTeamsFirst: 'אנא הסר אותו מכל הקבוצות תחילה, או סמן אותו כלא פעיל במקום זאת.',
     deleteConfirm: 'מחק שחקן',
-    deleteAction: 'פעולה זו אינה ניתנת לביטול.',
+
     created: 'השחקן נוצר בהצלחה',
     updated: 'השחקן עודכן בהצלחה',
     deleted: 'השחקן נמחק בהצלחה',
@@ -69,8 +68,7 @@ const he: TranslationDictionary = {
     noValidPlayers: 'לא נמצאו שחקנים תקינים בקובץ הייבוא.',
     duplicate: 'כפילות - יידלג',
     importPlayers: 'ייבא',
-    playerSingular: 'שחקן',
-    playerPlural: 'שחקנים',
+
     importComplete: 'הייבוא הושלם!',
     playersImported: 'שחקן(ים) יובאו',
     duplicatesSkipped: 'כפילות נדלגו',
@@ -163,11 +161,8 @@ const he: TranslationDictionary = {
     archivedLeagues: 'ליגות בארכיון',
     noActiveLeagues: 'אין ליגות פעילות',
     noLeagues: 'לא נמצאו ליגות',
-    activeStatus: 'פעיל',
-    completedInactive: 'ליגות שהסתיימו או לא פעילות. כל הנתונים נשמרים וניתן לצפות בהם או לשחזר אותם בכל עת.',
-    currentLeagues: 'הליגות הנוכחיות שלך. ניתן לארכב ליגות כשהן מסתיימות או כשהן לא פעילות יותר.',
-    player: 'שחקן',
-    team: 'קבוצה',
+    completedInactive: 'ליגות שהושלמו או לא פעילות. כל הנתונים שמורים וניתן לצפות או לשחזר בכל עת.',
+    currentLeagues: 'הליגות הנוכחיות שלך. ניתן לארכב ליגות כשהן מושלמות או לא פעילות יותר.',
     season: 'עונה',
     seasons: 'עונות',
     playersPerTeam: 'שחקנים/קבוצה',
@@ -197,7 +192,7 @@ const he: TranslationDictionary = {
     cannotDelete: 'לא ניתן למחוק ליגה כי יש לה עונות',
     completeOrDelete: 'אנא השלם או מחק את כל העונות תחילה, או סמן את הליגה כלא פעילה כדי לארכב אותה.',
     deleteConfirm: 'האם אתה בטוח שברצונך למחוק לצמיתות את הליגה',
-    deleteAction: 'פעולה זו אינה ניתנת לביטול.',
+
   },
 
   // ניהול עונות
@@ -208,7 +203,6 @@ const he: TranslationDictionary = {
     seasonName: 'שם עונה',
     startDate: 'תאריך התחלה',
     numberOfRounds: 'מספר סבבים',
-    active: 'פעיל',
     completed: 'הושלם',
     completeSeason: 'השלם עונה',
     teams: 'קבוצות',
@@ -248,7 +242,7 @@ const he: TranslationDictionary = {
     vs: 'נגד',
     avg: 'ממו',
     pts: 'נק',
-    player: 'שחקן',
+
     high: 'גבוה',
     series: 'סדרה',
     currentDate: 'תאריך נוכחי',

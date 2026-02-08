@@ -16,6 +16,10 @@ const en: TranslationDictionary = {
     losses: 'Losses',
     draws: 'Draws',
     players: 'Players',
+    player: 'Player',
+    active: 'Active',
+    team: 'Team',
+    deleteWarning: 'This action cannot be undone.',
   },
 
   // Authentication
@@ -26,11 +30,6 @@ const en: TranslationDictionary = {
     selectRole: 'Select Role',
     loginAs: 'Login as',
     welcome: 'Welcome',
-  },
-
-  // Navigation
-  nav: {
-    players: 'Players',
   },
 
   // Player Registry
@@ -51,7 +50,6 @@ const en: TranslationDictionary = {
     cannotDeleteAssigned: 'Cannot delete player because they are assigned to teams',
     removeFromTeamsFirst: 'Please remove them from all teams first, or mark them as inactive instead.',
     deleteConfirm: 'Delete player',
-    deleteAction: 'This action cannot be undone.',
     created: 'Player created successfully',
     updated: 'Player updated successfully',
     deleted: 'Player deleted successfully',
@@ -69,13 +67,10 @@ const en: TranslationDictionary = {
     noValidPlayers: 'No valid players found in the import file.',
     duplicate: 'Duplicate - will skip',
     importPlayers: 'Import',
-    playerSingular: 'Player',
-    playerPlural: 'Players',
     importComplete: 'Import complete!',
     playersImported: 'player(s) imported',
     duplicatesSkipped: 'duplicate(s) skipped',
     errorsDetails: 'error(s) (see modal for details)',
-    statusActive: 'Active',
     statusInactive: 'Inactive',
   },
 
@@ -155,10 +150,7 @@ const en: TranslationDictionary = {
       standardDesc: 'Highest average vs highest average',
       balanced: 'Balanced (1v4, 2v3, 3v2, 4v1) - Top vs Bottom',
       rankingBalancedDesc: 'Highest average vs lowest average',
-      standardDesc: 'Highest average vs highest average',
-      balancedDesc: 'Highest average vs lowest average',
-      standard: 'Standard (1v1, 2v2, 3v3, 4v4) - Top vs Top',
-      balanced: 'Balanced (1v4, 2v3, 3v2, 4v1) - Top vs Bottom',
+      balancedDesc: 'Highest average vs lowest average'
     },
     
     // Status and display
@@ -167,11 +159,7 @@ const en: TranslationDictionary = {
     archivedLeagues: 'Archived Leagues',
     noActiveLeagues: 'No active leagues',
     noLeagues: 'No leagues found',
-    activeStatus: 'Active',
-    completedInactive: 'Completed or inactive leagues. All data is preserved and can be viewed or restored anytime.',
     currentLeagues: 'Your current leagues. You can archive leagues when they\'re completed or no longer active.',
-    player: 'Player',
-    team: 'Team',
     season: 'season',
     seasons: 'seasons',
     playersPerTeam: 'players/team',
@@ -201,7 +189,6 @@ const en: TranslationDictionary = {
     cannotDelete: 'Cannot delete league because it has seasons',
     completeOrDelete: 'Please complete or delete all seasons first, or toggle the league to inactive to archive it.',
     deleteConfirm: 'Are you sure you want to permanently delete the league',
-    deleteAction: 'This action cannot be undone.',
   },
 
   // Season Management
@@ -212,7 +199,6 @@ const en: TranslationDictionary = {
     seasonName: 'Season Name',
     startDate: 'Start Date',
     numberOfRounds: 'Number of Rounds',
-    active: 'Active',
     completed: 'Completed',
     completeSeason: 'Complete Season',
     teams: 'Teams',
@@ -243,8 +229,6 @@ const en: TranslationDictionary = {
     noGamesInMatchDay: 'No games in this match day',
     gamesPlayed: 'GP',
     rank: 'Rank',
-    team: 'Team',
-    points: 'Points',
     pins: 'Pins',
     headToHeadRecords: 'Head-to-Head Records',
     headToHeadDesc: 'All team matchup records for this season',
@@ -252,7 +236,6 @@ const en: TranslationDictionary = {
     vs: 'vs',
     avg: 'Avg',
     pts: 'pts',
-    player: 'Player',
     high: 'High',
     series: 'Series',
     currentDate: 'Current date',

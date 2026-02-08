@@ -53,7 +53,7 @@ console.log('\n✅ Test 3: Critical Translation Sections');
 console.log('   Should have all required sections\n');
 
 const requiredSections = [
-  'common', 'auth', 'nav', 'players', 'leagues', 'seasons',
+  'common', 'auth', 'players', 'leagues', 'seasons',
   'teams', 'games', 'settings', 'dashboard', 'schedule', 'days', 'records'
 ];
 
@@ -79,7 +79,7 @@ console.log('   Should have correct Hebrew translations\n');
 const sampleTests = [
   { path: 'common.save', en: 'Save', he: 'שמור' },
   { path: 'auth.logout', en: 'Logout', he: 'התנתק' },
-  { path: 'nav.players', en: 'Players', he: 'שחקנים' },
+  { path: 'common.players', en: 'Players', he: 'שחקנים' },
   { path: 'players.title', en: 'Player Registry', he: 'רישום שחקנים' },
 ];
 
