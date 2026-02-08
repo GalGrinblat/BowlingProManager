@@ -269,7 +269,6 @@ const he: TranslationDictionary = {
     createTeams: 'צור {{count}} קבוצות',
     missingTeams: 'קבוצות חסרות',
     createMissingTeams: 'צור קבוצות חסרות',
-    assignPlayersDesc: 'הקצה שחקנים לכל קבוצה ({{count}} שחקנים לקבוצה)',
     expectedTeamsCount: 'צפויות {{expected}} קבוצות, אך רק {{actual}} מוגדרות.',
   },
 

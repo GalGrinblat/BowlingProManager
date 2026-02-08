@@ -269,7 +269,6 @@ const en: TranslationDictionary = {
     createTeams: 'Create {{count}} Teams',
     missingTeams: 'Missing Teams',
     createMissingTeams: 'Create Missing Teams',
-    assignPlayersDesc: 'Assign players to each team ({{count}} players per team)',
     expectedTeamsCount: 'Expected {{expected}} teams, but only {{actual}} found.',
   },
 
