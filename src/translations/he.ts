@@ -197,8 +197,10 @@ const he: TranslationDictionary = {
       rankingStandard: 'סטנדרטי (1 נגד 1, 2 נגד 2, 3 נגד 3, 4 נגד 4) - חזק נגד חזק',
       rankingBalanced: 'מאוזן (1 נגד 4, 2 נגד 3, 3 נגד 2, 4 נגד 1) - חזק נגד חלש',
       rankingStandardDesc: 'ממוצע גבוה ביותר נגד ממוצע גבוה ביותר',
-      rankingBalancedDesc: 'ממוצע גבוה ביותר נגד ממוצע נמוך ביותר',
-    },
+      rankingBalancedDesc: 'ממוצע גבוה ביותר נגד ממוצע נמוך ביותר',      standardDesc: 'ממוצע גבוה נגד ממוצע גבוה',
+      balancedDesc: 'ממוצע גבוה נגד ממוצע נמוך',
+      standard: 'סטנדרטי (1 נגד 1, 2 נגד 2, 3 נגד 3, 4 נגד 4) - חזק נגד חזק',
+      balanced: 'מאוזן (1 נגד 4, 2 נגד 3, 3 נגד 2, 4 נגד 1) - חזק נגד חלש',    },
     
     // סטטוס ותצוגה
     totalLeagues: 'סה"כ {{count}} ליגות',

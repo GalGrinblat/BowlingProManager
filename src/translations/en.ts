@@ -198,6 +198,10 @@ const en: TranslationDictionary = {
       rankingBalanced: 'Balanced (1v4, 2v3, 3v2, 4v1) - Top vs Bottom',
       rankingStandardDesc: 'Highest average vs highest average',
       rankingBalancedDesc: 'Highest average vs lowest average',
+      standardDesc: 'Highest average vs highest average',
+      balancedDesc: 'Highest average vs lowest average',
+      standard: 'Standard (1v1, 2v2, 3v3, 4v4) - Top vs Top',
+      balanced: 'Balanced (1v4, 2v3, 3v2, 4v1) - Top vs Bottom',
     },
     
     // Status and display
