@@ -1,6 +1,53 @@
-# League Creation & Configuration Guide
 
-This document explains how to create a new league in the Bowling League App, the available configuration options, and their default values.
+# League Overview
+
+This document provides a comprehensive overview of leagues in the Bowling League App, including their structure, configuration options, lifecycle, and management. League creation instructions are included as a subsection below.
+
+---
+
+## What is a League?
+
+A **league** is an independent competition within the organization. Each league can have its own rules, seasons, teams, and scoring system. Leagues are managed by admins and can run concurrently with different configurations.
+
+## League Structure
+
+- **Leagues** contain one or more **seasons**.
+- Each season has its own teams, schedule, and games.
+- Players are assigned to teams during season setup (not at league creation).
+- Leagues define the default rules and configuration for all their seasons.
+
+## League Lifecycle
+
+1. **Creation**: Admins create a new league and configure its rules.
+2. **Configuration**: League settings can be edited before the first season starts.
+3. **Active**: Seasons are created and played under the league's rules.
+4. **Completed/Archived**: Leagues and their seasons are retained for historical records.
+
+## League Management
+
+- Admins can create, edit, or delete leagues (if no active seasons/games).
+- League configuration can be updated from the **League Management** or **League Detail** views.
+- Some settings (like players per team) may be locked after the first season is created.
+- Changes to scoring or handicap rules affect all future games/seasons in the league.
+
+## Configurable Options
+
+All configuration options are described in detail below. These options define how the league operates and how games are scored.
+
+---
+
+## League Creation
+
+Leagues are managed by admins and serve as independent competitions within the organization. Each league can have its own rules, seasons, and teams.
+
+**To create a league:**
+1. Go to the **Admin Dashboard**.
+2. Navigate to **League Management**.
+3. Click **Create League**.
+4. Fill in the league details and configuration options (see below).
+5. Save to add the league to the system.
+
+---
 
 ---
 
