@@ -51,6 +51,7 @@ When creating or editing a league, the following configuration options are avail
 - **Handicap Percentage**: Percentage of the difference between basis and average used for handicap (default: 100%).
 - **No Negative Handicap**: Handicap values are never negative; if the calculation would result in a negative value, the handicap is set to 0.
 
+
 ### Bonus Points
 
 - **Player Bonus Points**
@@ -65,6 +66,10 @@ When creating or editing a league, the following configuration options are avail
 	- For each rule, you specify:
 		- Threshold: The minimum team score (for `pure_score`)
 		- Points: The number of bonus points awarded when the condition is met
+
+- **All Players Present Team Bonus**
+	- Optionally, you can enable a bonus that awards a team extra points if all players are present for a matchday.
+	- You can configure the number of bonus points given for this attendance bonus.
 
 ### Other
 - **Season Count**: Number of seasons the league will have (set during season creation).

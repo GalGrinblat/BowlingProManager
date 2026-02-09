@@ -152,6 +152,8 @@ const he: TranslationDictionary = {
       aboveAvg: 'פינים מעל הממוצע',
       scoreVsAverage: 'ניקוד מול ממוצע',
       score: 'ניקוד',
+      allPresentLabel: 'הענק בונוס קבוצה אם כל השחקנים נוכחים',
+      allPresentPoints: 'נקודות בונוס',
     },
     
     // אסטרטגיית סידור

@@ -150,6 +150,8 @@ const en: TranslationDictionary = {
       aboveAvg: 'Above Average',
       scoreVsAverage: 'Score versus Average',
       score: 'Score',
+      allPresentLabel: 'Award team bonus if all players are present',
+      allPresentPoints: 'Bonus points',
     },
     
     // Lineup strategy

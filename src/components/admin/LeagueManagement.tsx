@@ -24,6 +24,8 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
     lineupStrategy: LineupStrategy;
     lineupRule: LineupRule;
     bonusRules: BonusRule[];
+    teamAllPresentBonusEnabled: boolean;
+    teamAllPresentBonusPoints: number;
     playerMatchPointsPerWin: number;
     teamMatchPointsPerWin: number;
     teamGamePointsPerWin: number;
@@ -40,6 +42,8 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
     lineupStrategy: 'flexible',
     lineupRule: 'standard',
     bonusRules: [],
+    teamAllPresentBonusEnabled: false,
+    teamAllPresentBonusPoints: 1,
     playerMatchPointsPerWin: 1,
     teamMatchPointsPerWin: 1,
     teamGamePointsPerWin: 2,
@@ -97,6 +101,8 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
       lineupStrategy: 'flexible',
       lineupRule: 'standard',
       bonusRules: [],
+      teamAllPresentBonusEnabled: false,
+      teamAllPresentBonusPoints: 1,
       playerMatchPointsPerWin: 1,
       teamMatchPointsPerWin: 1,
       teamGamePointsPerWin: 2,
@@ -119,6 +125,8 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
       lineupStrategy: (league.lineupStrategy || 'flexible') as LineupStrategy,
       lineupRule: (league.lineupRule || 'standard') as LineupRule,
       bonusRules: league.bonusRules || [],
+      teamAllPresentBonusEnabled: league.teamAllPresentBonusEnabled || false,
+      teamAllPresentBonusPoints: league.teamAllPresentBonusPoints || 1,
       playerMatchPointsPerWin: league.playerMatchPointsPerWin || 1,
       teamMatchPointsPerWin: league.teamMatchPointsPerWin || 1,
       teamGamePointsPerWin: league.teamGamePointsPerWin || 2,
@@ -183,6 +191,8 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
       lineupStrategy: 'flexible',
       lineupRule: 'standard',
       bonusRules: [],
+      teamAllPresentBonusEnabled: false,
+      teamAllPresentBonusPoints: 1,
       playerMatchPointsPerWin: 1,
       teamMatchPointsPerWin: 1,
       teamGamePointsPerWin: 2,
@@ -440,6 +450,32 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
               </p>
               
               <div className="space-y-3">
+                {/* All Players Present Bonus Option */}
+                <div className="flex items-center mb-4">
+                  <input
+                    type="checkbox"
+                    id="teamAllPresentBonusEnabled"
+                    checked={formData.teamAllPresentBonusEnabled}
+                    onChange={e => setFormData({ ...formData, teamAllPresentBonusEnabled: e.target.checked })}
+                    className="mr-2"
+                  />
+                  <label htmlFor="teamAllPresentBonusEnabled" className="text-sm font-semibold text-gray-700">
+                    {t('leagues.bonus.allPresentLabel')}
+                  </label>
+                  {formData.teamAllPresentBonusEnabled && (
+                    <input
+                      type="number"
+                      min="1"
+                      max="10"
+                      value={formData.teamAllPresentBonusPoints}
+                      onChange={e => setFormData({ ...formData, teamAllPresentBonusPoints: Number(e.target.value) })}
+                      className="ml-4 w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+                    />
+                  )}
+                  {formData.teamAllPresentBonusEnabled && (
+                    <span className="ml-2 text-xs text-gray-500">{t('leagues.bonus.allPresentPoints')}</span>
+                  )}
+                </div>
                 {formData.bonusRules.map((rule, index) => (
                   <div key={index} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
                     <div className="grid grid-cols-1 md:grid-cols-5 gap-3">

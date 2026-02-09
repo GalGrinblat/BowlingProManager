@@ -57,6 +57,8 @@ export interface League {
   playerMatchPointsPerWin: number;
   teamMatchPointsPerWin: number;
   teamGamePointsPerWin: number;
+  teamAllPresentBonusEnabled?: boolean;
+  teamAllPresentBonusPoints?: number;
   active: boolean;
   createdAt: DateString;
 }

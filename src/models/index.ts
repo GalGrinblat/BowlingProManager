@@ -54,6 +54,8 @@ export const createLeague = ({
   playerMatchPointsPerWin = 1,
   teamMatchPointsPerWin = 1,
   teamGamePointsPerWin = 2,
+  teamAllPresentBonusEnabled = false,
+  teamAllPresentBonusPoints = 1,
   active = true
 }: {
   name?: string;
@@ -70,6 +72,8 @@ export const createLeague = ({
   playerMatchPointsPerWin?: number | string;
   teamMatchPointsPerWin?: number | string;
   teamGamePointsPerWin?: number | string;
+  teamAllPresentBonusEnabled?: boolean;
+  teamAllPresentBonusPoints?: number | string;
   active?: boolean;
 }): Omit<League, 'id' | 'createdAt'> => ({
   name,
@@ -86,6 +90,8 @@ export const createLeague = ({
   playerMatchPointsPerWin: parseFloat(String(playerMatchPointsPerWin)) || 1,
   teamMatchPointsPerWin: parseFloat(String(teamMatchPointsPerWin)) || 1,
   teamGamePointsPerWin: parseFloat(String(teamGamePointsPerWin)) || 2,
+  teamAllPresentBonusEnabled: !!teamAllPresentBonusEnabled,
+  teamAllPresentBonusPoints: parseInt(String(teamAllPresentBonusPoints)) || 1,
   active
 });
 
