@@ -70,6 +70,29 @@ export const calculateBonusPoints = (
   return 0;
 };
 
+/**
+ * Helper function to calculate team totals (pins and pins with handicap)
+ * @param gamePlayers - Array of player data from game.team1 or game.team2
+ * @param matchPlayers - Array of match player data with pins
+ * @returns Object with totalPins and totalWithHandicap
+ */
+const calculateTeamTotals = (
+  gamePlayers: any[],
+  matchPlayers: any[]
+): { totalPins: number; totalWithHandicap: number } => {
+  let totalPins = 0;
+  let totalWithHandicap = 0;
+  
+  gamePlayers.forEach((player, idx) => {
+    if (!player || !matchPlayers[idx]) return;
+    const score = player.absent ? player.average - 10 : (matchPlayers[idx].pins || 0);
+    totalPins += score;
+    totalWithHandicap += score + player.handicap;
+  });
+  
+  return { totalPins, totalWithHandicap };
+};
+
 export const calculateMatchResults = (game: Game, matchIndex: number): void => {
   if (!game.matches) return;
   const match = game.matches[matchIndex];
@@ -130,31 +153,15 @@ export const calculateMatchResults = (game: Game, matchIndex: number): void => {
     }
   });
 
-  // Calculate totals
+  // Calculate totals using helper function
   if (!game.team1 || !game.team2) return;
-  match.team1.totalPins = game.team1.players.reduce((sum: number, p: any, idx: number) => {
-    if (!p || !match.team1.players[idx]) return sum;
-    const score = p.absent ? p.average - 10 : (match.team1.players[idx].pins || 0);
-    return sum + score;
-  }, 0);
+  const team1Totals = calculateTeamTotals(game.team1.players, match.team1.players);
+  match.team1.totalPins = team1Totals.totalPins;
+  match.team1.totalWithHandicap = team1Totals.totalWithHandicap;
   
-  match.team2.totalPins = game.team2.players.reduce((sum: number, p: any, idx: number) => {
-    if (!p || !match.team2.players[idx]) return sum;
-    const score = p.absent ? p.average - 10 : (match.team2.players[idx].pins || 0);
-    return sum + score;
-  }, 0);
-  
-  match.team1.totalWithHandicap = game.team1.players.reduce((sum: number, p: any, idx: number) => {
-    if (!p || !match.team1.players[idx]) return sum;
-    const score = p.absent ? p.average - 10 : (match.team1.players[idx].pins || 0);
-    return sum + score + p.handicap;
-  }, 0);
-  
-  match.team2.totalWithHandicap = game.team2.players.reduce((sum: number, p: any, idx: number) => {
-    if (!p || !match.team2.players[idx]) return sum;
-    const score = p.absent ? p.average - 10 : (match.team2.players[idx].pins || 0);
-    return sum + score + p.handicap;
-  }, 0);
+  const team2Totals = calculateTeamTotals(game.team2.players, match.team2.players);
+  match.team2.totalPins = team2Totals.totalPins;
+  match.team2.totalWithHandicap = team2Totals.totalWithHandicap;
 
   // Calculate bonus points
   match.team1.bonusPoints = match.team1.players.reduce((sum: number, p: any) => sum + p.bonusPoints, 0);
