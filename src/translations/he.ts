@@ -3,6 +3,7 @@ import type { TranslationDictionary } from '../types/index';
 const he: TranslationDictionary = {
   // מילים ופעולות נפוצות
   common: {
+    remove: 'הסר',
     save: 'שמור',
     cancel: 'בטל',
     delete: 'מחק',
@@ -91,6 +92,11 @@ const he: TranslationDictionary = {
 
   // ניהול ליגות
   leagues: {
+    leagueFeatures: 'מאפייני ליגה',
+    handicapSettings: 'הגדרות הנדיקפ',
+    useHandicap: 'השתמש בהנדיקפ',
+    handicapBasis: 'בסיס הנדיקפ',
+    handicapPercentage: 'אחוז הנדיקפ',
     title: 'ניהול ליגות',
     createLeague: 'צור ליגה חדשה',
     editLeague: 'ערוך ליגה',
@@ -217,6 +223,7 @@ const he: TranslationDictionary = {
 
   // ניהול עונות
   seasons: {
+    teamRoster: 'סגל קבוצה',
     title: 'ניהול עונות',
     createSeason: 'צור עונה',
     backToLeague: 'חזרה לליגה',
@@ -310,6 +317,7 @@ const he: TranslationDictionary = {
     missingTeams: 'קבוצות חסרות',
     createMissingTeams: 'צור קבוצות חסרות',
     expectedTeamsCount: 'צפויות {{expected}} קבוצות, אך רק {{actual}} מוגדרות.',
+    inheritFromLeagueConfig: 'ירש מהגדרות הליגה',
   },
 
   // ניהול קבוצות

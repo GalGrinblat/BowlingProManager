@@ -3,6 +3,7 @@ import type { TranslationDictionary } from '../types/index';
 const en: TranslationDictionary = {
   // Common words and actions
   common: {
+    remove: 'Remove',
     save: 'Save',
     cancel: 'Cancel',
     delete: 'Delete',
@@ -89,6 +90,11 @@ const en: TranslationDictionary = {
 
   // League Management
   leagues: {
+    leagueFeatures: 'League Features',
+    handicapSettings: 'Handicap Settings',
+    useHandicap: 'Use Handicap',
+    handicapBasis: 'Handicap Basis',
+    handicapPercentage: 'Handicap Percentage',
     title: 'League Management',
     createLeague: 'Create New League',
     editLeague: 'Edit League',
@@ -217,6 +223,7 @@ const en: TranslationDictionary = {
 
   // Season Management
   seasons: {
+    teamRoster: 'Team Roster',
     title: 'Season Management',
     createSeason: 'Create Season',
     backToLeague: 'Back to League',
@@ -307,6 +314,7 @@ const en: TranslationDictionary = {
     missingTeams: 'Missing Teams',
     createMissingTeams: 'Create Missing Teams',
     expectedTeamsCount: 'Expected {{expected}} teams, but only {{actual}} found.',
+    inheritFromLeagueConfig: 'Inherit from league configurations',
   },
 
   // Team Management

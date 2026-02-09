@@ -21,7 +21,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
       e.dataTransfer.effectAllowed = 'move';
     };
 
-    const handleDragOver = (e: React.DragEvent<HTMLDivElement>, team: 'team1' | 'team2', idx: number) => {
+    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
       e.preventDefault();
       e.dataTransfer.dropEffect = 'move';
     };
@@ -484,7 +484,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
                     } ${lineupStrategy === 'flexible' ? 'cursor-move' : ''}`}
                     draggable={lineupStrategy === 'flexible'}
                     onDragStart={lineupStrategy === 'flexible' ? (e) => handleDragStart(e, 'team1', idx) : undefined}
-                    onDragOver={lineupStrategy === 'flexible' ? (e) => handleDragOver(e, 'team1', idx) : undefined}
+                    onDragOver={lineupStrategy === 'flexible' ? handleDragOver : undefined}
                     onDrop={lineupStrategy === 'flexible' ? (e) => handleDrop(e, 'team1', idx) : undefined}
                   >
                     <div className="flex items-start justify-between mb-2">
@@ -566,7 +566,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
                     } ${lineupStrategy === 'flexible' ? 'cursor-move' : ''}`}
                     draggable={lineupStrategy === 'flexible'}
                     onDragStart={lineupStrategy === 'flexible' ? (e) => handleDragStart(e, 'team2', idx) : undefined}
-                    onDragOver={lineupStrategy === 'flexible' ? (e) => handleDragOver(e, 'team2', idx) : undefined}
+                    onDragOver={lineupStrategy === 'flexible' ? handleDragOver : undefined}
                     onDrop={lineupStrategy === 'flexible' ? (e) => handleDrop(e, 'team2', idx) : undefined}
                   >
                     <div className="flex items-start justify-between mb-2">

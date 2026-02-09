@@ -1,357 +1,68 @@
 import React, { useState, useEffect } from 'react';
-import { seasonsApi, teamsApi, gamesApi, playersApi, leaguesApi } from '../../services/api';
-import { createSeason, createTeam, validateSeason } from '../../models';
-import { generateRoundRobinSchedule } from '../../utils/scheduleUtils';
-import { applyLineupRule } from '../../utils/lineupUtils';
-import { useTranslation } from '../../contexts/LanguageContext';
 import { HandicapSettingsForm } from './HandicapSettingsForm';
-
-import type { SeasonCreatorProps, BonusRule, LineupStrategy, LineupRule } from '../../types/index';
+import { playersApi, leaguesApi } from '../../services/api';
+import { useTranslation } from '../../contexts/LanguageContext';
+import type { SeasonCreatorProps } from '../../types/index';
 
 export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, onSuccess }) => {
   const { t } = useTranslation();
+  const [step, setStep] = useState(1);
   const [league, setLeague] = useState<any>(null);
-  const [step, setStep] = useState<1 | 2 | 3>(1);
-
-  // Load league data
-  useEffect(() => {
-    const leagueData = leaguesApi.getById(leagueId);
-    setLeague(leagueData);
-  }, [leagueId]);
-
-  // Load league data
-  useEffect(() => {
-    const leagueData = leaguesApi.getById(leagueId);
-    setLeague(leagueData);
-  }, [leagueId]);
-
-  const [formData, setFormData] = useState<{
-    name: string;
-    numberOfTeams: number;
-    playersPerTeam: number;
-    numberOfRounds: number;
-    handicapBasis: number;
-    useHandicap: boolean;
-    handicapPercentage: number;
-    matchesPerGame: number;
-    lineupStrategy: LineupStrategy;
-    lineupRule: LineupRule;
-    bonusRules: BonusRule[];
-    startDate: string;
-  }>({
+  const [formData, setFormData] = useState<any>({
     name: '',
-    numberOfTeams: 4,
-    playersPerTeam: 4,
+    numberOfTeams: 2,
+    playersPerTeam: 3,
     numberOfRounds: 1,
-    handicapBasis: 160,
+    matchesPerGame: 1,
     useHandicap: true,
+    handicapBasis: 160,
     handicapPercentage: 100,
-    matchesPerGame: 3,
-    lineupStrategy: 'flexible',
-    lineupRule: 'standard',
-    bonusRules: [],
-    startDate: new Date().toISOString().split('T')[0] || ''
+    bonusRules: [
+      { threshold: 50, points: 1 },
+      { threshold: 70, points: 2 },
+    ],
   });
+  const [teams, setTeams] = useState<any[]>([]);
+  const [inheritLeagueConfig, setInheritLeagueConfig] = useState(true);
+  const [availablePlayers, setAvailablePlayers] = useState<any[]>([]);
+  const [playerAverages, setPlayerAverages] = useState<{ [playerId: string]: number }>({});
 
-  // Update form data when league loads
   useEffect(() => {
-    if (league) {
-      setFormData(prev => ({
+    const fetchData = async () => {
+      const leagueData = await leaguesApi.getById(leagueId);
+      setLeague(leagueData);
+      setFormData((prev: any) => ({
         ...prev,
-        playersPerTeam: league.defaultPlayersPerTeam,
-        handicapBasis: league.defaultHandicapBasis,
-        useHandicap: league.useHandicap !== undefined ? league.useHandicap : true,
-        handicapPercentage: league.handicapPercentage || 100,
-        matchesPerGame: league.defaultMatchesPerGame || 3,
-        lineupStrategy: (league.lineupStrategy || 'flexible') as LineupStrategy,
-        lineupRule: (league.lineupRule || 'standard') as LineupRule,
-        bonusRules: league.bonusRules || []
+        playersPerTeam: leagueData?.defaultPlayersPerTeam || 3,
+        matchesPerGame: leagueData?.defaultMatchesPerGame || 1,
+        useHandicap: leagueData?.useHandicap ?? true,
+        handicapBasis: (leagueData as any)?.handicapBasis ?? 160,
+        handicapPercentage: leagueData?.handicapPercentage ?? 100,
       }));
-    }
-  }, [league]);
-  
-  const [teams, setTeams] = useState<Array<{ name: string; playerIds: string[] }>>([]);
-  const [availablePlayers] = useState(() => playersApi.getAll().filter(p => p.active));
-  const [playerAverages, setPlayerAverages] = useState<Record<string, number>>({});
+      const players = await playersApi.getAll();
+      setAvailablePlayers(players);
+    };
+    fetchData();
+  }, [leagueId]);
 
-  // Initialize teams when numberOfTeams changes
-  React.useEffect(() => {
-    const newTeams = Array.from({ length: formData.numberOfTeams }, (_, i) => ({
-      name: teams[i]?.name || `Team ${i + 1}`,
-      playerIds: teams[i]?.playerIds || []
-    }));
-    setTeams(newTeams);
-  }, [formData.numberOfTeams]);
-
-  const handleStepOneSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setStep(2);
-  };
-
-  const handleStepTwoSubmit = () => {
-    // Validate teams
-    const validationErrors = [];
-    
-    teams.forEach((team, index) => {
-      if (!team.name.trim()) {
-        validationErrors.push(`Team ${index + 1} needs a name`);
-      }
-      if (team.playerIds.length !== formData.playersPerTeam) {
-        validationErrors.push(`${team.name || `Team ${index + 1}`} needs exactly ${formData.playersPerTeam} players`);
-      }
-    });
-    
-    // Check for duplicate players across teams
-    const allPlayerIds = teams.flatMap(t => t.playerIds);
-    const duplicates = allPlayerIds.filter((id, index) => allPlayerIds.indexOf(id) !== index);
-    if (duplicates.length > 0) {
-      const playerNames = [...new Set(duplicates)].map(id => 
-        availablePlayers.find(p => p.id === id)?.name || 'Unknown'
-      );
-      validationErrors.push(`Players cannot be on multiple teams: ${playerNames.join(', ')}`);
-    }
-    
-    if (validationErrors.length > 0) {
-      alert('❌ Please fix these issues:\n\n' + validationErrors.join('\n'));
-      return;
-    }
-
-    // Initialize player averages from registry
-    const initialAverages: Record<string, number> = {};
-    allPlayerIds.forEach(playerId => {
-      if (!playerAverages[playerId]) {
-        // Default to 0 - users can edit in step 3
-        initialAverages[playerId] = 0;
-      } else {
-        initialAverages[playerId] = playerAverages[playerId];
-      }
-    });
-    setPlayerAverages(initialAverages);
-    
-    setStep(3);
-  };
-
-  const handleFinalSubmit = () => {
-    // Validate teams
-    const validationErrors = [];
-    
-    teams.forEach((team, index) => {
-      if (!team.name.trim()) {
-        validationErrors.push(`Team ${index + 1} needs a name`);
-      }
-      if (team.playerIds.length !== formData.playersPerTeam) {
-        validationErrors.push(`${team.name || `Team ${index + 1}`} needs exactly ${formData.playersPerTeam} players`);
-      }
-    });
-    
-    // Check for duplicate players across teams
-    const allPlayerIds = teams.flatMap(t => t.playerIds);
-    const duplicates = allPlayerIds.filter((id, index) => allPlayerIds.indexOf(id) !== index);
-    if (duplicates.length > 0) {
-      const playerNames = [...new Set(duplicates)].map(id => 
-        availablePlayers.find(p => p.id === id)?.name || 'Unknown'
-      );
-      validationErrors.push(`Players cannot be on multiple teams: ${playerNames.join(', ')}`);
-    }
-    
-    if (validationErrors.length > 0) {
-      alert('❌ Please fix these issues:\n\n' + validationErrors.join('\n'));
-      return;
-    }
-    
-    const seasonData = createSeason({
-      ...formData,
-      leagueId: league.id
-    });
-    
-    const validation = validateSeason(seasonData);
-    if (!validation.valid) {
-      alert(validation.error);
-      return;
-    }
-
-    const created = seasonsApi.create(seasonData);
-    
-    console.log('SeasonCreator: Created season', created.id, 'Creating', formData.numberOfTeams, 'teams with players');
-    
-    // Create teams with players and store them
-    const createdTeams = teams.map((team) => {
-      const teamData = createTeam({
-        seasonId: created.id,
-        name: team.name,
-        playerIds: team.playerIds
-      });
-      const createdTeam = teamsApi.create(teamData);
-      console.log('SeasonCreator: Created team', createdTeam.id, 'with', team.playerIds.length, 'players');
-      return { ...teamData, id: createdTeam.id };
-    });
-
-    // Generate schedule with actual team IDs
-    const actualTeamIds = createdTeams.map(t => t.id);
-    const schedule = generateRoundRobinSchedule(actualTeamIds, formData.numberOfRounds);
-
-    // Start the season and create games
-    seasonsApi.update(created.id, {
-      status: 'active',
-      schedule: schedule
-    });
-
-    // Create all games from schedule
-    schedule.forEach(daySchedule => {
-      daySchedule.matches.forEach(match => {
-        const team1 = createdTeams.find(t => t.id === match.team1Id);
-        const team2 = createdTeams.find(t => t.id === match.team2Id);
-        
-        if (team1 && team2) {
-          const team1Players = team1.playerIds.map((id: any, index: number) => {
-            const player = availablePlayers.find(p => p.id === id);
-            const playerAvg = playerAverages[id] || 0;  // Use custom average from step 3
-            let handicap = 0;
-            
-            if (formData.useHandicap && playerAvg > 0 && playerAvg < formData.handicapBasis) {
-              const diff = formData.handicapBasis - playerAvg;
-              handicap = Math.round(diff * (formData.handicapPercentage / 100));
-            }
-            
-            return {
-              playerId: id,
-              rank: index + 1,
-              name: player?.name || '',
-              average: playerAvg,
-              handicap,
-              absent: false
-            };
-          });
-
-          const team2Players = team2.playerIds.map((id: any, index: number) => {
-            const player = availablePlayers.find(p => p.id === id);
-            const playerAvg = playerAverages[id] || 0;  // Use custom average from step 3
-            let handicap = 0;
-            
-            if (formData.useHandicap && playerAvg > 0 && playerAvg < formData.handicapBasis) {
-              const diff = formData.handicapBasis - playerAvg;
-              handicap = Math.round(diff * (formData.handicapPercentage / 100));
-            }
-            
-            return {
-              playerId: id,
-              rank: index + 1,
-              name: player?.name || '',
-              average: playerAvg,
-              handicap,
-              absent: false
-            };
-          });
-
-          // Apply lineup rule if using rule-based strategy
-          let orderedTeam1Players = team1Players;
-          let orderedTeam2Players = team2Players;
-          
-          if (formData.lineupStrategy === 'rule-based' && formData.lineupRule) {
-            const orderedPlayers = applyLineupRule(team1Players, team2Players, formData.lineupRule);
-            // Ensure all players have rank and absent properties set
-            orderedTeam1Players = orderedPlayers.team1.map((p, idx) => ({ 
-              ...p, 
-              rank: idx + 1,
-              absent: p.absent || false
-            }));
-            orderedTeam2Players = orderedPlayers.team2.map((p, idx) => ({ 
-              ...p, 
-              rank: idx + 1,
-              absent: p.absent || false
-            }));
-          }
-
-          // Create empty matches based on season configuration
-          const emptyMatches = Array.from({ length: formData.matchesPerGame }, (_, i) => {
-            const emptyPlayers = Array.from({ length: formData.playersPerTeam }, () => ({ 
-              pins: 0, 
-              bonusPoints: 0 
-            }));
-            
-            const emptyPlayerMatches = Array.from({ length: formData.playersPerTeam }, (_, idx) => ({ 
-              player: idx + 1, 
-              result: null as null,
-              team1Points: 0,
-              team2Points: 0
-            }));
-            
-            return {
-              matchNumber: i + 1,
-              team1: {
-                score: 0,
-                totalPins: 0,
-                totalWithHandicap: 0,
-                bonusPoints: 0,
-                players: emptyPlayers
-              },
-              team2: {
-                score: 0,
-                totalPins: 0,
-                totalWithHandicap: 0,
-                bonusPoints: 0,
-                players: emptyPlayers.map(p => ({ ...p }))
-              },
-              playerMatches: emptyPlayerMatches
-            };
-          });
-
-          gamesApi.create({
-            seasonId: created.id,
-            round: daySchedule.round,
-            matchDay: daySchedule.matchDay,
-            team1Id: team1.id,
-            team2Id: team2.id,
-            lineupStrategy: created.lineupStrategy || 'flexible',
-            lineupRule: created.lineupRule || 'standard',
-            bonusRules: formData.bonusRules,
-            matchesPerGame: formData.matchesPerGame,
-            playerMatchPointsPerWin: league.playerMatchPointsPerWin || 1,
-            teamMatchPointsPerWin: league.teamMatchPointsPerWin || 1,
-            teamGamePointsPerWin: league.teamGamePointsPerWin || 2,
-            team1: {
-              name: team1.name,
-              players: orderedTeam1Players
-            },
-            team2: {
-              name: team2.name,
-              players: orderedTeam2Players
-            },
-            matches: emptyMatches,
-            grandTotalPoints: { team1: 0, team2: 0 }
-          });
-        }
-      });
-    });
-
-    alert('✅ Season created and started successfully! All games have been scheduled.');
-    onSuccess(created.id);
-  };
-
-  const handlePlayerToggle = (teamIndex: number, playerId: string) => {
-    const newTeams = [...teams];
-    const team = newTeams[teamIndex];
-    
-    if (!team) return;
-    
-    if (team.playerIds.includes(playerId)) {
-      team.playerIds = team.playerIds.filter(id => id !== playerId);
-    } else if (team.playerIds.length < formData.playersPerTeam) {
-      team.playerIds = [...team.playerIds, playerId];
-    }
-    
-    setTeams(newTeams);
-  };
-
+  // --- Team assignment logic ---
   const handleTeamNameChange = (teamIndex: number, name: string) => {
     const newTeams = [...teams];
-    const team = newTeams[teamIndex];
-    if (!team) return;
-    team.name = name;
+    newTeams[teamIndex].name = name;
     setTeams(newTeams);
   };
-
-  // Get players assigned to other teams
+  const handleAssignPlayer = (teamIndex: number, playerId: string) => {
+    const newTeams = [...teams];
+    if (!newTeams[teamIndex].playerIds.includes(playerId)) {
+      newTeams[teamIndex].playerIds.push(playerId);
+      setTeams(newTeams);
+    }
+  };
+  const handleRemovePlayer = (teamIndex: number, playerId: string) => {
+    const newTeams = [...teams];
+    newTeams[teamIndex].playerIds = newTeams[teamIndex].playerIds.filter((id: string) => id !== playerId);
+    setTeams(newTeams);
+  };
   const getAssignedPlayers = (excludeTeamIndex: number) => {
     return new Set(
       teams
@@ -360,7 +71,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
     );
   };
 
-  // Loading state
+  // --- Step 1: Season details ---
   if (!league) {
     return (
       <div className="bg-white rounded-xl shadow-lg p-6">
@@ -368,365 +79,448 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
       </div>
     );
   }
-
-  if (step === 3) {
-    // Get all players across teams with their team names
-    const allPlayersWithTeams = teams.flatMap(team => 
-      team.playerIds.map(playerId => {
-        const player = availablePlayers.find(p => p.id === playerId);
-        return {
-          playerId,
-          playerName: player?.name || 'Unknown',
-          teamName: team.name,
-          average: playerAverages[playerId] || 0
-        };
-      })
-    );
-
+  if (step === 1) {
+    // Helper: get value from league or formData depending on inheritLeagueConfig
+    const getValue = (key: string) => inheritLeagueConfig ? league?.[key] : formData[key];
     return (
       <div className="space-y-6">
-        {/* Header */}
         <div className="bg-white rounded-xl shadow-lg p-6">
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('seasons.createSeason')}</h1>
               <p className="text-gray-600">{league.name}</p>
             </div>
-            <button
-              onClick={onBack}
-              className="text-gray-600 hover:text-gray-800"
-            >
+            <button onClick={onBack} className="text-gray-600 hover:text-gray-800">
               {t('common.leftArrow')} {t('seasons.backToLeague')}
             </button>
           </div>
         </div>
-
-        {/* Step 3: Review and Edit Player Averages */}
         <div className="bg-white rounded-xl shadow-lg p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('seasons.reviewPlayerAverages')}</h2>
-          <p className="text-gray-600 mb-6">{t('seasons.reviewPlayerAveragesDesc')}</p>
-          
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {t('seasons.playerName')}
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {t('common.team')}
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    {t('seasons.average')}
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {allPlayersWithTeams.map((player) => (
-                  <tr key={player.playerId} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {player.playerName}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {player.teamName}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <input
-                        type="number"
-                        min="0"
-                        max="300"
-                        step="0.1"
-                        value={player.average}
-                        onChange={(e) => {
-                          const newAvg = parseFloat(e.target.value) || 0;
-                          setPlayerAverages(prev => ({
-                            ...prev,
-                            [player.playerId]: newAvg
-                          }));
-                        }}
-                        className="w-24 px-3 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </td>
-                  </tr>
+          <form onSubmit={e => { e.preventDefault();
+            const newTeams = Array.from({ length: formData.numberOfTeams }, (_, i) => ({ name: `Team ${i + 1}`, playerIds: [] }));
+            setTeams(newTeams);
+            setStep(2);
+          }} className="space-y-4">
+            {/* Season Name & Description */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">{t('seasons.seasonName')} *</label>
+                <input type="text" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="e.g., Spring 2026, Fall Season" required />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">{t('leagues.description')}</label>
+                <textarea value={formData.description || ''} onChange={e => setFormData({ ...formData, description: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder={t('leagues.briefDescription')} rows={2} />
+              </div>
+            </div>
+
+            {/* Inherit from League Configurations (now below description) */}
+            <div className="flex items-center mb-4 md:col-span-2">
+              <input
+                type="checkbox"
+                id="inheritLeagueConfig"
+                checked={inheritLeagueConfig}
+                onChange={e => {
+                  setInheritLeagueConfig(e.target.checked);
+                  if (e.target.checked) {
+                    // Reset formData to league values for all inheritable fields
+                    setFormData((prev: any) => ({
+                      ...prev,
+                      lineupStrategy: league?.lineupStrategy || 'flexible',
+                      lineupRule: league?.lineupRule || 'standard',
+                      playerMatchPointsPerWin: league?.playerMatchPointsPerWin || 1,
+                      teamMatchPointsPerWin: league?.teamMatchPointsPerWin || 1,
+                      teamGamePointsPerWin: league?.teamGamePointsPerWin || 2,
+                      useHandicap: league?.useHandicap ?? true,
+                      handicapBasis: league?.handicapBasis ?? 160,
+                      handicapPercentage: league?.handicapPercentage ?? 100,
+                      bonusRules: league?.bonusRules ? JSON.parse(JSON.stringify(league.bonusRules)) : [ { threshold: 50, points: 1 }, { threshold: 70, points: 2 } ],
+                    }));
+                  }
+                }}
+                className="mr-2"
+              />
+              <label htmlFor="inheritLeagueConfig" className="text-sm font-semibold text-gray-700">
+                {t('seasons.inheritFromLeagueConfig')}
+              </label>
+            </div>
+            {/* Season Name & Description */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">{t('seasons.seasonName')} *</label>
+                <input type="text" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="e.g., Spring 2026, Fall Season" required />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">{t('leagues.description')}</label>
+                <textarea value={formData.description || ''} onChange={e => setFormData({ ...formData, description: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder={t('leagues.briefDescription')} rows={2} />
+              </div>
+            </div>
+
+            {/* Season Settings */}
+            <div className="border-t pt-4 mt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">{t('seasons.numberOfTeams')} *</label>
+                  <input type="number" min="2" max="20" value={formData.numberOfTeams} onChange={e => setFormData({ ...formData, numberOfTeams: parseInt(e.target.value) })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">{t('seasons.playersPerTeam')} *</label>
+                  <input type="number" min="1" max="10" value={formData.playersPerTeam} onChange={e => setFormData({ ...formData, playersPerTeam: parseInt(e.target.value) })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">{t('seasons.numberOfRounds')} *</label>
+                  <input type="number" min="1" max="10" value={formData.numberOfRounds} onChange={e => setFormData({ ...formData, numberOfRounds: parseInt(e.target.value) })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required />
+                  <p className="text-xs text-gray-500 mt-1">{t('seasons.roundExplanation')}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">{t('seasons.matchesPerGame')}</label>
+                  <input type="number" min="1" max="5" value={formData.matchesPerGame} onChange={e => setFormData({ ...formData, matchesPerGame: parseInt(e.target.value) })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                  <p className="text-xs text-gray-500 mt-1">{t('seasons.matchesExplanation')}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Player Matchup Strategy Section */}
+            <div className="border-t pt-4 mt-4">
+              <h3 className="text-lg font-bold text-gray-800 mb-3">{t('leagues.lineup.strategyTitle')}</h3>
+              <p className="text-sm text-gray-600 mb-3">{t('leagues.lineup.strategyDesc')}</p>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">{t('leagues.lineup.strategyLabel')}</label>
+                  <select
+                    value={getValue('lineupStrategy') || 'flexible'}
+                    onChange={e => setFormData({ ...formData, lineupStrategy: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    disabled={inheritLeagueConfig}
+                  >
+                    <option value="flexible">{t('leagues.lineup.flexible')}</option>
+                    <option value="fixed">{t('leagues.lineup.fixed')}</option>
+                    <option value="rule-based">{t('leagues.lineup.ruleBased')}</option>
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {formData.lineupStrategy === 'flexible' && t('leagues.lineup.flexibleDesc')}
+                    {formData.lineupStrategy === 'rule-based' && t('leagues.lineup.ruleBasedDesc')}
+                  </p>
+                </div>
+                {formData.lineupStrategy === 'rule-based' && (
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">{t('leagues.lineup.rankingRuleLabel')}</label>
+                    <select
+                      value={getValue('lineupRule') || 'standard'}
+                      onChange={e => setFormData({ ...formData, lineupRule: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      disabled={inheritLeagueConfig}
+                    >
+                      <option value="standard">{t('leagues.lineup.standard')}</option>
+                      <option value="balanced">{t('leagues.lineup.balanced')}</option>
+                    </select>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {formData.lineupRule === 'standard' && t('leagues.lineup.standardDesc')}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Points Configuration Section */}
+            <div className="border-t pt-4 mt-4">
+              <h3 className="text-lg font-bold text-gray-800 mb-3">{t('leagues.points.config')}</h3>
+              <p className="text-sm text-gray-600 mb-3">{t('leagues.points.configDesc')}</p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">{t('leagues.points.playerMatchPerWin')}</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.5"
+                    value={getValue('playerMatchPointsPerWin') || 1}
+                    onChange={e => setFormData({ ...formData, playerMatchPointsPerWin: Number(e.target.value) })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    disabled={inheritLeagueConfig}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">{t('leagues.points.playerMatchPerWinDesc')}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">{t('leagues.points.teamMatchPerWin')}</label>
+                  <input
+                    type="number"
+                    min="0.5"
+                    step="0.5"
+                    value={getValue('teamMatchPointsPerWin') || 1}
+                    onChange={e => setFormData({ ...formData, teamMatchPointsPerWin: Number(e.target.value) })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    disabled={inheritLeagueConfig}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">{t('leagues.points.teamMatchPerWinDesc')}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">{t('leagues.points.teamGamePerWin')}</label>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.5"
+                    value={getValue('teamGamePointsPerWin') || 2}
+                    onChange={e => setFormData({ ...formData, teamGamePointsPerWin: Number(e.target.value) })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    disabled={inheritLeagueConfig}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">{t('leagues.points.teamGamePerWinDesc')}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Handicap Settings Section */}
+            <div className="border-t pt-4 mt-4">
+              <HandicapSettingsForm
+                useHandicap={getValue('useHandicap')}
+                handicapBasis={getValue('handicapBasis')}
+                handicapPercentage={getValue('handicapPercentage')}
+                onUseHandicapChange={(value: boolean) => setFormData({ ...formData, useHandicap: value })}
+                onHandicapBasisChange={(value: number) => setFormData({ ...formData, handicapBasis: value })}
+                onHandicapPercentageChange={(value: number) => setFormData({ ...formData, handicapPercentage: value })}
+                basisFieldName="handicapBasis"
+                showDescription={true}
+              />
+            </div>
+
+
+            {/* Bonus Rules Section */}
+            <div className="border-t pt-4 mt-4">
+              <h3 className="text-lg font-bold text-gray-800 mb-3">{t('leagues.bonus.rules')}</h3>
+              <p className="text-sm text-gray-600 mb-3">{t('leagues.bonus.rulesDesc')}</p>
+              <div className="space-y-2">
+                {(inheritLeagueConfig ? (league?.bonusRules || []) : formData.bonusRules).map((rule: any, idx: number) => (
+                  <div key={idx} className="flex items-center gap-2">
+                    <label className="text-sm text-gray-700">{t('leagues.bonusRules.bonusIfScoreAtLeast')}</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={rule.threshold}
+                      onChange={e => {
+                        if (inheritLeagueConfig) return;
+                        const newRules = [...formData.bonusRules];
+                        newRules[idx].threshold = parseInt(e.target.value);
+                        setFormData({ ...formData, bonusRules: newRules });
+                      }}
+                      className="w-20 px-2 py-1 border border-gray-300 rounded"
+                      disabled={inheritLeagueConfig}
+                    />
+                    <span className="text-sm text-gray-700">{t('leagues.bonusRules.bonusPins')}</span>
+                    <input
+                      type="number"
+                      min="1"
+                      value={rule.points}
+                      onChange={e => {
+                        if (inheritLeagueConfig) return;
+                        const newRules = [...formData.bonusRules];
+                        newRules[idx].points = parseInt(e.target.value);
+                        setFormData({ ...formData, bonusRules: newRules });
+                      }}
+                      className="w-16 px-2 py-1 border border-gray-300 rounded"
+                      disabled={inheritLeagueConfig}
+                    />
+                    <span className="text-sm text-gray-700">{t('leagues.bonusRules.bonusPoints')}</span>
+                    <button
+                      type="button"
+                      className="ml-2 text-red-500 hover:text-red-700"
+                      onClick={() => {
+                        if (inheritLeagueConfig) return;
+                        const newRules = formData.bonusRules.filter((_: any, i: number) => i !== idx);
+                        setFormData({ ...formData, bonusRules: newRules });
+                      }}
+                      title={t('common.remove')}
+                      disabled={inheritLeagueConfig}
+                    >
+                      &times;
+                    </button>
+                  </div>
                 ))}
-              </tbody>
-            </table>
-          </div>
-          
-          <div className="flex gap-3 mt-6">
-            <button
-              type="button"
-              onClick={() => setStep(2)}
-              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-semibold"
-            >
-              {t('common.leftArrow')} {t('common.back')}
-            </button>
-            <button
-              type="button"
-              onClick={handleFinalSubmit}
-              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold"
-            >
-              {t('seasons.createSeason')}
-            </button>
-            <button
-              type="button"
-              onClick={onBack}
-              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-semibold"
-            >
-              {t('common.cancel')}
-            </button>
-          </div>
+                {!inheritLeagueConfig && (
+                  <button
+                    type="button"
+                    className="mt-2 px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+                    onClick={() => setFormData({ ...formData, bonusRules: [...formData.bonusRules, { threshold: 0, points: 1 }] })}
+                  >
+                    {t('leagues.bonus.addRule')}
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button type="button" onClick={onBack} className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-semibold">{t('common.cancel')}</button>
+              <button type="submit" className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold">{t('common.next')}</button>
+            </div>
+          </form>
         </div>
       </div>
     );
   }
 
+  // Step 2: Team assignment
   if (step === 2) {
     return (
       <div className="space-y-6">
-        {/* Header */}
         <div className="bg-white rounded-xl shadow-lg p-6">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('seasons.createSeason')}</h1>
-              <p className="text-gray-600">{league.name}</p>
+              <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('seasons.assignPlayers')}</h1>
+              <p className="text-gray-600">{t('seasons.assignPlayersDesc').replace('{{count}}', String(formData.playersPerTeam))}</p>
             </div>
-            <button
-              onClick={onBack}
-              className="text-gray-600 hover:text-gray-800"
-            >
-              {t('common.leftArrow')} {t('seasons.backToLeague')}
-            </button>
+            <button onClick={() => setStep(1)} className="text-gray-600 hover:text-gray-800">{t('common.leftArrow')} {t('common.back')}</button>
           </div>
         </div>
-
-        {/* Step 2: Team Configuration */}
         <div className="bg-white rounded-xl shadow-lg p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('seasons.configureTeams')}</h2>
-          <p className="text-gray-600 mb-6">{t('seasons.assignPlayersDesc').replace('{{count}}', String(formData.playersPerTeam))}</p>
-          
-          <div className="space-y-6 max-h-[600px] overflow-y-auto">
-            {teams.map((team, teamIndex) => {
-              const assignedElsewhere = getAssignedPlayers(teamIndex);
-              const availableForThisTeam = availablePlayers.filter(p => !assignedElsewhere.has(p.id));
-              
-              return (
-                <div key={teamIndex} className="border rounded-lg p-4">
-                  <div className="mb-3">
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      {t('teams.name')} {teamIndex + 1} *
-                    </label>
-                    <input
-                      type="text"
-                      value={team.name}
-                      onChange={(e) => handleTeamNameChange(teamIndex, e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder={`Team ${teamIndex + 1}`}
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      {t('common.players')} ({team.playerIds.length}/{formData.playersPerTeam})
-                    </label>
-                    <div className="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto border rounded p-2">
-                      {availableForThisTeam.length === 0 ? (
-                        <p className="col-span-2 text-gray-500 text-sm">{t('seasons.noAvailablePlayers')}</p>
-                      ) : (
-                        availableForThisTeam.map(player => (
-                          <label
-                            key={player.id}
-                            className={`flex items-center space-x-2 p-2 rounded cursor-pointer hover:bg-gray-50 ${
-                              team.playerIds.includes(player.id) ? 'bg-blue-50 border border-blue-300' : 'border border-gray-200'
-                            }`}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={team.playerIds.includes(player.id)}
-                              onChange={() => handlePlayerToggle(teamIndex, player.id)}
-                              disabled={!team.playerIds.includes(player.id) && team.playerIds.length >= formData.playersPerTeam}
-                              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-                            />
-                            <span className="text-sm flex-1">
-                              {player.name}
-                            </span>
-                          </label>
-                        ))
-                      )}
-                    </div>
-                  </div>
+          <form onSubmit={e => { e.preventDefault(); setStep(3); }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {teams.map((team, teamIdx) => (
+                <div key={teamIdx} className="border rounded-lg p-4 bg-gray-50">
+                  <input type="text" value={team.name} onChange={e => handleTeamNameChange(teamIdx, e.target.value)} className="mb-2 w-full px-2 py-1 border border-gray-300 rounded" />
+                  <div className="mb-2 text-xs text-gray-500">{t('seasons.teamRoster')}</div>
+                  <ul className="mb-2">
+                    {team.playerIds.map((playerId: string) => {
+                      const player = availablePlayers.find((p: any) => p.id === playerId);
+                      return (
+                        <li key={playerId} className="flex items-center justify-between mb-1">
+                          <span>{player?.name || 'Unknown'}</span>
+                          <button type="button" onClick={() => handleRemovePlayer(teamIdx, playerId)} className="text-xs text-red-500 ml-2">{t('common.remove')}</button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                  <div className="mb-1 text-xs text-gray-500">{t('seasons.addPlayer')}</div>
+                  <select
+                    className="w-full px-2 py-1 border border-gray-300 rounded"
+                    value=""
+                    onChange={e => {
+                      if (e.target.value) handleAssignPlayer(teamIdx, e.target.value);
+                    }}
+                  >
+                    <option value="">{t('seasons.selectPlayer')}</option>
+                    {availablePlayers.filter(p => !getAssignedPlayers(teamIdx).has(p.id)).map((player: any) => (
+                      <option key={player.id} value={player.id}>{player.name}</option>
+                    ))}
+                  </select>
                 </div>
-              );
-            })}
-          </div>
-          
-          <div className="flex gap-3 mt-6">
-            <button
-              type="button"
-              onClick={() => setStep(1)}
-              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-semibold"
-            >
-              {t('common.leftArrow')} {t('common.back')}
-            </button>
-            <button
-              type="button"
-              onClick={handleStepTwoSubmit}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
-            >
-              {t('common.next')} {t('common.rightArrow')}
-            </button>
-            <button
-              type="button"
-              onClick={onBack}
-              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-semibold"
-            >
-              {t('common.cancel')}
-            </button>
-          </div>
+              ))}
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button type="button" onClick={() => setStep(1)} className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-semibold">{t('common.back')}</button>
+              <button type="submit" className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold">{t('common.next')}</button>
+            </div>
+          </form>
         </div>
       </div>
     );
   }
 
+  // Step 3: Review/edit player averages (already present)
+
+  // --- Final submit handler ---
+  const handleFinalSubmit = async () => {
+    // Basic validation
+    if (!formData.name || teams.length < 2 || teams.some(t => t.playerIds.length !== formData.playersPerTeam)) {
+      alert(t('validation.incompleteTeams') || 'Please complete all teams and fill in all required fields.');
+      return;
+    }
+    // Prepare season data (all required fields for Season)
+    const today = new Date().toISOString();
+    const seasonData = {
+      leagueId,
+      name: formData.name,
+      startDate: today,
+      endDate: today,
+      numberOfTeams: teams.length,
+      numberOfRounds: formData.numberOfRounds,
+      playersPerTeam: formData.playersPerTeam,
+      matchesPerGame: formData.matchesPerGame,
+      useHandicap: formData.useHandicap,
+      handicapBasis: formData.handicapBasis,
+      handicapPercentage: formData.handicapPercentage,
+      lineupStrategy: league?.lineupStrategy || 'flexible',
+      lineupRule: league?.lineupRule || 'standard',
+      bonusRules: league?.bonusRules || [],
+      playerMatchPointsPerWin: league?.playerMatchPointsPerWin || 1,
+      teamMatchPointsPerWin: league?.teamMatchPointsPerWin || 1,
+      teamGamePointsPerWin: league?.teamGamePointsPerWin || 2,
+      status: "setup" as const,
+      teams: teams.map(team => ({
+        name: team.name,
+        playerIds: team.playerIds,
+      })),
+      playerAverages,
+    };
+    // Save via API
+    try {
+      const { seasonsApi } = await import('../../services/api');
+      const created = await seasonsApi.create(seasonData);
+      if (typeof onSuccess === 'function') onSuccess(created.id);
+    } catch (err) {
+      alert(t('validation.saveError') || 'Error saving season.');
+    }
+  };
+  const allPlayersWithTeams = teams.flatMap(team =>
+    team.playerIds.map((playerId: string) => {
+      const player = availablePlayers.find((p: any) => p.id === playerId);
+      return {
+        playerId,
+        playerName: player?.name || 'Unknown',
+        teamName: team.name,
+        average: playerAverages[playerId] || 0
+      };
+    })
+  );
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="bg-white rounded-xl shadow-lg p-6">
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('seasons.createSeason')}</h1>
             <p className="text-gray-600">{league.name}</p>
           </div>
-          <button
-            onClick={onBack}
-            className="text-gray-600 hover:text-gray-800"
-          >
-            {t('common.leftArrow')} {t('seasons.backToLeague')}
-          </button>
+          <button onClick={onBack} className="text-gray-600 hover:text-gray-800">{t('common.leftArrow')} {t('seasons.backToLeague')}</button>
         </div>
       </div>
-
-      {/* Step 1: Season Configuration */}
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('seasons.createSeasonStep1')}</h2>
-        <form onSubmit={handleStepOneSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="md:col-span-2">
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                {t('seasons.seasonName')} *
-              </label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="e.g., Spring 2026, Fall Season"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                {t('seasons.numberOfTeams')} *
-              </label>
-              <input
-                type="number"
-                min="2"
-                max="20"
-                value={formData.numberOfTeams}
-                onChange={(e) => setFormData({ ...formData, numberOfTeams: parseInt(e.target.value) })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                {t('seasons.playersPerTeam')} *
-              </label>
-              <input
-                type="number"
-                min="1"
-                max="10"
-                value={formData.playersPerTeam}
-                onChange={(e) => setFormData({ ...formData, playersPerTeam: parseInt(e.target.value) })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                {t('seasons.numberOfRounds')} *
-              </label>
-              <input
-                type="number"
-                min="1"
-                max="10"
-                value={formData.numberOfRounds}
-                onChange={(e) => setFormData({ ...formData, numberOfRounds: parseInt(e.target.value) })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                {t('seasons.roundExplanation')}
-              </p>
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                {t('seasons.matchesPerGame')}
-              </label>
-              <input
-                type="number"
-                min="1"
-                max="5"
-                value={formData.matchesPerGame}
-                onChange={(e) => setFormData({ ...formData, matchesPerGame: parseInt(e.target.value) })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                {t('seasons.matchesExplanation')}
-              </p>
-            </div>
-          </div>
-          
-          {/* Handicap Settings Section */}
-          <HandicapSettingsForm
-            useHandicap={formData.useHandicap}
-            handicapBasis={formData.handicapBasis}
-            handicapPercentage={formData.handicapPercentage}
-            onUseHandicapChange={(value) => setFormData({ ...formData, useHandicap: value })}
-            onHandicapBasisChange={(value) => setFormData({ ...formData, handicapBasis: value })}
-            onHandicapPercentageChange={(value) => setFormData({ ...formData, handicapPercentage: value })}
-            basisFieldName="handicapBasis"
-            showDescription={false}
-          />
-          
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              {t('seasons.startDate')}
-            </label>
-            <input
-              type="date"
-              value={formData.startDate}
-              onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-          
-          <div className="flex gap-3">
-            <button
-              type="submit"
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
-            >
-              {t('seasons.nextConfigureTeams')} {t('common.rightArrow')}
-            </button>
-            <button
-              type="button"
-              onClick={onBack}
-              className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-semibold"
-            >
-              {t('common.cancel')}
-            </button>
-          </div>
-        </form>
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('seasons.reviewPlayerAverages')}</h2>
+        <p className="text-gray-600 mb-6">{t('seasons.reviewPlayerAveragesDesc')}</p>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('seasons.playerName')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('common.team')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('seasons.average')}</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {allPlayersWithTeams.map((player) => (
+                <tr key={player.playerId} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{player.playerName}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{player.teamName}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <input
+                      type="number"
+                      min="0"
+                      max="300"
+                      step="0.1"
+                      value={player.average}
+                      onChange={e => {
+                        const newAvg = parseFloat(e.target.value) || 0;
+                        setPlayerAverages(prev => ({ ...prev, [player.playerId]: newAvg }));
+                      }}
+                      className="w-24 px-3 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="flex gap-3 mt-6">
+          <button type="button" onClick={() => setStep(2)} className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-semibold">{t('common.leftArrow')} {t('common.back')}</button>
+          <button type="button" onClick={handleFinalSubmit} className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold">{t('seasons.createSeason')}</button>
+          <button type="button" onClick={onBack} className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-semibold">{t('common.cancel')}</button>
+        </div>
       </div>
     </div>
   );
