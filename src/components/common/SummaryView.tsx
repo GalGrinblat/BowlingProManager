@@ -1,4 +1,5 @@
 import { ArrowLeft, CheckCircle } from './Icons';
+import { TeamStatsCard } from './TeamStatsCard';
 
 import type { SummaryViewProps } from '../../types/index';
 
@@ -77,95 +78,19 @@ export const SummaryView: React.FC<SummaryViewProps> = ({ game, totals, playerSt
 
       {/* Player Statistics */}
       <div className="grid md:grid-cols-2 gap-6 mb-6">
-        <div className="bg-gray-800 rounded-lg p-4">
-          <div className="bowling-title text-orange-500 text-xl mb-4 text-center">
-            {game.team1.name}
-          </div>
-          <div className="space-y-2">
-            {playerStats.team1Stats.map((player: any, idx: number) => (
-              <div key={idx} className={`bg-gray-700 rounded p-3 ${player.isAbsent ? 'opacity-60 bg-red-900' : ''}`}>
-                <div className="grid grid-cols-4 gap-3 items-center h-14">
-                  <div className="col-span-2">
-                    <div className="text-white font-semibold text-lg">{player.name}</div>
-                  </div>
-                  {player.isAbsent ? (
-                    <div className="col-span-2 text-center">
-                      <div className="text-red-400 font-bold">ABSENT</div>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="text-center">
-                        <div className="text-gray-400 text-xs font-semibold">3-Game Avg</div>
-                        <div className={`font-bold ${parseInt(player.average) <= player.gameAverage ? 'text-green-400' : 'text-red-400'}`}>{player.gameAverage.toFixed(1)}</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-gray-400 text-xs font-semibold">Points Earned</div>
-                        <div className="text-green-400 font-bold">{player.pointsScored}</div>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-            ))}
-            <div className="bg-orange-600 rounded p-3 h-14">
-              <div className="grid grid-cols-4 gap-3 items-center h-full">
-                <div className="col-span-2">
-                  <div className="text-white font-semibold text-lg">TEAM TOTAL</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-gray-400 text-xs font-semibold">Team Average</div>
-                  <div className="text-white font-bold">{playerStats.team1Average.toFixed(1)}</div>
-                </div>
-                <div></div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <TeamStatsCard
+          teamName={game.team1.name}
+          teamColor="orange"
+          playerStats={playerStats.team1Stats}
+          teamAverage={playerStats.team1Average}
+        />
 
-        <div className="bg-gray-800 rounded-lg p-4">
-          <div className="bowling-title text-blue-400 text-xl mb-4 text-center">
-            {game.team2.name}
-          </div>
-          <div className="space-y-2">
-            {playerStats.team2Stats.map((player: any, idx: number) => (
-              <div key={idx} className={`bg-gray-700 rounded p-3 ${player.isAbsent ? 'opacity-60 bg-red-900' : ''}`}>
-                <div className="grid grid-cols-4 gap-3 items-center h-14">
-                  <div className="col-span-2">
-                    <div className="text-white font-semibold text-lg">{player.name}</div>
-                  </div>
-                  {player.isAbsent ? (
-                    <div className="col-span-2 text-center">
-                      <div className="text-red-400 font-bold">ABSENT</div>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="text-center">
-                        <div className="text-gray-400 text-xs font-semibold">3-Game Avg</div>
-                        <div className={`font-bold ${parseInt(player.average) <= player.gameAverage ? 'text-green-400' : 'text-red-400'}`}>{player.gameAverage.toFixed(1)}</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-gray-400 text-xs font-semibold">Points Earned</div>
-                        <div className="text-green-400 font-bold">{player.pointsScored}</div>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </div>
-            ))}
-            <div className="bg-blue-600 rounded p-3 h-14">
-              <div className="grid grid-cols-4 gap-3 items-center h-full">
-                <div className="col-span-2">
-                  <div className="text-white font-semibold text-lg">TEAM TOTAL</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-gray-400 text-xs font-semibold">Team Average</div>
-                  <div className="text-white font-bold">{playerStats.team2Average.toFixed(1)}</div>
-                </div>
-                <div></div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <TeamStatsCard
+          teamName={game.team2.name}
+          teamColor="blue"
+          playerStats={playerStats.team2Stats}
+          teamAverage={playerStats.team2Average}
+        />
       </div>
 
       {/* Navigation */}
