@@ -83,6 +83,7 @@ const en: TranslationDictionary = {
     playersImported: 'player(s) imported',
     duplicatesSkipped: 'duplicate(s) skipped',
     errorsDetails: 'error(s) (see modal for details)',
+    statusActive: 'Active',
     statusInactive: 'Inactive',
   },
 
@@ -172,6 +173,7 @@ const en: TranslationDictionary = {
     noActiveLeagues: 'No active leagues',
     noLeagues: 'No leagues found',
     currentLeagues: 'Your current leagues. You can archive leagues when they\'re completed or no longer active.',
+    completedInactive: 'Completed or inactive leagues. All data is preserved and can be viewed or restored at any time.',
     season: 'season',
     seasons: 'seasons',
     playersPerTeam: 'players/team',
