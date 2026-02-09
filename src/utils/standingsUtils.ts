@@ -5,6 +5,141 @@ import type { Team, Game, TeamStanding, PlayerStats, CurrentPlayerAverages } fro
  */
 
 /**
+ * Helper to initialize or find player stats
+ */
+const initializePlayerStat = (
+  playerStats: any[],
+  teamId: string,
+  teamName: string,
+  playerName: string,
+  playerIdx: number
+): any => {
+  let playerStat = playerStats.find(ps => 
+    ps.teamId === teamId && ps.playerName === playerName
+  );
+  
+  if (!playerStat && playerName) {
+    playerStat = {
+      playerId: `${teamId}-${playerIdx}`,
+      teamId,
+      teamName,
+      playerName,
+      gamesPlayed: 0,
+      totalPins: 0,
+      average: 0,
+      highGame: 0,
+      highSeries: 0,
+      pointsScored: 0
+    };
+    playerStats.push(playerStat);
+  }
+  
+  return playerStat;
+};
+
+/**
+ * Helper to process match statistics for a team's players
+ */
+const processMatchStats = (
+  gamePlayers: any[],
+  matchPlayers: any[],
+  playerMatches: any[],
+  teamId: string,
+  teamKey: 'team1' | 'team2',
+  playerStats: any[]
+): void => {
+  const pointsKey = teamKey === 'team1' ? 'team1Points' : 'team2Points';
+  
+  gamePlayers.forEach((player: any, playerIdx: number) => {
+    const playerStat = playerStats.find(ps => 
+      ps.teamId === teamId && ps.playerName === player.name
+    );
+    
+    if (playerStat && matchPlayers[playerIdx]) {
+      const matchPlayer = matchPlayers[playerIdx];
+      const pins = parseInt(matchPlayer.pins) || 0;
+      
+      if (pins > 0 || matchPlayer.pins !== '') {
+        playerStat.gamesPlayed++;
+        playerStat.totalPins += pins;
+        
+        if (pins > playerStat.highGame) {
+          playerStat.highGame = pins;
+        }
+        
+        if (playerMatches && playerMatches[playerIdx]) {
+          playerStat.pointsScored += playerMatches[playerIdx][pointsKey] || 0;
+        }
+      }
+    }
+  });
+};
+
+/**
+ * Helper to calculate high series for a team's players
+ */
+const calculateHighSeries = (
+  gamePlayers: any[],
+  matches: any[],
+  teamId: string,
+  teamKey: 'team1' | 'team2',
+  playerStats: any[]
+): void => {
+  gamePlayers.forEach((player: any, playerIdx: number) => {
+    const playerStat = playerStats.find((ps: any) => 
+      ps.teamId === teamId && ps.playerName === player.name
+    );
+    
+    if (playerStat) {
+      const seriesTotal = matches?.reduce((sum: number, match: any) => {
+        const pins = match[teamKey]?.players[playerIdx]?.pins;
+        return sum + (parseInt(pins) || 0);
+      }, 0) || 0;
+      
+      if (seriesTotal > playerStat.highSeries) {
+        playerStat.highSeries = seriesTotal;
+      }
+    }
+  });
+};
+
+/**
+ * Helper to process player averages from matches
+ */
+const processPlayerAverages = (
+  gamePlayers: any[],
+  matches: any[],
+  teamKey: 'team1' | 'team2',
+  playerAverages: CurrentPlayerAverages
+): void => {
+  gamePlayers.forEach((player: any, playerIdx: number) => {
+    if (!player.name) return;
+    
+    if (!playerAverages[player.name]) {
+      playerAverages[player.name] = {
+        totalPins: 0,
+        gamesPlayed: 0,
+        average: 0
+      };
+    }
+    
+    // Count pins from all matches in this game
+    matches?.forEach((match: any) => {
+      if (match[teamKey] && match[teamKey].players[playerIdx]) {
+        const pins = parseInt(match[teamKey].players[playerIdx].pins) || 0;
+        if (pins > 0 || match[teamKey].players[playerIdx].pins !== '') {
+          const playerAvg = playerAverages[player.name];
+          if (playerAvg) {
+            playerAvg.totalPins += pins;
+            playerAvg.gamesPlayed++;
+          }
+        }
+      }
+    });
+  });
+};
+
+/**
  * Calculate team standings for a season
  * @param {Array} teams - All teams in the season
  * @param {Array} games - All games in the season
@@ -117,149 +252,51 @@ export const calculatePlayerSeasonStats = (teams: Team[], games: Game[]): Player
   const completedGames = games.filter(g => g.status === 'completed');
   
   completedGames.forEach(game => {
-    // Process team1 players
+    // Initialize player stats for both teams
     if (game.team1 && game.team1.players) {
       game.team1.players.forEach((player: any, idx: number) => {
-        const playerStat = playerStats.find(ps => 
-          ps.teamId === game.team1Id && ps.playerName === player.name
-        );
-        
-        if (!playerStat && player.name) {
-          // Add new player stat entry
-          playerStats.push({
-            playerId: `${game.team1Id}-${idx}`,
-            teamId: game.team1Id,
-            teamName: game.team1?.name || '',
-            playerName: player.name,
-            gamesPlayed: 0,
-            totalPins: 0,
-            average: 0,
-            highGame: 0,
-            highSeries: 0,
-            pointsScored: 0
-          });
-        }
+        initializePlayerStat(playerStats, game.team1Id, game.team1?.name || '', player.name, idx);
       });
     }
 
-    // Process team2 players
     if (game.team2 && game.team2.players) {
       game.team2.players.forEach((player: any, idx: number) => {
-        const playerStat = playerStats.find(ps => 
-          ps.teamId === game.team2Id && ps.playerName === player.name
-        );
-        
-        if (!playerStat && player.name) {
-          playerStats.push({
-            playerId: `${game.team2Id}-${idx}`,
-            teamId: game.team2Id,
-            teamName: game.team2?.name || '',
-            playerName: player.name,
-            gamesPlayed: 0,
-            totalPins: 0,
-            average: 0,
-            highGame: 0,
-            highSeries: 0,
-            pointsScored: 0
-          });
-        }
+        initializePlayerStat(playerStats, game.team2Id, game.team2?.name || '', player.name, idx);
       });
     }
 
-    // Calculate stats from matches
+    // Calculate stats from matches for both teams
     game.matches?.forEach((match: any) => {
-      // Team 1 players
-      if (game.team1 && game.team1.players) {
-        game.team1.players.forEach((player: any, playerIdx: number) => {
-          const playerStat = playerStats.find(ps => 
-            ps.teamId === game.team1Id && ps.playerName === player.name
-          );
-          
-          if (playerStat && match.team1 && match.team1.players[playerIdx]) {
-            const matchPlayer = match.team1.players[playerIdx];
-            const pins = parseInt(matchPlayer.pins) || 0;
-            
-            if (pins > 0 || matchPlayer.pins !== '') {
-              playerStat.gamesPlayed++;
-              playerStat.totalPins += pins;
-              
-              if (pins > playerStat.highGame) {
-                playerStat.highGame = pins;
-              }
-              
-              if (match.playerMatches && match.playerMatches[playerIdx]) {
-                playerStat.pointsScored += match.playerMatches[playerIdx].team1Points || 0;
-              }
-            }
-          }
-        });
+      if (game.team1 && game.team1.players && match.team1) {
+        processMatchStats(
+          game.team1.players,
+          match.team1.players,
+          match.playerMatches,
+          game.team1Id,
+          'team1',
+          playerStats
+        );
       }
 
-      // Team 2 players
-      if (game.team2 && game.team2.players) {
-        game.team2.players.forEach((player: any, playerIdx: number) => {
-          const playerStat = playerStats.find(ps => 
-            ps.teamId === game.team2Id && ps.playerName === player.name
-          );
-          
-          if (playerStat && match.team2 && match.team2.players[playerIdx]) {
-            const matchPlayer = match.team2.players[playerIdx];
-            const pins = parseInt(matchPlayer.pins) || 0;
-            
-            if (pins > 0 || matchPlayer.pins !== '') {
-              playerStat.gamesPlayed++;
-              playerStat.totalPins += pins;
-              
-              if (pins > playerStat.highGame) {
-                playerStat.highGame = pins;
-              }
-              
-              if (match.playerMatches && match.playerMatches[playerIdx]) {
-                playerStat.pointsScored += match.playerMatches[playerIdx].team2Points || 0;
-              }
-            }
-          }
-        });
+      if (game.team2 && game.team2.players && match.team2) {
+        processMatchStats(
+          game.team2.players,
+          match.team2.players,
+          match.playerMatches,
+          game.team2Id,
+          'team2',
+          playerStats
+        );
       }
     });
 
-    // Calculate high series (3 games) per game
+    // Calculate high series for both teams
     if (game.team1 && game.team1.players) {
-      game.team1.players.forEach((player: any, playerIdx: number) => {
-        const playerStat = playerStats.find((ps: any) => 
-          ps.teamId === game.team1Id && ps.playerName === player.name
-        );
-        
-        if (playerStat) {
-          const seriesTotal = game.matches?.reduce((sum: number, match: any) => {
-            const pins = match.team1?.players[playerIdx]?.pins;
-            return sum + (parseInt(pins) || 0);
-          }, 0) || 0;
-          
-          if (seriesTotal > playerStat.highSeries) {
-            playerStat.highSeries = seriesTotal;
-          }
-        }
-      });
+      calculateHighSeries(game.team1.players, game.matches, game.team1Id, 'team1', playerStats);
     }
 
     if (game.team2 && game.team2.players) {
-      game.team2.players.forEach((player: any, playerIdx: number) => {
-        const playerStat = playerStats.find((ps: any) => 
-          ps.teamId === game.team2Id && ps.playerName === player.name
-        );
-        
-        if (playerStat) {
-          const seriesTotal = game.matches?.reduce((sum: number, match: any) => {
-            const pins = match.team2?.players[playerIdx]?.pins;
-            return sum + (parseInt(pins) || 0);
-          }, 0) || 0;
-          
-          if (seriesTotal > playerStat.highSeries) {
-            playerStat.highSeries = seriesTotal;
-          }
-        }
-      });
+      calculateHighSeries(game.team2.players, game.matches, game.team2Id, 'team2', playerStats);
     }
   });
 
@@ -289,62 +326,13 @@ export const calculateCurrentPlayerAverages = (_teams: Team[], games: Game[]): C
   const completedGames = games.filter(g => g.status === 'completed');
   
   completedGames.forEach((game: any) => {
-    // Process team1 players
+    // Process both teams' players
     if (game.team1 && game.team1.players) {
-      game.team1.players.forEach((player: any, playerIdx: number) => {
-        if (!player.name) return;
-        
-        if (!playerAverages[player.name]) {
-          playerAverages[player.name] = {
-            totalPins: 0,
-            gamesPlayed: 0,
-            average: 0
-          };
-        }
-        
-        // Count pins from all matches in this game
-        game.matches?.forEach((match: any) => {
-          if (match.team1 && match.team1.players[playerIdx]) {
-            const pins = parseInt(match.team1.players[playerIdx].pins) || 0;
-            if (pins > 0 || match.team1.players[playerIdx].pins !== '') {
-              const playerAvg = playerAverages[player.name];
-              if (playerAvg) {
-                playerAvg.totalPins += pins;
-                playerAvg.gamesPlayed++;
-              }
-            }
-          }
-        });
-      });
+      processPlayerAverages(game.team1.players, game.matches, 'team1', playerAverages);
     }
     
-    // Process team2 players
     if (game.team2 && game.team2.players) {
-      game.team2.players.forEach((player: any, playerIdx: number) => {
-        if (!player.name) return;
-        
-        if (!playerAverages[player.name]) {
-          playerAverages[player.name] = {
-            totalPins: 0,
-            gamesPlayed: 0,
-            average: 0
-          };
-        }
-        
-        // Count pins from all matches in this game
-        game.matches?.forEach((match: any) => {
-          if (match.team2 && match.team2.players[playerIdx]) {
-            const pins = parseInt(match.team2.players[playerIdx].pins) || 0;
-            if (pins > 0 || match.team2.players[playerIdx].pins !== '') {
-              const playerAvg = playerAverages[player.name];
-              if (playerAvg) {
-                playerAvg.totalPins += pins;
-                playerAvg.gamesPlayed++;
-              }
-            }
-          }
-        });
-      });
+      processPlayerAverages(game.team2.players, game.matches, 'team2', playerAverages);
     }
   });
   
