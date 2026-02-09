@@ -1,4 +1,5 @@
 import type { BonusRule, Game, PlayerMatchResult, GameMatch, MatchPlayer } from '../types/index';
+import { compareTeamScores, applyMatchWinnerPoints } from './comparisonUtils';
 
 export const createEmptyMatch = (matchNumber: number, playersPerTeam: number = 4): GameMatch => {
   const emptyPlayers: MatchPlayer[] = Array.from({ length: playersPerTeam }, () => ({ 
@@ -133,18 +134,12 @@ export const calculateMatchResults = (game: Game, matchIndex: number): void => {
         gameResult.result = 'draw';
         gameResult.team1Points = playerMatchPointsPerWin / 2;
         gameResult.team2Points = playerMatchPointsPerWin / 2;
-      } else if (team1WithHandicap > team2WithHandicap) {
-        gameResult.result = 'team1';
-        gameResult.team1Points = playerMatchPointsPerWin;
-        gameResult.team2Points = 0;
-      } else if (team2WithHandicap > team1WithHandicap) {
-        gameResult.result = 'team2';
-        gameResult.team1Points = 0;
-        gameResult.team2Points = playerMatchPointsPerWin;
       } else {
-        gameResult.result = 'draw';
-        gameResult.team1Points = playerMatchPointsPerWin / 2;
-        gameResult.team2Points = playerMatchPointsPerWin / 2;
+        // Use comparison utility for standard comparison
+        const comparison = compareTeamScores(team1WithHandicap, team2WithHandicap, playerMatchPointsPerWin);
+        gameResult.result = comparison.winner;
+        gameResult.team1Points = comparison.team1Points;
+        gameResult.team2Points = comparison.team2Points;
       }
     } else {
       gameResult.result = null;
@@ -189,16 +184,18 @@ export const calculateMatchResults = (game: Game, matchIndex: number): void => {
   const allScoresEntered = team1AllScoresEntered && team2AllScoresEntered;
   
   if (allScoresEntered) {
-    if (match.team1.totalWithHandicap > match.team2.totalWithHandicap) {
-      match.team1.score = team1GamePoints + teamMatchPointsPerWin + match.team1.bonusPoints;
-      match.team2.score = team2GamePoints + match.team2.bonusPoints;
-    } else if (match.team2.totalWithHandicap > match.team1.totalWithHandicap) {
-      match.team1.score = team1GamePoints + match.team1.bonusPoints;
-      match.team2.score = team2GamePoints + teamMatchPointsPerWin + match.team2.bonusPoints;
-    } else {
-      match.team1.score = team1GamePoints + (teamMatchPointsPerWin / 2) + match.team1.bonusPoints;
-      match.team2.score = team2GamePoints + (teamMatchPointsPerWin / 2) + match.team2.bonusPoints;
-    }
+    // Use comparison utility to apply match winner points
+    const team1BaseScore = team1GamePoints + match.team1.bonusPoints;
+    const team2BaseScore = team2GamePoints + match.team2.bonusPoints;
+    const scores = applyMatchWinnerPoints(
+      match.team1.totalWithHandicap,
+      match.team2.totalWithHandicap,
+      team1BaseScore,
+      team2BaseScore,
+      teamMatchPointsPerWin
+    );
+    match.team1.score = scores.team1Score;
+    match.team2.score = scores.team2Score;
   } else {
     match.team1.score = team1GamePoints + match.team1.bonusPoints;
     match.team2.score = team2GamePoints + match.team2.bonusPoints;
