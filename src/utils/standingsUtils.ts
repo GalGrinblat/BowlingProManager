@@ -1,4 +1,5 @@
 import type { Team, Game, TeamStanding, PlayerStats, CurrentPlayerAverages } from '../types/index';
+import { getTeamData, forEachTeam } from './teamUtils';
 
 /**
  * Standings Calculator - Calculate team and player standings from completed games
@@ -80,7 +81,7 @@ const processMatchStats = (
  */
 const calculateHighSeries = (
   gamePlayers: any[],
-  matches: any[],
+  matches: any[] | undefined,
   teamId: string,
   teamKey: 'team1' | 'team2',
   playerStats: any[]
@@ -252,52 +253,40 @@ export const calculatePlayerSeasonStats = (teams: Team[], games: Game[]): Player
   const completedGames = games.filter(g => g.status === 'completed');
   
   completedGames.forEach(game => {
-    // Initialize player stats for both teams
-    if (game.team1 && game.team1.players) {
-      game.team1.players.forEach((player: any, idx: number) => {
-        initializePlayerStat(playerStats, game.team1Id, game.team1?.name || '', player.name, idx);
-      });
-    }
-
-    if (game.team2 && game.team2.players) {
-      game.team2.players.forEach((player: any, idx: number) => {
-        initializePlayerStat(playerStats, game.team2Id, game.team2?.name || '', player.name, idx);
-      });
-    }
-
-    // Calculate stats from matches for both teams
-    game.matches?.forEach((match: any) => {
-      if (game.team1 && game.team1.players && match.team1) {
-        processMatchStats(
-          game.team1.players,
-          match.team1.players,
-          match.playerMatches,
-          game.team1Id,
-          'team1',
-          playerStats
-        );
-      }
-
-      if (game.team2 && game.team2.players && match.team2) {
-        processMatchStats(
-          game.team2.players,
-          match.team2.players,
-          match.playerMatches,
-          game.team2Id,
-          'team2',
-          playerStats
-        );
+    // Initialize player stats for both teams using team iteration
+    forEachTeam((teamKey) => {
+      const teamData = getTeamData(game, teamKey);
+      if (teamData.data && teamData.players) {
+        teamData.players.forEach((player: any, idx: number) => {
+          initializePlayerStat(playerStats, teamData.id, teamData.data?.name || '', player.name, idx);
+        });
       }
     });
 
-    // Calculate high series for both teams
-    if (game.team1 && game.team1.players) {
-      calculateHighSeries(game.team1.players, game.matches, game.team1Id, 'team1', playerStats);
-    }
+    // Calculate stats from matches for both teams
+    game.matches?.forEach((match: any) => {
+      forEachTeam((teamKey) => {
+        const teamData = getTeamData(game, teamKey);
+        if (teamData.data && teamData.players && match[teamKey]) {
+          processMatchStats(
+            teamData.players,
+            match[teamKey].players,
+            match.playerMatches,
+            teamData.id,
+            teamKey,
+            playerStats
+          );
+        }
+      });
+    });
 
-    if (game.team2 && game.team2.players) {
-      calculateHighSeries(game.team2.players, game.matches, game.team2Id, 'team2', playerStats);
-    }
+    // Calculate high series for both teams
+    forEachTeam((teamKey) => {
+      const teamData = getTeamData(game, teamKey);
+      if (teamData.data && teamData.players) {
+        calculateHighSeries(teamData.players, game.matches, teamData.id, teamKey, playerStats);
+      }
+    });
   });
 
   // Calculate averages
@@ -326,14 +315,13 @@ export const calculateCurrentPlayerAverages = (_teams: Team[], games: Game[]): C
   const completedGames = games.filter(g => g.status === 'completed');
   
   completedGames.forEach((game: any) => {
-    // Process both teams' players
-    if (game.team1 && game.team1.players) {
-      processPlayerAverages(game.team1.players, game.matches, 'team1', playerAverages);
-    }
-    
-    if (game.team2 && game.team2.players) {
-      processPlayerAverages(game.team2.players, game.matches, 'team2', playerAverages);
-    }
+    // Process both teams' players using team iteration
+    forEachTeam((teamKey) => {
+      const teamData = getTeamData(game, teamKey);
+      if (teamData.data && teamData.players) {
+        processPlayerAverages(teamData.players, game.matches, teamKey, playerAverages);
+      }
+    });
   });
   
   // Calculate averages
