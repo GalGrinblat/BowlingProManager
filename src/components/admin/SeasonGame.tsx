@@ -86,15 +86,15 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
       // Update team1 player averages and handicaps
       if (gameData.team1 && gameData.team1.players) {
         gameData.team1.players = gameData.team1.players.map((player: any) => {
-          // Use current average if player has played games, otherwise default to 0
+          // Use current average if player has played games, otherwise keep original average from setup
           const currentAvg = currentAverages[player.name];
           let playerAvg;
           
           if (currentAvg && currentAvg.gamesPlayed > 0) {
             playerAvg = currentAvg.average;
           } else {
-            // No games played yet, default to 0
-            playerAvg = 0;
+            // No games played yet, keep original average from season setup
+            playerAvg = player.average || 0;
           }
           
           // Recalculate handicap
@@ -115,15 +115,15 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
       // Update team2 player averages and handicaps
       if (gameData.team2 && gameData.team2.players) {
         gameData.team2.players = gameData.team2.players.map((player: any) => {
-          // Use current average if player has played games, otherwise default to 0
+          // Use current average if player has played games, otherwise keep original average from setup
           const currentAvg = currentAverages[player.name];
           let playerAvg;
           
           if (currentAvg && currentAvg.gamesPlayed > 0) {
             playerAvg = currentAvg.average;
           } else {
-            // No games played yet, default to 0
-            playerAvg = 0;
+            // No games played yet, keep original average from season setup
+            playerAvg = player.average || 0;
           }
           
           // Recalculate handicap
