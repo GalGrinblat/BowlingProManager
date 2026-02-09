@@ -34,6 +34,12 @@ export interface BonusRule {
   points: number;
 }
 
+/** LineupStrategy - How player matchups are determined for games */
+export type LineupStrategy = 'flexible' | 'fixed' | 'rule-based';
+
+/** LineupRule - Rule for automatic player ordering in rule-based lineup */
+export type LineupRule = 'standard' | 'balanced';
+
 /** League - Independent league with its own rules, seasons, and scoring configuration */
 export interface League {
   id: string;
@@ -45,6 +51,8 @@ export interface League {
   defaultPlayersPerTeam: number;
   defaultMatchesPerGame: number;
   dayOfWeek: string;
+  lineupStrategy?: LineupStrategy;
+  lineupRule?: LineupRule;
   bonusRules: BonusRule[];
   playerMatchPointsPerWin: number;
   teamMatchPointsPerWin: number;
@@ -67,6 +75,8 @@ export interface Season {
   handicapBasis: number;
   useHandicap: boolean;
   handicapPercentage: number;
+  lineupStrategy?: LineupStrategy;
+  lineupRule?: LineupRule;
   bonusRules: BonusRule[];
   playerMatchPointsPerWin: number;
   teamMatchPointsPerWin: number;
@@ -103,6 +113,7 @@ export interface GamePlayer {
   name: string;
   average: number;
   handicap: number;
+  rank?: number;
   absent?: boolean;
 }
 
@@ -129,8 +140,8 @@ export interface Game {
   team2?: GameTeam;
   matchesPerGame?: number;
   useHandicap?: boolean;
-  lineupStrategy?: string;
-  lineupRule?: string;
+  lineupStrategy?: LineupStrategy;
+  lineupRule?: LineupRule;
   bonusRules?: BonusRule[];
   playerMatchPointsPerWin?: number;
   teamMatchPointsPerWin?: number;

@@ -5,14 +5,30 @@ import { useTranslation } from '../../contexts/LanguageContext';
 import { MAX_BOWLING_SCORE } from '../../constants/bowling';
 import { HandicapSettingsForm } from './HandicapSettingsForm';
 
-import type { LeagueManagementProps, BonusRule } from '../../types/index';
+import type { LeagueManagementProps, BonusRule, LineupStrategy, LineupRule } from '../../types/index';
 
 export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onViewLeague }) => {
   const { t } = useTranslation();
   const [leagues, setLeagues] = useState<any[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    description: string;
+    defaultHandicapBasis: number;
+    useHandicap: boolean;
+    handicapPercentage: number;
+    defaultPlayersPerTeam: number;
+    defaultMatchesPerGame: number;
+    dayOfWeek: string;
+    lineupStrategy: LineupStrategy;
+    lineupRule: LineupRule;
+    bonusRules: BonusRule[];
+    playerMatchPointsPerWin: number;
+    teamMatchPointsPerWin: number;
+    teamGamePointsPerWin: number;
+    active: boolean;
+  }>({
     name: '',
     description: '',
     defaultHandicapBasis: 160,
@@ -21,9 +37,9 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
     defaultPlayersPerTeam: 4,
     defaultMatchesPerGame: 3,
     dayOfWeek: '',
-    lineupStrategy: 'flexible' as 'flexible' | 'rule-based',
-    lineupRule: 'standard' as 'standard' | 'high-low' | 'low-high',
-    bonusRules: [] as BonusRule[],
+    lineupStrategy: 'flexible',
+    lineupRule: 'standard',
+    bonusRules: [],
     playerMatchPointsPerWin: 1,
     teamMatchPointsPerWin: 1,
     teamGamePointsPerWin: 2,
@@ -100,8 +116,8 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
       defaultPlayersPerTeam: league.defaultPlayersPerTeam,
       defaultMatchesPerGame: league.defaultMatchesPerGame || 3,
       dayOfWeek: league.dayOfWeek || '',
-      lineupStrategy: league.lineupStrategy || 'flexible',
-      lineupRule: league.lineupRule || 'standard',
+      lineupStrategy: (league.lineupStrategy || 'flexible') as LineupStrategy,
+      lineupRule: (league.lineupRule || 'standard') as LineupRule,
       bonusRules: league.bonusRules || [],
       playerMatchPointsPerWin: league.playerMatchPointsPerWin || 1,
       teamMatchPointsPerWin: league.teamMatchPointsPerWin || 1,
@@ -164,8 +180,8 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
       defaultPlayersPerTeam: 4,
       defaultMatchesPerGame: 3,
       dayOfWeek: '',
-      lineupStrategy: 'flexible' as 'flexible' | 'rule-based',
-      lineupRule: 'standard' as 'standard' | 'high-low' | 'low-high',
+      lineupStrategy: 'flexible',
+      lineupRule: 'standard',
       bonusRules: [],
       playerMatchPointsPerWin: 1,
       teamMatchPointsPerWin: 1,
@@ -300,7 +316,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                   </label>
                   <select
                     value={formData.lineupStrategy}
-                    onChange={(e) => setFormData({ ...formData, lineupStrategy: e.target.value as 'flexible' | 'rule-based' })}
+                    onChange={(e) => setFormData({ ...formData, lineupStrategy: e.target.value as LineupStrategy })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     <option value="flexible">{t('leagues.lineup.flexible')}</option>
@@ -320,7 +336,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                     </label>
                     <select
                       value={formData.lineupRule}
-                      onChange={(e) => setFormData({ ...formData, lineupRule: e.target.value as 'standard' | 'high-low' | 'low-high' })}
+                      onChange={(e) => setFormData({ ...formData, lineupRule: e.target.value as LineupRule })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     >
                       <option value="standard">{t('leagues.lineup.standard')}</option>

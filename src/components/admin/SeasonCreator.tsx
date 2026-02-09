@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { seasonsApi, teamsApi, gamesApi, playersApi, leaguesApi } from '../../services/api';
 import { createSeason, createTeam, validateSeason } from '../../models';
 import { generateRoundRobinSchedule } from '../../utils/scheduleUtils';
+import { applyLineupRule } from '../../utils/lineupUtils';
 import { useTranslation } from '../../contexts/LanguageContext';
 import { HandicapSettingsForm } from './HandicapSettingsForm';
 
-import type { SeasonCreatorProps } from '../../types/index';
+import type { SeasonCreatorProps, BonusRule, LineupStrategy, LineupRule } from '../../types/index';
 
 export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, onSuccess }) => {
   const { t } = useTranslation();
@@ -24,7 +25,20 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
     setLeague(leagueData);
   }, [leagueId]);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string;
+    numberOfTeams: number;
+    playersPerTeam: number;
+    numberOfRounds: number;
+    handicapBasis: number;
+    useHandicap: boolean;
+    handicapPercentage: number;
+    matchesPerGame: number;
+    lineupStrategy: LineupStrategy;
+    lineupRule: LineupRule;
+    bonusRules: BonusRule[];
+    startDate: string;
+  }>({
     name: '',
     numberOfTeams: 4,
     playersPerTeam: 4,
@@ -33,8 +47,10 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
     useHandicap: true,
     handicapPercentage: 100,
     matchesPerGame: 3,
+    lineupStrategy: 'flexible',
+    lineupRule: 'standard',
     bonusRules: [],
-    startDate: new Date().toISOString().split('T')[0]
+    startDate: new Date().toISOString().split('T')[0] || ''
   });
 
   // Update form data when league loads
@@ -47,6 +63,8 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
         useHandicap: league.useHandicap !== undefined ? league.useHandicap : true,
         handicapPercentage: league.handicapPercentage || 100,
         matchesPerGame: league.defaultMatchesPerGame || 3,
+        lineupStrategy: (league.lineupStrategy || 'flexible') as LineupStrategy,
+        lineupRule: (league.lineupRule || 'standard') as LineupRule,
         bonusRules: league.bonusRules || []
       }));
     }
@@ -225,6 +243,25 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
             };
           });
 
+          // Apply lineup rule if using rule-based strategy
+          let orderedTeam1Players = team1Players;
+          let orderedTeam2Players = team2Players;
+          
+          if (formData.lineupStrategy === 'rule-based' && formData.lineupRule) {
+            const orderedPlayers = applyLineupRule(team1Players, team2Players, formData.lineupRule);
+            // Ensure all players have rank and absent properties set
+            orderedTeam1Players = orderedPlayers.team1.map((p, idx) => ({ 
+              ...p, 
+              rank: idx + 1,
+              absent: p.absent || false
+            }));
+            orderedTeam2Players = orderedPlayers.team2.map((p, idx) => ({ 
+              ...p, 
+              rank: idx + 1,
+              absent: p.absent || false
+            }));
+          }
+
           // Create empty matches based on season configuration
           const emptyMatches = Array.from({ length: formData.matchesPerGame }, (_, i) => {
             const emptyPlayers = Array.from({ length: formData.playersPerTeam }, () => ({ 
@@ -265,8 +302,8 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
             matchDay: daySchedule.matchDay,
             team1Id: team1.id,
             team2Id: team2.id,
-            lineupStrategy: 'flexible',
-            lineupRule: 'standard',
+            lineupStrategy: created.lineupStrategy || 'flexible',
+            lineupRule: created.lineupRule || 'standard',
             bonusRules: formData.bonusRules,
             matchesPerGame: formData.matchesPerGame,
             playerMatchPointsPerWin: league.playerMatchPointsPerWin || 1,
@@ -274,11 +311,11 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
             teamGamePointsPerWin: league.teamGamePointsPerWin || 2,
             team1: {
               name: team1.name,
-              players: team1Players
+              players: orderedTeam1Players
             },
             team2: {
               name: team2.name,
-              players: team2Players
+              players: orderedTeam2Players
             },
             matches: emptyMatches,
             grandTotalPoints: { team1: 0, team2: 0 }

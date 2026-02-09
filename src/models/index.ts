@@ -11,7 +11,9 @@ import type {
   Team,
   Game,
   ValidationResult,
-  BonusRule
+  BonusRule,
+  LineupStrategy,
+  LineupRule
 } from '../types/index';
 import { MAX_BOWLING_SCORE, DEFAULT_HANDICAP_BASIS, DEFAULT_HANDICAP_PERCENTAGE } from '../constants/bowling';
 
@@ -46,6 +48,8 @@ export const createLeague = ({
   defaultPlayersPerTeam = 4,
   defaultMatchesPerGame = 3,
   dayOfWeek = '',
+  lineupStrategy: lineupStrategyParam = 'flexible',
+  lineupRule: lineupRuleParam = 'standard',
   bonusRules = [],
   playerMatchPointsPerWin = 1,
   teamMatchPointsPerWin = 1,
@@ -60,6 +64,8 @@ export const createLeague = ({
   defaultPlayersPerTeam?: number | string;
   defaultMatchesPerGame?: number | string;
   dayOfWeek?: string;
+  lineupStrategy?: LineupStrategy;
+  lineupRule?: LineupRule;
   bonusRules?: BonusRule[];
   playerMatchPointsPerWin?: number | string;
   teamMatchPointsPerWin?: number | string;
@@ -74,6 +80,8 @@ export const createLeague = ({
   defaultPlayersPerTeam: parseInt(String(defaultPlayersPerTeam)) || 4,
   defaultMatchesPerGame: parseInt(String(defaultMatchesPerGame)) || 3,
   dayOfWeek,
+  lineupStrategy: lineupStrategyParam,
+  lineupRule: lineupRuleParam,
   bonusRules,
   playerMatchPointsPerWin: parseFloat(String(playerMatchPointsPerWin)) || 1,
   teamMatchPointsPerWin: parseFloat(String(teamMatchPointsPerWin)) || 1,
@@ -92,6 +100,8 @@ export const createSeason = ({
   useHandicap = true,
   handicapPercentage = DEFAULT_HANDICAP_PERCENTAGE,
   matchesPerGame = 3,
+  lineupStrategy: lineupStrategyParam = 'flexible',
+  lineupRule: lineupRuleParam = 'standard',
   bonusRules = [],
   playerMatchPointsPerWin = 1,
   teamMatchPointsPerWin = 1,
@@ -108,6 +118,8 @@ export const createSeason = ({
   useHandicap?: boolean;
   handicapPercentage?: number | string;
   matchesPerGame?: number | string;
+  lineupStrategy?: LineupStrategy;
+  lineupRule?: LineupRule;
   bonusRules?: BonusRule[];
   playerMatchPointsPerWin?: number | string;
   teamMatchPointsPerWin?: number | string;
@@ -124,6 +136,8 @@ export const createSeason = ({
   useHandicap: useHandicap !== false,
   handicapPercentage: Math.min(DEFAULT_HANDICAP_PERCENTAGE, Math.max(0, parseInt(String(handicapPercentage)) || DEFAULT_HANDICAP_PERCENTAGE)),
   matchesPerGame: parseInt(String(matchesPerGame)) || 3,
+  lineupStrategy: lineupStrategyParam,
+  lineupRule: lineupRuleParam,
   bonusRules,
   playerMatchPointsPerWin: parseFloat(String(playerMatchPointsPerWin)) || 1,
   teamMatchPointsPerWin: parseFloat(String(teamMatchPointsPerWin)) || 1,

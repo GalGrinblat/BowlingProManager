@@ -8,6 +8,7 @@ import { calculateMatchResults, calculateBonusPoints } from '../../utils/matchUt
 import { calculatePlayerStats, calculateGameTotals, calculateGrandTotalPoints } from '../../utils/statsUtils';
 import { createEmptyMatch } from '../../utils/matchUtils';
 import { calculateCurrentPlayerAverages } from '../../utils/standingsUtils';
+import { applyLineupRule } from '../../utils/lineupUtils';
 
 import type { SeasonGameProps } from '../../types/index';
 
@@ -189,16 +190,26 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
   };
 
   const handlePreMatchContinue = () => {
-    // Save the updated game with absent status
+    // Apply lineup rule if using rule-based strategy
+    let finalTeam1Players = team1Players;
+    let finalTeam2Players = team2Players;
+    
+    if (game.lineupStrategy === 'rule-based' && game.lineupRule) {
+      const orderedPlayers = applyLineupRule(team1Players, team2Players, game.lineupRule);
+      finalTeam1Players = orderedPlayers.team1;
+      finalTeam2Players = orderedPlayers.team2;
+    }
+    
+    // Save the updated game with absent status and ordered lineup
     const updatedGame = {
       ...game,
       team1: {
         ...game.team1,
-        players: team1Players
+        players: finalTeam1Players
       },
       team2: {
         ...game.team2,
-        players: team2Players
+        players: finalTeam2Players
       }
     };
     gamesApi.update(gameId, updatedGame);
@@ -355,7 +366,6 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
   if (showPreMatch) {
     const lineupStrategy = game.lineupStrategy || 'flexible';
     const lineupRule = game.lineupRule || 'standard';
-    const isLineupLocked = lineupStrategy === 'fixed' || lineupStrategy === 'rule-based';
     
     return (
       <div className="min-h-screen bg-gray-900 text-white p-6">
@@ -386,7 +396,17 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
                   {lineupStrategy === 'rule-based' && `📊 ${t('games.lineupRuleBased')} - ${lineupRule === 'standard' ? t('games.lineupStandard') : t('games.lineupBalanced')}`}
                 </span>
               </div>
-              {isLineupLocked && (
+              {lineupStrategy === 'rule-based' && (
+                <p className="text-xs text-yellow-400 mt-2 flex items-center gap-1">
+                  <span>⚡</span>
+                  <span>
+                    {lineupRule === 'standard' 
+                      ? 'Players will be automatically ordered by average (highest vs highest)'
+                      : 'Players will be automatically ordered by average (highest vs lowest)'}
+                  </span>
+                </p>
+              )}
+              {lineupStrategy === 'fixed' && (
                 <p className="text-xs text-gray-400 mt-1">
                   {t('games.lineupLocked')}
                 </p>
