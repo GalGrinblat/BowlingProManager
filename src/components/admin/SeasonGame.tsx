@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { gamesApi, teamsApi, seasonsApi } from '../../services/api';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from '../../contexts/LanguageContext';
@@ -13,6 +13,37 @@ import { applyLineupRule } from '../../utils/lineupUtils';
 import type { SeasonGameProps } from '../../types/index';
 
 export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
+    // Drag and drop state and handlers
+    const dragItem = useRef<{ team: 'team1' | 'team2'; idx: number } | null>(null);
+
+    const handleDragStart = (e: React.DragEvent<HTMLDivElement>, team: 'team1' | 'team2', idx: number) => {
+      dragItem.current = { team, idx };
+      e.dataTransfer.effectAllowed = 'move';
+    };
+
+    const handleDragOver = (e: React.DragEvent<HTMLDivElement>, team: 'team1' | 'team2', idx: number) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+    };
+
+    const handleDrop = (e: React.DragEvent<HTMLDivElement>, team: 'team1' | 'team2', idx: number) => {
+      e.preventDefault();
+      if (!dragItem.current || dragItem.current.team !== team) return;
+      const fromIdx = dragItem.current.idx;
+      if (fromIdx === idx) return;
+      if (team === 'team1') {
+        const updated = [...team1Players];
+        const [moved] = updated.splice(fromIdx, 1);
+        updated.splice(idx, 0, moved);
+        setTeam1Players(updated);
+      } else {
+        const updated = [...team2Players];
+        const [moved] = updated.splice(fromIdx, 1);
+        updated.splice(idx, 0, moved);
+        setTeam2Players(updated);
+      }
+      dragItem.current = null;
+    };
   const { currentUser, isPlayer } = useAuth();
   const { t } = useTranslation();
   const [game, setGame] = useState<any>(null);
@@ -348,6 +379,27 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
     );
   }
 
+  // Move player up/down in the lineup (for flexible strategy)
+  const movePlayer = (team: 'team1' | 'team2', index: number, direction: 'up' | 'down') => {
+    if (team === 'team1') {
+      const updated = [...team1Players];
+      if (direction === 'up' && index > 0) {
+        [updated[index - 1], updated[index]] = [updated[index], updated[index - 1]];
+      } else if (direction === 'down' && index < updated.length - 1) {
+        [updated[index + 1], updated[index]] = [updated[index], updated[index + 1]];
+      }
+      setTeam1Players(updated);
+    } else {
+      const updated = [...team2Players];
+      if (direction === 'up' && index > 0) {
+        [updated[index - 1], updated[index]] = [updated[index], updated[index - 1]];
+      } else if (direction === 'down' && index < updated.length - 1) {
+        [updated[index + 1], updated[index]] = [updated[index], updated[index + 1]];
+      }
+      setTeam2Players(updated);
+    }
+  };
+
   if (showSummary) {
     const totals = calculateGameTotals(game);
     const playerStats = calculatePlayerStats(game);
@@ -429,7 +481,11 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
                       player.absent
                         ? 'bg-red-900/20 border-red-500'
                         : 'bg-gray-700 border-gray-600'
-                    }`}
+                    } ${lineupStrategy === 'flexible' ? 'cursor-move' : ''}`}
+                    draggable={lineupStrategy === 'flexible'}
+                    onDragStart={lineupStrategy === 'flexible' ? (e) => handleDragStart(e, 'team1', idx) : undefined}
+                    onDragOver={lineupStrategy === 'flexible' ? (e) => handleDragOver(e, 'team1', idx) : undefined}
+                    onDrop={lineupStrategy === 'flexible' ? (e) => handleDrop(e, 'team1', idx) : undefined}
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1">
@@ -454,16 +510,40 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
                           </div>
                         )}
                       </div>
-                      <button
-                        onClick={() => toggleAbsent('team1', idx)}
-                        className={`px-4 py-2 rounded font-medium transition-colors ${
-                          player.absent
-                            ? 'bg-green-600 hover:bg-green-700 text-white'
-                            : 'bg-red-600 hover:bg-red-700 text-white'
-                        }`}
-                      >
-                        {player.absent ? t('games.markPresent') : t('games.markAbsent')}
-                      </button>
+                      <div className="flex flex-col items-end ml-2">
+                        <div className="flex flex-row items-center gap-2">
+                          <button
+                            onClick={() => toggleAbsent('team1', idx)}
+                            className={`px-4 py-2 rounded font-medium transition-colors ${
+                              player.absent
+                                ? 'bg-green-600 hover:bg-green-700 text-white'
+                                : 'bg-red-600 hover:bg-red-700 text-white'
+                            }`}
+                          >
+                            {player.absent ? t('games.markPresent') : t('games.markAbsent')}
+                          </button>
+                          {lineupStrategy === 'flexible' && (
+                            <>
+                              <button
+                                className="bg-gray-600 hover:bg-blue-500 text-white rounded p-1 disabled:opacity-40"
+                                onClick={() => movePlayer('team1', idx, 'up')}
+                                disabled={idx === 0}
+                                title="Move Up"
+                              >
+                                ▲
+                              </button>
+                              <button
+                                className="bg-gray-600 hover:bg-blue-500 text-white rounded p-1 disabled:opacity-40"
+                                onClick={() => movePlayer('team1', idx, 'down')}
+                                disabled={idx === team1Players.length - 1}
+                                title="Move Down"
+                              >
+                                ▼
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -483,7 +563,11 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
                       player.absent
                         ? 'bg-red-900/20 border-red-500'
                         : 'bg-gray-700 border-gray-600'
-                    }`}
+                    } ${lineupStrategy === 'flexible' ? 'cursor-move' : ''}`}
+                    draggable={lineupStrategy === 'flexible'}
+                    onDragStart={lineupStrategy === 'flexible' ? (e) => handleDragStart(e, 'team2', idx) : undefined}
+                    onDragOver={lineupStrategy === 'flexible' ? (e) => handleDragOver(e, 'team2', idx) : undefined}
+                    onDrop={lineupStrategy === 'flexible' ? (e) => handleDrop(e, 'team2', idx) : undefined}
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1">
@@ -508,16 +592,40 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
                           </div>
                         )}
                       </div>
-                      <button
-                        onClick={() => toggleAbsent('team2', idx)}
-                        className={`px-4 py-2 rounded font-medium transition-colors ${
-                          player.absent
-                            ? 'bg-green-600 hover:bg-green-700 text-white'
-                            : 'bg-red-600 hover:bg-red-700 text-white'
-                        }`}
-                      >
-                        {player.absent ? t('games.markPresent') : t('games.markAbsent')}
-                      </button>
+                      <div className="flex flex-col items-end ml-2">
+                        <div className="flex flex-row items-center gap-2">
+                          <button
+                            onClick={() => toggleAbsent('team2', idx)}
+                            className={`px-4 py-2 rounded font-medium transition-colors ${
+                              player.absent
+                                ? 'bg-green-600 hover:bg-green-700 text-white'
+                                : 'bg-red-600 hover:bg-red-700 text-white'
+                            }`}
+                          >
+                            {player.absent ? t('games.markPresent') : t('games.markAbsent')}
+                          </button>
+                          {lineupStrategy === 'flexible' && (
+                            <>
+                              <button
+                                className="bg-gray-600 hover:bg-blue-500 text-white rounded p-1 disabled:opacity-40"
+                                onClick={() => movePlayer('team2', idx, 'up')}
+                                disabled={idx === 0}
+                                title="Move Up"
+                              >
+                                ▲
+                              </button>
+                              <button
+                                className="bg-gray-600 hover:bg-blue-500 text-white rounded p-1 disabled:opacity-40"
+                                onClick={() => movePlayer('team2', idx, 'down')}
+                                disabled={idx === team2Players.length - 1}
+                                title="Move Down"
+                              >
+                                ▼
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ))}
