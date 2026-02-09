@@ -1,4 +1,5 @@
-import { ArrowLeft, ArrowRight, Star } from './Icons';
+import { ArrowLeft, ArrowRight } from './Icons';
+import { PlayerScoreInput } from './PlayerScoreInput';
 import type { MatchViewProps } from '../../types/index';
 
 export const MatchView: React.FC<MatchViewProps> = ({ matchNumber, game, onUpdateScore, onNavigate, onCancel, isReadOnly = false }) => {
@@ -38,81 +39,18 @@ export const MatchView: React.FC<MatchViewProps> = ({ matchNumber, game, onUpdat
             <div key={idx} className="player-row bg-gray-700 rounded-lg p-3">
               <div className="grid grid-cols-3 gap-4 items-center">
                 {/* Team 1 Player */}
-                <div className="flex items-center gap-2">
-                  <div className="bg-orange-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">
-                    {player.rank}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-white text-sm truncate">{player.name}</div>
-                    <div className="text-xs text-gray-400">
-                      Avg: {typeof player.average === 'number' ? player.average.toFixed(1) : player.average} | HC: {game.useHandicap === false ? 'N/A' : player.handicap}
-                      {player.absent && <span className="text-red-400 font-bold ml-1">(ABSENT)</span>}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    {player.absent ? (
-                      <>
-                        <div className="text-center">
-                          <label className="text-gray-400 text-sm block">Score</label>
-                          <div className="w-16 px-2 py-1 bg-red-700 text-yellow-300 rounded border border-red-600 font-bold text-center text-sm">
-                            {parseInt(player.average) - 10}
-                          </div>
-                        </div>
-                        <div className="text-center">
-                          <label className="text-gray-400 text-sm block">W/Hdc</label>
-                          <div className="w-16 px-2 py-1 text-orange-400 font-bold text-sm text-center">
-                            {(parseInt(player.average) - 10) + player.handicap}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-1 text-yellow-400 flex-shrink-0 w-12">
-                          {match.team1.players[idx].bonusPoints > 0 && (
-                            <>
-                              <Star size={12} fill="currentColor" />
-                              <span className="text-xs font-bold">+{match.team1.players[idx].bonusPoints}</span>
-                            </>
-                          )}
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="text-center">
-                          <label className="text-gray-400 text-sm block">Score</label>
-                          <input
-                            type="number"
-                            value={match.team1.players[idx].pins}
-                            onChange={(e) => onUpdateScore(matchIndex, 'team1', idx, e.target.value)}
-                            onKeyDown={(e) => ['-', '+', 'e', 'E'].includes(e.key) && e.preventDefault()}
-                            placeholder="0-300"
-                            min="0"
-                            max="300"
-                            disabled={isReadOnly}
-                            className={`w-16 sm:w-20 px-2 py-2 sm:py-3 rounded border font-bold text-center text-base sm:text-lg ${
-                              isReadOnly 
-                                ? 'bg-gray-600 text-gray-400 border-gray-500 cursor-not-allowed'
-                                : 'bg-gray-600 text-white border-gray-500 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500'
-                            }`}
-                          />
-                        </div>
-                        <div className="text-center">
-                          <label className="text-gray-400 text-sm block">W/Hdc</label>
-                          <div className="w-16 px-2 py-1 text-orange-400 font-bold text-sm text-center">
-                            {match.team1.players[idx].pins !== '' 
-                              ? parseInt(match.team1.players[idx].pins) + player.handicap 
-                              : 0}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-1 text-yellow-400 flex-shrink-0 w-12">
-                          {match.team1.players[idx].bonusPoints > 0 && (
-                            <>
-                              <Star size={12} fill="currentColor" />
-                              <span className="text-xs font-bold">+{match.team1.players[idx].bonusPoints}</span>
-                            </>
-                          )}
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </div>
+                <PlayerScoreInput
+                  player={player}
+                  matchPlayer={match.team1.players[idx]}
+                  teamColor="orange"
+                  teamKey="team1"
+                  playerIdx={idx}
+                  matchIdx={matchIndex}
+                  useHandicap={game.useHandicap}
+                  onUpdateScore={onUpdateScore}
+                  isReadOnly={isReadOnly}
+                  alignment="left"
+                />
 
                 {/* Points in Middle */}
                 <div className="text-center">
@@ -131,81 +69,18 @@ export const MatchView: React.FC<MatchViewProps> = ({ matchNumber, game, onUpdat
                 </div>
 
                 {/* Team 2 Player */}
-                <div className="text-right flex items-center justify-end gap-2">
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    {game.team2.players[idx].absent ? (
-                      <>
-                        <div className="flex items-center gap-1 text-yellow-400 flex-shrink-0 w-12">
-                          {match.team2.players[idx].bonusPoints > 0 && (
-                            <>
-                              <span className="text-xs font-bold">+{match.team2.players[idx].bonusPoints}</span>
-                              <Star size={12} fill="currentColor" />
-                            </>
-                          )}
-                        </div>
-                        <div className="text-center">
-                          <label className="text-gray-400 text-sm block">W/Hdc</label>
-                          <div className="w-16 px-2 py-1 text-blue-400 font-bold text-sm text-center">
-                            {(parseInt(game.team2.players[idx].average) - 10) + game.team2.players[idx].handicap}
-                          </div>
-                        </div>
-                        <div className="text-center">
-                          <label className="text-gray-400 text-sm block">Score</label>
-                          <div className="w-16 px-2 py-1 bg-red-700 text-yellow-300 rounded border border-red-600 font-bold text-center text-sm">
-                            {parseInt(game.team2.players[idx].average) - 10}
-                          </div>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="flex items-center gap-1 text-yellow-400 flex-shrink-0 w-12">
-                          {match.team2.players[idx].bonusPoints > 0 && (
-                            <>
-                              <span className="text-xs font-bold">+{match.team2.players[idx].bonusPoints}</span>
-                              <Star size={12} fill="currentColor" />
-                            </>
-                          )}
-                        </div>
-                        <div className="text-center">
-                          <label className="text-gray-400 text-sm block">W/Hdc</label>
-                          <div className="w-16 px-2 py-1 text-blue-400 font-bold text-sm text-center">
-                            {match.team2.players[idx].pins !== '' 
-                              ? parseInt(match.team2.players[idx].pins) + game.team2.players[idx].handicap 
-                              : 0}
-                          </div>
-                        </div>
-                        <div className="text-center">
-                          <label className="text-gray-400 text-sm block">Score</label>
-                          <input
-                            type="number"
-                            value={match.team2.players[idx].pins}
-                            onChange={(e) => onUpdateScore(matchIndex, 'team2', idx, e.target.value)}
-                            onKeyDown={(e) => ['-', '+', 'e', 'E'].includes(e.key) && e.preventDefault()}
-                            placeholder="0-300"
-                            min="0"
-                            max="300"
-                            disabled={isReadOnly}
-                            className={`w-16 sm:w-20 px-2 py-2 sm:py-3 rounded border font-bold text-center text-base sm:text-lg ${
-                              isReadOnly 
-                                ? 'bg-gray-600 text-gray-400 border-gray-500 cursor-not-allowed'
-                                : 'bg-gray-600 text-white border-gray-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500'
-                            }`}
-                          />
-                        </div>
-                      </>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-white text-sm text-right truncate">{game.team2.players[idx].name}</div>
-                    <div className="text-xs text-gray-400 text-right">
-                      Avg: {typeof game.team2.players[idx].average === 'number' ? game.team2.players[idx].average.toFixed(1) : game.team2.players[idx].average} | HC: {game.useHandicap === false ? 'N/A' : game.team2.players[idx].handicap}
-                      {game.team2.players[idx].absent && <span className="text-red-400 font-bold ml-1">(ABSENT)</span>}
-                    </div>
-                  </div>
-                  <div className="bg-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">
-                    {game.team2.players[idx].rank}
-                  </div>
-                </div>
+                <PlayerScoreInput
+                  player={game.team2.players[idx]}
+                  matchPlayer={match.team2.players[idx]}
+                  teamColor="blue"
+                  teamKey="team2"
+                  playerIdx={idx}
+                  matchIdx={matchIndex}
+                  useHandicap={game.useHandicap}
+                  onUpdateScore={onUpdateScore}
+                  isReadOnly={isReadOnly}
+                  alignment="right"
+                />
               </div>
             </div>
           ))}

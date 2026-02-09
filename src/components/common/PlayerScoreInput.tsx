@@ -1,0 +1,173 @@
+import React from 'react';
+import { Star } from './Icons';
+
+export interface PlayerScoreInputProps {
+  player: {
+    name: string;
+    rank: number;
+    average: number | string;
+    handicap: number;
+    absent: boolean;
+  };
+  matchPlayer: {
+    pins: string | number;
+    bonusPoints: number;
+  };
+  teamColor: 'orange' | 'blue';
+  teamKey: 'team1' | 'team2';
+  playerIdx: number;
+  matchIdx: number;
+  useHandicap: boolean;
+  onUpdateScore: (matchIdx: number, team: string, idx: number, value: string) => void;
+  isReadOnly?: boolean;
+  alignment?: 'left' | 'right';
+}
+
+export const PlayerScoreInput: React.FC<PlayerScoreInputProps> = ({
+  player,
+  matchPlayer,
+  teamColor,
+  teamKey,
+  playerIdx,
+  matchIdx,
+  useHandicap,
+  onUpdateScore,
+  isReadOnly = false,
+  alignment = 'left',
+}) => {
+  const isRightAligned = alignment === 'right';
+  
+  // Color configurations
+  const bgColor = teamColor === 'orange' ? 'bg-orange-600' : 'bg-blue-600';
+  const textColor = teamColor === 'orange' ? 'text-orange-400' : 'text-blue-400';
+  const focusBorder = teamColor === 'orange' ? 'focus:border-orange-500' : 'focus:border-blue-500';
+  const focusRing = teamColor === 'orange' ? 'focus:ring-orange-500' : 'focus:ring-blue-500';
+  
+  // Calculate values
+  const absentScore = parseInt(String(player.average)) - 10;
+  const scoreWithHandicap = player.absent
+    ? absentScore + player.handicap
+    : matchPlayer.pins !== ''
+    ? parseInt(String(matchPlayer.pins)) + player.handicap
+    : 0;
+
+  // Render player info (name and stats)
+  const PlayerInfo = () => (
+    <div className="flex-1 min-w-0">
+      <div className={`font-semibold text-white text-sm truncate ${isRightAligned ? 'text-right' : ''}`}>
+        {player.name}
+      </div>
+      <div className={`text-xs text-gray-400 ${isRightAligned ? 'text-right' : ''}`}>
+        Avg: {typeof player.average === 'number' ? player.average.toFixed(1) : player.average} | HC: {useHandicap === false ? 'N/A' : player.handicap}
+        {player.absent && <span className="text-red-400 font-bold ml-1">(ABSENT)</span>}
+      </div>
+    </div>
+  );
+
+  // Render rank badge
+  const RankBadge = () => (
+    <div className={`${bgColor} text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0`}>
+      {player.rank}
+    </div>
+  );
+
+  // Render score inputs or absent display
+  const ScoreDisplay = () => (
+    <div className="flex items-center gap-2 flex-shrink-0">
+      {player.absent ? (
+        <>
+          {isRightAligned && (
+            <div className="flex items-center gap-1 text-yellow-400 flex-shrink-0 w-12">
+              {matchPlayer.bonusPoints > 0 && (
+                <>
+                  <span className="text-xs font-bold">+{matchPlayer.bonusPoints}</span>
+                  <Star size={12} fill="currentColor" />
+                </>
+              )}
+            </div>
+          )}
+          <div className="text-center">
+            <label className="text-gray-400 text-sm block">W/Hdc</label>
+            <div className={`w-16 px-2 py-1 ${textColor} font-bold text-sm text-center`}>
+              {scoreWithHandicap}
+            </div>
+          </div>
+          <div className="text-center">
+            <label className="text-gray-400 text-sm block">Score</label>
+            <div className="w-16 px-2 py-1 bg-red-700 text-yellow-300 rounded border border-red-600 font-bold text-center text-sm">
+              {absentScore}
+            </div>
+          </div>
+          {!isRightAligned && (
+            <div className="flex items-center gap-1 text-yellow-400 flex-shrink-0 w-12">
+              {matchPlayer.bonusPoints > 0 && (
+                <>
+                  <Star size={12} fill="currentColor" />
+                  <span className="text-xs font-bold">+{matchPlayer.bonusPoints}</span>
+                </>
+              )}
+            </div>
+          )}
+        </>
+      ) : (
+        <>
+          {isRightAligned && (
+            <div className="flex items-center gap-1 text-yellow-400 flex-shrink-0 w-12">
+              {matchPlayer.bonusPoints > 0 && (
+                <>
+                  <span className="text-xs font-bold">+{matchPlayer.bonusPoints}</span>
+                  <Star size={12} fill="currentColor" />
+                </>
+              )}
+            </div>
+          )}
+          <div className="text-center">
+            <label className="text-gray-400 text-sm block">W/Hdc</label>
+            <div className={`w-16 px-2 py-1 ${textColor} font-bold text-sm text-center`}>
+              {scoreWithHandicap}
+            </div>
+          </div>
+          <div className="text-center">
+            <label className="text-gray-400 text-sm block">Score</label>
+            <input
+              type="number"
+              value={matchPlayer.pins}
+              onChange={(e) => onUpdateScore(matchIdx, teamKey, playerIdx, e.target.value)}
+              onKeyDown={(e) => ['-', '+', 'e', 'E'].includes(e.key) && e.preventDefault()}
+              placeholder="0-300"
+              min="0"
+              max="300"
+              disabled={isReadOnly}
+              className={`w-16 sm:w-20 px-2 py-2 sm:py-3 rounded border font-bold text-center text-base sm:text-lg ${
+                isReadOnly
+                  ? 'bg-gray-600 text-gray-400 border-gray-500 cursor-not-allowed'
+                  : `bg-gray-600 text-white border-gray-500 ${focusBorder} focus:outline-none focus:ring-2 ${focusRing}`
+              }`}
+            />
+          </div>
+          {!isRightAligned && (
+            <div className="flex items-center gap-1 text-yellow-400 flex-shrink-0 w-12">
+              {matchPlayer.bonusPoints > 0 && (
+                <>
+                  <Star size={12} fill="currentColor" />
+                  <span className="text-xs font-bold">+{matchPlayer.bonusPoints}</span>
+                </>
+              )}
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
+
+  // Main layout based on alignment
+  return (
+    <div className={`flex items-center gap-2 ${isRightAligned ? 'text-right justify-end' : ''}`}>
+      {!isRightAligned && <RankBadge />}
+      {!isRightAligned && <PlayerInfo />}
+      <ScoreDisplay />
+      {isRightAligned && <PlayerInfo />}
+      {isRightAligned && <RankBadge />}
+    </div>
+  );
+};
