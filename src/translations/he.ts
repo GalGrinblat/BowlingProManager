@@ -92,8 +92,6 @@ const he: TranslationDictionary = {
 
   // ניהול ליגות
   leagues: {
-    leagueFeatures: 'מאפייני ליגה',
-    handicapSettings: 'הגדרות הנדיקפ',
     useHandicap: 'השתמש בהנדיקפ',
     handicapBasis: 'בסיס הנדיקפ',
     handicapPercentage: 'אחוז הנדיקפ',
@@ -159,7 +157,6 @@ const he: TranslationDictionary = {
     // אסטרטגיית סידור
     lineup: {
       strategy: 'אסטרטגיית סידור',
-      strategyTitle: 'אסטרטגיית התמודדות שחקנים',
       strategyDesc: 'הגדר כיצד נקבעות התמודדויות השחקנים (1 נגד 1, 2 נגד 2, וכו\') במשחקים',
       strategyLabel: 'אסטרטגיית סידור',
       flexible: 'סידור גמיש - ניתן להתאים לפני כל משחק',
@@ -176,6 +173,10 @@ const he: TranslationDictionary = {
     },
     
     // סטטוס ותצוגה
+    defaultNumberOfTeams: 'מספר קבוצות ברירת מחדל',
+    defaultNumberOfTeamsDesc: 'הגדר את מספר הקבוצות ברירת המחדל לעונות חדשות בליגה זו.',
+    defaultNumberOfRounds: 'מספר סיבובי ברירת מחדל',
+    defaultNumberOfRoundsDesc: 'הגדר את מספר הסיבובים ברירת המחדל לעונה.',
     totalLeagues: 'סה"כ {{count}} ליגות',
     activeLeagues: 'ליגות פעילות',
     archivedLeagues: 'ליגות בארכיון',

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { HandicapSettingsForm } from './HandicapSettingsForm';
+import { HandicapConfigurationForm } from './HandicapConfigurationForm';
 import { playersApi, leaguesApi } from '../../services/api';
 import { useTranslation } from '../../contexts/LanguageContext';
 import type { SeasonCreatorProps } from '../../types/index';
@@ -21,6 +21,8 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
       { threshold: 50, points: 1 },
       { threshold: 70, points: 2 },
     ],
+    teamAllPresentBonusEnabled: false,
+    teamAllPresentBonusPoints: 1,
   });
   const [teams, setTeams] = useState<any[]>([]);
   const [inheritLeagueConfig, setInheritLeagueConfig] = useState(true);
@@ -38,6 +40,8 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
         useHandicap: leagueData?.useHandicap ?? true,
         handicapBasis: (leagueData as any)?.handicapBasis ?? 160,
         handicapPercentage: leagueData?.handicapPercentage ?? 100,
+        teamAllPresentBonusEnabled: leagueData?.teamAllPresentBonusEnabled || false,
+        teamAllPresentBonusPoints: leagueData?.teamAllPresentBonusPoints || 1,
       }));
       const players = await playersApi.getAll();
       setAvailablePlayers(players);
@@ -81,7 +85,14 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
   }
   if (step === 1) {
     // Helper: get value from league or formData depending on inheritLeagueConfig
-    const getValue = (key: string) => inheritLeagueConfig ? league?.[key] : formData[key];
+    const getValue = (key: string) => {
+      if (inheritLeagueConfig) {
+        if (key === 'numberOfTeams') return league?.defaultNumberOfTeams || 2;
+        if (key === 'numberOfRounds') return league?.defaultNumberOfRounds || 1;
+        return league?.[key];
+      }
+      return formData[key];
+    };
     return (
       <div className="space-y-6">
         <div className="bg-white rounded-xl shadow-lg p-6">
@@ -97,11 +108,12 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
         </div>
         <div className="bg-white rounded-xl shadow-lg p-6">
           <form onSubmit={e => { e.preventDefault();
-            const newTeams = Array.from({ length: formData.numberOfTeams }, (_, i) => ({ name: `Team ${i + 1}`, playerIds: [] }));
+            const newTeams = Array.from({ length: getValue('numberOfTeams') }, (_, i) => ({ name: `Team ${i + 1}`, playerIds: [] }));
             setTeams(newTeams);
             setStep(2);
           }} className="space-y-4">
-            {/* Season Name & Description */}
+
+            {/* Title & Description */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="md:col-span-2">
                 <label className="block text-sm font-semibold text-gray-700 mb-2">{t('seasons.seasonName')} *</label>
@@ -111,77 +123,74 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
                 <label className="block text-sm font-semibold text-gray-700 mb-2">{t('leagues.description')}</label>
                 <textarea value={formData.description || ''} onChange={e => setFormData({ ...formData, description: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder={t('leagues.briefDescription')} rows={2} />
               </div>
-            </div>
-
-            {/* Inherit from League Configurations (now below description) */}
-            <div className="flex items-center mb-4 md:col-span-2">
-              <input
-                type="checkbox"
-                id="inheritLeagueConfig"
-                checked={inheritLeagueConfig}
-                onChange={e => {
-                  setInheritLeagueConfig(e.target.checked);
-                  if (e.target.checked) {
-                    // Reset formData to league values for all inheritable fields
-                    setFormData((prev: any) => ({
-                      ...prev,
-                      lineupStrategy: league?.lineupStrategy || 'flexible',
-                      lineupRule: league?.lineupRule || 'standard',
-                      playerMatchPointsPerWin: league?.playerMatchPointsPerWin || 1,
-                      teamMatchPointsPerWin: league?.teamMatchPointsPerWin || 1,
-                      teamGamePointsPerWin: league?.teamGamePointsPerWin || 2,
-                      useHandicap: league?.useHandicap ?? true,
-                      handicapBasis: league?.handicapBasis ?? 160,
-                      handicapPercentage: league?.handicapPercentage ?? 100,
-                      bonusRules: league?.bonusRules ? JSON.parse(JSON.stringify(league.bonusRules)) : [ { threshold: 50, points: 1 }, { threshold: 70, points: 2 } ],
-                    }));
-                  }
-                }}
-                className="mr-2"
-              />
-              <label htmlFor="inheritLeagueConfig" className="text-sm font-semibold text-gray-700">
-                {t('seasons.inheritFromLeagueConfig')}
-              </label>
-            </div>
-            {/* Season Name & Description */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="md:col-span-2">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">{t('seasons.seasonName')} *</label>
-                <input type="text" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="e.g., Spring 2026, Fall Season" required />
-              </div>
-              <div className="md:col-span-2">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">{t('leagues.description')}</label>
-                <textarea value={formData.description || ''} onChange={e => setFormData({ ...formData, description: e.target.value })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder={t('leagues.briefDescription')} rows={2} />
+              <div className="md:col-span-2 flex items-center mb-4">
+                <input
+                  type="checkbox"
+                  id="inheritLeagueConfig"
+                  checked={inheritLeagueConfig}
+                  onChange={e => {
+                    setInheritLeagueConfig(e.target.checked);
+                    if (e.target.checked) {
+                      // Reset formData to league values for all inheritable fields
+                      setFormData((prev: any) => ({
+                        ...prev,
+                        lineupStrategy: league?.lineupStrategy || 'flexible',
+                        lineupRule: league?.lineupRule || 'standard',
+                        playerMatchPointsPerWin: league?.playerMatchPointsPerWin || 1,
+                        teamMatchPointsPerWin: league?.teamMatchPointsPerWin || 1,
+                        teamGamePointsPerWin: league?.teamGamePointsPerWin || 2,
+                        useHandicap: league?.useHandicap ?? true,
+                        handicapBasis: league?.handicapBasis ?? 160,
+                        handicapPercentage: league?.handicapPercentage ?? 100,
+                        bonusRules: league?.bonusRules ? JSON.parse(JSON.stringify(league.bonusRules)) : [ { threshold: 50, points: 1 }, { threshold: 70, points: 2 } ],
+                        teamAllPresentBonusEnabled: league?.teamAllPresentBonusEnabled || false,
+                        teamAllPresentBonusPoints: league?.teamAllPresentBonusPoints || 1,
+                      }));
+                    }
+                  }}
+                  className="mr-2"
+                />
+                <label htmlFor="inheritLeagueConfig" className="text-sm font-semibold text-gray-700">
+                  {t('seasons.inheritFromLeagueConfig')}
+                </label>
               </div>
             </div>
 
-            {/* Season Settings */}
+            {/* General Configurations */}
             <div className="border-t pt-4 mt-4">
+              <h3 className="text-lg font-bold text-gray-800 mb-3">{t('leagues.generalConfiguration')}</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">{t('seasons.numberOfTeams')} *</label>
-                  <input type="number" min="2" max="20" value={formData.numberOfTeams} onChange={e => setFormData({ ...formData, numberOfTeams: parseInt(e.target.value) })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required />
+                  <input type="number" min="2" max="20" value={getValue('numberOfTeams')} onChange={e => setFormData({ ...formData, numberOfTeams: parseInt(e.target.value) })} className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent${inheritLeagueConfig ? ' bg-gray-100 cursor-not-allowed' : ''}`} required disabled={inheritLeagueConfig} />
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">{t('seasons.playersPerTeam')} *</label>
-                  <input type="number" min="1" max="10" value={formData.playersPerTeam} onChange={e => setFormData({ ...formData, playersPerTeam: parseInt(e.target.value) })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required />
+                  <input type="number" min="1" max="10" value={formData.playersPerTeam} onChange={e => setFormData({ ...formData, playersPerTeam: parseInt(e.target.value) })} className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent${inheritLeagueConfig ? ' bg-gray-100 cursor-not-allowed' : ''}`} required disabled={inheritLeagueConfig} />
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">{t('seasons.numberOfRounds')} *</label>
-                  <input type="number" min="1" max="10" value={formData.numberOfRounds} onChange={e => setFormData({ ...formData, numberOfRounds: parseInt(e.target.value) })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" required />
+                  <input type="number" min="1" max="10" value={getValue('numberOfRounds')} onChange={e => setFormData({ ...formData, numberOfRounds: parseInt(e.target.value) })} className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent${inheritLeagueConfig ? ' bg-gray-100 cursor-not-allowed' : ''}`} required disabled={inheritLeagueConfig} />
                   <p className="text-xs text-gray-500 mt-1">{t('seasons.roundExplanation')}</p>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">{t('seasons.matchesPerGame')}</label>
-                  <input type="number" min="1" max="5" value={formData.matchesPerGame} onChange={e => setFormData({ ...formData, matchesPerGame: parseInt(e.target.value) })} className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                  <input type="number" min="1" max="5" value={formData.matchesPerGame} onChange={e => setFormData({ ...formData, matchesPerGame: parseInt(e.target.value) })} className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent${inheritLeagueConfig ? ' bg-gray-100 cursor-not-allowed' : ''}`} disabled={inheritLeagueConfig} />
                   <p className="text-xs text-gray-500 mt-1">{t('seasons.matchesExplanation')}</p>
                 </div>
+                {league?.dayOfWeek && (
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">{t('leagues.leagueDay')}</label>
+                    <input type="text" value={league.dayOfWeek} className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed" disabled />
+                    <p className="text-xs text-gray-500 mt-1">{t('leagues.dayPlayed')}</p>
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Player Matchup Strategy Section */}
             <div className="border-t pt-4 mt-4">
-              <h3 className="text-lg font-bold text-gray-800 mb-3">{t('leagues.lineup.strategyTitle')}</h3>
+              <h3 className="text-lg font-bold text-gray-800 mb-3">{t('leagues.playerMatchupConfiguration')}</h3>
               <p className="text-sm text-gray-600 mb-3">{t('leagues.lineup.strategyDesc')}</p>
               <div className="space-y-4">
                 <div>
@@ -270,7 +279,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
 
             {/* Handicap Settings Section */}
             <div className="border-t pt-4 mt-4">
-              <HandicapSettingsForm
+              <HandicapConfigurationForm
                 useHandicap={getValue('useHandicap')}
                 handicapBasis={getValue('handicapBasis')}
                 handicapPercentage={getValue('handicapPercentage')}
@@ -279,15 +288,51 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
                 onHandicapPercentageChange={(value: number) => setFormData({ ...formData, handicapPercentage: value })}
                 basisFieldName="handicapBasis"
                 showDescription={true}
+                disabled={inheritLeagueConfig}
               />
             </div>
 
 
             {/* Bonus Rules Section */}
             <div className="border-t pt-4 mt-4">
-              <h3 className="text-lg font-bold text-gray-800 mb-3">{t('leagues.bonus.rules')}</h3>
+              <h3 className="text-lg font-bold text-gray-800 mb-3">{t('leagues.bonus.bonusPointsConfiguration')}</h3>
               <p className="text-sm text-gray-600 mb-3">{t('leagues.bonus.rulesDesc')}</p>
               <div className="space-y-2">
+                {/* Team All Present Bonus Option */}
+                <div className="flex items-center mb-4">
+                  <input
+                    type="checkbox"
+                    id="teamAllPresentBonusEnabled"
+                    checked={inheritLeagueConfig ? league?.teamAllPresentBonusEnabled : formData.teamAllPresentBonusEnabled}
+                    onChange={e => {
+                      if (inheritLeagueConfig) return;
+                      setFormData({ ...formData, teamAllPresentBonusEnabled: e.target.checked });
+                    }}
+                    className="mr-2"
+                    disabled={inheritLeagueConfig}
+                  />
+                  <label htmlFor="teamAllPresentBonusEnabled" className="text-sm font-semibold text-gray-700">
+                    {t('leagues.bonus.allPresentLabel')}
+                  </label>
+                  {(inheritLeagueConfig ? league?.teamAllPresentBonusEnabled : formData.teamAllPresentBonusEnabled) && (
+                    <input
+                      type="number"
+                      min="1"
+                      max="10"
+                      value={inheritLeagueConfig ? league?.teamAllPresentBonusPoints : formData.teamAllPresentBonusPoints}
+                      onChange={e => {
+                        if (inheritLeagueConfig) return;
+                        setFormData({ ...formData, teamAllPresentBonusPoints: Number(e.target.value) });
+                      }}
+                      className="ml-4 w-20 px-2 py-1 border border-gray-300 rounded text-sm"
+                      disabled={inheritLeagueConfig}
+                    />
+                  )}
+                  {(inheritLeagueConfig ? league?.teamAllPresentBonusEnabled : formData.teamAllPresentBonusEnabled) && (
+                    <span className="ml-2 text-xs text-gray-500">{t('leagues.bonus.allPresentPoints')}</span>
+                  )}
+                </div>
+                {/* Player/Team Bonus Rules */}
                 {(inheritLeagueConfig ? (league?.bonusRules || []) : formData.bonusRules).map((rule: any, idx: number) => (
                   <div key={idx} className="flex items-center gap-2">
                     <label className="text-sm text-gray-700">{t('leagues.bonusRules.bonusIfScoreAtLeast')}</label>
@@ -430,7 +475,11 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
       startDate: today,
       endDate: today,
       numberOfTeams: teams.length,
-      numberOfRounds: formData.numberOfRounds,
+      numberOfRounds: inheritLeagueConfig ? (league?.defaultNumberOfRounds || 1) : formData.numberOfRounds,
+      ...(league?.defaultNumberOfTeams && { defaultNumberOfTeams: league.defaultNumberOfTeams }),
+      ...(league?.defaultNumberOfRounds && { defaultNumberOfRounds: league.defaultNumberOfRounds }),
+      teamAllPresentBonusEnabled: inheritLeagueConfig ? league?.teamAllPresentBonusEnabled : formData.teamAllPresentBonusEnabled,
+      teamAllPresentBonusPoints: inheritLeagueConfig ? league?.teamAllPresentBonusPoints : formData.teamAllPresentBonusPoints,
       playersPerTeam: formData.playersPerTeam,
       matchesPerGame: formData.matchesPerGame,
       useHandicap: formData.useHandicap,

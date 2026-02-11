@@ -3,7 +3,7 @@ import { leaguesApi, seasonsApi } from '../../services/api';
 import { createLeague, validateLeague } from '../../models';
 import { useTranslation } from '../../contexts/LanguageContext';
 import { MAX_BOWLING_SCORE } from '../../constants/bowling';
-import { HandicapSettingsForm } from './HandicapSettingsForm';
+import { HandicapConfigurationForm } from './HandicapConfigurationForm';
 
 import type { LeagueManagementProps, BonusRule, LineupStrategy, LineupRule } from '../../types/index';
 
@@ -20,6 +20,8 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
     handicapPercentage: number;
     defaultPlayersPerTeam: number;
     defaultMatchesPerGame: number;
+    defaultNumberOfTeams: number;
+    defaultNumberOfRounds: number;
     dayOfWeek: string;
     lineupStrategy: LineupStrategy;
     lineupRule: LineupRule;
@@ -38,6 +40,8 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
     handicapPercentage: 100,
     defaultPlayersPerTeam: 4,
     defaultMatchesPerGame: 3,
+    defaultNumberOfTeams: 4,
+    defaultNumberOfRounds: 2,
     dayOfWeek: '',
     lineupStrategy: 'flexible',
     lineupRule: 'standard',
@@ -97,6 +101,8 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
       handicapPercentage: 100,
       defaultPlayersPerTeam: 4,
       defaultMatchesPerGame: 3,
+      defaultNumberOfTeams: 4,
+      defaultNumberOfRounds: 2,
       dayOfWeek: '',
       lineupStrategy: 'flexible',
       lineupRule: 'standard',
@@ -121,6 +127,8 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
       handicapPercentage: league.handicapPercentage || 100,
       defaultPlayersPerTeam: league.defaultPlayersPerTeam,
       defaultMatchesPerGame: league.defaultMatchesPerGame || 3,
+      defaultNumberOfTeams: league.defaultNumberOfTeams || 4,
+      defaultNumberOfRounds: league.defaultNumberOfRounds || 2,
       dayOfWeek: league.dayOfWeek || '',
       lineupStrategy: (league.lineupStrategy || 'flexible') as LineupStrategy,
       lineupRule: (league.lineupRule || 'standard') as LineupRule,
@@ -187,6 +195,8 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
       handicapPercentage: 100,
       defaultPlayersPerTeam: 4,
       defaultMatchesPerGame: 3,
+      defaultNumberOfTeams: 4,
+      defaultNumberOfRounds: 2,
       dayOfWeek: '',
       lineupStrategy: 'flexible',
       lineupRule: 'standard',
@@ -230,6 +240,8 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
             {editingId ? t('leagues.editLeague') : t('leagues.createLeague')}
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
+
+            {/* Title & Description */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="md:col-span-2">
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -258,46 +270,75 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
               </div>
             </div>
 
-            {/* League Settings */}
+            {/* General Configurations */}
             <div className="border-t pt-4 mt-4">
+              <h3 className="text-lg font-bold text-gray-800 mb-3">{t('leagues.generalConfiguration')}</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  {t('leagues.defaultPlayersPerTeam')}
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  max="10"
-                  value={formData.defaultPlayersPerTeam}
-                  onChange={(e) => setFormData({ ...formData, defaultPlayersPerTeam: Number(e.target.value) })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-                <p className="text-xs text-gray-500 mt-1">{t('leagues.canChangePerSeason')}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  {t('leagues.defaultMatchesPerGame')}
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  max="5"
-                  value={formData.defaultMatchesPerGame}
-                  onChange={(e) => setFormData({ ...formData, defaultMatchesPerGame: Number(e.target.value) })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-                <p className="text-xs text-gray-500 mt-1">{t('leagues.matchesInGame')}</p>
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  {t('leagues.leagueDay')}
-                </label>
-                <select
-                  value={formData.dayOfWeek}
-                  onChange={(e) => setFormData({ ...formData, dayOfWeek: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    {t('leagues.defaultNumberOfTeams')}
+                  </label>
+                  <input
+                    type="number"
+                    min="2"
+                    max="24"
+                    value={formData.defaultNumberOfTeams}
+                    onChange={(e) => setFormData({ ...formData, defaultNumberOfTeams: Number(e.target.value) })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">{t('leagues.defaultNumberOfTeamsDesc')}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    {t('leagues.defaultPlayersPerTeam')}
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="10"
+                    value={formData.defaultPlayersPerTeam}
+                    onChange={(e) => setFormData({ ...formData, defaultPlayersPerTeam: Number(e.target.value) })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">{t('leagues.canChangePerSeason')}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    {t('leagues.defaultNumberOfRounds')}
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="10"
+                    value={formData.defaultNumberOfRounds}
+                    onChange={(e) => setFormData({ ...formData, defaultNumberOfRounds: Number(e.target.value) })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">{t('leagues.defaultNumberOfRoundsDesc')}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    {t('leagues.defaultMatchesPerGame')}
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="5"
+                    value={formData.defaultMatchesPerGame}
+                    onChange={(e) => setFormData({ ...formData, defaultMatchesPerGame: Number(e.target.value) })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">{t('leagues.matchesInGame')}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    {t('leagues.leagueDay')}
+                  </label>
+                  <select
+                    value={formData.dayOfWeek}
+                    onChange={(e) => setFormData({ ...formData, dayOfWeek: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
                   <option value="">{t('leagues.selectDay')}</option>
                   <option value="Sunday">{t('days.sunday')}</option>
                   <option value="Monday">{t('days.monday')}</option>
@@ -312,9 +353,9 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
               </div>
             </div>
 
-            {/* Player Matchup Strategy Section */}
+            {/* Player Matchup Configuration Section */}
             <div className="border-t pt-4 mt-4">
-              <h3 className="text-lg font-bold text-gray-800 mb-3">{t('leagues.lineup.strategyTitle')}</h3>
+              <h3 className="text-lg font-bold text-gray-800 mb-3">{t('leagues.playerMatchupConfiguration')}</h3>
               <p className="text-sm text-gray-600 mb-3">
                 {t('leagues.lineup.strategyDesc')}
               </p>
@@ -414,13 +455,13 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
             </div>
 
             {/* Handicap Settings Section */}
-            <HandicapSettingsForm
+            <HandicapConfigurationForm
               useHandicap={formData.useHandicap}
               handicapBasis={formData.defaultHandicapBasis}
               handicapPercentage={formData.handicapPercentage}
-              onUseHandicapChange={(value) => setFormData({ ...formData, useHandicap: value })}
-              onHandicapBasisChange={(value) => setFormData({ ...formData, defaultHandicapBasis: value })}
-              onHandicapPercentageChange={(value) => setFormData({ ...formData, handicapPercentage: value })}
+              onUseHandicapChange={(value: boolean) => setFormData({ ...formData, useHandicap: value })}
+              onHandicapBasisChange={(value: number) => setFormData({ ...formData, defaultHandicapBasis: value })}
+              onHandicapPercentageChange={(value: number) => setFormData({ ...formData, handicapPercentage: value })}
               basisFieldName="defaultHandicapBasis"
               showDescription={true}
             />
@@ -428,7 +469,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
             {/* Bonus Rules Section */}
             <div className="border-t pt-4 mt-4">
               <div className="flex justify-between items-center mb-3">
-                <h3 className="text-lg font-bold text-gray-800">{t('leagues.bonus.rules')}</h3>
+                <h3 className="text-lg font-bold text-gray-800">{t('leagues.bonus.bonusPointsConfiguration')}</h3>
                 <button
                   type="button"
                   onClick={() => {

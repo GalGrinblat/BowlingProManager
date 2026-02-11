@@ -90,8 +90,7 @@ const en: TranslationDictionary = {
 
   // League Management
   leagues: {
-    leagueFeatures: 'League Features',
-    handicapSettings: 'Handicap Settings',
+    generalConfiguration: 'General Configuration',
     useHandicap: 'Use Handicap',
     handicapBasis: 'Handicap Basis',
     handicapPercentage: 'Handicap Percentage',
@@ -113,8 +112,8 @@ const en: TranslationDictionary = {
     
     // Handicap settings
     handicap: {
-      settings: 'Handicap Settings',
-      settingsDesc: 'Configure handicap rules to level the playing field between players of different skill levels',
+      Configuration: 'Handicap Configuration',
+      ConfigurationDesc: 'Configure handicap rules to level the playing field between players of different skill levels',
       use: 'Use Handicap',
       basis: 'Handicap Basis',
       percentage: 'Handicap Percentage',
@@ -141,7 +140,7 @@ const en: TranslationDictionary = {
     
     // Bonus rules
     bonus: {
-      rules: 'Bonus Point Rules',
+      bonusPointsConfiguration: 'Bonus Points Configuration',
       rulesDesc: 'Configure bonus points awarded during games. Rules are evaluated in order (highest points first).',
       addRule: 'Add Rule',
       removeRule: 'Remove Rule',
@@ -155,9 +154,9 @@ const en: TranslationDictionary = {
     },
     
     // Lineup strategy
+    playerMatchupConfiguration: 'Player Matchup Configuration',
     lineup: {
       strategy: 'Lineup Strategy',
-      strategyTitle: 'Player Matchup Strategy',
       strategyDesc: 'Configure how player matchups (1v1, 2v2, and so on) are determined for games',
       strategyLabel: 'Lineup Strategy',
       flexible: 'Flexible Lineup - Can adjust before each match',
@@ -175,6 +174,10 @@ const en: TranslationDictionary = {
     },
     
     // Status and display
+    defaultNumberOfTeams: 'Default Number of Teams',
+    defaultNumberOfTeamsDesc: 'Set the default number of teams for new seasons in this league.',
+    defaultNumberOfRounds: 'Default Number of Rounds',
+    defaultNumberOfRoundsDesc: 'Set the default number of round-robins per season.',
     totalLeagues: '{{count}} total leagues',
     activeLeagues: 'Active Leagues',
     archivedLeagues: 'Archived Leagues',

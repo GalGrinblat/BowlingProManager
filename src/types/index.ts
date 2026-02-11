@@ -70,8 +70,8 @@ export interface Season {
   name: string;
   startDate: DateString;
   endDate: DateString;
-  numberOfTeams: number;
-  numberOfRounds: number;
+  defaultNumberOfTeams: number;
+  defaultNumberOfRounds: number;
   playersPerTeam: number;
   matchesPerGame: number;
   handicapBasis: number;
