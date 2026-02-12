@@ -204,49 +204,19 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
             </div>
 
             {/* General Configurations */}
-            <div className="border-t pt-4 mt-4">
-              <h3 className="text-lg font-bold text-gray-800 mb-3">{t('leagues.generalConfiguration')}</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">{t('seasons.numberOfTeams')} *</label>
-                  <input type="number" min="2" max="20" value={getValue('numberOfTeams')} onChange={e => setFormData({ ...formData, numberOfTeams: parseInt(e.target.value) })} className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent${inheritLeagueConfig ? ' bg-gray-100 cursor-not-allowed' : ''}`} required disabled={inheritLeagueConfig} />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">{t('seasons.playersPerTeam')} *</label>
-                  <input type="number" min="1" max="10" value={formData.playersPerTeam} onChange={e => setFormData({ ...formData, playersPerTeam: parseInt(e.target.value) })} className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent${inheritLeagueConfig ? ' bg-gray-100 cursor-not-allowed' : ''}`} required disabled={inheritLeagueConfig} />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">{t('seasons.numberOfRounds')} *</label>
-                  <input type="number" min="1" max="10" value={getValue('numberOfRounds')} onChange={e => setFormData({ ...formData, numberOfRounds: parseInt(e.target.value) })} className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent${inheritLeagueConfig ? ' bg-gray-100 cursor-not-allowed' : ''}`} required disabled={inheritLeagueConfig} />
-                  <p className="text-xs text-gray-500 mt-1">{t('seasons.roundExplanation')}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">{t('seasons.matchesPerGame')}</label>
-                  <input type="number" min="1" max="5" value={formData.matchesPerGame} onChange={e => setFormData({ ...formData, matchesPerGame: parseInt(e.target.value) })} className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent${inheritLeagueConfig ? ' bg-gray-100 cursor-not-allowed' : ''}`} disabled={inheritLeagueConfig} />
-                  <p className="text-xs text-gray-500 mt-1">{t('seasons.matchesExplanation')}</p>
-                </div>
-                {league?.dayOfWeek && (
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">{t('leagues.leagueDay')}</label>
-                    <input type="text" value={league.dayOfWeek} className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed" disabled />
-                    <p className="text-xs text-gray-500 mt-1">{t('leagues.dayPlayed')}</p>
-                  </div>
-                )}
-              <GeneralConfiguration
-                numberOfTeams={getValue('numberOfTeams')}
-                playersPerTeam={getValue('playersPerTeam')}
-                numberOfRounds={getValue('numberOfRounds')}
-                matchesPerGame={getValue('matchesPerGame')}
-                dayOfWeek={league?.dayOfWeek || ''}
-                onNumberOfTeamsChange={value => setFormData({ ...formData, numberOfTeams: value })}
-                onPlayersPerTeamChange={value => setFormData({ ...formData, playersPerTeam: value })}
-                onNumberOfRoundsChange={value => setFormData({ ...formData, numberOfRounds: value })}
-                onMatchesPerGameChange={value => setFormData({ ...formData, matchesPerGame: value })}
-                onDayOfWeekChange={value => setFormData({ ...formData, dayOfWeek: value })}
-                disabled={inheritLeagueConfig}
-              />
-              </div>
-            </div>
+            <GeneralConfiguration
+              numberOfTeams={getValue('numberOfTeams')}
+              playersPerTeam={getValue('playersPerTeam')}
+              numberOfRounds={getValue('numberOfRounds')}
+              matchesPerGame={getValue('matchesPerGame')}
+              dayOfWeek={league?.dayOfWeek || ''}
+              onNumberOfTeamsChange={value => setFormData({ ...formData, numberOfTeams: value })}
+              onPlayersPerTeamChange={value => setFormData({ ...formData, playersPerTeam: value })}
+              onNumberOfRoundsChange={value => setFormData({ ...formData, numberOfRounds: value })}
+              onMatchesPerGameChange={value => setFormData({ ...formData, matchesPerGame: value })}
+              onDayOfWeekChange={value => setFormData({ ...formData, dayOfWeek: value })}
+              disabled={inheritLeagueConfig}
+            />
 
             {/* Player Matchup Configuration Section */}
             <div className="border-t pt-4 mt-4">
