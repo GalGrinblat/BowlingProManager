@@ -87,8 +87,8 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
     // Helper: get value from league or formData depending on inheritLeagueConfig
     const getValue = (key: string) => {
       if (inheritLeagueConfig) {
-        if (key === 'numberOfTeams') return league?.defaultNumberOfTeams || 2;
-        if (key === 'numberOfRounds') return league?.defaultNumberOfRounds || 1;
+        if (key === 'numberOfTeams') return league?.numberOfTeams || 8;
+        if (key === 'numberOfRounds') return league?.numberOfRounds || 2;
         return league?.[key];
       }
       return formData[key];
@@ -475,9 +475,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
       startDate: today,
       endDate: today,
       numberOfTeams: teams.length,
-      numberOfRounds: inheritLeagueConfig ? (league?.defaultNumberOfRounds || 1) : formData.numberOfRounds,
-      ...(league?.defaultNumberOfTeams && { defaultNumberOfTeams: league.defaultNumberOfTeams }),
-      ...(league?.defaultNumberOfRounds && { defaultNumberOfRounds: league.defaultNumberOfRounds }),
+      numberOfRounds: inheritLeagueConfig ? (league?.numberOfRounds || 1) : formData.numberOfRounds,
       teamAllPresentBonusEnabled: inheritLeagueConfig ? league?.teamAllPresentBonusEnabled : formData.teamAllPresentBonusEnabled,
       teamAllPresentBonusPoints: inheritLeagueConfig ? league?.teamAllPresentBonusPoints : formData.teamAllPresentBonusPoints,
       playersPerTeam: formData.playersPerTeam,

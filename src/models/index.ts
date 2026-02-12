@@ -99,9 +99,9 @@ export const createLeague = ({
 export const createSeason = ({
   leagueId = '',
   name = '',
-  defaultNumberOfTeams = 0,
+  numberOfTeams = 8,
   playersPerTeam = 4,
-  defaultNumberOfRounds = 1,
+  numberOfRounds = 2,
   handicapBasis = DEFAULT_HANDICAP_BASIS,
   useHandicap = true,
   handicapPercentage = DEFAULT_HANDICAP_PERCENTAGE,
@@ -117,9 +117,9 @@ export const createSeason = ({
 }: {
   leagueId?: string;
   name?: string;
-  defaultNumberOfTeams?: number | string;
+  numberOfTeams?: number | string;
   playersPerTeam?: number | string;
-  defaultNumberOfRounds?: number | string;
+  numberOfRounds?: number | string;
   handicapBasis?: number | string;
   useHandicap?: boolean;
   handicapPercentage?: number | string;
@@ -135,9 +135,9 @@ export const createSeason = ({
 }): Omit<Season, 'id' | 'createdAt'> => ({
   leagueId,
   name,
-  defaultNumberOfTeams: parseInt(String(defaultNumberOfTeams)) || 0,
+  numberOfTeams: parseInt(String(numberOfTeams)) || 8,
   playersPerTeam: parseInt(String(playersPerTeam)) || 4,
-  defaultNumberOfRounds: parseInt(String(defaultNumberOfRounds)) || 1,
+  numberOfRounds: parseInt(String(numberOfRounds)) || 2,
   handicapBasis: parseInt(String(handicapBasis)) || DEFAULT_HANDICAP_BASIS,
   useHandicap: useHandicap !== false,
   handicapPercentage: Math.min(DEFAULT_HANDICAP_PERCENTAGE, Math.max(0, parseInt(String(handicapPercentage)) || DEFAULT_HANDICAP_PERCENTAGE)),
