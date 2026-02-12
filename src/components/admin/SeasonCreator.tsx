@@ -6,6 +6,7 @@ import { playersApi, leaguesApi } from '../../services/api';
 import { useTranslation } from '../../contexts/LanguageContext';
 import type { SeasonCreatorProps } from '../../types/index';
 import { DEFAULT_HANDICAP_BASIS, DEFAULT_HANDICAP_PERCENTAGE, DEFAULT_NUMBER_OF_TEAMS, DEFAULT_NUMBER_OF_ROUNDS, DEFAULT_PLAYERS_PER_TEAM, DEFAULT_MATCHES_PER_GAME, DEFAULT_PLAYER_MATCH_POINTS, DEFAULT_TEAM_MATCH_POINTS, DEFAULT_TEAM_GAME_POINTS, DEFAULT_USE_HANDICAP } from '../../constants/bowling';
+import { PlayerMatchupConfiguration } from './PlayerMatchupConfiguration';
 
 export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, onSuccess }) => {
   const { t } = useTranslation();
@@ -272,6 +273,14 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
                     </p>
                   </div>
                 )}
+              {/* Player Matchup Configuration Section */}
+              <PlayerMatchupConfiguration
+                lineupStrategy={getValue('lineupStrategy')}
+                lineupRule={getValue('lineupRule')}
+                onLineupStrategyChange={value => setFormData({ ...formData, lineupStrategy: value })}
+                onLineupRuleChange={value => setFormData({ ...formData, lineupRule: value })}
+                disabled={inheritLeagueConfig}
+              />
               </div>
             </div>
 

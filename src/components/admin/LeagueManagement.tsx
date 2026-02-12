@@ -4,6 +4,7 @@ import { createLeague, validateLeague } from '../../models';
 import { useTranslation } from '../../contexts/LanguageContext';
 import { DEFAULT_HANDICAP_BASIS, DEFAULT_HANDICAP_PERCENTAGE, DEFAULT_NUMBER_OF_TEAMS, DEFAULT_NUMBER_OF_ROUNDS, DEFAULT_PLAYERS_PER_TEAM, DEFAULT_MATCHES_PER_GAME, DEFAULT_PLAYER_MATCH_POINTS, DEFAULT_TEAM_MATCH_POINTS, DEFAULT_TEAM_GAME_POINTS, DEFAULT_USE_HANDICAP } from '../../constants/bowling';
 import { HandicapConfigurationForm } from './HandicapConfigurationForm';
+import { PlayerMatchupConfiguration } from './PlayerMatchupConfiguration';
 import { PointsConfiguration } from '../common/PointsConfiguration';
 import { BonusRulesConfiguration } from '../common/BonusRulesConfiguration';
 
@@ -356,52 +357,12 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
             </div>
 
             {/* Player Matchup Configuration Section */}
-            <div className="border-t pt-4 mt-4">
-              <h3 className="text-lg font-bold text-gray-800 mb-3">{t('leagues.playerMatchupConfiguration')}</h3>
-              <p className="text-sm text-gray-600 mb-3">
-                {t('leagues.lineup.strategyDesc')}
-              </p>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    {t('leagues.lineup.strategyLabel')}
-                  </label>
-                  <select
-                    value={formData.lineupStrategy}
-                    onChange={(e) => setFormData({ ...formData, lineupStrategy: e.target.value as LineupStrategy })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="flexible">{t('leagues.lineup.flexible')}</option>
-                    <option value="fixed">{t('leagues.lineup.fixed')}</option>
-                    <option value="rule-based">{t('leagues.lineup.ruleBased')}</option>
-                  </select>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {formData.lineupStrategy === 'flexible' && t('leagues.lineup.flexibleDesc')}
-                    {formData.lineupStrategy === 'rule-based' && t('leagues.lineup.ruleBasedDesc')}
-                  </p>
-                </div>
-
-                {formData.lineupStrategy === 'rule-based' && (
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      {t('leagues.lineup.rankingRuleLabel')}
-                    </label>
-                    <select
-                      value={formData.lineupRule}
-                      onChange={(e) => setFormData({ ...formData, lineupRule: e.target.value as LineupRule })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="standard">{t('leagues.lineup.standard')}</option>
-                      <option value="balanced">{t('leagues.lineup.balanced')}</option>
-                    </select>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {formData.lineupRule === 'standard' && t('leagues.lineup.standardDesc')}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
+            <PlayerMatchupConfiguration
+              lineupStrategy={formData.lineupStrategy}
+              lineupRule={formData.lineupRule}
+              onLineupStrategyChange={value => setFormData({ ...formData, lineupStrategy: value as LineupStrategy })}
+              onLineupRuleChange={value => setFormData({ ...formData, lineupRule: value as LineupRule })}
+            />
 
             {/* Point Configuration Section */}
             <PointsConfiguration
