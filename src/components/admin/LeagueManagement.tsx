@@ -4,6 +4,7 @@ import { createLeague, validateLeague } from '../../models';
 import { useTranslation } from '../../contexts/LanguageContext';
 import { DEFAULT_HANDICAP_BASIS, DEFAULT_HANDICAP_PERCENTAGE, DEFAULT_NUMBER_OF_TEAMS, DEFAULT_NUMBER_OF_ROUNDS, DEFAULT_PLAYERS_PER_TEAM, DEFAULT_MATCHES_PER_GAME, DEFAULT_PLAYER_MATCH_POINTS, DEFAULT_TEAM_MATCH_POINTS, DEFAULT_TEAM_GAME_POINTS, DEFAULT_USE_HANDICAP } from '../../constants/bowling';
 import { HandicapConfigurationForm } from './HandicapConfigurationForm';
+import { PointsConfiguration } from '../common/PointsConfiguration';
 import { BonusRulesConfiguration } from '../common/BonusRulesConfiguration';
 
 import type { LeagueManagementProps, BonusRule, LineupStrategy, LineupRule } from '../../types/index';
@@ -403,57 +404,14 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
             </div>
 
             {/* Point Configuration Section */}
-            <div className="border-t pt-4 mt-4">
-              <h3 className="text-lg font-bold text-gray-800 mb-3">{t('leagues.points.config')}</h3>
-              <p className="text-sm text-gray-600 mb-3">
-                {t('leagues.points.configDesc')}
-              </p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    {t('leagues.points.playerMatchPerWin')}
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.5"
-                    value={formData.playerMatchPointsPerWin}
-                    onChange={(e) => setFormData({ ...formData, playerMatchPointsPerWin: Number(e.target.value) })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">{t('leagues.points.playerMatchPerWinDesc')}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    {t('leagues.points.teamMatchPerWin')}
-                  </label>
-                  <input
-                    type="number"
-                    min="0.5"
-                    step="0.5"
-                    value={formData.teamMatchPointsPerWin}
-                    onChange={(e) => setFormData({ ...formData, teamMatchPointsPerWin: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">{t('leagues.points.teamMatchPerWinDesc')}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    {t('leagues.points.teamGamePerWin')}
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.5"
-                    value={formData.teamGamePointsPerWin}
-                    onChange={(e) => setFormData({ ...formData, teamGamePointsPerWin: Number(e.target.value) })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">{t('leagues.points.teamGamePerWinDesc')}</p>
-                </div>
-              </div>
-            </div>
+            <PointsConfiguration
+              playerMatchPointsPerWin={formData.playerMatchPointsPerWin}
+              teamMatchPointsPerWin={formData.teamMatchPointsPerWin}
+              teamGamePointsPerWin={formData.teamGamePointsPerWin}
+              onPlayerMatchPointsPerWinChange={value => setFormData({ ...formData, playerMatchPointsPerWin: value })}
+              onTeamMatchPointsPerWinChange={value => setFormData({ ...formData, teamMatchPointsPerWin: value })}
+              onTeamGamePointsPerWinChange={value => setFormData({ ...formData, teamGamePointsPerWin: value })}
+            />
 
             {/* Handicap Configuration Section */}
             <HandicapConfigurationForm
@@ -467,7 +425,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
               showDescription={true}
             />
 
-            {/* Bonus Rules Section */}
+            {/* Bonus Rules Configuration Section */}
             <div className="border-t pt-4 mt-4">
               <BonusRulesConfiguration
                 bonusRules={formData.bonusRules}

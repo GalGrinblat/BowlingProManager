@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { HandicapConfigurationForm } from './HandicapConfigurationForm';
+import { PointsConfiguration } from '../common/PointsConfiguration';
 import { BonusRulesConfiguration } from '../common/BonusRulesConfiguration';
 import { playersApi, leaguesApi } from '../../services/api';
 import { useTranslation } from '../../contexts/LanguageContext';
@@ -232,7 +233,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
               </div>
             </div>
 
-            {/* Player Matchup Strategy Section */}
+            {/* Player Matchup Configuration Section */}
             <div className="border-t pt-4 mt-4">
               <h3 className="text-lg font-bold text-gray-800 mb-3">{t('leagues.playerMatchupConfiguration')}</h3>
               <p className="text-sm text-gray-600 mb-3">{t('leagues.lineup.strategyDesc')}</p>
@@ -275,51 +276,15 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
             </div>
 
             {/* Points Configuration Section */}
-            <div className="border-t pt-4 mt-4">
-              <h3 className="text-lg font-bold text-gray-800 mb-3">{t('leagues.points.config')}</h3>
-              <p className="text-sm text-gray-600 mb-3">{t('leagues.points.configDesc')}</p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">{t('leagues.points.playerMatchPerWin')}</label>
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.5"
-                    value={getValue('playerMatchPointsPerWin') || 1}
-                    onChange={e => setFormData({ ...formData, playerMatchPointsPerWin: Number(e.target.value) })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    disabled={inheritLeagueConfig}
-                  />
-                  <p className="text-xs text-gray-500 mt-1">{t('leagues.points.playerMatchPerWinDesc')}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">{t('leagues.points.teamMatchPerWin')}</label>
-                  <input
-                    type="number"
-                    min="0.5"
-                    step="0.5"
-                    value={getValue('teamMatchPointsPerWin') || 1}
-                    onChange={e => setFormData({ ...formData, teamMatchPointsPerWin: Number(e.target.value) })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                    disabled={inheritLeagueConfig}
-                  />
-                  <p className="text-xs text-gray-500 mt-1">{t('leagues.points.teamMatchPerWinDesc')}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">{t('leagues.points.teamGamePerWin')}</label>
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.5"
-                    value={getValue('teamGamePointsPerWin') || 2}
-                    onChange={e => setFormData({ ...formData, teamGamePointsPerWin: Number(e.target.value) })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    disabled={inheritLeagueConfig}
-                  />
-                  <p className="text-xs text-gray-500 mt-1">{t('leagues.points.teamGamePerWinDesc')}</p>
-                </div>
-              </div>
-            </div>
+            <PointsConfiguration
+              playerMatchPointsPerWin={getValue('playerMatchPointsPerWin') || 1}
+              teamMatchPointsPerWin={getValue('teamMatchPointsPerWin') || 1}
+              teamGamePointsPerWin={getValue('teamGamePointsPerWin') || 2}
+              onPlayerMatchPointsPerWinChange={value => setFormData({ ...formData, playerMatchPointsPerWin: value })}
+              onTeamMatchPointsPerWinChange={value => setFormData({ ...formData, teamMatchPointsPerWin: value })}
+              onTeamGamePointsPerWinChange={value => setFormData({ ...formData, teamGamePointsPerWin: value })}
+              disabled={inheritLeagueConfig}
+            />
 
             {/* Handicap Configuration Section */}
             <div className="border-t pt-4 mt-4">
@@ -337,7 +302,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
             </div>
 
 
-            {/* Bonus Rules Section */}
+            {/* Bonus Rules Configuration Section */}
             <div className="border-t pt-4 mt-4">
               <BonusRulesConfiguration
                 bonusRules={inheritLeagueConfig ? (league?.bonusRules || []) : formData.bonusRules}
