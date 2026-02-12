@@ -64,6 +64,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
     newTeams[teamIndex].name = name;
     setTeams(newTeams);
   };
+
   const handleAssignPlayer = (teamIndex: number, playerId: string) => {
     const newTeams = [...teams];
     if (!newTeams[teamIndex].playerIds.includes(playerId)) {
@@ -71,11 +72,13 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
       setTeams(newTeams);
     }
   };
+
   const handleRemovePlayer = (teamIndex: number, playerId: string) => {
     const newTeams = [...teams];
     newTeams[teamIndex].playerIds = newTeams[teamIndex].playerIds.filter((id: string) => id !== playerId);
     setTeams(newTeams);
   };
+  
   const getAssignedPlayers = (excludeTeamIndex: number) => {
     return new Set(
       teams
@@ -96,9 +99,40 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
     // Helper: get value from league or formData depending on inheritLeagueConfig
     const getValue = (key: string) => {
       if (inheritLeagueConfig) {
-        if (key === 'numberOfTeams') return league?.numberOfTeams || 8;
-        if (key === 'numberOfRounds') return league?.numberOfRounds || 2;
-        return league?.[key];
+        switch (key) {
+          case 'numberOfTeams':
+            return league?.defaultNumberOfTeams || DEFAULT_NUMBER_OF_TEAMS;
+          case 'playersPerTeam':
+            return league?.defaultPlayersPerTeam || DEFAULT_PLAYERS_PER_TEAM;
+          case 'numberOfRounds':
+            return league?.defaultNumberOfRounds || DEFAULT_NUMBER_OF_ROUNDS;
+          case 'matchesPerGame':
+            return league?.defaultMatchesPerGame || DEFAULT_MATCHES_PER_GAME;
+          case 'lineupStrategy':
+            return league?.lineupStrategy || 'flexible';
+          case 'lineupRule':
+            return league?.lineupRule || 'standard';
+          case 'playerMatchPointsPerWin':
+            return league?.playerMatchPointsPerWin || DEFAULT_PLAYER_MATCH_POINTS;
+          case 'teamMatchPointsPerWin':
+            return league?.teamMatchPointsPerWin || DEFAULT_TEAM_MATCH_POINTS;
+          case 'teamGamePointsPerWin':
+            return league?.teamGamePointsPerWin || DEFAULT_TEAM_GAME_POINTS;
+          case 'useHandicap':
+            return league?.useHandicap ?? DEFAULT_USE_HANDICAP;
+          case 'handicapBasis':
+            return league?.defaultHandicapBasis ?? DEFAULT_HANDICAP_BASIS;
+          case 'handicapPercentage':
+            return league?.handicapPercentage ?? DEFAULT_HANDICAP_PERCENTAGE;
+          case 'teamAllPresentBonusEnabled':
+            return league?.teamAllPresentBonusEnabled || false;
+          case 'teamAllPresentBonusPoints':
+            return league?.teamAllPresentBonusPoints || 1;
+          case 'bonusRules':
+            return league?.bonusRules ? JSON.parse(JSON.stringify(league.bonusRules)) : [];
+          default:
+            return league?.[key];
+        }
       }
       return formData[key];
     };
