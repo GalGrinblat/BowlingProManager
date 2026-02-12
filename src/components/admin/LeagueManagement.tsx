@@ -6,6 +6,7 @@ import { DEFAULT_HANDICAP_BASIS, DEFAULT_HANDICAP_PERCENTAGE, DEFAULT_NUMBER_OF_
 import { HandicapConfigurationForm } from './HandicapConfigurationForm';
 import { PlayerMatchupConfiguration } from './PlayerMatchupConfiguration';
 import { PointsConfiguration } from '../common/PointsConfiguration';
+import GeneralConfiguration from './GeneralConfiguration';
 import { BonusRulesConfiguration } from '../common/BonusRulesConfiguration';
 
 import type { LeagueManagementProps, BonusRule, LineupStrategy, LineupRule } from '../../types/index';
@@ -274,87 +275,18 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
             </div>
 
             {/* General Configurations */}
-            <div className="border-t pt-4 mt-4">
-              <h3 className="text-lg font-bold text-gray-800 mb-3">{t('leagues.generalConfiguration')}</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    {t('leagues.defaultNumberOfTeams')}
-                  </label>
-                  <input
-                    type="number"
-                    min="2"
-                    max="24"
-                    value={formData.defaultNumberOfTeams}
-                    onChange={(e) => setFormData({ ...formData, defaultNumberOfTeams: Number(e.target.value) })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">{t('leagues.defaultNumberOfTeamsDesc')}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    {t('leagues.defaultPlayersPerTeam')}
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="10"
-                    value={formData.defaultPlayersPerTeam}
-                    onChange={(e) => setFormData({ ...formData, defaultPlayersPerTeam: Number(e.target.value) })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">{t('leagues.canChangePerSeason')}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    {t('leagues.defaultNumberOfRounds')}
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="10"
-                    value={formData.defaultNumberOfRounds}
-                    onChange={(e) => setFormData({ ...formData, defaultNumberOfRounds: Number(e.target.value) })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">{t('leagues.defaultNumberOfRoundsDesc')}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    {t('leagues.defaultMatchesPerGame')}
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="5"
-                    value={formData.defaultMatchesPerGame}
-                    onChange={(e) => setFormData({ ...formData, defaultMatchesPerGame: Number(e.target.value) })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">{t('leagues.matchesInGame')}</p>
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    {t('leagues.leagueDay')}
-                  </label>
-                  <select
-                    value={formData.dayOfWeek}
-                    onChange={(e) => setFormData({ ...formData, dayOfWeek: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                  <option value="">{t('leagues.selectDay')}</option>
-                  <option value="Sunday">{t('days.sunday')}</option>
-                  <option value="Monday">{t('days.monday')}</option>
-                  <option value="Tuesday">{t('days.tuesday')}</option>
-                  <option value="Wednesday">{t('days.wednesday')}</option>
-                  <option value="Thursday">{t('days.thursday')}</option>
-                  <option value="Friday">{t('days.friday')}</option>
-                  <option value="Saturday">{t('days.saturday')}</option>
-                </select>
-                <p className="text-xs text-gray-500 mt-1">{t('leagues.dayPlayed')}</p>
-              </div>
-              </div>
-            </div>
+            <GeneralConfiguration
+              numberOfTeams={formData.defaultNumberOfTeams}
+              playersPerTeam={formData.defaultPlayersPerTeam}
+              numberOfRounds={formData.defaultNumberOfRounds}
+              matchesPerGame={formData.defaultMatchesPerGame}
+              dayOfWeek={formData.dayOfWeek}
+              onNumberOfTeamsChange={value => setFormData({ ...formData, defaultNumberOfTeams: value })}
+              onPlayersPerTeamChange={value => setFormData({ ...formData, defaultPlayersPerTeam: value })}
+              onNumberOfRoundsChange={value => setFormData({ ...formData, defaultNumberOfRounds: value })}
+              onMatchesPerGameChange={value => setFormData({ ...formData, defaultMatchesPerGame: value })}
+              onDayOfWeekChange={value => setFormData({ ...formData, dayOfWeek: value })}
+            />
 
             {/* Player Matchup Configuration Section */}
             <PlayerMatchupConfiguration

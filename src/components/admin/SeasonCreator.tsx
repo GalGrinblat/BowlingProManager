@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { HandicapConfigurationForm } from './HandicapConfigurationForm';
 import { PointsConfiguration } from '../common/PointsConfiguration';
+import GeneralConfiguration from './GeneralConfiguration';
 import { BonusRulesConfiguration } from '../common/BonusRulesConfiguration';
 import { playersApi, leaguesApi } from '../../services/api';
 import { useTranslation } from '../../contexts/LanguageContext';
@@ -231,6 +232,19 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
                     <p className="text-xs text-gray-500 mt-1">{t('leagues.dayPlayed')}</p>
                   </div>
                 )}
+              <GeneralConfiguration
+                numberOfTeams={getValue('numberOfTeams')}
+                playersPerTeam={getValue('playersPerTeam')}
+                numberOfRounds={getValue('numberOfRounds')}
+                matchesPerGame={getValue('matchesPerGame')}
+                dayOfWeek={league?.dayOfWeek || ''}
+                onNumberOfTeamsChange={value => setFormData({ ...formData, numberOfTeams: value })}
+                onPlayersPerTeamChange={value => setFormData({ ...formData, playersPerTeam: value })}
+                onNumberOfRoundsChange={value => setFormData({ ...formData, numberOfRounds: value })}
+                onMatchesPerGameChange={value => setFormData({ ...formData, matchesPerGame: value })}
+                onDayOfWeekChange={value => setFormData({ ...formData, dayOfWeek: value })}
+                disabled={inheritLeagueConfig}
+              />
               </div>
             </div>
 
