@@ -365,7 +365,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
       teamAllPresentBonusEnabled: formData.teamAllPresentBonusEnabled,
       teamAllPresentBonusPoints: formData.teamAllPresentBonusPoints,
       bonusRules: league?.bonusRules || [],
-      status: "setup" as const,
+          status: "active" as const,
       teams: teams.map(team => ({
         name: team.name,
         playerIds: team.playerIds,
