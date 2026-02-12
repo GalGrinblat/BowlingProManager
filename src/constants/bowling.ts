@@ -29,6 +29,8 @@ export const MIN_MATCHES_PER_GAME = 1;
 export const MAX_MATCHES_PER_GAME = 5;
 
 // Default League Configuration
+export const DEFAULT_NUMBER_OF_TEAMS = 8;
+export const DEFAULT_NUMBER_OF_ROUNDS = 2;
 export const DEFAULT_PLAYERS_PER_TEAM = 4;
 export const DEFAULT_MATCHES_PER_GAME = 3;
 
