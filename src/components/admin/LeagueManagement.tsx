@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { leaguesApi, seasonsApi } from '../../services/api';
 import { createLeague, validateLeague } from '../../models';
 import { useTranslation } from '../../contexts/LanguageContext';
-import { MAX_BOWLING_SCORE, DEFAULT_HANDICAP_BASIS, DEFAULT_HANDICAP_PERCENTAGE, DEFAULT_NUMBER_OF_TEAMS, DEFAULT_NUMBER_OF_ROUNDS, DEFAULT_PLAYERS_PER_TEAM, DEFAULT_MATCHES_PER_GAME, DEFAULT_PLAYER_MATCH_POINTS, DEFAULT_TEAM_MATCH_POINTS, DEFAULT_TEAM_GAME_POINTS } from '../../constants/bowling';
+import { MAX_BOWLING_SCORE, DEFAULT_HANDICAP_BASIS, DEFAULT_HANDICAP_PERCENTAGE, DEFAULT_NUMBER_OF_TEAMS, DEFAULT_NUMBER_OF_ROUNDS, DEFAULT_PLAYERS_PER_TEAM, DEFAULT_MATCHES_PER_GAME, DEFAULT_PLAYER_MATCH_POINTS, DEFAULT_TEAM_MATCH_POINTS, DEFAULT_TEAM_GAME_POINTS, DEFAULT_USE_HANDICAP } from '../../constants/bowling';
 import { HandicapConfigurationForm } from './HandicapConfigurationForm';
 
 import type { LeagueManagementProps, BonusRule, LineupStrategy, LineupRule } from '../../types/index';
@@ -36,7 +36,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
     name: '',
     description: '',
     defaultHandicapBasis: DEFAULT_HANDICAP_BASIS,
-    useHandicap: true,
+    useHandicap: DEFAULT_USE_HANDICAP,
     handicapPercentage: DEFAULT_HANDICAP_PERCENTAGE,
     defaultPlayersPerTeam: DEFAULT_PLAYERS_PER_TEAM,
     defaultMatchesPerGame: DEFAULT_MATCHES_PER_GAME,
@@ -97,7 +97,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
       name: '',
       description: '',
       defaultHandicapBasis: DEFAULT_HANDICAP_BASIS,
-      useHandicap: true,
+      useHandicap: DEFAULT_USE_HANDICAP,
       handicapPercentage: DEFAULT_HANDICAP_PERCENTAGE,
       defaultPlayersPerTeam: DEFAULT_PLAYERS_PER_TEAM,
       defaultMatchesPerGame: DEFAULT_MATCHES_PER_GAME,
@@ -123,7 +123,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
       name: league.name,
       description: league.description || '',
       defaultHandicapBasis: league.defaultHandicapBasis,
-      useHandicap: league.useHandicap !== undefined ? league.useHandicap : true,
+      useHandicap: league.useHandicap !== undefined ? league.useHandicap : DEFAULT_USE_HANDICAP,
       handicapPercentage: league.handicapPercentage || DEFAULT_HANDICAP_PERCENTAGE,
       defaultPlayersPerTeam: league.defaultPlayersPerTeam || DEFAULT_PLAYERS_PER_TEAM,
       defaultMatchesPerGame: league.defaultMatchesPerGame || DEFAULT_MATCHES_PER_GAME,
@@ -191,7 +191,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
       name: '',
       description: '',
       defaultHandicapBasis: DEFAULT_HANDICAP_BASIS,
-      useHandicap: true,
+      useHandicap: DEFAULT_USE_HANDICAP,
       handicapPercentage: DEFAULT_HANDICAP_PERCENTAGE,
       defaultPlayersPerTeam: DEFAULT_PLAYERS_PER_TEAM,
       defaultMatchesPerGame: DEFAULT_MATCHES_PER_GAME,

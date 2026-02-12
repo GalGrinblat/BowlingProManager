@@ -11,6 +11,7 @@ export const MIN_BOWLING_SCORE = 0;
 export const ABSENT_PLAYER_PENALTY = 10;
 
 // Default Handicap Configuration
+export const DEFAULT_USE_HANDICAP = false;
 export const DEFAULT_HANDICAP_BASIS = 160;
 export const DEFAULT_HANDICAP_PERCENTAGE = 100;
 export const MIN_HANDICAP_PERCENTAGE = 0;

@@ -3,6 +3,7 @@ import { HandicapConfigurationForm } from './HandicapConfigurationForm';
 import { playersApi, leaguesApi } from '../../services/api';
 import { useTranslation } from '../../contexts/LanguageContext';
 import type { SeasonCreatorProps } from '../../types/index';
+import { DEFAULT_HANDICAP_BASIS, DEFAULT_HANDICAP_PERCENTAGE, DEFAULT_NUMBER_OF_TEAMS, DEFAULT_NUMBER_OF_ROUNDS, DEFAULT_PLAYERS_PER_TEAM, DEFAULT_MATCHES_PER_GAME, DEFAULT_PLAYER_MATCH_POINTS, DEFAULT_TEAM_MATCH_POINTS, DEFAULT_TEAM_GAME_POINTS, DEFAULT_USE_HANDICAP } from '../../constants/bowling';
 
 export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, onSuccess }) => {
   const { t } = useTranslation();
@@ -10,19 +11,19 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
   const [league, setLeague] = useState<any>(null);
   const [formData, setFormData] = useState<any>({
     name: '',
-    numberOfTeams: 2,
-    playersPerTeam: 3,
-    numberOfRounds: 1,
-    matchesPerGame: 1,
-    useHandicap: true,
-    handicapBasis: 160,
-    handicapPercentage: 100,
-    bonusRules: [
-      { threshold: 50, points: 1 },
-      { threshold: 70, points: 2 },
-    ],
+    numberOfTeams: DEFAULT_NUMBER_OF_TEAMS,
+    playersPerTeam: DEFAULT_PLAYERS_PER_TEAM,
+    numberOfRounds: DEFAULT_NUMBER_OF_ROUNDS,
+    matchesPerGame: DEFAULT_MATCHES_PER_GAME,
+    playerMatchPointsPerWin: DEFAULT_PLAYER_MATCH_POINTS,
+    teamMatchPointsPerWin: DEFAULT_TEAM_MATCH_POINTS,
+    teamGamePointsPerWin: DEFAULT_TEAM_GAME_POINTS,
+    useHandicap: DEFAULT_USE_HANDICAP,
+    handicapBasis: DEFAULT_HANDICAP_BASIS,
+    handicapPercentage: DEFAULT_HANDICAP_PERCENTAGE,
     teamAllPresentBonusEnabled: false,
     teamAllPresentBonusPoints: 1,
+    bonusRules: [ ],
   });
   const [teams, setTeams] = useState<any[]>([]);
   const [inheritLeagueConfig, setInheritLeagueConfig] = useState(true);
@@ -35,13 +36,21 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
       setLeague(leagueData);
       setFormData((prev: any) => ({
         ...prev,
-        playersPerTeam: leagueData?.defaultPlayersPerTeam || 3,
-        matchesPerGame: leagueData?.defaultMatchesPerGame || 1,
-        useHandicap: leagueData?.useHandicap ?? true,
-        handicapBasis: (leagueData as any)?.handicapBasis ?? 160,
-        handicapPercentage: leagueData?.handicapPercentage ?? 100,
+        numberOfTeams: leagueData?.defaultNumberOfTeams || DEFAULT_NUMBER_OF_TEAMS,
+        playersPerTeam: leagueData?.defaultPlayersPerTeam || DEFAULT_PLAYERS_PER_TEAM,
+        numberOfRounds: leagueData?.defaultNumberOfRounds || DEFAULT_NUMBER_OF_ROUNDS,
+        matchesPerGame: leagueData?.defaultMatchesPerGame || DEFAULT_MATCHES_PER_GAME,
+        lineupStrategy: leagueData?.lineupStrategy || 'flexible',
+        lineupRule: leagueData?.lineupRule || 'standard',
+        playerMatchPointsPerWin: leagueData?.playerMatchPointsPerWin || DEFAULT_PLAYER_MATCH_POINTS,
+        teamMatchPointsPerWin: leagueData?.teamMatchPointsPerWin || DEFAULT_TEAM_MATCH_POINTS,
+        teamGamePointsPerWin: leagueData?.teamGamePointsPerWin || DEFAULT_TEAM_GAME_POINTS,
+        useHandicap: leagueData?.useHandicap ?? DEFAULT_USE_HANDICAP,
+        handicapBasis: leagueData?.defaultHandicapBasis ?? DEFAULT_HANDICAP_BASIS,
+        handicapPercentage: leagueData?.handicapPercentage ?? DEFAULT_HANDICAP_PERCENTAGE,
         teamAllPresentBonusEnabled: leagueData?.teamAllPresentBonusEnabled || false,
         teamAllPresentBonusPoints: leagueData?.teamAllPresentBonusPoints || 1,
+        bonusRules: leagueData?.bonusRules ? JSON.parse(JSON.stringify(leagueData.bonusRules)) : [ ],
       }));
       const players = await playersApi.getAll();
       setAvailablePlayers(players);
