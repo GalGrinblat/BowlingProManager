@@ -15,7 +15,7 @@ import type {
   LineupStrategy,
   LineupRule
 } from '../types/index';
-import { MAX_BOWLING_SCORE, DEFAULT_HANDICAP_BASIS, DEFAULT_HANDICAP_PERCENTAGE } from '../constants/bowling';
+import { MAX_BOWLING_SCORE, DEFAULT_USE_HANDICAP, DEFAULT_HANDICAP_BASIS, DEFAULT_HANDICAP_PERCENTAGE, DEFAULT_NUMBER_OF_TEAMS, DEFAULT_PLAYER_MATCH_POINTS, DEFAULT_PLAYERS_PER_TEAM, DEFAULT_NUMBER_OF_ROUNDS, DEFAULT_MATCHES_PER_GAME, DEFAULT_TEAM_GAME_POINTS, DEFAULT_TEAM_MATCH_POINTS } from '../constants/bowling';
 
 // ===== ORGANIZATION MODEL =====
 export const createOrganization = ({
@@ -42,56 +42,62 @@ export const createPlayer = ({
 export const createLeague = ({
   name = '',
   description = '',
-  defaultHandicapBasis = DEFAULT_HANDICAP_BASIS,
-  useHandicap = true,
-  handicapPercentage = DEFAULT_HANDICAP_PERCENTAGE,
-  defaultPlayersPerTeam = 4,
-  defaultMatchesPerGame = 3,
+  defaultNumberOfTeams = DEFAULT_NUMBER_OF_TEAMS,
+  defaultPlayersPerTeam = DEFAULT_PLAYERS_PER_TEAM,
+  defaultNumberOfRounds = DEFAULT_NUMBER_OF_ROUNDS,
+  defaultMatchesPerGame = DEFAULT_MATCHES_PER_GAME,
   dayOfWeek = '',
   lineupStrategy: lineupStrategyParam = 'flexible',
   lineupRule: lineupRuleParam = 'standard',
-  bonusRules = [],
-  playerMatchPointsPerWin = 1,
-  teamMatchPointsPerWin = 1,
-  teamGamePointsPerWin = 2,
+  playerMatchPointsPerWin = DEFAULT_PLAYER_MATCH_POINTS,
+  teamMatchPointsPerWin = DEFAULT_TEAM_MATCH_POINTS,
+  teamGamePointsPerWin = DEFAULT_TEAM_GAME_POINTS,
+  useHandicap = DEFAULT_USE_HANDICAP,
+  defaultHandicapBasis = DEFAULT_HANDICAP_BASIS,
+  handicapPercentage = DEFAULT_HANDICAP_PERCENTAGE,
   teamAllPresentBonusEnabled = false,
   teamAllPresentBonusPoints = 1,
+  bonusRules = [],
   active = true
 }: {
   name?: string;
   description?: string;
-  defaultHandicapBasis?: number | string;
-  useHandicap?: boolean;
-  handicapPercentage?: number | string;
+  defaultNumberOfTeams?: number | string;
   defaultPlayersPerTeam?: number | string;
+  defaultNumberOfRounds?: number | string;
   defaultMatchesPerGame?: number | string;
   dayOfWeek?: string;
   lineupStrategy?: LineupStrategy;
   lineupRule?: LineupRule;
-  bonusRules?: BonusRule[];
   playerMatchPointsPerWin?: number | string;
   teamMatchPointsPerWin?: number | string;
   teamGamePointsPerWin?: number | string;
+  useHandicap?: boolean;
+  defaultHandicapBasis?: number | string;
+  handicapPercentage?: number | string;
   teamAllPresentBonusEnabled?: boolean;
   teamAllPresentBonusPoints?: number | string;
+  bonusRules?: BonusRule[];
   active?: boolean;
 }): Omit<League, 'id' | 'createdAt'> => ({
   name,
   description,
-  defaultHandicapBasis: parseInt(String(defaultHandicapBasis)) || DEFAULT_HANDICAP_BASIS,
-  useHandicap: useHandicap !== false,
-  handicapPercentage: Math.min(DEFAULT_HANDICAP_PERCENTAGE, Math.max(0, parseInt(String(handicapPercentage)) || DEFAULT_HANDICAP_PERCENTAGE)),
-  defaultPlayersPerTeam: parseInt(String(defaultPlayersPerTeam)) || 4,
-  defaultMatchesPerGame: parseInt(String(defaultMatchesPerGame)) || 3,
+  defaultNumberOfTeams: parseInt(String(defaultNumberOfTeams)) || DEFAULT_NUMBER_OF_TEAMS,
+  defaultPlayersPerTeam: parseInt(String(defaultPlayersPerTeam)) || DEFAULT_PLAYERS_PER_TEAM,
+  defaultNumberOfRounds: parseInt(String(defaultNumberOfRounds)) || DEFAULT_NUMBER_OF_ROUNDS,
+  defaultMatchesPerGame: parseInt(String(defaultMatchesPerGame)) || DEFAULT_MATCHES_PER_GAME,
   dayOfWeek,
   lineupStrategy: lineupStrategyParam,
   lineupRule: lineupRuleParam,
-  bonusRules,
-  playerMatchPointsPerWin: parseFloat(String(playerMatchPointsPerWin)) || 1,
-  teamMatchPointsPerWin: parseFloat(String(teamMatchPointsPerWin)) || 1,
-  teamGamePointsPerWin: parseFloat(String(teamGamePointsPerWin)) || 2,
-  teamAllPresentBonusEnabled: !!teamAllPresentBonusEnabled,
+  playerMatchPointsPerWin: parseFloat(String(playerMatchPointsPerWin)) || DEFAULT_PLAYER_MATCH_POINTS,
+  teamMatchPointsPerWin: parseFloat(String(teamMatchPointsPerWin)) || DEFAULT_TEAM_MATCH_POINTS,
+  teamGamePointsPerWin: parseFloat(String(teamGamePointsPerWin)) || DEFAULT_TEAM_GAME_POINTS,
+  useHandicap: useHandicap,
+  defaultHandicapBasis: parseInt(String(defaultHandicapBasis)) || DEFAULT_HANDICAP_BASIS,
+  handicapPercentage: parseInt(String(handicapPercentage)) || DEFAULT_HANDICAP_PERCENTAGE,
+  teamAllPresentBonusEnabled: teamAllPresentBonusEnabled,
   teamAllPresentBonusPoints: parseInt(String(teamAllPresentBonusPoints)) || 1,
+  bonusRules,
   active
 });
 
@@ -99,57 +105,63 @@ export const createLeague = ({
 export const createSeason = ({
   leagueId = '',
   name = '',
-  numberOfTeams = 8,
-  playersPerTeam = 4,
-  numberOfRounds = 2,
-  handicapBasis = DEFAULT_HANDICAP_BASIS,
-  useHandicap = true,
-  handicapPercentage = DEFAULT_HANDICAP_PERCENTAGE,
-  matchesPerGame = 3,
+  startDate = '',
+  endDate = '',
+  numberOfTeams = DEFAULT_NUMBER_OF_TEAMS,
+  playersPerTeam = DEFAULT_PLAYERS_PER_TEAM,
+  numberOfRounds = DEFAULT_NUMBER_OF_ROUNDS,
+  matchesPerGame = DEFAULT_MATCHES_PER_GAME,
   lineupStrategy: lineupStrategyParam = 'flexible',
   lineupRule: lineupRuleParam = 'standard',
+  playerMatchPointsPerWin = DEFAULT_PLAYER_MATCH_POINTS,
+  teamMatchPointsPerWin = DEFAULT_TEAM_MATCH_POINTS,
+  teamGamePointsPerWin = DEFAULT_TEAM_GAME_POINTS,
+  useHandicap = DEFAULT_USE_HANDICAP,
+  handicapBasis = DEFAULT_HANDICAP_BASIS,
+  handicapPercentage = DEFAULT_HANDICAP_PERCENTAGE,
+  teamAllPresentBonusEnabled = false,
+  teamAllPresentBonusPoints = 1,  
   bonusRules = [],
-  playerMatchPointsPerWin = 1,
-  teamMatchPointsPerWin = 1,
-  teamGamePointsPerWin = 2,
-  startDate = '',
-  endDate = ''
 }: {
   leagueId?: string;
   name?: string;
+  startDate?: string;
+  endDate?: string;
   numberOfTeams?: number | string;
   playersPerTeam?: number | string;
   numberOfRounds?: number | string;
-  handicapBasis?: number | string;
-  useHandicap?: boolean;
-  handicapPercentage?: number | string;
   matchesPerGame?: number | string;
   lineupStrategy?: LineupStrategy;
   lineupRule?: LineupRule;
-  bonusRules?: BonusRule[];
   playerMatchPointsPerWin?: number | string;
   teamMatchPointsPerWin?: number | string;
   teamGamePointsPerWin?: number | string;
-  startDate?: string;
-  endDate?: string;
+  useHandicap?: boolean;
+  handicapBasis?: number | string;
+  handicapPercentage?: number | string;
+  teamAllPresentBonusEnabled?: boolean;
+  teamAllPresentBonusPoints?: number;  
+  bonusRules?: BonusRule[];
 }): Omit<Season, 'id' | 'createdAt'> => ({
   leagueId,
   name,
-  numberOfTeams: parseInt(String(numberOfTeams)) || 8,
-  playersPerTeam: parseInt(String(playersPerTeam)) || 4,
-  numberOfRounds: parseInt(String(numberOfRounds)) || 2,
-  handicapBasis: parseInt(String(handicapBasis)) || DEFAULT_HANDICAP_BASIS,
-  useHandicap: useHandicap !== false,
-  handicapPercentage: Math.min(DEFAULT_HANDICAP_PERCENTAGE, Math.max(0, parseInt(String(handicapPercentage)) || DEFAULT_HANDICAP_PERCENTAGE)),
-  matchesPerGame: parseInt(String(matchesPerGame)) || 3,
-  lineupStrategy: lineupStrategyParam,
-  lineupRule: lineupRuleParam,
-  bonusRules,
-  playerMatchPointsPerWin: parseFloat(String(playerMatchPointsPerWin)) || 1,
-  teamMatchPointsPerWin: parseFloat(String(teamMatchPointsPerWin)) || 1,
-  teamGamePointsPerWin: parseFloat(String(teamGamePointsPerWin)) || 2,
   startDate: startDate || new Date().toISOString(),
   endDate,
+  numberOfTeams: parseInt(String(numberOfTeams)) || DEFAULT_NUMBER_OF_TEAMS,
+  playersPerTeam: parseInt(String(playersPerTeam)) || DEFAULT_PLAYERS_PER_TEAM,
+  numberOfRounds: parseInt(String(numberOfRounds)) || DEFAULT_NUMBER_OF_ROUNDS,
+  matchesPerGame: parseInt(String(matchesPerGame)) || DEFAULT_MATCHES_PER_GAME,
+  lineupStrategy: lineupStrategyParam,
+  lineupRule: lineupRuleParam,
+  playerMatchPointsPerWin: parseFloat(String(playerMatchPointsPerWin)) || DEFAULT_PLAYER_MATCH_POINTS,
+  teamMatchPointsPerWin: parseFloat(String(teamMatchPointsPerWin)) || DEFAULT_TEAM_MATCH_POINTS,
+  teamGamePointsPerWin: parseFloat(String(teamGamePointsPerWin)) || DEFAULT_TEAM_GAME_POINTS,
+  useHandicap: useHandicap,
+  handicapBasis: parseInt(String(handicapBasis)) || DEFAULT_HANDICAP_BASIS,
+  handicapPercentage: parseInt(String(handicapPercentage)) || DEFAULT_HANDICAP_PERCENTAGE,
+  teamAllPresentBonusEnabled: teamAllPresentBonusEnabled,
+  teamAllPresentBonusPoints: parseInt(String(teamAllPresentBonusPoints)) || 1,
+  bonusRules,
   status: 'setup'
 });
 
