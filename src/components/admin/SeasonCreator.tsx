@@ -219,54 +219,13 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
             />
 
             {/* Player Matchup Configuration Section */}
-            <div className="border-t pt-4 mt-4">
-              <h3 className="text-lg font-bold text-gray-800 mb-3">{t('leagues.playerMatchupConfiguration')}</h3>
-              <p className="text-sm text-gray-600 mb-3">{t('leagues.lineup.strategyDesc')}</p>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">{t('leagues.lineup.strategyLabel')}</label>
-                  <select
-                    value={getValue('lineupStrategy') || 'flexible'}
-                    onChange={e => setFormData({ ...formData, lineupStrategy: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    disabled={inheritLeagueConfig}
-                  >
-                    <option value="flexible">{t('leagues.lineup.flexible')}</option>
-                    <option value="fixed">{t('leagues.lineup.fixed')}</option>
-                    <option value="rule-based">{t('leagues.lineup.ruleBased')}</option>
-                  </select>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {formData.lineupStrategy === 'flexible' && t('leagues.lineup.flexibleDesc')}
-                    {formData.lineupStrategy === 'rule-based' && t('leagues.lineup.ruleBasedDesc')}
-                  </p>
-                </div>
-                {formData.lineupStrategy === 'rule-based' && (
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">{t('leagues.lineup.rankingRuleLabel')}</label>
-                    <select
-                      value={getValue('lineupRule') || 'standard'}
-                      onChange={e => setFormData({ ...formData, lineupRule: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      disabled={inheritLeagueConfig}
-                    >
-                      <option value="standard">{t('leagues.lineup.standard')}</option>
-                      <option value="balanced">{t('leagues.lineup.balanced')}</option>
-                    </select>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {formData.lineupRule === 'standard' && t('leagues.lineup.standardDesc')}
-                    </p>
-                  </div>
-                )}
-              {/* Player Matchup Configuration Section */}
-              <PlayerMatchupConfiguration
-                lineupStrategy={getValue('lineupStrategy')}
-                lineupRule={getValue('lineupRule')}
-                onLineupStrategyChange={value => setFormData({ ...formData, lineupStrategy: value })}
-                onLineupRuleChange={value => setFormData({ ...formData, lineupRule: value })}
-                disabled={inheritLeagueConfig}
-              />
-              </div>
-            </div>
+            <PlayerMatchupConfiguration
+              lineupStrategy={getValue('lineupStrategy')}
+              lineupRule={getValue('lineupRule')}
+              onLineupStrategyChange={value => setFormData({ ...formData, lineupStrategy: value })}
+              onLineupRuleChange={value => setFormData({ ...formData, lineupRule: value })}
+              disabled={inheritLeagueConfig}
+            />
 
             {/* Points Configuration Section */}
             <PointsConfiguration
@@ -392,20 +351,20 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
       startDate: today,
       endDate: today,
       numberOfTeams: teams.length,
-      numberOfRounds: inheritLeagueConfig ? (league?.numberOfRounds || 1) : formData.numberOfRounds,
-      teamAllPresentBonusEnabled: inheritLeagueConfig ? league?.teamAllPresentBonusEnabled : formData.teamAllPresentBonusEnabled,
-      teamAllPresentBonusPoints: inheritLeagueConfig ? league?.teamAllPresentBonusPoints : formData.teamAllPresentBonusPoints,
       playersPerTeam: formData.playersPerTeam,
+      numberOfRounds: formData.numberOfRounds,
       matchesPerGame: formData.matchesPerGame,
-      useHandicap: formData.useHandicap,
-      handicapBasis: formData.handicapBasis,
-      handicapPercentage: formData.handicapPercentage,
       lineupStrategy: league?.lineupStrategy || 'flexible',
       lineupRule: league?.lineupRule || 'standard',
-      bonusRules: league?.bonusRules || [],
       playerMatchPointsPerWin: league?.playerMatchPointsPerWin || 1,
       teamMatchPointsPerWin: league?.teamMatchPointsPerWin || 1,
       teamGamePointsPerWin: league?.teamGamePointsPerWin || 2,
+      useHandicap: formData.useHandicap,
+      handicapBasis: formData.handicapBasis,
+      handicapPercentage: formData.handicapPercentage,
+      teamAllPresentBonusEnabled: formData.teamAllPresentBonusEnabled,
+      teamAllPresentBonusPoints: formData.teamAllPresentBonusPoints,
+      bonusRules: league?.bonusRules || [],
       status: "setup" as const,
       teams: teams.map(team => ({
         name: team.name,
@@ -415,8 +374,55 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
     };
     // Save via API
     try {
-      const { seasonsApi } = await import('../../services/api');
+      const { seasonsApi, gamesApi, teamsApi } = await import('../../services/api');
+      const { generateRoundRobinSchedule } = await import('../../utils/scheduleUtils');
+      // 1. Create the season
       const created = await seasonsApi.create(seasonData);
+      // 2. Create teams in DB and collect their IDs
+      type TeamType = { name: string; playerIds: string[] };
+      const createdTeams: { id: string; name: string }[] = [];
+      for (const team of teams as TeamType[]) {
+        const newTeam = teamsApi.create({
+          name: team.name,
+          seasonId: created.id,
+          playerIds: team.playerIds,
+          rosterChanges: [],
+        });
+        createdTeams.push({ id: newTeam.id, name: newTeam.name });
+      }
+      // Map team names to IDs (for schedule)
+      const teamIdMap: Record<string, string> = {};
+      createdTeams.forEach((team) => {
+        teamIdMap[team.name] = team.id;
+      });
+      // Use the actual team IDs for schedule
+      const teamIds = createdTeams.map(team => team.id);
+      const schedule = generateRoundRobinSchedule(
+        teamIds,
+        created.numberOfRounds,
+        created.startDate,
+        league?.dayOfWeek || null
+      );
+      // 3. Create games for each match in the schedule
+      for (const day of schedule) {
+        for (const match of day.matches) {
+          await gamesApi.create({
+            seasonId: created.id,
+            round: day.round,
+            matchDay: day.matchDay,
+            team1Id: match.team1Id,
+            team2Id: match.team2Id,
+            scheduledDate: day.date || undefined,
+            matchesPerGame: created.matchesPerGame,
+            useHandicap: created.useHandicap,
+            lineupStrategy: created.lineupStrategy,
+            lineupRule: created.lineupRule,
+            // matches: [], // Will be filled in when scores are entered
+          });
+        }
+      }
+      // 4. Update season with schedule
+      await seasonsApi.update(created.id, { schedule });
       if (typeof onSuccess === 'function') onSuccess(created.id);
     } catch (err) {
       alert(t('validation.saveError') || 'Error saving season.');
