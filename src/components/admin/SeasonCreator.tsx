@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { HandicapConfigurationForm } from './HandicapConfigurationForm';
+import { BonusRulesConfiguration } from '../common/BonusRulesConfiguration';
 import { playersApi, leaguesApi } from '../../services/api';
 import { useTranslation } from '../../contexts/LanguageContext';
 import type { SeasonCreatorProps } from '../../types/index';
@@ -320,7 +321,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
               </div>
             </div>
 
-            {/* Handicap Settings Section */}
+            {/* Handicap Configuration Section */}
             <div className="border-t pt-4 mt-4">
               <HandicapConfigurationForm
                 useHandicap={getValue('useHandicap')}
@@ -338,100 +339,15 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
 
             {/* Bonus Rules Section */}
             <div className="border-t pt-4 mt-4">
-              <h3 className="text-lg font-bold text-gray-800 mb-3">{t('leagues.bonus.bonusPointsConfiguration')}</h3>
-              <p className="text-sm text-gray-600 mb-3">{t('leagues.bonus.rulesDesc')}</p>
-              <div className="space-y-2">
-                {/* Team All Present Bonus Option */}
-                <div className="flex items-center mb-4">
-                  <input
-                    type="checkbox"
-                    id="teamAllPresentBonusEnabled"
-                    checked={inheritLeagueConfig ? league?.teamAllPresentBonusEnabled : formData.teamAllPresentBonusEnabled}
-                    onChange={e => {
-                      if (inheritLeagueConfig) return;
-                      setFormData({ ...formData, teamAllPresentBonusEnabled: e.target.checked });
-                    }}
-                    className="mr-2"
-                    disabled={inheritLeagueConfig}
-                  />
-                  <label htmlFor="teamAllPresentBonusEnabled" className="text-sm font-semibold text-gray-700">
-                    {t('leagues.bonus.allPresentLabel')}
-                  </label>
-                  {(inheritLeagueConfig ? league?.teamAllPresentBonusEnabled : formData.teamAllPresentBonusEnabled) && (
-                    <input
-                      type="number"
-                      min="1"
-                      max="10"
-                      value={inheritLeagueConfig ? league?.teamAllPresentBonusPoints : formData.teamAllPresentBonusPoints}
-                      onChange={e => {
-                        if (inheritLeagueConfig) return;
-                        setFormData({ ...formData, teamAllPresentBonusPoints: Number(e.target.value) });
-                      }}
-                      className="ml-4 w-20 px-2 py-1 border border-gray-300 rounded text-sm"
-                      disabled={inheritLeagueConfig}
-                    />
-                  )}
-                  {(inheritLeagueConfig ? league?.teamAllPresentBonusEnabled : formData.teamAllPresentBonusEnabled) && (
-                    <span className="ml-2 text-xs text-gray-500">{t('leagues.bonus.allPresentPoints')}</span>
-                  )}
-                </div>
-                {/* Player/Team Bonus Rules */}
-                {(inheritLeagueConfig ? (league?.bonusRules || []) : formData.bonusRules).map((rule: any, idx: number) => (
-                  <div key={idx} className="flex items-center gap-2">
-                    <label className="text-sm text-gray-700">{t('leagues.bonusRules.bonusIfScoreAtLeast')}</label>
-                    <input
-                      type="number"
-                      min="0"
-                      value={rule.threshold}
-                      onChange={e => {
-                        if (inheritLeagueConfig) return;
-                        const newRules = [...formData.bonusRules];
-                        newRules[idx].threshold = parseInt(e.target.value);
-                        setFormData({ ...formData, bonusRules: newRules });
-                      }}
-                      className="w-20 px-2 py-1 border border-gray-300 rounded"
-                      disabled={inheritLeagueConfig}
-                    />
-                    <span className="text-sm text-gray-700">{t('leagues.bonusRules.bonusPins')}</span>
-                    <input
-                      type="number"
-                      min="1"
-                      value={rule.points}
-                      onChange={e => {
-                        if (inheritLeagueConfig) return;
-                        const newRules = [...formData.bonusRules];
-                        newRules[idx].points = parseInt(e.target.value);
-                        setFormData({ ...formData, bonusRules: newRules });
-                      }}
-                      className="w-16 px-2 py-1 border border-gray-300 rounded"
-                      disabled={inheritLeagueConfig}
-                    />
-                    <span className="text-sm text-gray-700">{t('leagues.bonusRules.bonusPoints')}</span>
-                    <button
-                      type="button"
-                      className="ml-2 text-red-500 hover:text-red-700"
-                      onClick={() => {
-                        if (inheritLeagueConfig) return;
-                        const newRules = formData.bonusRules.filter((_: any, i: number) => i !== idx);
-                        setFormData({ ...formData, bonusRules: newRules });
-                      }}
-                      title={t('common.remove')}
-                      disabled={inheritLeagueConfig}
-                    >
-                      &times;
-                    </button>
-                  </div>
-                ))}
-                {!inheritLeagueConfig && (
-                  <button
-                    type="button"
-                    className="mt-2 px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
-                    onClick={() => setFormData({ ...formData, bonusRules: [...formData.bonusRules, { threshold: 0, points: 1 }] })}
-                  >
-                    {t('leagues.bonus.addRule')}
-                  </button>
-                )}
-              </div>
+              <BonusRulesConfiguration
+                bonusRules={inheritLeagueConfig ? (league?.bonusRules || []) : formData.bonusRules}
+                teamAllPresentBonusEnabled={inheritLeagueConfig ? league?.teamAllPresentBonusEnabled : formData.teamAllPresentBonusEnabled}
+                teamAllPresentBonusPoints={inheritLeagueConfig ? league?.teamAllPresentBonusPoints : formData.teamAllPresentBonusPoints}
+                onBonusRulesChange={rules => setFormData({ ...formData, bonusRules: rules })}
+                onTeamAllPresentBonusEnabledChange={enabled => setFormData({ ...formData, teamAllPresentBonusEnabled: enabled })}
+                onTeamAllPresentBonusPointsChange={points => setFormData({ ...formData, teamAllPresentBonusPoints: points })}
+                disabled={inheritLeagueConfig}
+              />
             </div>
 
             <div className="flex gap-3 mt-6">

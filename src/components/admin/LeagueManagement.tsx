@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { leaguesApi, seasonsApi } from '../../services/api';
 import { createLeague, validateLeague } from '../../models';
 import { useTranslation } from '../../contexts/LanguageContext';
-import { MAX_BOWLING_SCORE, DEFAULT_HANDICAP_BASIS, DEFAULT_HANDICAP_PERCENTAGE, DEFAULT_NUMBER_OF_TEAMS, DEFAULT_NUMBER_OF_ROUNDS, DEFAULT_PLAYERS_PER_TEAM, DEFAULT_MATCHES_PER_GAME, DEFAULT_PLAYER_MATCH_POINTS, DEFAULT_TEAM_MATCH_POINTS, DEFAULT_TEAM_GAME_POINTS, DEFAULT_USE_HANDICAP } from '../../constants/bowling';
+import { DEFAULT_HANDICAP_BASIS, DEFAULT_HANDICAP_PERCENTAGE, DEFAULT_NUMBER_OF_TEAMS, DEFAULT_NUMBER_OF_ROUNDS, DEFAULT_PLAYERS_PER_TEAM, DEFAULT_MATCHES_PER_GAME, DEFAULT_PLAYER_MATCH_POINTS, DEFAULT_TEAM_MATCH_POINTS, DEFAULT_TEAM_GAME_POINTS, DEFAULT_USE_HANDICAP } from '../../constants/bowling';
 import { HandicapConfigurationForm } from './HandicapConfigurationForm';
+import { BonusRulesConfiguration } from '../common/BonusRulesConfiguration';
 
 import type { LeagueManagementProps, BonusRule, LineupStrategy, LineupRule } from '../../types/index';
 
@@ -454,7 +455,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
               </div>
             </div>
 
-            {/* Handicap Settings Section */}
+            {/* Handicap Configuration Section */}
             <HandicapConfigurationForm
               useHandicap={formData.useHandicap}
               handicapBasis={formData.defaultHandicapBasis}
@@ -468,168 +469,15 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
 
             {/* Bonus Rules Section */}
             <div className="border-t pt-4 mt-4">
-              <div className="flex justify-between items-center mb-3">
-                <h3 className="text-lg font-bold text-gray-800">{t('leagues.bonus.bonusPointsConfiguration')}</h3>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setFormData({
-                      ...formData,
-                      bonusRules: [
-                        ...formData.bonusRules,
-                        { type: 'player', condition: 'vs_average', threshold: 50, points: 1 }
-                      ]
-                    });
-                  }}
-                  className="px-3 py-1 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 font-semibold text-sm"
-                >
-                  + {t('leagues.bonus.addRule')}
-                </button>
-              </div>
-              <p className="text-sm text-gray-600 mb-3">
-                {t('leagues.bonus.rulesDesc')}
-              </p>
-              
-              <div className="space-y-3">
-                {/* All Players Present Bonus Option */}
-                <div className="flex items-center mb-4">
-                  <input
-                    type="checkbox"
-                    id="teamAllPresentBonusEnabled"
-                    checked={formData.teamAllPresentBonusEnabled}
-                    onChange={e => setFormData({ ...formData, teamAllPresentBonusEnabled: e.target.checked })}
-                    className="mr-2"
-                  />
-                  <label htmlFor="teamAllPresentBonusEnabled" className="text-sm font-semibold text-gray-700">
-                    {t('leagues.bonus.allPresentLabel')}
-                  </label>
-                  {formData.teamAllPresentBonusEnabled && (
-                    <input
-                      type="number"
-                      min="1"
-                      max="10"
-                      value={formData.teamAllPresentBonusPoints}
-                      onChange={e => setFormData({ ...formData, teamAllPresentBonusPoints: Number(e.target.value) })}
-                      className="ml-4 w-20 px-2 py-1 border border-gray-300 rounded text-sm"
-                    />
-                  )}
-                  {formData.teamAllPresentBonusEnabled && (
-                    <span className="ml-2 text-xs text-gray-500">{t('leagues.bonus.allPresentPoints')}</span>
-                  )}
-                </div>
-                {formData.bonusRules.map((rule, index) => (
-                  <div key={index} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-                    <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
-                      <div>
-                        <label className="block text-xs font-semibold text-gray-600 mb-1">{t('leagues.bonus.applyTo')}</label>
-                        <select
-                          value={rule.type}
-                          onChange={(e) => {
-                            const updated = [...formData.bonusRules];
-                            if (updated[index]) {
-                              updated[index].type = e.target.value as 'player' | 'team';
-                              // Reset condition to vs_average if switching to team
-                              if (e.target.value === 'team') {
-                                updated[index].condition = 'pure_score';
-                              }
-                            }
-                            setFormData({ ...formData, bonusRules: updated });
-                          }}
-                          className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
-                        >
-                          <option value="player">{t('common.player')}</option>
-                          <option value="team">{t('common.team')}</option>
-                        </select>
-                      </div>
-                      
-                      <div>
-                        <label className="block text-xs font-semibold text-gray-600 mb-1">{t('leagues.bonus.condition')}</label>
-                        <select
-                          value={rule.condition}
-                          onChange={(e) => {
-                            const updated = [...formData.bonusRules];
-                            if (updated[index]) {
-                              updated[index].condition = e.target.value as 'vs_average' | 'pure_score';
-                            }
-                            setFormData({ ...formData, bonusRules: updated });
-                          }}
-                          className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
-                          disabled={rule.type === 'team'}
-                        >
-                          {rule.type === 'player' && (
-                            <option value="vs_average">{t('leagues.bonus.scoreVsAverage')}</option>
-                          )}
-                          <option value="pure_score">{t('leagues.bonus.score')}</option>
-                        </select>
-                      </div>
-                      
-                      <div>
-                        <label className="block text-xs font-semibold text-gray-600 mb-1">
-                          {rule.condition === 'vs_average' ? t('leagues.bonus.aboveAvg') : t('leagues.bonus.score')}
-                        </label>
-                        <input
-                          type="number"
-                          min="0"
-                          max={MAX_BOWLING_SCORE}
-                          value={rule.threshold}
-                          onChange={(e) => {
-                            const updated = [...formData.bonusRules];
-                            if (updated[index]) {
-                              updated[index].threshold = parseInt(e.target.value) || 0;
-                            }
-                            setFormData({ ...formData, bonusRules: updated });
-                          }}
-                          className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
-                        />
-                      </div>
-                      
-                      <div>
-                        <label className="block text-xs font-semibold text-gray-600 mb-1">{t('common.points')}</label>
-                        <input
-                          type="number"
-                          min="1"
-                          max="10"
-                          value={rule.points}
-                          onChange={(e) => {
-                            const updated = [...formData.bonusRules];
-                            if (updated[index]) {
-                              updated[index].points = parseInt(e.target.value) || 1;
-                            }
-                            setFormData({ ...formData, bonusRules: updated });
-                          }}
-                          className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
-                        />
-                      </div>
-                      
-                      <div className="flex items-end">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const updated = formData.bonusRules.filter((_, i) => i !== index);
-                            setFormData({ ...formData, bonusRules: updated });
-                          }}
-                          className="w-full px-2 py-1.5 bg-red-100 text-red-700 rounded hover:bg-red-200 font-semibold text-sm"
-                        >
-                          {t('leagues.bonus.removeRule')}
-                        </button>
-                      </div>
-                    </div>
-                    
-                    <div className="mt-2 text-xs text-gray-600">
-                      {rule.type === 'player' ? `👤 ${t('common.player')}` : `👥 ${t('common.team')}`} {t('common.points')}: <strong className="ltr-content">+{rule.points}</strong> {rule.condition === 'vs_average' 
-                        ? `(${rule.threshold}+ ${t('leagues.bonus.aboveAvg')})`
-                        : `(${rule.threshold}+ ${t('leagues.bonus.score')})`
-                      }
-                    </div>
-                  </div>
-                ))}
-                
-                {formData.bonusRules.length === 0 && (
-                  <div className="text-center py-4 text-gray-500 text-sm">
-                    {t('leagues.bonus.rulesDesc')}
-                  </div>
-                )}
-              </div>
+              <BonusRulesConfiguration
+                bonusRules={formData.bonusRules}
+                teamAllPresentBonusEnabled={formData.teamAllPresentBonusEnabled}
+                teamAllPresentBonusPoints={formData.teamAllPresentBonusPoints}
+                onBonusRulesChange={rules => setFormData({ ...formData, bonusRules: rules })}
+                onTeamAllPresentBonusEnabledChange={enabled => setFormData({ ...formData, teamAllPresentBonusEnabled: enabled })}
+                onTeamAllPresentBonusPointsChange={points => setFormData({ ...formData, teamAllPresentBonusPoints: points })}
+                disabled={false}
+              />
             </div>
 
             <div className="flex gap-3">
