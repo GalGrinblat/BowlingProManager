@@ -1,7 +1,7 @@
 import React from 'react';
-import { useTranslation } from '../../contexts/LanguageContext';
+import { useTranslation } from '../../../contexts/LanguageContext';
 
-export interface GeneralConfigurationProps {
+interface GeneralConfigurationProps {
   numberOfTeams: number;
   playersPerTeam: number;
   numberOfRounds: number;
@@ -15,7 +15,7 @@ export interface GeneralConfigurationProps {
   disabled?: boolean;
 }
 
-const GeneralConfiguration: React.FC<GeneralConfigurationProps> = ({
+export const GeneralConfiguration: React.FC<GeneralConfigurationProps> = ({
   numberOfTeams,
   playersPerTeam,
   numberOfRounds,
@@ -119,5 +119,3 @@ const GeneralConfiguration: React.FC<GeneralConfigurationProps> = ({
     </div>
   );
 };
-
-export default GeneralConfiguration;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTranslation } from '../../contexts/LanguageContext';
+import { useTranslation } from '../../../contexts/LanguageContext';
 
 interface PointsConfigurationProps {
   playerMatchPointsPerWin: number;

@@ -1,7 +1,7 @@
 import React from 'react';
-import { useTranslation } from '../../contexts/LanguageContext';
+import { useTranslation } from '../../../contexts/LanguageContext';
 
-export interface PlayerMatchupConfigurationProps {
+interface PlayerMatchupConfigurationProps {
   lineupStrategy: string;
   lineupRule: string;
   onLineupStrategyChange: (value: string) => void;

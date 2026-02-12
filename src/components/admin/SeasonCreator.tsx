@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { HandicapConfigurationForm } from './HandicapConfigurationForm';
-import { PointsConfiguration } from '../common/PointsConfiguration';
-import GeneralConfiguration from './GeneralConfiguration';
-import { BonusRulesConfiguration } from '../common/BonusRulesConfiguration';
+import { HandicapConfigurationForm } from './shared/HandicapConfigurationForm';
+import { PointsConfiguration } from './shared/PointsConfiguration';
+import { GeneralConfiguration } from './shared/GeneralConfiguration';
+import { BonusRulesConfiguration } from './shared/BonusRulesConfiguration';
 import { playersApi, leaguesApi } from '../../services/api';
 import { useTranslation } from '../../contexts/LanguageContext';
 import type { SeasonCreatorProps } from '../../types/index';
 import { DEFAULT_HANDICAP_BASIS, DEFAULT_HANDICAP_PERCENTAGE, DEFAULT_NUMBER_OF_TEAMS, DEFAULT_NUMBER_OF_ROUNDS, DEFAULT_PLAYERS_PER_TEAM, DEFAULT_MATCHES_PER_GAME, DEFAULT_PLAYER_MATCH_POINTS, DEFAULT_TEAM_MATCH_POINTS, DEFAULT_TEAM_GAME_POINTS, DEFAULT_USE_HANDICAP } from '../../constants/bowling';
-import { PlayerMatchupConfiguration } from './PlayerMatchupConfiguration';
+import { PlayerMatchupConfiguration } from './shared/PlayerMatchupConfiguration';
 
 export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, onSuccess }) => {
   const { t } = useTranslation();

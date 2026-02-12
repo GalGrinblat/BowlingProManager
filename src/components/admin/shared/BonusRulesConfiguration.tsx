@@ -1,6 +1,6 @@
 import React from 'react';
-import { useTranslation } from '../../contexts/LanguageContext';
-import { MAX_BOWLING_SCORE } from '../../constants/bowling';
+import { useTranslation } from '../../../contexts/LanguageContext';
+import { MAX_BOWLING_SCORE } from '../../../constants/bowling';
 
 export interface BonusRule {
   type: 'player' | 'team';
