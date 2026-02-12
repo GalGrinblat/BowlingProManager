@@ -11,6 +11,8 @@ const he: TranslationDictionary = {
     back: 'חזור',
     next: 'הבא',
     view: 'צפה',
+    leftArrow: '←',
+    rightArrow: '→',
     name: 'שם',
     average: 'ממוצע',
     points: 'נקודות',
@@ -61,7 +63,6 @@ const he: TranslationDictionary = {
     cannotDeleteAssigned: 'לא ניתן למחוק שחקן כי הוא משובץ לקבוצות',
     removeFromTeamsFirst: 'אנא הסר אותו מכל הקבוצות תחילה, או סמן אותו כלא פעיל במקום זאת.',
     deleteConfirm: 'מחק שחקן',
-
     created: 'השחקן נוצר בהצלחה',
     updated: 'השחקן עודכן בהצלחה',
     deleted: 'השחקן נמחק בהצלחה',
@@ -78,7 +79,6 @@ const he: TranslationDictionary = {
     noValidPlayers: 'לא נמצאו שחקנים תקינים בקובץ הייבוא.',
     duplicate: 'כפילות - יידלג',
     importPlayers: 'ייבא',
-
     importComplete: 'הייבוא הושלם!',
     playersImported: 'שחקן(ים) יובאו',
     duplicatesSkipped: 'כפילות נדלגו',
@@ -89,9 +89,7 @@ const he: TranslationDictionary = {
 
   // ניהול ליגות
   leagues: {
-    useHandicap: 'השתמש בהנדיקפ',
-    handicapBasis: 'בסיס הנדיקפ',
-    handicapPercentage: 'אחוז הנדיקפ',
+    generalConfiguration: 'הגדרות כלליות',
     title: 'ניהול ליגות',
     createLeague: 'צור ליגה חדשה',
     editLeague: 'ערוך ליגה',
@@ -110,8 +108,8 @@ const he: TranslationDictionary = {
     
     // הגדרות הנדיקפ
     handicap: {
-      settings: 'הגדרות הנדיקפ',
-      settingsDesc: 'הגדר כללי הנדיקפ כדי ליצור איזון בין שחקנים ברמות מיומנות שונות',
+      Configuration: 'הגדרות הנדיקפ',
+      ConfigurationDesc: 'הגדר כללי הנדיקפ כדי ליצור איזון בין שחקנים ברמות מיומנות שונות',
       use: 'השתמש בהנדיקפ',
       basis: 'בסיס הנדיקפ',
       percentage: 'אחוז הנדיקפ',
@@ -138,7 +136,7 @@ const he: TranslationDictionary = {
     
     // חוקי בונוס
     bonus: {
-      rules: 'חוקי נקודות בונוס',
+      bonusPointsConfiguration: 'הגדרות נקודות בונוס',
       rulesDesc: 'הגדר נקודות בונוס שמוענקות במהלך המשחקים. החוקים מוערכים לפי הסדר (נקודות גבוהות יותר קודם).',
       addRule: 'הוסף חוק',
       removeRule: 'הסר חוק',
@@ -152,6 +150,7 @@ const he: TranslationDictionary = {
     },
     
     // אסטרטגיית סידור
+    playerMatchupConfiguration: 'הגדרות סידור שחקנים',
     lineup: {
       strategy: 'אסטרטגיית סידור',
       strategyDesc: 'הגדר כיצד נקבעות התמודדויות השחקנים (1 נגד 1, 2 נגד 2, וכו\') במשחקים',
@@ -167,6 +166,7 @@ const he: TranslationDictionary = {
       standardDesc: 'ממוצע גבוה ביותר נגד ממוצע גבוה ביותר',
       balanced: 'מאוזן (1 נגד 4, 2 נגד 3, 3 נגד 2, 4 נגד 1) - חזק נגד חלש',
       rankingBalancedDesc: 'ממוצע גבוה ביותר נגד ממוצע נמוך ביותר',
+      balancedDesc: 'ממוצע גבוה ביותר נגד ממוצע נמוך ביותר',
     },
     
     // סטטוס ותצוגה
@@ -201,6 +201,7 @@ const he: TranslationDictionary = {
     restoreDesc: 'פעולה זו תחזיר את הליגה לרשימת הליגות הפעילות שלך.',
     archived: 'הועברה לארכיון',
     restored: 'שוחזרה',
+
         // ייצוא/ייבוא
     exportLeague: 'ייצא ליגה',
     exportLeagueDesc: 'הורד גיבוי מלא של הליגה עם כל העונות, הקבוצות והמשחקים',
@@ -210,6 +211,7 @@ const he: TranslationDictionary = {
     importSuccess: 'הליגה יובאה בהצלחה',
     importError: 'נכשל בייבוא הליגה',
     selectFile: 'בחר קובץ',
+
         // הודעות
     leagueCreated: 'הליגה נוצרה בהצלחה!',
     leagueUpdated: 'הליגה עודכנה בהצלחה!',
@@ -218,7 +220,6 @@ const he: TranslationDictionary = {
     cannotDelete: 'לא ניתן למחוק ליגה כי יש לה עונות',
     completeOrDelete: 'אנא השלם או מחק את כל העונות תחילה, או סמן את הליגה כלא פעילה כדי לארכב אותה.',
     deleteConfirm: 'האם אתה בטוח שברצונך למחוק לצמיתות את הליגה',
-
   },
 
   // ניהול עונות
@@ -260,8 +261,6 @@ const he: TranslationDictionary = {
     noGamesInMatchDay: 'אין משחקים במחזור זה',
     gamesPlayed: 'משחקים ששוחקו',
     rank: 'דירוג',
-    team: 'קבוצה',
-    points: 'נקודות',
     pins: 'פינים',
     headToHeadRecords: 'רשומות התמודדות ישירות',
     headToHeadDesc: 'כל רשומות ההתמודדויות בין קבוצות עבור עונה זו',
@@ -269,7 +268,6 @@ const he: TranslationDictionary = {
     vs: 'נגד',
     avg: 'ממוצע',
     pts: 'נקודות',
-
     highGame: 'משחק גבוה',
     highSeries: 'סדרה גבוהה',
     currentDate: 'תאריך נוכחי',
@@ -356,8 +354,6 @@ const he: TranslationDictionary = {
     pinsPerGame: 'פינים/משחק',
     continueToMatch: 'המשך למשחק',
   },
-
-
 
   // שיאים
   records: {

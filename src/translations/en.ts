@@ -7,6 +7,8 @@ const en: TranslationDictionary = {
     save: 'Save',
     cancel: 'Cancel',
     delete: 'Delete',
+    edit: 'Edit',
+    back: 'Back',
     next: 'Next',
     view: 'View',
     leftArrow: '←',
@@ -88,9 +90,6 @@ const en: TranslationDictionary = {
   // League Management
   leagues: {
     generalConfiguration: 'General Configuration',
-    useHandicap: 'Use Handicap',
-    handicapBasis: 'Handicap Basis',
-    handicapPercentage: 'Handicap Percentage',
     title: 'League Management',
     createLeague: 'Create New League',
     editLeague: 'Edit League',
@@ -355,8 +354,6 @@ const en: TranslationDictionary = {
     pinsPerGame: 'pins/game',
     continueToMatch: 'Continue to Match',
   },
-
-
 
   // Records
   records: {
