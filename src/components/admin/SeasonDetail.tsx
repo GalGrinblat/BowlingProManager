@@ -9,13 +9,14 @@ import { exportSeason, downloadExportFile, readImportFile, importLeagueOrSeason 
 import { PrintMatchDay } from './PrintMatchDay';
 
 import type { SeasonDetailProps } from '../../types/index';
+import type { Season, League, Team, Game } from '../../types/index';
 
 export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, onPlayGame, onViewGame, onManageTeams }) => {
   const { t, direction, isRTL } = useTranslation();
-  const [season, setSeason] = useState<any>(null);
-  const [league, setLeague] = useState<any>(null);
-  const [teams, setTeams] = useState<any[]>([]);
-  const [games, setGames] = useState<any[]>([]);
+  const [season, setSeason] = useState<Season | null>(null);
+  const [league, setLeague] = useState<League | null>(null);
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [games, setGames] = useState<Game[]>([]);
   const [view, setView] = useState('schedule'); // schedule, teamStandings, playerStandings, h2h, records
   const [selectedRound, setSelectedRound] = useState(1);
   const [selectedMatchDay, setSelectedMatchDay] = useState<number | null>(null);
@@ -30,12 +31,10 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
 
   const loadSeasonData = () => {
     const seasonData = seasonsApi.getById(seasonId);
-    setSeason(seasonData);
-    
+    setSeason(seasonData ?? null);
     if (!seasonData) return;
-    
     const leagueData = leaguesApi.getById(seasonData.leagueId);
-    setLeague(leagueData);
+    setLeague(leagueData ?? null);
     
     const teamsData = teamsApi.getBySeason(seasonId);
     setTeams(teamsData);
@@ -73,7 +72,7 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
   };
 
   const handlePostponeMatchDay = () => {
-    if (!league.dayOfWeek) {
+    if (!league?.dayOfWeek) {
       alert(t('seasons.cannotPostponeNoDay'));
       return;
     }
@@ -89,10 +88,10 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
 
     if (confirm(t('seasons.confirmPostpone').replace('{{matchDay}}', String(selectedMatchDay)).replace('{{weeks}}', String(postponeWeeks)))) {
       const updatedSchedule = postponeMatchDay(
-        season.schedule,
-        selectedMatchDay!,
+        season?.schedule ?? [],
+        selectedMatchDay ?? 1,
         postponeWeeks,
-        league.dayOfWeek
+        league?.dayOfWeek ?? ''
       );
 
       // Update season with new schedule
@@ -118,7 +117,7 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
 
   const handleExportSeason = () => {
     const exportData = exportSeason(seasonId);
-    if (exportData) {
+    if (exportData && season) {
       const filename = `${season.name.replace(/[^a-z0-9]/gi, '_')}_${new Date().toISOString().split('T')[0]}.json`;
       downloadExportFile(exportData, filename);
       alert(t('seasons.exportSuccess'));
@@ -370,7 +369,7 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
                         const incompleteMatchDay = matchDays.find(md => 
                           roundGamesForRound.filter(g => g.matchDay === md && g.status !== 'completed').length > 0
                         );
-                        setSelectedMatchDay(incompleteMatchDay || matchDays[matchDays.length - 1]);
+                        setSelectedMatchDay((incompleteMatchDay ?? matchDays[matchDays.length - 1]) ?? null);
                       }
                     }}
                     className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
@@ -798,7 +797,7 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
             <div className="mb-4">
               <p className="text-sm text-gray-600 mb-2">
                 {t('seasons.currentDate')}: {season.schedule?.find((s: any) => s.matchDay === selectedMatchDay)?.date
-                  ? formatMatchDate(season.schedule.find((s: any) => s.matchDay === selectedMatchDay)!.date)
+                  ? formatMatchDate(season.schedule.find((s: any) => s.matchDay === selectedMatchDay)?.date ?? null)
                   : t('seasons.notScheduled')}
               </p>
               <p className="text-sm text-gray-600 mb-4">
@@ -819,9 +818,12 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
               
               {postponeWeeks > 0 && season.schedule?.find((s: any) => s.matchDay === selectedMatchDay)?.date && (
                 <p className="text-sm text-gray-500 mt-2">
-                  {t('seasons.newDate')}: {formatMatchDate(
-                    new Date(new Date(season.schedule.find((s: any) => s.matchDay === selectedMatchDay)!.date).getTime() + postponeWeeks * 7 * 24 * 60 * 60 * 1000).toISOString()
-                  )}
+                  {t('seasons.newDate')}: {(() => {
+                    const dateStr = season.schedule.find((s: any) => s.matchDay === selectedMatchDay)?.date;
+                    if (!dateStr) return t('seasons.notScheduled');
+                    const newDate = new Date(new Date(dateStr).getTime() + postponeWeeks * 7 * 24 * 60 * 60 * 1000);
+                    return formatMatchDate(newDate.toISOString());
+                  })()}
                 </p>
               )}
             </div>
