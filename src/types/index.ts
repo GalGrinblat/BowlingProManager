@@ -119,8 +119,8 @@ export interface GamePlayer {
   name: string;
   average: number;
   handicap: number;
-  rank?: number;
-  absent?: boolean;
+  rank: number;
+  absent: boolean;
 }
 
 /** GameTeam - Team data snapshot for a specific game with roster */
@@ -144,18 +144,18 @@ export interface Game {
   matches?: GameMatch[];
   team1?: GameTeam;
   team2?: GameTeam;
-  matchesPerGame?: number;
-  useHandicap?: boolean;
+  matchesPerGame: number;
+  useHandicap: boolean;
   lineupStrategy?: LineupStrategy;
   lineupRule?: LineupRule;
   bonusRules?: BonusRule[];
-  playerMatchPointsPerWin?: number;
-  teamMatchPointsPerWin?: number;
-  teamGamePointsPerWin?: number;
+  playerMatchPointsPerWin: number;
+  teamMatchPointsPerWin: number;
+  teamGamePointsPerWin: number;
   /** Points awarded for highest total pins across all matches (calculated at runtime) */
   grandTotalPoints?: { team1: number; team2: number };
   scheduledDate?: DateString;
-  postponed?: boolean;
+  postponed: boolean;
   originalDate?: DateString;
   updatedAt?: DateString;
 }

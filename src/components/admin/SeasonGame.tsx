@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { gamesApi, teamsApi, seasonsApi } from '../../services/api';
-import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from '../../contexts/LanguageContext';
 import { MatchView } from '../common/MatchView';
 import { SummaryView } from '../common/SummaryView';
@@ -8,54 +7,22 @@ import { calculateMatchResults, calculateBonusPoints } from '../../utils/matchUt
 import { calculatePlayerStats, calculateGameTotals, calculateGrandTotalPoints } from '../../utils/statsUtils';
 import { createEmptyMatch } from '../../utils/matchUtils';
 import { calculateCurrentPlayerAverages } from '../../utils/standingsUtils';
+import { TeamPanel } from './TeamPanel';
 import { applyLineupRule } from '../../utils/lineupUtils';
 
-import type { SeasonGameProps } from '../../types/index';
+import type { SeasonGameProps, Game, GamePlayer } from '../../types/index';
 
 export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
-    // Drag and drop state and handlers
-    const dragItem = useRef<{ team: 'team1' | 'team2'; idx: number } | null>(null);
 
-    const handleDragStart = (e: React.DragEvent<HTMLDivElement>, team: 'team1' | 'team2', idx: number) => {
-      dragItem.current = { team, idx };
-      e.dataTransfer.effectAllowed = 'move';
-    };
-
-    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = 'move';
-    };
-
-    const handleDrop = (e: React.DragEvent<HTMLDivElement>, team: 'team1' | 'team2', idx: number) => {
-      e.preventDefault();
-      if (!dragItem.current || dragItem.current.team !== team) return;
-      const fromIdx = dragItem.current.idx;
-      if (fromIdx === idx) return;
-      if (team === 'team1') {
-        const updated = [...team1Players];
-        const [moved] = updated.splice(fromIdx, 1);
-        updated.splice(idx, 0, moved);
-        setTeam1Players(updated);
-      } else {
-        const updated = [...team2Players];
-        const [moved] = updated.splice(fromIdx, 1);
-        updated.splice(idx, 0, moved);
-        setTeam2Players(updated);
-      }
-      dragItem.current = null;
-    };
-  const { currentUser, isPlayer } = useAuth();
   const { t } = useTranslation();
-  const [game, setGame] = useState<any>(null);
-  const [currentMatch, setCurrentMatch] = useState(1);
-  const [showSummary, setShowSummary] = useState(false);
-  const [showPreMatch, setShowPreMatch] = useState(false);
-  const [hasAccess, setHasAccess] = useState(true);
-  const [isReadOnly, setIsReadOnly] = useState(false);
-  
+  const [game, setGame] = useState<Game | null>(null);
+  const [currentMatch, setCurrentMatch] = useState<number>(1);
+  const [showSummary, setShowSummary] = useState<boolean>(false);
+  const [showPreMatch, setShowPreMatch] = useState<boolean>(false);
+
   // Pre-match setup state
-  const [team1Players, setTeam1Players] = useState<any[]>([]);
-  const [team2Players, setTeam2Players] = useState<any[]>([]);
+  const [team1Players, setTeam1Players] = useState<GamePlayer[]>([]);
+  const [team2Players, setTeam2Players] = useState<GamePlayer[]>([]);
 
   useEffect(() => {
     loadGame();
@@ -65,28 +32,9 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
     const gameData = gamesApi.getById(gameId);
     
     if (!gameData) {
-      setHasAccess(false);
       return;
     }
-    
-    // Check access for players
-    if (isPlayer()) {
-      const team1 = teamsApi.getById(gameData.team1Id);
-      const team2 = teamsApi.getById(gameData.team2Id);
-      const playerIsOnTeam = team1?.playerIds.includes(currentUser.userId) || 
-                             team2?.playerIds.includes(currentUser.userId);
-      
-      if (!playerIsOnTeam) {
-        setHasAccess(false);
-        return;
-      }
-      
-      // Players can only edit incomplete games
-      if (gameData.status === 'completed') {
-        setIsReadOnly(true);
-      }
-    }
-    
+        
     // Initialize matches if empty or not present
     if (!gameData.matches || gameData.matches.length === 0) {
       if (!gameData.team1 || !gameData.team2) return;
@@ -195,8 +143,8 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
         m.team2.players.some((p: any) => p.pins > 0)
       );
       
-      // Show pre-match setup if no scores entered yet and not in read-only mode
-      if (!hasAnyScores && !isReadOnly) {
+      // Show pre-match setup if no scores entered yet
+      if (!hasAnyScores) {
         setShowPreMatch(true);
       } else {
         // Find first incomplete match
@@ -221,27 +169,44 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
   };
 
   const handlePreMatchContinue = () => {
+    if (!game || !game.team1 || !game.team2) return;
     // Apply lineup rule if using rule-based strategy
     let finalTeam1Players = team1Players;
     let finalTeam2Players = team2Players;
-    
     if (game.lineupStrategy === 'rule-based' && game.lineupRule) {
       const orderedPlayers = applyLineupRule(team1Players, team2Players, game.lineupRule);
       finalTeam1Players = orderedPlayers.team1;
       finalTeam2Players = orderedPlayers.team2;
     }
-    
     // Save the updated game with absent status and ordered lineup
-    const updatedGame = {
+    const defaultGrandTotalPoints = { team1: 0, team2: 0 };
+    const updatedGame: Game = {
       ...game,
       team1: {
         ...game.team1,
-        players: finalTeam1Players
+        players: finalTeam1Players,
+        name: game.team1.name ?? '',
       },
       team2: {
         ...game.team2,
-        players: finalTeam2Players
-      }
+        players: finalTeam2Players,
+        name: game.team2.name ?? '',
+      },
+      id: game.id ?? '',
+      seasonId: game.seasonId ?? '',
+      round: game.round ?? 1,
+      matchDay: game.matchDay ?? 1,
+      team1Id: game.team1Id ?? '',
+      team2Id: game.team2Id ?? '',
+      status: game.status ?? 'pending',
+      matches: game.matches ?? [],
+      matchesPerGame: game.matchesPerGame ?? 3,
+      bonusRules: game.bonusRules ?? [],
+      lineupStrategy: game.lineupStrategy ?? 'flexible',
+      lineupRule: game.lineupRule ?? 'standard',
+      grandTotalPoints: typeof game.grandTotalPoints === 'object' && game.grandTotalPoints !== null ? game.grandTotalPoints : defaultGrandTotalPoints,
+      completedAt: game.completedAt,
+      updatedAt: game.updatedAt,
     };
     gamesApi.update(gameId, updatedGame);
     setGame(updatedGame);
@@ -252,81 +217,132 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
   const toggleAbsent = (team: 'team1' | 'team2', playerIndex: number) => {
     if (team === 'team1') {
       const updated = [...team1Players];
-      updated[playerIndex] = {
-        ...updated[playerIndex],
-        absent: !updated[playerIndex].absent
-      };
-      setTeam1Players(updated);
+      if (updated[playerIndex]) {
+        updated[playerIndex] = {
+          ...updated[playerIndex],
+          absent: !updated[playerIndex].absent
+        };
+        setTeam1Players(updated);
+      }
     } else {
       const updated = [...team2Players];
-      updated[playerIndex] = {
-        ...updated[playerIndex],
-        absent: !updated[playerIndex].absent
-      };
-      setTeam2Players(updated);
+      if (updated[playerIndex]) {
+        updated[playerIndex] = {
+          ...updated[playerIndex],
+          absent: !updated[playerIndex].absent
+        };
+        setTeam2Players(updated);
+      }
     }
   };
 
   const updateMatchScore = (matchIndex: any, team: any, playerIndex: any, pins: any) => {
-    const updated = { ...game };
-    const pinsValue = pins === '' ? '' : Math.max(0, Math.min(300, parseInt(pins) || 0));
-    updated.matches[matchIndex][team].players[playerIndex].pins = pinsValue;
-    
-    // Calculate bonus points for this player using season bonus rules
-    const playerAverage = updated[team].players[playerIndex].average;
-    const isAbsent = updated[team].players[playerIndex].absent;
-    updated.matches[matchIndex][team].players[playerIndex].bonusPoints = 
-      calculateBonusPoints(pinsValue, playerAverage, isAbsent, game.bonusRules);
-    
+    if (!game || !game.matches || !game.team1 || !game.team2) return;
+    const updated: Game = { ...game };
+    if (!updated.matches || !updated.team1 || !updated.team2) return;
+    const pinsValue = typeof pins === 'number' ? Math.max(0, Math.min(300, pins)) : Math.max(0, Math.min(300, parseInt(pins) || 0));
+    // Type-safe access
+    const match = updated.matches[matchIndex];
+    if (!match) return;
+    let playerObj;
+    if (
+      team === 'team1' &&
+      match.team1 &&
+      match.team1.players &&
+      match.team1.players[playerIndex] &&
+      updated.team1.players &&
+      updated.team1.players[playerIndex]
+    ) {
+      match.team1.players[playerIndex].pins = pinsValue;
+      playerObj = updated.team1.players[playerIndex];
+      if (playerObj) {
+        match.team1.players[playerIndex].bonusPoints = calculateBonusPoints(
+          pinsValue,
+          playerObj.average,
+          typeof playerObj.absent === 'boolean' ? playerObj.absent : false,
+          game.bonusRules ?? []
+        );
+      }
+    } else if (
+      team === 'team2' &&
+      match.team2 &&
+      match.team2.players &&
+      match.team2.players[playerIndex] &&
+      updated.team2.players &&
+      updated.team2.players[playerIndex]
+    ) {
+      match.team2.players[playerIndex].pins = pinsValue;
+      playerObj = updated.team2.players[playerIndex];
+      if (playerObj) {
+        match.team2.players[playerIndex].bonusPoints = calculateBonusPoints(
+          pinsValue,
+          playerObj.average,
+          typeof playerObj.absent === 'boolean' ? playerObj.absent : false,
+          game.bonusRules ?? []
+        );
+      }
+    }
     calculateMatchResults(updated, matchIndex);
     updated.grandTotalPoints = calculateGrandTotalPoints(updated);
-    
     // Update game status
-    const allMatchesComplete = updated.matches.every((m: any) => {
-      const team1Complete = updated.team1.players.every((p: any, pIdx: any) => 
-        p.absent || m.team1.players[pIdx].pins !== ''
-      );
-      const team2Complete = updated.team2.players.every((p: any, pIdx: any) => 
-        p.absent || m.team2.players[pIdx].pins !== ''
-      );
-      return team1Complete && team2Complete;
-    });
-    
+    let allMatchesComplete = false;
+    if (
+      updated.matches &&
+      Array.isArray(updated.matches) &&
+      updated.team1 &&
+      Array.isArray(updated.team1.players) &&
+      updated.team2 &&
+      Array.isArray(updated.team2.players)
+    ) {
+      allMatchesComplete = updated.matches.every((m: any) => {
+        if (!m.team1 || !m.team1.players || !m.team2 || !m.team2.players) return false;
+        const team1Complete = updated.team1 && Array.isArray(updated.team1.players) && updated.team1.players.every((p: any, pIdx: any) =>
+          p.absent || (m.team1.players[pIdx] && typeof m.team1.players[pIdx].pins === 'number')
+        );
+        const team2Complete = updated.team2 && Array.isArray(updated.team2.players) && updated.team2.players.every((p: any, pIdx: any) =>
+          p.absent || (m.team2.players[pIdx] && typeof m.team2.players[pIdx].pins === 'number')
+        );
+        return team1Complete && team2Complete;
+      });
+    }
     if (allMatchesComplete) {
       updated.status = 'completed';
       updated.completedAt = new Date().toISOString();
     } else if (updated.status === 'pending') {
       updated.status = 'in-progress';
     }
-    
     setGame(updated);
     gamesApi.update(gameId, updated);
   };
 
   const togglePlayerAbsent = (team: any, playerIndex: any) => {
-    const updated = { ...game };
-    updated[team].players[playerIndex].absent = !updated[team].players[playerIndex].absent;
+    if (!game || !game.team1 || !game.team2 || !game.team1.players || !game.team2.players) return;
+    const updated: Game = { ...game };
+    if (team === 'team1' && updated.team1 && updated.team1.players && updated.team1.players[playerIndex]) {
+      updated.team1.players[playerIndex].absent = !updated.team1.players[playerIndex].absent;
+    } else if (team === 'team2' && updated.team2 && updated.team2.players && updated.team2.players[playerIndex]) {
+      updated.team2.players[playerIndex].absent = !updated.team2.players[playerIndex].absent;
+    }
     setGame(updated);
     gamesApi.update(gameId, updated);
   };
 
   const goToNextMatch = () => {
+    if (!game || !game.matches || !game.team1 || !game.team2) return;
     const matchIndex = currentMatch - 1;
     const match = game.matches[matchIndex];
-    
+    if (!match || !match.team1 || !match.team2) return;
     // Validate current match is complete
-    const team1Complete = game.team1.players.every((p: any, idx: any) => 
-      p.absent || match.team1.players[idx].pins !== ''
+    const team1Complete = game.team1.players && match.team1.players && game.team1.players.every((p: any, idx: any) => 
+      p.absent || (match.team1.players[idx] && typeof match.team1.players[idx].pins === 'number')
     );
-    const team2Complete = game.team2.players.every((p: any, idx: any) => 
-      p.absent || match.team2.players[idx].pins !== ''
+    const team2Complete = game.team2.players && match.team2.players && game.team2.players.every((p: any, idx: any) => 
+      p.absent || (match.team2.players[idx] && typeof match.team2.players[idx].pins === 'number')
     );
-    
     if (!team1Complete || !team2Complete) {
       alert('Please enter all scores before proceeding');
       return;
     }
-    
     const totalMatches = game.matches.length;
     if (currentMatch < totalMatches) {
       setCurrentMatch(currentMatch + 1);
@@ -336,6 +352,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
   };
 
   const goToPreviousMatch = () => {
+    if (!game || !game.matches) return;
     if (showSummary) {
       setShowSummary(false);
       setCurrentMatch(game.matches.length);
@@ -345,12 +362,27 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
   };
 
   const finishGame = () => {
-    // Ensure game is marked as completed and track who completed it
-    const updated = { 
-      ...game, 
-      status: 'completed', 
+    if (!game || !game.team1 || !game.team2 || !game.matches) return;
+    // Ensure game is marked as completed
+    const updated: Game = {
+      ...game,
+      status: 'completed',
       completedAt: new Date().toISOString(),
-      enteredBy: currentUser.userId // Track who completed this game
+      id: game.id ?? '',
+      seasonId: game.seasonId ?? '',
+      round: game.round ?? 1,
+      matchDay: game.matchDay ?? 1,
+      team1Id: game.team1Id ?? '',
+      team2Id: game.team2Id ?? '',
+      matches: game.matches ?? [],
+      matchesPerGame: game.matchesPerGame ?? 3,
+      bonusRules: game.bonusRules ?? [],
+      lineupStrategy: game.lineupStrategy ?? 'flexible',
+      lineupRule: game.lineupRule ?? 'standard',
+      grandTotalPoints: typeof game.grandTotalPoints === 'object' && game.grandTotalPoints !== null ? game.grandTotalPoints : { team1: 0, team2: 0 },
+      updatedAt: game.updatedAt,
+      team1: game.team1,
+      team2: game.team2,
     };
     gamesApi.update(gameId, updated);
     onBack();
@@ -358,45 +390,54 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
 
   if (!game) return <div>Loading...</div>;
 
-  // Access denied for players not on either team
-  if (!hasAccess) {
-    return (
-      <div className="space-y-6">
-        <div className="bg-white rounded-xl shadow-lg p-6">
-          <button
-            onClick={onBack}
-            className="text-gray-600 hover:text-gray-800 mb-4"
-          >
-            {t('common.leftArrow')} Back
-          </button>
-          <div className="text-center py-12">
-            <span className="text-6xl mb-4 block">🚫</span>
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">Access Denied</h2>
-            <p className="text-gray-600">You can only view and edit games where you are a player.</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   // Move player up/down in the lineup (for flexible strategy)
   const movePlayer = (team: 'team1' | 'team2', index: number, direction: 'up' | 'down') => {
     if (team === 'team1') {
       const updated = [...team1Players];
-      if (direction === 'up' && index > 0) {
-        [updated[index - 1], updated[index]] = [updated[index], updated[index - 1]];
-      } else if (direction === 'down' && index < updated.length - 1) {
-        [updated[index + 1], updated[index]] = [updated[index], updated[index + 1]];
+      if (
+        direction === 'up' &&
+        index > 0 &&
+        updated[index] !== undefined &&
+        updated[index - 1] !== undefined
+      ) {
+        const temp = updated[index] as GamePlayer;
+        updated[index] = updated[index - 1] as GamePlayer;
+        updated[index - 1] = temp;
+        setTeam1Players(updated);
+      } else if (
+        direction === 'down' &&
+        index < updated.length - 1 &&
+        updated[index] !== undefined &&
+        updated[index + 1] !== undefined
+      ) {
+        const temp = updated[index] as GamePlayer;
+        updated[index] = updated[index + 1] as GamePlayer;
+        updated[index + 1] = temp;
+        setTeam1Players(updated);
       }
-      setTeam1Players(updated);
     } else {
       const updated = [...team2Players];
-      if (direction === 'up' && index > 0) {
-        [updated[index - 1], updated[index]] = [updated[index], updated[index - 1]];
-      } else if (direction === 'down' && index < updated.length - 1) {
-        [updated[index + 1], updated[index]] = [updated[index], updated[index + 1]];
+      if (
+        direction === 'up' &&
+        index > 0 &&
+        updated[index] !== undefined &&
+        updated[index - 1] !== undefined
+      ) {
+        const temp = updated[index] as GamePlayer;
+        updated[index] = updated[index - 1] as GamePlayer;
+        updated[index - 1] = temp;
+        setTeam2Players(updated);
+      } else if (
+        direction === 'down' &&
+        index < updated.length - 1 &&
+        updated[index] !== undefined &&
+        updated[index + 1] !== undefined
+      ) {
+        const temp = updated[index] as GamePlayer;
+        updated[index] = updated[index + 1] as GamePlayer;
+        updated[index + 1] = temp;
+        setTeam2Players(updated);
       }
-      setTeam2Players(updated);
     }
   };
 
@@ -418,7 +459,6 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
   if (showPreMatch) {
     const lineupStrategy = game.lineupStrategy || 'flexible';
     const lineupRule = game.lineupRule || 'standard';
-    
     return (
       <div className="min-h-screen bg-gray-900 text-white p-6">
         <div className="max-w-6xl mx-auto">
@@ -437,7 +477,6 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
             <p className="text-gray-400 text-sm mt-1">
               {t('games.reviewPlayers')}
             </p>
-            
             {/* Lineup Strategy Info */}
             <div className="mt-4 bg-blue-900/30 border border-blue-500 rounded-lg p-3">
               <div className="flex items-center gap-2">
@@ -465,174 +504,29 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
               )}
             </div>
           </div>
-
           {/* Teams Side by Side */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            {/* Team 1 */}
-            <div className="bg-gray-800 rounded-lg p-6">
-              <h2 className="text-2xl font-bold mb-4 text-blue-400">
-                {game.team1.name}
-              </h2>
-              <div className="space-y-3">
-                {team1Players.map((player: any, idx: number) => (
-                  <div
-                    key={idx}
-                    className={`p-4 rounded-lg border-2 transition-all ${
-                      player.absent
-                        ? 'bg-red-900/20 border-red-500'
-                        : 'bg-gray-700 border-gray-600'
-                    } ${lineupStrategy === 'flexible' ? 'cursor-move' : ''}`}
-                    draggable={lineupStrategy === 'flexible'}
-                    onDragStart={lineupStrategy === 'flexible' ? (e) => handleDragStart(e, 'team1', idx) : undefined}
-                    onDragOver={lineupStrategy === 'flexible' ? handleDragOver : undefined}
-                    onDrop={lineupStrategy === 'flexible' ? (e) => handleDrop(e, 'team1', idx) : undefined}
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="text-lg font-semibold">
-                            {player.rank}. {player.name}
-                          </span>
-                          {player.absent && (
-                            <span className="text-xs bg-red-500 text-white px-2 py-0.5 rounded">
-                              {t('games.absent').toUpperCase()}
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-sm text-gray-400 mt-1">
-                          {t('common.average')}: <span className="text-white font-medium">{typeof player.average === 'number' ? player.average.toFixed(1) : player.average}</span>
-                          {' • '}
-                          {t('games.handicap')}: <span className="text-white font-medium">{player.handicap}</span>
-                        </div>
-                        {player.absent && (
-                          <div className="text-xs text-red-400 mt-1">
-                            {t('games.willUse')}: {Math.round(player.average) - 10} {t('games.pinsPerGame')}
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex flex-col items-end ml-2">
-                        <div className="flex flex-row items-center gap-2">
-                          <button
-                            onClick={() => toggleAbsent('team1', idx)}
-                            className={`px-4 py-2 rounded font-medium transition-colors ${
-                              player.absent
-                                ? 'bg-green-600 hover:bg-green-700 text-white'
-                                : 'bg-red-600 hover:bg-red-700 text-white'
-                            }`}
-                          >
-                            {player.absent ? t('games.markPresent') : t('games.markAbsent')}
-                          </button>
-                          {lineupStrategy === 'flexible' && (
-                            <>
-                              <button
-                                className="bg-gray-600 hover:bg-blue-500 text-white rounded p-1 disabled:opacity-40"
-                                onClick={() => movePlayer('team1', idx, 'up')}
-                                disabled={idx === 0}
-                                title="Move Up"
-                              >
-                                ▲
-                              </button>
-                              <button
-                                className="bg-gray-600 hover:bg-blue-500 text-white rounded p-1 disabled:opacity-40"
-                                onClick={() => movePlayer('team1', idx, 'down')}
-                                disabled={idx === team1Players.length - 1}
-                                title="Move Down"
-                              >
-                                ▼
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Team 2 */}
-            <div className="bg-gray-800 rounded-lg p-6">
-              <h2 className="text-2xl font-bold mb-4 text-green-400">
-                {game.team2.name}
-              </h2>
-              <div className="space-y-3">
-                {team2Players.map((player: any, idx: number) => (
-                  <div
-                    key={idx}
-                    className={`p-4 rounded-lg border-2 transition-all ${
-                      player.absent
-                        ? 'bg-red-900/20 border-red-500'
-                        : 'bg-gray-700 border-gray-600'
-                    } ${lineupStrategy === 'flexible' ? 'cursor-move' : ''}`}
-                    draggable={lineupStrategy === 'flexible'}
-                    onDragStart={lineupStrategy === 'flexible' ? (e) => handleDragStart(e, 'team2', idx) : undefined}
-                    onDragOver={lineupStrategy === 'flexible' ? handleDragOver : undefined}
-                    onDrop={lineupStrategy === 'flexible' ? (e) => handleDrop(e, 'team2', idx) : undefined}
-                  >
-                    <div className="flex items-start justify-between mb-2">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="text-lg font-semibold">
-                            {player.rank}. {player.name}
-                          </span>
-                          {player.absent && (
-                            <span className="text-xs bg-red-500 text-white px-2 py-0.5 rounded">
-                              {t('games.absent').toUpperCase()}
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-sm text-gray-400 mt-1">
-                          {t('common.average')}: <span className="text-white font-medium">{typeof player.average === 'number' ? player.average.toFixed(1) : player.average}</span>
-                          {' • '}
-                          {t('games.handicap')}: <span className="text-white font-medium">{player.handicap}</span>
-                        </div>
-                        {player.absent && (
-                          <div className="text-xs text-red-400 mt-1">
-                            {t('games.willUse')}: {Math.round(player.average) - 10} {t('games.pinsPerGame')}
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex flex-col items-end ml-2">
-                        <div className="flex flex-row items-center gap-2">
-                          <button
-                            onClick={() => toggleAbsent('team2', idx)}
-                            className={`px-4 py-2 rounded font-medium transition-colors ${
-                              player.absent
-                                ? 'bg-green-600 hover:bg-green-700 text-white'
-                                : 'bg-red-600 hover:bg-red-700 text-white'
-                            }`}
-                          >
-                            {player.absent ? t('games.markPresent') : t('games.markAbsent')}
-                          </button>
-                          {lineupStrategy === 'flexible' && (
-                            <>
-                              <button
-                                className="bg-gray-600 hover:bg-blue-500 text-white rounded p-1 disabled:opacity-40"
-                                onClick={() => movePlayer('team2', idx, 'up')}
-                                disabled={idx === 0}
-                                title="Move Up"
-                              >
-                                ▲
-                              </button>
-                              <button
-                                className="bg-gray-600 hover:bg-blue-500 text-white rounded p-1 disabled:opacity-40"
-                                onClick={() => movePlayer('team2', idx, 'down')}
-                                disabled={idx === team2Players.length - 1}
-                                title="Move Down"
-                              >
-                                ▼
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <TeamPanel
+              teamName={game.team1 && game.team1.name ? game.team1.name : t('games.team1')}
+              teamColor="text-blue-400"
+              players={team1Players}
+              team="team1"
+              lineupStrategy={lineupStrategy}
+              toggleAbsent={toggleAbsent}
+              movePlayer={movePlayer}
+              t={t}
+            />
+            <TeamPanel
+              teamName={game.team2 && game.team2.name ? game.team2.name : t('games.team2')}
+              teamColor="text-green-400"
+              players={team2Players}
+              team="team2"
+              lineupStrategy={lineupStrategy}
+              toggleAbsent={toggleAbsent}
+              movePlayer={movePlayer}
+              t={t}
+            />
           </div>
-
           {/* Continue Button */}
           <div className="flex justify-end">
             <button
@@ -661,7 +555,6 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
         }
       }}
       onCancel={onBack}
-      isReadOnly={isReadOnly}
     />
   );
 };

@@ -453,12 +453,15 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
             matchDay: day.matchDay,
             team1Id: match.team1Id,
             team2Id: match.team2Id,
-            scheduledDate: day.date || undefined,
             matchesPerGame: created.matchesPerGame,
             useHandicap: created.useHandicap,
+            playerMatchPointsPerWin: created.playerMatchPointsPerWin,
+            teamMatchPointsPerWin: created.teamMatchPointsPerWin,
+            teamGamePointsPerWin: created.teamGamePointsPerWin,
+            scheduledDate: day.date || undefined,
+            postponed: false,
             lineupStrategy: created.lineupStrategy,
             lineupRule: created.lineupRule,
-            // matches: [], // Will be filled in when scores are entered
           });
         }
       }
