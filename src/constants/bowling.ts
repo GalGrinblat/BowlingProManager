@@ -3,6 +3,8 @@
  * Central location for all business logic constants
  */
 
+import type { LineupStrategy, LineupRule } from '../types/index';
+
 // Bowling Score Limits
 export const MAX_BOWLING_SCORE = 300;
 export const MIN_BOWLING_SCORE = 0;
@@ -39,3 +41,7 @@ export const DEFAULT_MATCHES_PER_GAME = 3;
 export const DEFAULT_PLAYER_MATCH_POINTS = 1;
 export const DEFAULT_TEAM_MATCH_POINTS = 1;
 export const DEFAULT_TEAM_GAME_POINTS = 2;
+
+// Default Lineup Configuration
+export const DEFAULT_LINEUP_RULE: LineupRule = "standard";
+export const DEFAULT_LINEUP_STRATEGY: LineupStrategy = "flexible";

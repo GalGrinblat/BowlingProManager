@@ -2,60 +2,66 @@ import React, { useState, useEffect } from 'react';
 import { leaguesApi, seasonsApi } from '../../services/api';
 import { createLeague, validateLeague } from '../../models';
 import { useTranslation } from '../../contexts/LanguageContext';
-import { DEFAULT_HANDICAP_BASIS, DEFAULT_HANDICAP_PERCENTAGE, DEFAULT_NUMBER_OF_TEAMS, DEFAULT_NUMBER_OF_ROUNDS, DEFAULT_PLAYERS_PER_TEAM, DEFAULT_MATCHES_PER_GAME, DEFAULT_PLAYER_MATCH_POINTS, DEFAULT_TEAM_MATCH_POINTS, DEFAULT_TEAM_GAME_POINTS, DEFAULT_USE_HANDICAP } from '../../constants/bowling';
+import { DEFAULT_HANDICAP_BASIS, DEFAULT_HANDICAP_PERCENTAGE, DEFAULT_NUMBER_OF_TEAMS, DEFAULT_NUMBER_OF_ROUNDS, DEFAULT_PLAYERS_PER_TEAM, DEFAULT_MATCHES_PER_GAME, DEFAULT_PLAYER_MATCH_POINTS, DEFAULT_TEAM_MATCH_POINTS, DEFAULT_TEAM_GAME_POINTS, DEFAULT_USE_HANDICAP, DEFAULT_LINEUP_STRATEGY, DEFAULT_LINEUP_RULE } from '../../constants/bowling';
 import { HandicapConfigurationForm } from './shared/HandicapConfigurationForm';
 import { PlayerMatchupConfiguration } from './shared/PlayerMatchupConfiguration';
 import { PointsConfiguration } from './shared/PointsConfiguration';
 import { GeneralConfiguration } from './shared/GeneralConfiguration';
 import { BonusRulesConfiguration } from './shared/BonusRulesConfiguration';
 
-import type { LeagueManagementProps, BonusRule, LineupStrategy, LineupRule } from '../../types/index';
+import type { League, LeagueManagementProps, BonusRule, LineupStrategy, LineupRule } from '../../types/index';
+
+function getDefaultFormData() {
+  return {
+    name: '',
+    description: '',
+    defaultNumberOfTeams: DEFAULT_NUMBER_OF_TEAMS,
+    defaultPlayersPerTeam: DEFAULT_PLAYERS_PER_TEAM,
+    defaultNumberOfRounds: DEFAULT_NUMBER_OF_ROUNDS,
+    defaultMatchesPerGame: DEFAULT_MATCHES_PER_GAME,
+    dayOfWeek: '',
+    lineupStrategy: DEFAULT_LINEUP_STRATEGY,
+    lineupRule: DEFAULT_LINEUP_RULE,
+    playerMatchPointsPerWin: DEFAULT_PLAYER_MATCH_POINTS,
+    teamMatchPointsPerWin: DEFAULT_TEAM_MATCH_POINTS,
+    teamGamePointsPerWin: DEFAULT_TEAM_GAME_POINTS,
+    useHandicap: DEFAULT_USE_HANDICAP,
+    defaultHandicapBasis: DEFAULT_HANDICAP_BASIS,
+    handicapPercentage: DEFAULT_HANDICAP_PERCENTAGE,
+    teamAllPresentBonusEnabled: false,
+    teamAllPresentBonusPoints: 1,
+    bonusRules: [],
+    active: true
+  };
+}
 
 export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onViewLeague }) => {
   const { t } = useTranslation();
-  const [leagues, setLeagues] = useState<any[]>([]);
+  const [leagues, setLeagues] = useState<League[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<{
     name: string;
     description: string;
-    defaultHandicapBasis: number;
-    useHandicap: boolean;
-    handicapPercentage: number;
-    defaultPlayersPerTeam: number;
-    defaultMatchesPerGame: number;
     defaultNumberOfTeams: number;
+    defaultPlayersPerTeam: number;
     defaultNumberOfRounds: number;
+    defaultMatchesPerGame: number;
     dayOfWeek: string;
     lineupStrategy: LineupStrategy;
     lineupRule: LineupRule;
-    bonusRules: BonusRule[];
-    teamAllPresentBonusEnabled: boolean;
-    teamAllPresentBonusPoints: number;
     playerMatchPointsPerWin: number;
     teamMatchPointsPerWin: number;
     teamGamePointsPerWin: number;
+    useHandicap: boolean;
+    defaultHandicapBasis: number;
+    handicapPercentage: number;
+    teamAllPresentBonusEnabled: boolean;
+    teamAllPresentBonusPoints: number;
+    bonusRules: BonusRule[];
     active: boolean;
   }>({
-    name: '',
-    description: '',
-    defaultHandicapBasis: DEFAULT_HANDICAP_BASIS,
-    useHandicap: DEFAULT_USE_HANDICAP,
-    handicapPercentage: DEFAULT_HANDICAP_PERCENTAGE,
-    defaultPlayersPerTeam: DEFAULT_PLAYERS_PER_TEAM,
-    defaultMatchesPerGame: DEFAULT_MATCHES_PER_GAME,
-    defaultNumberOfTeams: DEFAULT_NUMBER_OF_TEAMS,
-    defaultNumberOfRounds: DEFAULT_NUMBER_OF_ROUNDS,
-    dayOfWeek: '',
-    lineupStrategy: 'flexible',
-    lineupRule: 'standard',
-    bonusRules: [],
-    teamAllPresentBonusEnabled: false,
-    teamAllPresentBonusPoints: 1,
-    playerMatchPointsPerWin: DEFAULT_PLAYER_MATCH_POINTS,
-    teamMatchPointsPerWin: DEFAULT_TEAM_MATCH_POINTS,
-    teamGamePointsPerWin: DEFAULT_TEAM_GAME_POINTS,
-    active: true
+    ...getDefaultFormData()
   });
 
   useEffect(() => {
@@ -97,51 +103,32 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
       alert(t('leagues.leagueCreated'));
     }
 
-    setFormData({
-      name: '',
-      description: '',
-      defaultHandicapBasis: DEFAULT_HANDICAP_BASIS,
-      useHandicap: DEFAULT_USE_HANDICAP,
-      handicapPercentage: DEFAULT_HANDICAP_PERCENTAGE,
-      defaultPlayersPerTeam: DEFAULT_PLAYERS_PER_TEAM,
-      defaultMatchesPerGame: DEFAULT_MATCHES_PER_GAME,
-      defaultNumberOfTeams: DEFAULT_NUMBER_OF_TEAMS,
-      defaultNumberOfRounds: DEFAULT_NUMBER_OF_ROUNDS,
-      dayOfWeek: '',
-      lineupStrategy: 'flexible',
-      lineupRule: 'standard',
-      bonusRules: [],
-      teamAllPresentBonusEnabled: false,
-      teamAllPresentBonusPoints: 1,
-      playerMatchPointsPerWin: DEFAULT_PLAYER_MATCH_POINTS,
-      teamMatchPointsPerWin: DEFAULT_TEAM_MATCH_POINTS,
-      teamGamePointsPerWin: DEFAULT_TEAM_GAME_POINTS,
-      active: true
-    });
+    setFormData(getDefaultFormData());
     setIsAdding(false);
     loadLeagues();
   };
 
   const handleEdit = (league: any) => {
     setFormData({
+      ...getDefaultFormData(),
       name: league.name,
       description: league.description || '',
-      defaultHandicapBasis: league.defaultHandicapBasis,
-      useHandicap: league.useHandicap !== undefined ? league.useHandicap : DEFAULT_USE_HANDICAP,
-      handicapPercentage: league.handicapPercentage || DEFAULT_HANDICAP_PERCENTAGE,
-      defaultPlayersPerTeam: league.defaultPlayersPerTeam || DEFAULT_PLAYERS_PER_TEAM,
-      defaultMatchesPerGame: league.defaultMatchesPerGame || DEFAULT_MATCHES_PER_GAME,
       defaultNumberOfTeams: league.defaultNumberOfTeams || DEFAULT_NUMBER_OF_TEAMS,
+      defaultPlayersPerTeam: league.defaultPlayersPerTeam || DEFAULT_PLAYERS_PER_TEAM,
       defaultNumberOfRounds: league.defaultNumberOfRounds || DEFAULT_NUMBER_OF_ROUNDS,
+      defaultMatchesPerGame: league.defaultMatchesPerGame || DEFAULT_MATCHES_PER_GAME,
       dayOfWeek: league.dayOfWeek || '',
-      lineupStrategy: (league.lineupStrategy || 'flexible') as LineupStrategy,
-      lineupRule: (league.lineupRule || 'standard') as LineupRule,
-      bonusRules: league.bonusRules || [],
-      teamAllPresentBonusEnabled: league.teamAllPresentBonusEnabled || false,
-      teamAllPresentBonusPoints: league.teamAllPresentBonusPoints || 1,
+      lineupStrategy: (league.lineupStrategy || DEFAULT_LINEUP_STRATEGY),
+      lineupRule: (league.lineupRule || DEFAULT_LINEUP_RULE),
       playerMatchPointsPerWin: league.playerMatchPointsPerWin || DEFAULT_PLAYER_MATCH_POINTS,
       teamMatchPointsPerWin: league.teamMatchPointsPerWin || DEFAULT_TEAM_MATCH_POINTS,
       teamGamePointsPerWin: league.teamGamePointsPerWin || DEFAULT_TEAM_GAME_POINTS,
+      useHandicap: league.useHandicap !== undefined ? league.useHandicap : DEFAULT_USE_HANDICAP,
+      defaultHandicapBasis: league.defaultHandicapBasis,
+      handicapPercentage: league.handicapPercentage || DEFAULT_HANDICAP_PERCENTAGE,
+      teamAllPresentBonusEnabled: league.teamAllPresentBonusEnabled || false,
+      teamAllPresentBonusPoints: league.teamAllPresentBonusPoints || 1,
+      bonusRules: league.bonusRules || [],
       active: league.active
     });
     setEditingId(league.id);
@@ -191,27 +178,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
   };
 
   const handleCancel = () => {
-    setFormData({
-      name: '',
-      description: '',
-      defaultHandicapBasis: DEFAULT_HANDICAP_BASIS,
-      useHandicap: DEFAULT_USE_HANDICAP,
-      handicapPercentage: DEFAULT_HANDICAP_PERCENTAGE,
-      defaultPlayersPerTeam: DEFAULT_PLAYERS_PER_TEAM,
-      defaultMatchesPerGame: DEFAULT_MATCHES_PER_GAME,
-      defaultNumberOfTeams: DEFAULT_NUMBER_OF_TEAMS,
-      defaultNumberOfRounds: DEFAULT_NUMBER_OF_ROUNDS,
-      dayOfWeek: '',
-      lineupStrategy: 'flexible',
-      lineupRule: 'standard',
-      bonusRules: [],
-      teamAllPresentBonusEnabled: false,
-      teamAllPresentBonusPoints: 1,
-      playerMatchPointsPerWin: DEFAULT_PLAYER_MATCH_POINTS,
-      teamMatchPointsPerWin: DEFAULT_TEAM_MATCH_POINTS,
-      teamGamePointsPerWin: DEFAULT_TEAM_GAME_POINTS,
-      active: true
-    });
+    setFormData(getDefaultFormData());
     setIsAdding(false);
     setEditingId(null);
   };
