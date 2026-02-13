@@ -67,6 +67,7 @@ const en: TranslationDictionary = {
     updated: 'Player updated successfully',
     deleted: 'Player deleted successfully',
     duplicateName: 'A player with this name already exists. Please use a different name.',
+    assignedToTeams: 'Assigned to teams',
     importExport: 'Import/Export Players',
     exportCSV: 'Export CSV',
     exportJSON: 'Export JSON',

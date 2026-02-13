@@ -68,6 +68,7 @@ const he: TranslationDictionary = {
     deleted: 'השחקן נמחק בהצלחה',
     duplicateName: 'שחקן עם שם זה כבר קיים. אנא השתמש בשם אחר.',
     assignedToTeams: 'משובץ לקבוצות',
+    importExport: 'ייבוא/ייצוא שחקנים',
     exportCSV: 'ייצוא CSV',
     exportJSON: 'ייצוא JSON',
     importFile: 'ייבוא קובץ',
