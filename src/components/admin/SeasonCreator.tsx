@@ -5,55 +5,92 @@ import { GeneralConfiguration } from './shared/GeneralConfiguration';
 import { BonusRulesConfiguration } from './shared/BonusRulesConfiguration';
 import { playersApi, leaguesApi } from '../../services/api';
 import { useTranslation } from '../../contexts/LanguageContext';
-import type { SeasonCreatorProps } from '../../types/index';
-import { DEFAULT_HANDICAP_BASIS, DEFAULT_HANDICAP_PERCENTAGE, DEFAULT_NUMBER_OF_TEAMS, DEFAULT_NUMBER_OF_ROUNDS, DEFAULT_PLAYERS_PER_TEAM, DEFAULT_MATCHES_PER_GAME, DEFAULT_PLAYER_MATCH_POINTS, DEFAULT_TEAM_MATCH_POINTS, DEFAULT_TEAM_GAME_POINTS, DEFAULT_USE_HANDICAP } from '../../constants/bowling';
+import type { SeasonCreatorProps, BonusRule, LineupStrategy, LineupRule, League } from '../../types/index';
+import { DEFAULT_HANDICAP_BASIS, DEFAULT_HANDICAP_PERCENTAGE, DEFAULT_NUMBER_OF_TEAMS, DEFAULT_NUMBER_OF_ROUNDS, DEFAULT_PLAYERS_PER_TEAM, DEFAULT_MATCHES_PER_GAME, DEFAULT_PLAYER_MATCH_POINTS, DEFAULT_TEAM_MATCH_POINTS, DEFAULT_TEAM_GAME_POINTS, DEFAULT_USE_HANDICAP, DEFAULT_LINEUP_STRATEGY, DEFAULT_LINEUP_RULE, DEFAULT_TEAM_ALL_PRESENT_BONUS_ENABLED, DEFAULT_TEAM_ALL_PRESENT_BONUS_POINTS } from '../../constants/bowling';
 import { PlayerMatchupConfiguration } from './shared/PlayerMatchupConfiguration';
+
+// Explicit types for formData, teams, and availablePlayers
+type SeasonFormData = {
+  name: string;
+  description?: string;
+  numberOfTeams: number;
+  playersPerTeam: number;
+  numberOfRounds: number;
+  matchesPerGame: number;
+  lineupStrategy?: LineupStrategy;
+  lineupRule?: LineupRule;
+  playerMatchPointsPerWin: number;
+  teamMatchPointsPerWin: number;
+  teamGamePointsPerWin: number;
+  useHandicap: boolean;
+  handicapBasis: number;
+  handicapPercentage: number;
+  teamAllPresentBonusEnabled: boolean;
+  teamAllPresentBonusPoints: number;
+  bonusRules: BonusRule[];
+  dayOfWeek?: string;
+};
+
+type Team = {
+  name: string;
+  playerIds: string[];
+};
+
+type Player = {
+  id: string;
+  name: string;
+  [key: string]: any;
+};
 
 export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, onSuccess }) => {
   const { t } = useTranslation();
   const [step, setStep] = useState(1);
-  const [league, setLeague] = useState<any>(null);
-  const [formData, setFormData] = useState<any>({
+  const [league, setLeague] = useState<League | null>(null);
+  const [formData, setFormData] = useState<SeasonFormData>({
     name: '',
+    description: '',
     numberOfTeams: DEFAULT_NUMBER_OF_TEAMS,
     playersPerTeam: DEFAULT_PLAYERS_PER_TEAM,
     numberOfRounds: DEFAULT_NUMBER_OF_ROUNDS,
     matchesPerGame: DEFAULT_MATCHES_PER_GAME,
+    lineupStrategy: DEFAULT_LINEUP_STRATEGY,
+    lineupRule: DEFAULT_LINEUP_RULE,
     playerMatchPointsPerWin: DEFAULT_PLAYER_MATCH_POINTS,
     teamMatchPointsPerWin: DEFAULT_TEAM_MATCH_POINTS,
     teamGamePointsPerWin: DEFAULT_TEAM_GAME_POINTS,
     useHandicap: DEFAULT_USE_HANDICAP,
     handicapBasis: DEFAULT_HANDICAP_BASIS,
     handicapPercentage: DEFAULT_HANDICAP_PERCENTAGE,
-    teamAllPresentBonusEnabled: false,
-    teamAllPresentBonusPoints: 1,
-    bonusRules: [ ],
+    teamAllPresentBonusEnabled: DEFAULT_TEAM_ALL_PRESENT_BONUS_ENABLED,
+    teamAllPresentBonusPoints: DEFAULT_TEAM_ALL_PRESENT_BONUS_POINTS,
+    bonusRules: [],
+    dayOfWeek: '',
   });
-  const [teams, setTeams] = useState<any[]>([]);
+  const [teams, setTeams] = useState<Team[]>([]);
   const [inheritLeagueConfig, setInheritLeagueConfig] = useState(true);
-  const [availablePlayers, setAvailablePlayers] = useState<any[]>([]);
+  const [availablePlayers, setAvailablePlayers] = useState<Player[]>([]);
   const [playerAverages, setPlayerAverages] = useState<{ [playerId: string]: number }>({});
 
   useEffect(() => {
     const fetchData = async () => {
       const leagueData = await leaguesApi.getById(leagueId);
-      setLeague(leagueData);
+      setLeague(leagueData ?? null);
       setFormData((prev: any) => ({
         ...prev,
         numberOfTeams: leagueData?.defaultNumberOfTeams || DEFAULT_NUMBER_OF_TEAMS,
         playersPerTeam: leagueData?.defaultPlayersPerTeam || DEFAULT_PLAYERS_PER_TEAM,
         numberOfRounds: leagueData?.defaultNumberOfRounds || DEFAULT_NUMBER_OF_ROUNDS,
         matchesPerGame: leagueData?.defaultMatchesPerGame || DEFAULT_MATCHES_PER_GAME,
-        lineupStrategy: leagueData?.lineupStrategy || 'flexible',
-        lineupRule: leagueData?.lineupRule || 'standard',
+        lineupStrategy: leagueData?.lineupStrategy || DEFAULT_LINEUP_STRATEGY,
+        lineupRule: leagueData?.lineupRule || DEFAULT_LINEUP_RULE,
         playerMatchPointsPerWin: leagueData?.playerMatchPointsPerWin || DEFAULT_PLAYER_MATCH_POINTS,
         teamMatchPointsPerWin: leagueData?.teamMatchPointsPerWin || DEFAULT_TEAM_MATCH_POINTS,
         teamGamePointsPerWin: leagueData?.teamGamePointsPerWin || DEFAULT_TEAM_GAME_POINTS,
         useHandicap: leagueData?.useHandicap ?? DEFAULT_USE_HANDICAP,
         handicapBasis: leagueData?.defaultHandicapBasis ?? DEFAULT_HANDICAP_BASIS,
         handicapPercentage: leagueData?.handicapPercentage ?? DEFAULT_HANDICAP_PERCENTAGE,
-        teamAllPresentBonusEnabled: leagueData?.teamAllPresentBonusEnabled || false,
-        teamAllPresentBonusPoints: leagueData?.teamAllPresentBonusPoints || 1,
+        teamAllPresentBonusEnabled: leagueData?.teamAllPresentBonusEnabled ?? DEFAULT_TEAM_ALL_PRESENT_BONUS_ENABLED,
+        teamAllPresentBonusPoints: leagueData?.teamAllPresentBonusPoints ?? DEFAULT_TEAM_ALL_PRESENT_BONUS_POINTS,
         bonusRules: leagueData?.bonusRules ? JSON.parse(JSON.stringify(leagueData.bonusRules)) : [ ],
       }));
       const players = await playersApi.getAll();
@@ -65,13 +102,15 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
   // --- Team assignment logic ---
   const handleTeamNameChange = (teamIndex: number, name: string) => {
     const newTeams = [...teams];
-    newTeams[teamIndex].name = name;
-    setTeams(newTeams);
+    if (newTeams[teamIndex]) {
+      newTeams[teamIndex].name = name;
+      setTeams(newTeams);
+    }
   };
 
   const handleAssignPlayer = (teamIndex: number, playerId: string) => {
     const newTeams = [...teams];
-    if (!newTeams[teamIndex].playerIds.includes(playerId)) {
+    if (newTeams[teamIndex] && !newTeams[teamIndex].playerIds.includes(playerId)) {
       newTeams[teamIndex].playerIds.push(playerId);
       setTeams(newTeams);
     }
@@ -79,8 +118,10 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
 
   const handleRemovePlayer = (teamIndex: number, playerId: string) => {
     const newTeams = [...teams];
-    newTeams[teamIndex].playerIds = newTeams[teamIndex].playerIds.filter((id: string) => id !== playerId);
-    setTeams(newTeams);
+    if (newTeams[teamIndex]) {
+      newTeams[teamIndex].playerIds = newTeams[teamIndex].playerIds.filter((id: string) => id !== playerId);
+      setTeams(newTeams);
+    }
   };
   
   const getAssignedPlayers = (excludeTeamIndex: number) => {
@@ -101,7 +142,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
   }
   if (step === 1) {
     // Helper: get value from league or formData depending on inheritLeagueConfig
-    const getValue = (key: string) => {
+    const getValue = (key: keyof SeasonFormData) => {
       if (inheritLeagueConfig) {
         switch (key) {
           case 'numberOfTeams':
@@ -113,9 +154,9 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
           case 'matchesPerGame':
             return league?.defaultMatchesPerGame || DEFAULT_MATCHES_PER_GAME;
           case 'lineupStrategy':
-            return league?.lineupStrategy || 'flexible';
+            return league?.lineupStrategy || DEFAULT_LINEUP_STRATEGY;
           case 'lineupRule':
-            return league?.lineupRule || 'standard';
+            return league?.lineupRule || DEFAULT_LINEUP_RULE;
           case 'playerMatchPointsPerWin':
             return league?.playerMatchPointsPerWin || DEFAULT_PLAYER_MATCH_POINTS;
           case 'teamMatchPointsPerWin':
@@ -129,9 +170,9 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
           case 'handicapPercentage':
             return league?.handicapPercentage ?? DEFAULT_HANDICAP_PERCENTAGE;
           case 'teamAllPresentBonusEnabled':
-            return league?.teamAllPresentBonusEnabled || false;
+            return league?.teamAllPresentBonusEnabled ?? DEFAULT_TEAM_ALL_PRESENT_BONUS_ENABLED;
           case 'teamAllPresentBonusPoints':
-            return league?.teamAllPresentBonusPoints || 1;
+            return league?.teamAllPresentBonusPoints ?? DEFAULT_TEAM_ALL_PRESENT_BONUS_POINTS;
           case 'bonusRules':
             return league?.bonusRules ? JSON.parse(JSON.stringify(league.bonusRules)) : [];
           default:
@@ -187,11 +228,11 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
                         teamMatchPointsPerWin: league?.teamMatchPointsPerWin || 1,
                         teamGamePointsPerWin: league?.teamGamePointsPerWin || 2,
                         useHandicap: league?.useHandicap ?? true,
-                        handicapBasis: league?.handicapBasis ?? 160,
+                        handicapBasis: league?.defaultHandicapBasis ?? 160,
                         handicapPercentage: league?.handicapPercentage ?? 100,
                         bonusRules: league?.bonusRules ? JSON.parse(JSON.stringify(league.bonusRules)) : [ { threshold: 50, points: 1 }, { threshold: 70, points: 2 } ],
-                        teamAllPresentBonusEnabled: league?.teamAllPresentBonusEnabled || false,
-                        teamAllPresentBonusPoints: league?.teamAllPresentBonusPoints || 1,
+                        teamAllPresentBonusEnabled: league?.teamAllPresentBonusEnabled || DEFAULT_TEAM_ALL_PRESENT_BONUS_ENABLED,
+                        teamAllPresentBonusPoints: league?.teamAllPresentBonusPoints || DEFAULT_TEAM_ALL_PRESENT_BONUS_POINTS,
                       }));
                     }
                   }}
@@ -222,8 +263,8 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
             <PlayerMatchupConfiguration
               lineupStrategy={getValue('lineupStrategy')}
               lineupRule={getValue('lineupRule')}
-              onLineupStrategyChange={value => setFormData({ ...formData, lineupStrategy: value })}
-              onLineupRuleChange={value => setFormData({ ...formData, lineupRule: value })}
+              onLineupStrategyChange={value => setFormData({ ...formData, lineupStrategy: value as LineupStrategy })}
+              onLineupRuleChange={value => setFormData({ ...formData, lineupRule: value as LineupRule })}
               disabled={inheritLeagueConfig}
             />
 
@@ -258,8 +299,8 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
             <div className="border-t pt-4 mt-4">
               <BonusRulesConfiguration
                 bonusRules={inheritLeagueConfig ? (league?.bonusRules || []) : formData.bonusRules}
-                teamAllPresentBonusEnabled={inheritLeagueConfig ? league?.teamAllPresentBonusEnabled : formData.teamAllPresentBonusEnabled}
-                teamAllPresentBonusPoints={inheritLeagueConfig ? league?.teamAllPresentBonusPoints : formData.teamAllPresentBonusPoints}
+                teamAllPresentBonusEnabled={inheritLeagueConfig ? (league?.teamAllPresentBonusEnabled ?? DEFAULT_TEAM_ALL_PRESENT_BONUS_ENABLED) : formData.teamAllPresentBonusEnabled}
+                teamAllPresentBonusPoints={inheritLeagueConfig ? (league?.teamAllPresentBonusPoints ?? DEFAULT_TEAM_ALL_PRESENT_BONUS_POINTS) : formData.teamAllPresentBonusPoints}
                 onBonusRulesChange={rules => setFormData({ ...formData, bonusRules: rules })}
                 onTeamAllPresentBonusEnabledChange={enabled => setFormData({ ...formData, teamAllPresentBonusEnabled: enabled })}
                 onTeamAllPresentBonusPointsChange={points => setFormData({ ...formData, teamAllPresentBonusPoints: points })}

@@ -5,19 +5,11 @@
 
 import type { LineupStrategy, LineupRule } from '../types/index';
 
+// Limits
+
 // Bowling Score Limits
 export const MAX_BOWLING_SCORE = 300;
 export const MIN_BOWLING_SCORE = 0;
-
-// Absent Player Penalty
-export const ABSENT_PLAYER_PENALTY = 10;
-
-// Default Handicap Configuration
-export const DEFAULT_USE_HANDICAP = false;
-export const DEFAULT_HANDICAP_BASIS = 160;
-export const DEFAULT_HANDICAP_PERCENTAGE = 100;
-export const MIN_HANDICAP_PERCENTAGE = 0;
-export const MAX_HANDICAP_PERCENTAGE = 100;
 
 // Team Configuration Limits
 export const MIN_TEAMS_PER_SEASON = 2;
@@ -30,6 +22,17 @@ export const MIN_ROUNDS = 1;
 export const MAX_ROUNDS = 10;
 export const MIN_MATCHES_PER_GAME = 1;
 export const MAX_MATCHES_PER_GAME = 5;
+
+// Defaults
+// Absent Player Penalty
+export const ABSENT_PLAYER_PENALTY = 10;
+
+// Default Handicap Configuration
+export const DEFAULT_USE_HANDICAP = false;
+export const DEFAULT_HANDICAP_BASIS = 160;
+export const DEFAULT_HANDICAP_PERCENTAGE = 100;
+export const MIN_HANDICAP_PERCENTAGE = 0;
+export const MAX_HANDICAP_PERCENTAGE = 100;
 
 // Default League Configuration
 export const DEFAULT_NUMBER_OF_TEAMS = 8;
@@ -45,3 +48,7 @@ export const DEFAULT_TEAM_GAME_POINTS = 2;
 // Default Lineup Configuration
 export const DEFAULT_LINEUP_RULE: LineupRule = "standard";
 export const DEFAULT_LINEUP_STRATEGY: LineupStrategy = "flexible";
+
+// Default Bonus Points Configuration
+export const DEFAULT_TEAM_ALL_PRESENT_BONUS_ENABLED = false;
+export const DEFAULT_TEAM_ALL_PRESENT_BONUS_POINTS = 1;
