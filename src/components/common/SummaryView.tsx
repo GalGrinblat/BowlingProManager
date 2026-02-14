@@ -4,6 +4,7 @@ import { TeamStatsCard } from './TeamStatsCard';
 import type { SummaryViewProps } from '../../types/index';
 
 export const SummaryView: React.FC<SummaryViewProps> = ({ game, totals, playerStats, onBack, onFinish }) => {
+    if (!game || !game.team1 || !game.team2) return null;
   return (
     <div className="scorecard rounded-xl p-6 md:p-8 mb-8 animate-slide-in">
       <div className="flex items-center justify-between mb-6">
@@ -14,15 +15,15 @@ export const SummaryView: React.FC<SummaryViewProps> = ({ game, totals, playerSt
       {/* Overall Winner */}
       <div className="bg-gradient-to-br from-yellow-400 to-orange-500 text-gray-900 p-6 rounded-lg mb-6 text-center">
         <div className="text-lg font-bold uppercase mb-2">Game Winner</div>
-        {totals.team1Total > totals.team2Total ? (
+        {totals.team1Points > totals.team2Points ? (
           <div className="bowling-title text-5xl">{game.team1.name}</div>
-        ) : totals.team2Total > totals.team1Total ? (
+        ) : totals.team2Points > totals.team1Points ? (
           <div className="bowling-title text-5xl">{game.team2.name}</div>
         ) : (
           <div className="bowling-title text-5xl">TIE GAME</div>
         )}
         <div className="text-3xl font-bold mt-2">
-          {totals.team1Total} - {totals.team2Total}
+          {totals.team1Points} - {totals.team2Points}
         </div>
       </div>
 
@@ -30,7 +31,7 @@ export const SummaryView: React.FC<SummaryViewProps> = ({ game, totals, playerSt
       <div className="bg-gray-800 rounded-lg p-4 mb-6">
         <div className="bowling-title text-white text-xl mb-4">MATCH BREAKDOWN</div>
         <div className="space-y-2">
-          {game.matches.map((match: any, idx: number) => (
+          {Array.isArray(game.matches) && game.matches.map((match: any, idx: number) => (
             <div key={idx} className="bg-gray-700 rounded p-3">
               <div className="grid grid-cols-3 items-center">
                 <div className="text-center">
@@ -61,7 +62,9 @@ export const SummaryView: React.FC<SummaryViewProps> = ({ game, totals, playerSt
               <div className="text-center">
                 <div className="text-white font-bold text-sm mb-1">TOTAL</div>
                 <div className="text-yellow-400 font-bold text-2xl">
-                  {game.grandTotalPoints.team1} - {game.grandTotalPoints.team2}
+                  {game.grandTotalPoints
+                    ? `${game.grandTotalPoints.team1} - ${game.grandTotalPoints.team2}`
+                    : 'N/A'}
                 </div>
               </div>
               <div className="text-center">
