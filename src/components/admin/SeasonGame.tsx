@@ -14,34 +14,6 @@ import type { SeasonGameProps, Game, GamePlayer, Team, GameTeam } from '../../ty
 
 export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
   
-  // Helper: Fetch teams by ID, build GameTeam objects, and assign to game
-  const fetchAndAssignTeams = (gameObj: Game): void => {
-    if (!gameObj.team1Id || !gameObj.team2Id) return;
-
-    // Fetch teams
-    const team1 = teamsApi.getById(gameObj.team1Id);
-    const team2 = teamsApi.getById(gameObj.team2Id);
-    if (!team1 || !team2) return;
-
-    // Build GameTeam objects with player name from registry
-    const buildGameTeam = (team: Team): GameTeam => ({
-      name: team.name,
-      players: (team.playerIds || []).map((playerId: string, idx: number) => {
-        const player = playersApi.getById(playerId);
-        return {
-          playerId,
-          name: player ? player.name : '',
-          average: 0,
-          handicap: 0,
-          rank: idx + 1,
-          absent: false,
-        };
-      }),
-    });
-    gameObj.team1 = buildGameTeam(team1);
-    gameObj.team2 = buildGameTeam(team2);
-  };
-
   const { t } = useTranslation();
   const [game, setGame] = useState<Game | null>(null);
   const [currentMatch, setCurrentMatch] = useState<number>(1);
@@ -78,80 +50,10 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
     }
     
     // Recalculate player averages and handicaps based on current season performance
-    const season = seasonsApi.getById(gameData.seasonId);
-    const teams = teamsApi.getBySeason(gameData.seasonId);
-    const allGames = gamesApi.getBySeason(gameData.seasonId);
-      
-    // Get games completed before this one (same round or earlier)
-    const completedGames = allGames.filter(g => 
-      g.status === 'completed' && 
-      (g.round < gameData.round || (g.round === gameData.round && g.matchDay < gameData.matchDay))
-    );
-      
-    // Calculate current player averages from completed games
-    const currentAverages = calculateCurrentPlayerAverages(teams, completedGames);
-      
-    // Update team1 player averages and handicaps
-    if (gameData.team1 && gameData.team1.players) {
-      gameData.team1.players = gameData.team1.players.map((player: any) => {
-        // Use current average if player has played games, otherwise keep original average from setup
-        const currentAvg = currentAverages[player.name];
-        let playerAvg;
-          
-        if (currentAvg && currentAvg.gamesPlayed > 0) {
-          playerAvg = currentAvg.average;
-        } else {
-          // No games played yet, keep original average from season setup
-          playerAvg = player.average || 0;
-        }
-          
-        // Recalculate handicap
-        let handicap = 0;
-        if (season && season.useHandicap && playerAvg > 0 && playerAvg < season.handicapBasis) {
-          const diff = season.handicapBasis - playerAvg;
-          handicap = Math.round(diff * (season.handicapPercentage / 100));
-        }
-          
-        return {
-          ...player,
-          average: playerAvg,
-          handicap
-        };
-      });
-    }
-      
-    // Update team2 player averages and handicaps
-    if (gameData.team2 && gameData.team2.players) {
-      gameData.team2.players = gameData.team2.players.map((player: any) => {
-        // Use current average if player has played games, otherwise keep original average from setup
-        const currentAvg = currentAverages[player.name];
-        let playerAvg;
-          
-        if (currentAvg && currentAvg.gamesPlayed > 0) {
-          playerAvg = currentAvg.average;
-        } else {
-          // No games played yet, keep original average from season setup
-          playerAvg = player.average || 0;
-        }
-          
-        // Recalculate handicap
-        let handicap = 0;
-        if (season && season.useHandicap && playerAvg > 0 && playerAvg < season.handicapBasis) {
-          const diff = season.handicapBasis - playerAvg;
-          handicap = Math.round(diff * (season.handicapPercentage / 100));
-        }
-          
-        return {
-          ...player,
-          average: playerAvg,
-          handicap
-        };
-      });
-    }
-      
+    recalculatePlayerAveragesAndHandicaps(gameData);
+
     // Save updated player data back to game
-    gamesApi.update(gameId, gameData);
-    
+    gamesApi.update(gameId, gameData);  
     setGame(gameData);
     
     // Initialize pre-match players state when entering pre-match setup
@@ -421,8 +323,6 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
     onBack();
   };
 
-  if (!game) return <div>Loading...</div>;
-
   // Move player up/down in the lineup (for flexible strategy)
   const movePlayer = (team: 'team1' | 'team2', index: number, direction: 'up' | 'down') => {
     if (team === 'team1') {
@@ -474,6 +374,110 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
     }
   };
 
+  // Fetch teams by ID, build GameTeam objects, and assign to game
+  function fetchAndAssignTeams(gameObj: Game) {
+    if (!gameObj.team1Id || !gameObj.team2Id) return;
+
+    // Fetch teams
+    const team1 = teamsApi.getById(gameObj.team1Id);
+    const team2 = teamsApi.getById(gameObj.team2Id);
+    if (!team1 || !team2) return;
+
+    // Build GameTeam objects with player name from registry
+    const buildGameTeam = (team: Team): GameTeam => ({
+      name: team.name,
+      players: (team.playerIds || []).map((playerId: string, idx: number) => {
+        const player = playersApi.getById(playerId);
+        return {
+          playerId,
+          name: player ? player.name : '',
+          average: 0,
+          handicap: 0,
+          rank: idx + 1,
+          absent: false,
+        };
+      }),
+    });
+    gameObj.team1 = buildGameTeam(team1);
+    gameObj.team2 = buildGameTeam(team2);
+  }
+
+  // Recalculate player averages and handicaps for both teams
+  function recalculatePlayerAveragesAndHandicaps(gameData: Game) {
+    const season = seasonsApi.getById(gameData.seasonId);
+    const teams = teamsApi.getBySeason(gameData.seasonId);
+    const allGames = gamesApi.getBySeason(gameData.seasonId);
+
+    // Get games completed before this one (same round or earlier)
+    const completedGames = allGames.filter(g =>
+      g.status === 'completed' &&
+      (g.round < gameData.round || (g.round === gameData.round && g.matchDay < gameData.matchDay))
+    );
+
+    // Calculate current player averages from completed games
+    const currentAverages = calculateCurrentPlayerAverages(teams, completedGames);
+
+    // Update team1 player averages and handicaps
+    if (gameData.team1 && gameData.team1.players) {
+      gameData.team1.players = gameData.team1.players.map((player: any) => {
+        // Use current average if player has played games, otherwise keep original average from setup
+        const currentAvg = currentAverages[player.name];
+        let playerAvg;
+
+        if (currentAvg && currentAvg.gamesPlayed > 0) {
+          playerAvg = currentAvg.average;
+        } else {
+          // No games played yet, keep original average from season setup
+          playerAvg = player.average || 0;
+        }
+
+        // Recalculate handicap
+        let handicap = 0;
+        if (season && season.useHandicap && playerAvg > 0 && playerAvg < season.handicapBasis) {
+          const diff = season.handicapBasis - playerAvg;
+          handicap = Math.round(diff * (season.handicapPercentage / 100));
+        }
+
+        return {
+          ...player,
+          average: playerAvg,
+          handicap
+        };
+      });
+    }
+
+    // Update team2 player averages and handicaps
+    if (gameData.team2 && gameData.team2.players) {
+      gameData.team2.players = gameData.team2.players.map((player: any) => {
+        // Use current average if player has played games, otherwise keep original average from setup
+        const currentAvg = currentAverages[player.name];
+        let playerAvg;
+
+        if (currentAvg && currentAvg.gamesPlayed > 0) {
+          playerAvg = currentAvg.average;
+        } else {
+          // No games played yet, keep original average from season setup
+          playerAvg = player.average || 0;
+        }
+
+        // Recalculate handicap
+        let handicap = 0;
+        if (season && season.useHandicap && playerAvg > 0 && playerAvg < season.handicapBasis) {
+          const diff = season.handicapBasis - playerAvg;
+          handicap = Math.round(diff * (season.handicapPercentage / 100));
+        }
+
+        return {
+          ...player,
+          average: playerAvg,
+          handicap
+        };
+      });
+    }
+    }
+
+  if (!game) return <div>Loading...</div>;
+  
   if (showSummary) {
     const totals = calculateGameTotals(game);
     const playerStats = calculatePlayerStats(game);
