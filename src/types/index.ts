@@ -182,8 +182,8 @@ export interface User {
 
 /** AuthContextType - Authentication context providing user state and actions */
 export interface AuthContextType {
-  currentUser: any;
-  playerData?: any;
+  currentUser: User | null;
+  playerData?: Player;
   isLoading?: boolean;
   user?: User | null;
   login: (userId: string, role: 'admin' | 'player') => any;
@@ -290,7 +290,7 @@ export interface MatchPlayer {
 
 /** MatchTeam - Team's calculated totals for a single match */
 export interface MatchTeam {
-  score: number;
+  points: number;
   totalPins: number;
   totalWithHandicap: number;
   bonusPoints: number;
@@ -355,7 +355,7 @@ export interface SeasonDetailProps {
   seasonId: string;
   onBack: () => void;
   onPlayGame: (gameId: string) => void;
-  onViewGame: (gameId: string, game?: any) => void;
+  onViewGame: (gameId: string, game?: Game) => void;
   onManageTeams: () => void;
 }
 
@@ -414,7 +414,7 @@ export interface MatchViewProps {
 
 /** Props for SummaryView - Final game results and statistics */
 export interface SummaryViewProps {
-  game: any;
+  game: Game;
   totals: any;
   playerStats: any;
   onBack: () => void;
@@ -423,7 +423,7 @@ export interface SummaryViewProps {
 
 /** Props for CompletedGameView - View details of a finished game */
 export interface CompletedGameViewProps {
-  game: any;
+  game: Game;
   onBack: () => void;
 }
 

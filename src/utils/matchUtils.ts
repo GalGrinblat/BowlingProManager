@@ -17,14 +17,14 @@ export const createEmptyMatch = (matchNumber: number, playersPerTeam: number): G
   return {
     matchNumber,
     team1: {
-      score: 0,
+      points: 0,
       totalPins: 0,
       totalWithHandicap: 0,
       bonusPoints: 0,
       players: emptyPlayers
     },
     team2: {
-      score: 0,
+      points: 0,
       totalPins: 0,
       totalWithHandicap: 0,
       bonusPoints: 0,
@@ -183,22 +183,22 @@ export const calculateMatchResults = (game: Game, matchIndex: number): void => {
   });
   const allScoresEntered = team1AllScoresEntered && team2AllScoresEntered;
   
-  if (allScoresEntered) {
-    // Use comparison utility to apply match winner points
-    const team1BaseScore = team1GamePoints + match.team1.bonusPoints;
-    const team2BaseScore = team2GamePoints + match.team2.bonusPoints;
+  // Use comparison utility to apply match winner points
+  const team1BasePoints = team1GamePoints + match.team1.bonusPoints;
+  const team2BasePoints = team2GamePoints + match.team2.bonusPoints;
+    if (allScoresEntered) {
     const scores = applyMatchWinnerPoints(
       match.team1.totalWithHandicap,
       match.team2.totalWithHandicap,
-      team1BaseScore,
-      team2BaseScore,
+      team1BasePoints,
+      team2BasePoints,
       teamMatchPointsPerWin
     );
-    match.team1.score = scores.team1Score;
-    match.team2.score = scores.team2Score;
+    match.team1.points = scores.team1Points;
+    match.team2.points = scores.team2Points;
   } else {
-    match.team1.score = team1GamePoints + match.team1.bonusPoints;
-    match.team2.score = team2GamePoints + match.team2.bonusPoints;
+    match.team1.points = team1BasePoints;
+    match.team2.points = team2BasePoints;
   }
 };
 

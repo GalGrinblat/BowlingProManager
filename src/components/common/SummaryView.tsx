@@ -40,7 +40,7 @@ export const SummaryView: React.FC<SummaryViewProps> = ({ game, totals, playerSt
                 <div className="text-center">
                   <div className="text-white font-bold text-sm mb-1">Match {idx + 1}</div>
                   <div className="text-yellow-400 font-bold text-xl">
-                    {match.team1.score} - {match.team2.score}
+                    {match.team1.points} - {match.team2.points}
                   </div>
                 </div>
                 <div className="text-center">

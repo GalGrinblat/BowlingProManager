@@ -86,15 +86,15 @@ export const calculatePlayerStats = (game: Game): GameStats => {
 };
 
 export const calculateGameTotals = (game: Game): { 
-  team1Total: number; 
-  team2Total: number;
+  team1Points: number; 
+  team2Points: number;
   team1TotalPinsWithHandicap: number;
   team1TotalPinsNoHandicap: number;
   team2TotalPinsWithHandicap: number;
   team2TotalPinsNoHandicap: number;
 } => {
-  const team1Total = (game.matches?.reduce((sum: number, m: any) => sum + m.team1.score, 0) || 0) + (game.grandTotalPoints?.team1 || 0);
-  const team2Total = (game.matches?.reduce((sum: number, m: any) => sum + m.team2.score, 0) || 0) + (game.grandTotalPoints?.team2 || 0);
+  const team1Points = (game.matches?.reduce((sum: number, m: any) => sum + m.team1.points, 0) || 0) + (game.grandTotalPoints?.team1 || 0);
+  const team2Points = (game.matches?.reduce((sum: number, m: any) => sum + m.team2.points, 0) || 0) + (game.grandTotalPoints?.team2 || 0);
   
   const team1TotalPinsWithHandicap = game.matches?.reduce((sum: number, m: any) => sum + m.team1.totalWithHandicap, 0) || 0;
   const team2TotalPinsWithHandicap = game.matches?.reduce((sum: number, m: any) => sum + m.team2.totalWithHandicap, 0) || 0;
@@ -102,8 +102,8 @@ export const calculateGameTotals = (game: Game): {
   const team2TotalPinsNoHandicap = game.matches?.reduce((sum: number, m: any) => sum + m.team2.totalPins, 0) || 0;
   
   return {
-    team1Total,
-    team2Total,
+    team1Points: team1Points,
+    team2Points: team2Points,
     team1TotalPinsWithHandicap,
     team1TotalPinsNoHandicap,
     team2TotalPinsWithHandicap,

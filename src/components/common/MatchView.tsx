@@ -106,7 +106,7 @@ export const MatchView: React.FC<MatchViewProps> = ({ matchNumber, game, onUpdat
             <div className="text-2xl font-bold mb-3">{match.team1.totalWithHandicap}</div>
             <div className="pt-3 border-t border-orange-400">
               <div className="text-sm font-bold uppercase tracking-wider opacity-90 mb-1">Match Points</div>
-              <div className="text-4xl font-bold">{match.team1.score}</div>
+              <div className="text-4xl font-bold">{match.team1.points}</div>
             </div>
           </div>
         </div>
@@ -115,9 +115,9 @@ export const MatchView: React.FC<MatchViewProps> = ({ matchNumber, game, onUpdat
           <div className="bg-gray-900 rounded-lg p-3 border border-gray-600">
             <div className="text-xs text-gray-400 mb-1 text-center">POINTS</div>
             <div className="flex items-center justify-center gap-2">
-              <span className="text-orange-400 font-bold text-2xl">{match.team1.score}</span>
+              <span className="text-orange-400 font-bold text-2xl">{match.team1.points}</span>
               <span className="text-gray-600">-</span>
-              <span className="text-blue-400 font-bold text-2xl">{match.team2.score}</span>
+              <span className="text-blue-400 font-bold text-2xl">{match.team2.points}</span>
             </div>
           </div>
         </div>
@@ -130,7 +130,7 @@ export const MatchView: React.FC<MatchViewProps> = ({ matchNumber, game, onUpdat
             <div className="text-2xl font-bold mb-3">{match.team2.totalWithHandicap}</div>
             <div className="pt-3 border-t border-blue-400">
               <div className="text-sm font-bold uppercase tracking-wider opacity-90 mb-1">Match Points</div>
-              <div className="text-4xl font-bold">{match.team2.score}</div>
+              <div className="text-4xl font-bold">{match.team2.points}</div>
             </div>
           </div>
         </div>
