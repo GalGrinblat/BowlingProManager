@@ -18,7 +18,7 @@ export interface PlayerScoreInputProps {
   playerIdx: number;
   matchIdx: number;
   useHandicap: boolean;
-  onUpdateScore: (matchIdx: number, team: string, idx: number, value: string) => void;
+  onUpdateScore: (matchIdx: number, team: 'team1' | 'team2', idx: number, pins: number | string) => void;
   isReadOnly?: boolean;
   alignment?: 'left' | 'right';
 }

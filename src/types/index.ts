@@ -405,8 +405,8 @@ export interface PlayerSeasonComparisonProps {
 export interface MatchViewProps {
   matchNumber: number;
   game: any;
-  onUpdateScore: (matchIndex: number, team: string, playerIndex: number, value: string) => void;
-  onToggleAbsent?: (team: string, playerIndex: number) => void;
+  onUpdateScore: (matchIndex: number, team: 'team1' | 'team2', playerIndex: number, pins: number | string) => void;
+  onToggleAbsent?: (team: 'team1' | 'team2', playerIndex: number) => void;
   onNavigate: (direction: string) => void;
   onCancel: () => void;
   isReadOnly?: boolean;
