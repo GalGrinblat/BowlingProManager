@@ -10,7 +10,7 @@ import { calculateCurrentPlayerAverages } from '../../utils/standingsUtils';
 import { TeamPanel } from './TeamPanel';
 import { applyLineupRule } from '../../utils/lineupUtils';
 
-import type { SeasonGameProps, Game, GamePlayer, Team, GameTeam } from '../../types/index';
+import type { SeasonGameProps, Game, GamePlayer, Team, GameTeam, GameMatch, MatchPlayer } from '../../types/index';
 
 export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
   
@@ -68,9 +68,9 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
     } else {
       // Check if this is the first time entering the game (no scores entered yet)
       // Any positive pins value means scores have been entered
-      const hasAnyScores = gameData.matches.some((m: any) =>
-        m.team1.players.some((p: any) => p.pins > 0) ||
-        m.team2.players.some((p: any) => p.pins > 0)
+      const hasAnyScores = gameData.matches.some((m: GameMatch) =>
+        m.team1.players.some((p: MatchPlayer) => p.pins > 0) ||
+        m.team2.players.some((p: MatchPlayer) => p.pins > 0)
       );
       
       // Show pre-match setup if no scores entered yet
@@ -79,12 +79,12 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
       } else {
         // Find first incomplete match
         if (!gameData.team1 || !gameData.team2) return;
-        const incompleteMatchIndex = gameData.matches.findIndex((m: any) => {
-          const team1Complete = gameData.team1!.players.every((p: any, idx: any) =>
-            p.absent || m.team1.players[idx].pins !== ''
+        const incompleteMatchIndex = gameData.matches.findIndex((m: GameMatch) => {
+          const team1Complete = gameData.team1!.players.every((p: GamePlayer, idx: number) =>
+            p.absent || (m.team1.players[idx] && m.team1.players[idx].pins !== 0)
           );
-          const team2Complete = gameData.team2!.players.every((p: any, idx: any) =>
-            p.absent || m.team2.players[idx].pins !== ''
+          const team2Complete = gameData.team2!.players.every((p: GamePlayer, idx: number) =>
+            p.absent || (m.team2.players[idx] && m.team2.players[idx].pins !== 0)
           );
           return !team1Complete || !team2Complete;
         });
@@ -229,13 +229,13 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
       updated.team2 &&
       Array.isArray(updated.team2.players)
     ) {
-      allMatchesComplete = updated.matches.every((m: any) => {
+      allMatchesComplete = updated.matches.every((m: GameMatch) => {
         if (!m.team1 || !m.team1.players || !m.team2 || !m.team2.players) return false;
-        const team1Complete = updated.team1 && Array.isArray(updated.team1.players) && updated.team1.players.every((p: any, pIdx: any) =>
-          p.absent || (m.team1.players[pIdx] && typeof m.team1.players[pIdx].pins === 'number')
+        const team1Complete = updated.team1 && Array.isArray(updated.team1.players) && updated.team1.players.every((p: GamePlayer, pIdx: number) =>
+          p.absent || (m.team1.players[pIdx] && m.team1.players[pIdx].pins !== 0)
         );
-        const team2Complete = updated.team2 && Array.isArray(updated.team2.players) && updated.team2.players.every((p: any, pIdx: any) =>
-          p.absent || (m.team2.players[pIdx] && typeof m.team2.players[pIdx].pins === 'number')
+        const team2Complete = updated.team2 && Array.isArray(updated.team2.players) && updated.team2.players.every((p: GamePlayer, pIdx: number) =>
+          p.absent || (m.team2.players[pIdx] && m.team2.players[pIdx].pins !== 0)
         );
         return team1Complete && team2Complete;
       });
@@ -268,11 +268,11 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
     const match = game.matches[matchIndex];
     if (!match || !match.team1 || !match.team2) return;
     // Validate current match is complete
-    const team1Complete = game.team1.players && match.team1.players && game.team1.players.every((p: any, idx: any) => 
-      p.absent || (match.team1.players[idx] && typeof match.team1.players[idx].pins === 'number')
+    const team1Complete = game.team1.players && match.team1.players && game.team1.players.every((p: GamePlayer, idx: number) => 
+      p.absent || (match.team1.players[idx] && match.team1.players[idx].pins !== 0)
     );
-    const team2Complete = game.team2.players && match.team2.players && game.team2.players.every((p: any, idx: any) => 
-      p.absent || (match.team2.players[idx] && typeof match.team2.players[idx].pins === 'number')
+    const team2Complete = game.team2.players && match.team2.players && game.team2.players.every((p: GamePlayer, idx: number) => 
+      p.absent || (match.team2.players[idx] && match.team2.players[idx].pins !== 0)
     );
     if (!team1Complete || !team2Complete) {
       alert('Please enter all scores before proceeding');
@@ -419,7 +419,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
 
     // Update team1 player averages and handicaps
     if (gameData.team1 && gameData.team1.players) {
-      gameData.team1.players = gameData.team1.players.map((player: any) => {
+      gameData.team1.players = gameData.team1.players.map((player: GamePlayer) => {
         // Use current average if player has played games, otherwise keep original average from setup
         const currentAvg = currentAverages[player.name];
         let playerAvg;
@@ -448,7 +448,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
 
     // Update team2 player averages and handicaps
     if (gameData.team2 && gameData.team2.players) {
-      gameData.team2.players = gameData.team2.players.map((player: any) => {
+      gameData.team2.players = gameData.team2.players.map((player: GamePlayer) => {
         // Use current average if player has played games, otherwise keep original average from setup
         const currentAvg = currentAverages[player.name];
         let playerAvg;
@@ -477,7 +477,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
     }
 
   if (!game) return <div>Loading...</div>;
-  
+
   if (showSummary) {
     const totals = calculateGameTotals(game);
     const playerStats = calculatePlayerStats(game);
@@ -494,8 +494,8 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
   }
 
   if (showPreMatch) {
-    const lineupStrategy = game.lineupStrategy || 'flexible';
-    const lineupRule = game.lineupRule || 'standard';
+    const lineupStrategy = game.lineupStrategy;
+    const lineupRule = game.lineupRule;
     return (
       <div className="min-h-screen bg-gray-900 text-white p-6">
         <div className="max-w-6xl mx-auto">

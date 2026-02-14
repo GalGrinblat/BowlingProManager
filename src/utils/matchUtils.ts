@@ -1,7 +1,7 @@
 import type { BonusRule, Game, PlayerMatchResult, GameMatch, MatchPlayer } from '../types/index';
 import { compareTeamScores, applyMatchWinnerPoints } from './comparisonUtils';
 
-export const createEmptyMatch = (matchNumber: number, playersPerTeam: number = 4): GameMatch => {
+export const createEmptyMatch = (matchNumber: number, playersPerTeam: number): GameMatch => {
   const emptyPlayers: MatchPlayer[] = Array.from({ length: playersPerTeam }, () => ({ 
     pins: 0, 
     bonusPoints: 0 

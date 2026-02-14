@@ -5,7 +5,7 @@ interface PlayerRowProps {
   player: GamePlayer;
   idx: number;
   team: 'team1' | 'team2';
-  lineupStrategy: string;
+  lineupStrategy?: string;
   toggleAbsent: (team: 'team1' | 'team2', idx: number) => void;
   movePlayer: (team: 'team1' | 'team2', idx: number, direction: 'up' | 'down') => void;
   t: (key: string) => string;
@@ -92,7 +92,7 @@ interface TeamPanelProps {
   teamColor: string;
   players: GamePlayer[];
   team: 'team1' | 'team2';
-  lineupStrategy: string;
+  lineupStrategy?: string;
   toggleAbsent: (team: 'team1' | 'team2', idx: number) => void;
   movePlayer: (team: 'team1' | 'team2', idx: number, direction: 'up' | 'down') => void;
   t: (key: string) => string;
