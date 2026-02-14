@@ -1,4 +1,4 @@
-import type { Game } from '../types/index';
+import type { Game, GameMatch, GamePlayer } from '../types/index';
 
 interface PlayerGameStats {
   totalPins: number;
@@ -28,7 +28,7 @@ export const calculatePlayerStats = (game: Game): GameStats => {
       team2Average: 0
     };
   }
-  const team1Stats = game.team1.players.map((player: any, idx: number) => {
+  const team1Stats = game.team1.players.map((player: GamePlayer, idx: number) => {
     if (!player) {
       return { totalPins: 0, gameAverage: 0, pointsScored: 0, isAbsent: false };
     }
@@ -36,16 +36,26 @@ export const calculatePlayerStats = (game: Game): GameStats => {
       const absenceScore = player.average - 10;
       const totalPins = absenceScore * 3;
       const gameAverage = absenceScore;
-      const pointsScored = game.matches?.reduce((sum: number, m: any) => sum + m.playerMatches[idx].team1Points, 0) || 0;
+      const pointsScored = game.matches?.reduce((sum: number, m: GameMatch) => {
+        const playerMatch = m.playerMatches?.[idx];
+        return sum + (playerMatch?.team1Points ?? 0);
+      }, 0) || 0;
       return { ...player, totalPins, gameAverage, pointsScored, isAbsent: true };
     }
-    const totalPins = game.matches?.reduce((sum: number, m: any) => sum + (m.team1.players[idx].pins || 0), 0) || 0;
+    const totalPins = game.matches?.reduce((sum: number, m: GameMatch) => {
+      const player = m.team1.players[idx];
+      const pins = player && player.pins !== undefined && player.pins !== '' ? Number(player.pins) : 0;
+      return sum + pins;
+    }, 0) || 0;
     const gameAverage = totalPins / 3;
-    const pointsScored = game.matches?.reduce((sum: number, m: any) => sum + m.playerMatches[idx].team1Points, 0) || 0;
+    const pointsScored = game.matches?.reduce((sum: number, m: GameMatch) => {
+      const playerMatch = m.playerMatches && m.playerMatches[idx];
+      return sum + (playerMatch?.team1Points ?? 0);
+    }, 0) || 0;
     return { ...player, totalPins, gameAverage, pointsScored, isAbsent: false };
   });
   
-  const team2Stats = game.team2.players.map((player: any, idx: number) => {
+  const team2Stats = game.team2.players.map((player: GamePlayer, idx: number) => {
     if (!player) {
       return { totalPins: 0, gameAverage: 0, pointsScored: 0, isAbsent: false };
     }
@@ -53,12 +63,22 @@ export const calculatePlayerStats = (game: Game): GameStats => {
       const absenceScore = player.average - 10;
       const totalPins = absenceScore * 3;
       const gameAverage = absenceScore;
-      const pointsScored = game.matches?.reduce((sum: number, m: any) => sum + m.playerMatches[idx].team2Points, 0) || 0;
+      const pointsScored = game.matches?.reduce((sum: number, m: GameMatch) => {
+        const playerMatch = m.playerMatches && m.playerMatches[idx];
+        return sum + (playerMatch?.team2Points ?? 0);
+      }, 0) || 0;
       return { ...player, totalPins, gameAverage, pointsScored, isAbsent: true };
     }
-    const totalPins = game.matches?.reduce((sum: number, m: any) => sum + (m.team2.players[idx].pins || 0), 0) || 0;
+    const totalPins = game.matches?.reduce((sum: number, m: GameMatch) => {
+      const player = m.team2.players[idx];
+      const pins = player && player.pins !== undefined && player.pins !== '' ? Number(player.pins) : 0;
+      return sum + pins;
+    }, 0) || 0;
     const gameAverage = totalPins / 3;
-    const pointsScored = game.matches?.reduce((sum: number, m: any) => sum + m.playerMatches[idx].team2Points, 0) || 0;
+    const pointsScored = game.matches?.reduce((sum: number, m: GameMatch) => {
+      const playerMatch = m.playerMatches && m.playerMatches[idx];
+      return sum + (playerMatch?.team2Points ?? 0);
+    }, 0) || 0;
     return { ...player, totalPins, gameAverage, pointsScored, isAbsent: false };
   });
   

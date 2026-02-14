@@ -1,7 +1,7 @@
 import { ArrowLeft, CheckCircle } from './Icons';
 import { TeamStatsCard } from './TeamStatsCard';
 
-import type { SummaryViewProps } from '../../types/index';
+import type { GameMatch, SummaryViewProps } from '../../types/index';
 
 export const SummaryView: React.FC<SummaryViewProps> = ({ game, totals, playerStats, onBack, onFinish }) => {
     if (!game || !game.team1 || !game.team2) return null;
@@ -31,7 +31,7 @@ export const SummaryView: React.FC<SummaryViewProps> = ({ game, totals, playerSt
       <div className="bg-gray-800 rounded-lg p-4 mb-6">
         <div className="bowling-title text-white text-xl mb-4">MATCH BREAKDOWN</div>
         <div className="space-y-2">
-          {Array.isArray(game.matches) && game.matches.map((match: any, idx: number) => (
+          {Array.isArray(game.matches) && game.matches.map((match: GameMatch, idx: number) => (
             <div key={idx} className="bg-gray-700 rounded p-3">
               <div className="grid grid-cols-3 items-center">
                 <div className="text-center">

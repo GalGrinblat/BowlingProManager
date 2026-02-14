@@ -108,7 +108,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
     loadLeagues();
   };
 
-  const handleEdit = (league: any) => {
+  const handleEdit = (league: League) => {
     setFormData({
       ...getDefaultFormData(),
       name: league.name,
@@ -159,7 +159,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
     }
   };
 
-  const toggleActive = (league: any) => {
+  const toggleActive = (league: League) => {
     if (league.active) {
       // Archiving an active league
       if (confirm(`📦 ${t('leagues.archiveConfirm')} "${league.name}"?\n\n${t('leagues.archiveDesc')}`)) {

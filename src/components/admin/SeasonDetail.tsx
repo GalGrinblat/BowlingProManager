@@ -8,7 +8,7 @@ import { useTranslation } from '../../contexts/LanguageContext';
 import { exportSeason, downloadExportFile, readImportFile, importLeagueOrSeason } from '../../utils/leagueImportExportUtils';
 import { PrintMatchDay } from './PrintMatchDay';
 
-import type { SeasonDetailProps } from '../../types/index';
+import type { GameMatch, ScheduleMatchDay, SeasonDetailProps } from '../../types/index';
 import type { Season, League, Team, Game } from '../../types/index';
 
 export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, onPlayGame, onViewGame, onManageTeams }) => {
@@ -98,7 +98,7 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
       seasonsApi.update(seasonId, { schedule: updatedSchedule });
 
       // Update all games with new dates from schedule
-      updatedSchedule.forEach((daySchedule: any) => {
+      updatedSchedule.forEach((daySchedule: ScheduleMatchDay) => {
         const gamesToUpdate = games.filter(g => g.matchDay === daySchedule.matchDay);
         gamesToUpdate.forEach(game => {
           gamesApi.update(game.id, { 
@@ -415,7 +415,7 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
                 {matchDaysInRound.map(matchDay => {
                   const matchDayGamesForDay = roundGames.filter(g => g.matchDay === matchDay);
                   const completedInMatchDay = matchDayGamesForDay.filter(g => g.status === 'completed').length;
-                  const scheduleEntry = season.schedule?.find((s: any) => s.matchDay === matchDay);
+                  const scheduleEntry = season.schedule?.find((s: ScheduleMatchDay) => s.matchDay === matchDay);
                   const dateDisplay = scheduleEntry?.date ? formatMatchDate(scheduleEntry.date) : null;
                   const isPostponed = scheduleEntry?.postponed;
                   
@@ -796,8 +796,8 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
             
             <div className="mb-4">
               <p className="text-sm text-gray-600 mb-2">
-                {t('seasons.currentDate')}: {season.schedule?.find((s: any) => s.matchDay === selectedMatchDay)?.date
-                  ? formatMatchDate(season.schedule.find((s: any) => s.matchDay === selectedMatchDay)?.date ?? null)
+                {t('seasons.currentDate')}: {season.schedule?.find((s: ScheduleMatchDay) => s.matchDay === selectedMatchDay)?.date
+                  ? formatMatchDate(season.schedule.find((s: ScheduleMatchDay) => s.matchDay === selectedMatchDay)?.date ?? null)
                   : t('seasons.notScheduled')}
               </p>
               <p className="text-sm text-gray-600 mb-4">
@@ -816,10 +816,10 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
               />
               
-              {postponeWeeks > 0 && season.schedule?.find((s: any) => s.matchDay === selectedMatchDay)?.date && (
+              {postponeWeeks > 0 && season.schedule?.find((s: ScheduleMatchDay) => s.matchDay === selectedMatchDay)?.date && (
                 <p className="text-sm text-gray-500 mt-2">
                   {t('seasons.newDate')}: {(() => {
-                    const dateStr = season.schedule.find((s: any) => s.matchDay === selectedMatchDay)?.date;
+                    const dateStr = season.schedule.find((s: ScheduleMatchDay) => s.matchDay === selectedMatchDay)?.date;
                     if (!dateStr) return t('seasons.notScheduled');
                     const newDate = new Date(new Date(dateStr).getTime() + postponeWeeks * 7 * 24 * 60 * 60 * 1000);
                     return formatMatchDate(newDate.toISOString());
@@ -853,7 +853,7 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
 };
 
 // Game Card Component
-const GameCard = ({ game, team1, team2, h2h, onPlayGame, onViewGame }: { game: any, team1: any, team2: any, h2h: any, onPlayGame: () => void, onViewGame: () => void }) => {
+const GameCard = ({ game, team1, team2, h2h, onPlayGame, onViewGame }: { game: Game, team1: any, team2: any, h2h: any, onPlayGame: () => void, onViewGame: () => void }) => {
   const { t } = useTranslation();
   
   const getStatusBadge = () => {
@@ -867,8 +867,8 @@ const GameCard = ({ game, team1, team2, h2h, onPlayGame, onViewGame }: { game: a
     }
   };
 
-  const team1TotalPoints = game.matches?.reduce((sum: any, m: any) => sum + (m.team1?.score || 0), 0) + (game.grandTotalPoints?.team1 || 0);
-  const team2TotalPoints = game.matches?.reduce((sum: any, m: any) => sum + (m.team2?.score || 0), 0) + (game.grandTotalPoints?.team2 || 0);
+  const team1TotalPoints = game.matches?.reduce((sum: any, m: GameMatch) => sum + (m.team1?.points || 0), 0) + (game.grandTotalPoints?.team1 || 0);
+  const team2TotalPoints = game.matches?.reduce((sum: any, m: GameMatch) => sum + (m.team2?.points || 0), 0) + (game.grandTotalPoints?.team2 || 0);
 
   return (
     <div className={`border rounded-lg p-4 transition-colors ${

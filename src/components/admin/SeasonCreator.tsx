@@ -340,7 +340,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
                   <div className="mb-2 text-xs text-gray-500">{t('seasons.teamRoster')}</div>
                   <ul className="mb-2">
                     {team.playerIds.map((playerId: string) => {
-                      const player = availablePlayers.find((p: any) => p.id === playerId);
+                      const player = availablePlayers.find((p: Player) => p.id === playerId);
                       return (
                         <li key={playerId} className="flex items-center justify-between mb-1">
                           <span>{player?.name || 'Unknown'}</span>
@@ -358,7 +358,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
                     }}
                   >
                     <option value="">{t('seasons.selectPlayer')}</option>
-                    {availablePlayers.filter(p => !getAssignedPlayers(teamIdx).has(p.id)).map((player: any) => (
+                    {availablePlayers.filter(p => !getAssignedPlayers(teamIdx).has(p.id)).map((player: Player) => (
                       <option key={player.id} value={player.id}>{player.name}</option>
                     ))}
                   </select>
@@ -474,7 +474,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
   };
   const allPlayersWithTeams = teams.flatMap(team =>
     team.playerIds.map((playerId: string) => {
-      const player = availablePlayers.find((p: any) => p.id === playerId);
+      const player = availablePlayers.find((p: Player) => p.id === playerId);
       return {
         playerId,
         playerName: player?.name || 'Unknown',

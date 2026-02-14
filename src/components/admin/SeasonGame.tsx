@@ -69,8 +69,8 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
       // Check if this is the first time entering the game (no scores entered yet)
       // Any positive pins value means scores have been entered
       const hasAnyScores = gameData.matches.some((m: GameMatch) =>
-        m.team1.players.some((p: MatchPlayer) => p.pins > 0) ||
-        m.team2.players.some((p: MatchPlayer) => p.pins > 0)
+        m.team1.players.some((p: MatchPlayer) => p.pins === '') ||
+        m.team2.players.some((p: MatchPlayer) => p.pins === '')
       );
       
       // Show pre-match setup if no scores entered yet
@@ -81,10 +81,10 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
         if (!gameData.team1 || !gameData.team2) return;
         const incompleteMatchIndex = gameData.matches.findIndex((m: GameMatch) => {
           const team1Complete = gameData.team1!.players.every((p: GamePlayer, idx: number) =>
-            p.absent || (m.team1.players[idx] && m.team1.players[idx].pins !== 0)
+            p.absent || (m.team1.players[idx] && m.team1.players[idx].pins !== '')
           );
           const team2Complete = gameData.team2!.players.every((p: GamePlayer, idx: number) =>
-            p.absent || (m.team2.players[idx] && m.team2.players[idx].pins !== 0)
+            p.absent || (m.team2.players[idx] && m.team2.players[idx].pins !== '')
           );
           return !team1Complete || !team2Complete;
         });
@@ -170,12 +170,11 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
     matchIndex: number,
     team: 'team1' | 'team2',
     playerIndex: number,
-    pins: number | string
+    pins: string
   ) => {
     if (!game || !game.matches || !game.team1 || !game.team2) return;
     const updated: Game = { ...game };
     if (!updated.matches || !updated.team1 || !updated.team2) return;
-    const pinsValue = typeof pins === 'number' ? Math.max(0, Math.min(300, pins)) : Math.max(0, Math.min(300, parseInt(pins) || 0));
     // Type-safe access
     const match = updated.matches[matchIndex];
     if (!match) return;
@@ -188,13 +187,13 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
       updated.team1.players &&
       updated.team1.players[playerIndex]
     ) {
-      match.team1.players[playerIndex].pins = pinsValue;
+      match.team1.players[playerIndex].pins = pins;
       playerObj = updated.team1.players[playerIndex];
       if (playerObj) {
         match.team1.players[playerIndex].bonusPoints = calculateBonusPoints(
-          pinsValue,
+          pins,
           playerObj.average,
-          typeof playerObj.absent === 'boolean' ? playerObj.absent : false,
+          playerObj.absent,
           game.bonusRules ?? []
         );
       }
@@ -206,13 +205,13 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
       updated.team2.players &&
       updated.team2.players[playerIndex]
     ) {
-      match.team2.players[playerIndex].pins = pinsValue;
+      match.team2.players[playerIndex].pins = pins;
       playerObj = updated.team2.players[playerIndex];
       if (playerObj) {
         match.team2.players[playerIndex].bonusPoints = calculateBonusPoints(
-          pinsValue,
+          pins,
           playerObj.average,
-          typeof playerObj.absent === 'boolean' ? playerObj.absent : false,
+          playerObj.absent,
           game.bonusRules ?? []
         );
       }
@@ -232,10 +231,10 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
       allMatchesComplete = updated.matches.every((m: GameMatch) => {
         if (!m.team1 || !m.team1.players || !m.team2 || !m.team2.players) return false;
         const team1Complete = updated.team1 && Array.isArray(updated.team1.players) && updated.team1.players.every((p: GamePlayer, pIdx: number) =>
-          p.absent || (m.team1.players[pIdx] && m.team1.players[pIdx].pins !== 0)
+          p.absent || (m.team1.players[pIdx] && m.team1.players[pIdx].pins !== '')
         );
         const team2Complete = updated.team2 && Array.isArray(updated.team2.players) && updated.team2.players.every((p: GamePlayer, pIdx: number) =>
-          p.absent || (m.team2.players[pIdx] && m.team2.players[pIdx].pins !== 0)
+          p.absent || (m.team2.players[pIdx] && m.team2.players[pIdx].pins !== '')
         );
         return team1Complete && team2Complete;
       });
@@ -269,10 +268,10 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
     if (!match || !match.team1 || !match.team2) return;
     // Validate current match is complete
     const team1Complete = game.team1.players && match.team1.players && game.team1.players.every((p: GamePlayer, idx: number) => 
-      p.absent || (match.team1.players[idx] && match.team1.players[idx].pins !== 0)
+      p.absent || (match.team1.players[idx] && match.team1.players[idx].pins !== '')
     );
     const team2Complete = game.team2.players && match.team2.players && game.team2.players.every((p: GamePlayer, idx: number) => 
-      p.absent || (match.team2.players[idx] && match.team2.players[idx].pins !== 0)
+      p.absent || (match.team2.players[idx] && match.team2.players[idx].pins !== '')
     );
     if (!team1Complete || !team2Complete) {
       alert('Please enter all scores before proceeding');

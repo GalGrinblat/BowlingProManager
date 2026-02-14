@@ -284,7 +284,7 @@ export interface ScheduleMatchDay {
 
 /** MatchPlayer - Individual player's performance in a single match (pins + bonus) */
 export interface MatchPlayer {
-  pins: number;
+  pins: string;
   bonusPoints: number;
 }
 
@@ -405,7 +405,7 @@ export interface PlayerSeasonComparisonProps {
 export interface MatchViewProps {
   matchNumber: number;
   game: Game;
-  onUpdateScore: (matchIndex: number, team: 'team1' | 'team2', playerIndex: number, pins: number | string) => void;
+  onUpdateScore: (matchIndex: number, team: 'team1' | 'team2', playerIndex: number, pins: string) => void;
   onToggleAbsent?: (team: 'team1' | 'team2', playerIndex: number) => void;
   onNavigate: (direction: string) => void;
   onCancel: () => void;

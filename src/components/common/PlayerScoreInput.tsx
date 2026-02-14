@@ -10,7 +10,7 @@ export interface PlayerScoreInputProps {
   playerIdx: number;
   matchIdx: number;
   useHandicap: boolean;
-  onUpdateScore: (matchIdx: number, team: 'team1' | 'team2', idx: number, pins: number | string) => void;
+  onUpdateScore: (matchIdx: number, team: 'team1' | 'team2', idx: number, pins: string) => void;
   isReadOnly?: boolean;
   alignment?: 'left' | 'right';
 }
@@ -39,7 +39,7 @@ export const PlayerScoreInput: React.FC<PlayerScoreInputProps> = ({
   const absentScore = parseInt(String(player.average)) - 10;
   const scoreWithHandicap = player.absent
     ? absentScore + player.handicap
-    : matchPlayer.pins !== 0
+    : matchPlayer.pins !== ''
     ? parseInt(String(matchPlayer.pins)) + player.handicap
     : 0;
 
