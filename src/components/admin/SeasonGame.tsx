@@ -69,8 +69,8 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
       // Check if this is the first time entering the game (no scores entered yet)
       // Any positive pins value means scores have been entered
       const hasAnyScores = gameData.matches.some((m: GameMatch) =>
-        m.team1.players.some((p: MatchPlayer) => p.pins === '') ||
-        m.team2.players.some((p: MatchPlayer) => p.pins === '')
+        m.team1.players.some((p: MatchPlayer) => p.pins !== '') ||
+        m.team2.players.some((p: MatchPlayer) => p.pins !== '')
       );
       
       // Show pre-match setup if no scores entered yet

@@ -45,7 +45,6 @@ export const calculateBonusPoints = (
   
   if (score === '' || average === 0) return 0;
   const scoreNum = typeof score === 'string' ? parseInt(score) : score;
-  const avgNum = typeof average === 'string' ? parseFloat(average) : average;
   
   // Use bonus rules if provided
   if (!bonusRules || bonusRules.length === 0) return 0;
@@ -58,7 +57,7 @@ export const calculateBonusPoints = (
   // Check each rule and return the first (highest) bonus that applies
   for (const rule of playerRules) {
     if (rule.condition === 'vs_average') {
-      if (scoreNum >= avgNum + rule.threshold) {
+      if (scoreNum >= average + rule.threshold) {
         return rule.points;
       }
     } else if (rule.condition === 'pure_score') {

@@ -44,7 +44,7 @@ export const PlayerScoreInput: React.FC<PlayerScoreInputProps> = ({
     : 0;
 
   // Render player info (name and stats)
-  const PlayerInfo = () => (
+  const playerInfo = (
     <div className="flex-1 min-w-0">
       <div className={`font-semibold text-white text-sm truncate ${isRightAligned ? 'text-right' : ''}`}>
         {player.name}
@@ -57,14 +57,14 @@ export const PlayerScoreInput: React.FC<PlayerScoreInputProps> = ({
   );
 
   // Render rank badge
-  const RankBadge = () => (
+  const rankBadge = (
     <div className={`${bgColor} text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0`}>
       {player.rank}
     </div>
   );
 
   // Render score inputs or absent display
-  const ScoreDisplay = () => (
+  const scoreDisplay = (
     <div className="flex items-center gap-2 flex-shrink-0">
       {player.absent ? (
         <>
@@ -123,6 +123,7 @@ export const PlayerScoreInput: React.FC<PlayerScoreInputProps> = ({
             <label className="text-gray-400 text-sm block">Score</label>
             <input
               type="number"
+              inputMode='numeric'
               value={matchPlayer.pins}
               onChange={(e) => onUpdateScore(matchIdx, teamKey, playerIdx, e.target.value)}
               onKeyDown={(e) => ['-', '+', 'e', 'E'].includes(e.key) && e.preventDefault()}
@@ -155,11 +156,11 @@ export const PlayerScoreInput: React.FC<PlayerScoreInputProps> = ({
   // Main layout based on alignment
   return (
     <div className={`flex items-center gap-2 ${isRightAligned ? 'text-right justify-end' : ''}`}>
-      {!isRightAligned && <RankBadge />}
-      {!isRightAligned && <PlayerInfo />}
-      <ScoreDisplay />
-      {isRightAligned && <PlayerInfo />}
-      {isRightAligned && <RankBadge />}
+      {!isRightAligned && rankBadge}
+      {!isRightAligned && playerInfo}
+      {scoreDisplay}
+      {isRightAligned && playerInfo}
+      {isRightAligned && rankBadge}
     </div>
   );
 };
