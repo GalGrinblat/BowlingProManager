@@ -223,6 +223,9 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
             postponed: false,
             lineupStrategy: created.lineupStrategy,
             lineupRule: created.lineupRule,
+            bonusRules: created.bonusRules,
+            teamAllPresentBonusEnabled: created.teamAllPresentBonusEnabled,
+            teamAllPresentBonusPoints: created.teamAllPresentBonusPoints,
           });
         }
       }

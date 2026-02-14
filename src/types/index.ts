@@ -150,6 +150,8 @@ export interface Game {
   useHandicap: boolean;
   lineupStrategy?: LineupStrategy;
   lineupRule?: LineupRule;
+  teamAllPresentBonusEnabled?: boolean;
+  teamAllPresentBonusPoints?: number;  
   bonusRules?: BonusRule[];
   playerMatchPointsPerWin: number;
   teamMatchPointsPerWin: number;
