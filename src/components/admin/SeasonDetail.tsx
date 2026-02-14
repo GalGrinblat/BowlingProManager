@@ -853,7 +853,7 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
 };
 
 // Game Card Component
-const GameCard = ({ game, team1, team2, h2h, onPlayGame, onViewGame }: { game: Game, team1: any, team2: any, h2h: any, onPlayGame: () => void, onViewGame: () => void }) => {
+const GameCard = ({ game, team1, team2, h2h, onPlayGame, onViewGame }: { game: Game, team1: Team | undefined, team2: Team | undefined, h2h: any, onPlayGame: () => void, onViewGame: () => void }) => {
   const { t } = useTranslation();
   
   const getStatusBadge = () => {
@@ -883,7 +883,7 @@ const GameCard = ({ game, team1, team2, h2h, onPlayGame, onViewGame }: { game: G
         <div className="mb-3 pb-3 border-b border-gray-300">
           <div className="flex items-center gap-2 text-sm text-gray-600">
             <span className="font-semibold">📊 {t('games.seriesRecord')}:</span>
-            <span>{formatHeadToHead(h2h, team1?.name, team2?.name)}</span>
+            <span>{formatHeadToHead(h2h, team1?.name ?? '', team2?.name ?? '')}</span>
           </div>
         </div>
       )}

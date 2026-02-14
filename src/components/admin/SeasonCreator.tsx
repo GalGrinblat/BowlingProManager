@@ -132,6 +132,109 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
     );
   };
 
+    // --- Final submit handler ---
+  const handleFinalSubmit = async () => {
+    // Basic validation
+    if (!formData.name || teams.length < 2 || teams.some(t => t.playerIds.length !== formData.playersPerTeam)) {
+      alert(t('validation.incompleteTeams') || 'Please complete all teams and fill in all required fields.');
+      return;
+    }
+    // Prepare season data (all required fields for Season)
+    const today = new Date().toISOString();
+    const seasonData = {
+      leagueId,
+      name: formData.name,
+      startDate: today,
+      endDate: today,
+      numberOfTeams: teams.length,
+      playersPerTeam: formData.playersPerTeam,
+      numberOfRounds: formData.numberOfRounds,
+      matchesPerGame: formData.matchesPerGame,
+      lineupStrategy: league?.lineupStrategy || 'flexible',
+      lineupRule: league?.lineupRule || 'standard',
+      playerMatchPointsPerWin: league?.playerMatchPointsPerWin || 1,
+      teamMatchPointsPerWin: league?.teamMatchPointsPerWin || 1,
+      teamGamePointsPerWin: league?.teamGamePointsPerWin || 2,
+      useHandicap: formData.useHandicap,
+      handicapBasis: formData.handicapBasis,
+      handicapPercentage: formData.handicapPercentage,
+      teamAllPresentBonusEnabled: formData.teamAllPresentBonusEnabled,
+      teamAllPresentBonusPoints: formData.teamAllPresentBonusPoints,
+      bonusRules: league?.bonusRules || [],
+          status: "active" as const,
+      teams: teams.map(team => ({
+        name: team.name,
+        playerIds: team.playerIds,
+      })),
+      playerAverages,
+    };
+
+    // Save via API
+    try {
+      const { seasonsApi, gamesApi, teamsApi } = await import('../../services/api');
+      const { generateRoundRobinSchedule } = await import('../../utils/scheduleUtils');
+      
+      // 1. Create the season
+      const created = await seasonsApi.create(seasonData);
+
+      // 2. Create teams in DB and collect their IDs
+      type TeamType = { name: string; playerIds: string[] };
+      const createdTeams: { id: string; name: string }[] = [];
+      for (const team of teams as TeamType[]) {
+        const newTeam = teamsApi.create({
+          name: team.name,
+          seasonId: created.id,
+          playerIds: team.playerIds,
+          rosterChanges: [],
+        });
+        createdTeams.push({ id: newTeam.id, name: newTeam.name });
+      }
+
+      // Map team names to IDs (for schedule)
+      const teamIdMap: Record<string, string> = {};
+      createdTeams.forEach((team) => {
+        teamIdMap[team.name] = team.id;
+      });
+
+      // Use the actual team IDs for schedule
+      const teamIds = createdTeams.map(team => team.id);
+      const schedule = generateRoundRobinSchedule(
+        teamIds,
+        created.numberOfRounds,
+        created.startDate,
+        league?.dayOfWeek || null
+      );
+
+      // 3. Create games for each match in the schedule
+      for (const day of schedule) {
+        for (const match of day.matches) {
+          await gamesApi.create({
+            seasonId: created.id,
+            round: day.round,
+            matchDay: day.matchDay,
+            team1Id: match.team1Id,
+            team2Id: match.team2Id,
+            matchesPerGame: created.matchesPerGame,
+            useHandicap: created.useHandicap,
+            playerMatchPointsPerWin: created.playerMatchPointsPerWin,
+            teamMatchPointsPerWin: created.teamMatchPointsPerWin,
+            teamGamePointsPerWin: created.teamGamePointsPerWin,
+            scheduledDate: day.date || undefined,
+            postponed: false,
+            lineupStrategy: created.lineupStrategy,
+            lineupRule: created.lineupRule,
+          });
+        }
+      }
+      
+      // 4. Update season with schedule
+      await seasonsApi.update(created.id, { schedule });
+      if (typeof onSuccess === 'function') onSuccess(created.id);
+    } catch (err) {
+      alert(t('validation.saveError') || 'Error saving season.');
+    }
+  };
+  
   // --- Step 1: Season details ---
   if (!league) {
     return (
@@ -140,6 +243,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
       </div>
     );
   }
+
   if (step === 1) {
     // Helper: get value from league or formData depending on inheritLeagueConfig
     const getValue = (key: keyof SeasonFormData) => {
@@ -375,103 +479,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
     );
   }
 
-  // Step 3: Review/edit player averages (already present)
-
-  // --- Final submit handler ---
-  const handleFinalSubmit = async () => {
-    // Basic validation
-    if (!formData.name || teams.length < 2 || teams.some(t => t.playerIds.length !== formData.playersPerTeam)) {
-      alert(t('validation.incompleteTeams') || 'Please complete all teams and fill in all required fields.');
-      return;
-    }
-    // Prepare season data (all required fields for Season)
-    const today = new Date().toISOString();
-    const seasonData = {
-      leagueId,
-      name: formData.name,
-      startDate: today,
-      endDate: today,
-      numberOfTeams: teams.length,
-      playersPerTeam: formData.playersPerTeam,
-      numberOfRounds: formData.numberOfRounds,
-      matchesPerGame: formData.matchesPerGame,
-      lineupStrategy: league?.lineupStrategy || 'flexible',
-      lineupRule: league?.lineupRule || 'standard',
-      playerMatchPointsPerWin: league?.playerMatchPointsPerWin || 1,
-      teamMatchPointsPerWin: league?.teamMatchPointsPerWin || 1,
-      teamGamePointsPerWin: league?.teamGamePointsPerWin || 2,
-      useHandicap: formData.useHandicap,
-      handicapBasis: formData.handicapBasis,
-      handicapPercentage: formData.handicapPercentage,
-      teamAllPresentBonusEnabled: formData.teamAllPresentBonusEnabled,
-      teamAllPresentBonusPoints: formData.teamAllPresentBonusPoints,
-      bonusRules: league?.bonusRules || [],
-          status: "active" as const,
-      teams: teams.map(team => ({
-        name: team.name,
-        playerIds: team.playerIds,
-      })),
-      playerAverages,
-    };
-    // Save via API
-    try {
-      const { seasonsApi, gamesApi, teamsApi } = await import('../../services/api');
-      const { generateRoundRobinSchedule } = await import('../../utils/scheduleUtils');
-      // 1. Create the season
-      const created = await seasonsApi.create(seasonData);
-      // 2. Create teams in DB and collect their IDs
-      type TeamType = { name: string; playerIds: string[] };
-      const createdTeams: { id: string; name: string }[] = [];
-      for (const team of teams as TeamType[]) {
-        const newTeam = teamsApi.create({
-          name: team.name,
-          seasonId: created.id,
-          playerIds: team.playerIds,
-          rosterChanges: [],
-        });
-        createdTeams.push({ id: newTeam.id, name: newTeam.name });
-      }
-      // Map team names to IDs (for schedule)
-      const teamIdMap: Record<string, string> = {};
-      createdTeams.forEach((team) => {
-        teamIdMap[team.name] = team.id;
-      });
-      // Use the actual team IDs for schedule
-      const teamIds = createdTeams.map(team => team.id);
-      const schedule = generateRoundRobinSchedule(
-        teamIds,
-        created.numberOfRounds,
-        created.startDate,
-        league?.dayOfWeek || null
-      );
-      // 3. Create games for each match in the schedule
-      for (const day of schedule) {
-        for (const match of day.matches) {
-          await gamesApi.create({
-            seasonId: created.id,
-            round: day.round,
-            matchDay: day.matchDay,
-            team1Id: match.team1Id,
-            team2Id: match.team2Id,
-            matchesPerGame: created.matchesPerGame,
-            useHandicap: created.useHandicap,
-            playerMatchPointsPerWin: created.playerMatchPointsPerWin,
-            teamMatchPointsPerWin: created.teamMatchPointsPerWin,
-            teamGamePointsPerWin: created.teamGamePointsPerWin,
-            scheduledDate: day.date || undefined,
-            postponed: false,
-            lineupStrategy: created.lineupStrategy,
-            lineupRule: created.lineupRule,
-          });
-        }
-      }
-      // 4. Update season with schedule
-      await seasonsApi.update(created.id, { schedule });
-      if (typeof onSuccess === 'function') onSuccess(created.id);
-    } catch (err) {
-      alert(t('validation.saveError') || 'Error saving season.');
-    }
-  };
+  // Step 3: Review/edit player averages
   const allPlayersWithTeams = teams.flatMap(team =>
     team.playerIds.map((playerId: string) => {
       const player = availablePlayers.find((p: Player) => p.id === playerId);

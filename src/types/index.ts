@@ -89,6 +89,8 @@ export interface Season {
   bonusRules: BonusRule[];
   status: 'setup' | 'active' | 'completed';
   schedule?: ScheduleMatchDay[];
+  /** Initial player averages for this season, keyed by playerId */
+  playerAverages?: { [playerId: string]: number };
   updatedAt?: DateString;
   createdAt: DateString;
 }
