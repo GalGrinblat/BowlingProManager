@@ -1,11 +1,14 @@
 import { ArrowLeft, ArrowRight } from './Icons';
 import { PlayerScoreInput } from './PlayerScoreInput';
-import type { MatchViewProps } from '../../types/index';
+import type { MatchViewProps, GamePlayer } from '../../types/index';
 
 export const MatchView: React.FC<MatchViewProps> = ({ matchNumber, game, onUpdateScore, onNavigate, onCancel, isReadOnly = false }) => {
   const matchIndex = matchNumber - 1;
+  if (!game || !game.matches || !game.matches[matchIndex]) return null;
   const match = game.matches[matchIndex];
   const totalMatches = game.matches.length;
+  if (!game.team1 || !game.team2) return null;
+  if (!match.team1 || !match.team2) return null;
   
   return (
     <div className="scorecard rounded-xl p-6 md:p-8 mb-8 animate-slide-in">
@@ -35,55 +38,61 @@ export const MatchView: React.FC<MatchViewProps> = ({ matchNumber, game, onUpdat
       {/* Players Grid */}
       <div className="bg-gray-800 rounded-lg p-4 mb-6">
         <div className="space-y-3">
-          {game.team1.players.map((player: any, idx: number) => (
-            <div key={idx} className="player-row bg-gray-700 rounded-lg p-3">
-              <div className="grid grid-cols-3 gap-4 items-center">
-                {/* Team 1 Player */}
-                <PlayerScoreInput
-                  player={player}
-                  matchPlayer={match.team1.players[idx]}
-                  teamColor="orange"
-                  teamKey="team1"
-                  playerIdx={idx}
-                  matchIdx={matchIndex}
-                  useHandicap={game.useHandicap}
-                  onUpdateScore={onUpdateScore}
-                  isReadOnly={isReadOnly}
-                  alignment="left"
-                />
+          {game.team1.players.map((player: GamePlayer, idx: number) => {
+            const team1MatchPlayer = match.team1.players[idx];
+            const team2Player = game.team2?.players[idx];
+            const team2MatchPlayer = match.team2.players[idx];
+            if (!team1MatchPlayer ||!team2Player || !team2MatchPlayer) return null;
+            return (
+              <div key={idx} className="player-row bg-gray-700 rounded-lg p-3">
+                <div className="grid grid-cols-3 gap-4 items-center">
+                  {/* Team 1 Player */}
+                  <PlayerScoreInput
+                    player={player}
+                    matchPlayer={team1MatchPlayer}
+                    teamColor="orange"
+                    teamKey="team1"
+                    playerIdx={idx}
+                    matchIdx={matchIndex}
+                    useHandicap={game.useHandicap}
+                    onUpdateScore={onUpdateScore}
+                    isReadOnly={isReadOnly}
+                    alignment="left"
+                  />
 
-                {/* Points in Middle */}
-                <div className="text-center">
-                  <div className="bg-gray-900 rounded-lg p-2 border border-gray-600">
-                    <div className="text-xs text-gray-400 mb-1">POINTS</div>
-                    <div className="flex items-center justify-center gap-2">
-                      <span className={`font-bold text-lg ${match.playerMatches[idx].result === 'team1' ? 'text-green-400' : 'text-gray-500'}`}>
-                        {match.playerMatches[idx].team1Points}
-                      </span>
-                      <span className="text-gray-600">-</span>
-                      <span className={`font-bold text-lg ${match.playerMatches[idx].result === 'team2' ? 'text-green-400' : 'text-gray-500'}`}>
-                        {match.playerMatches[idx].team2Points}
-                      </span>
+                  {/* Points in Middle */}
+                  <div className="text-center">
+                    <div className="bg-gray-900 rounded-lg p-2 border border-gray-600">
+                      <div className="text-xs text-gray-400 mb-1">POINTS</div>
+                      <div className="flex items-center justify-center gap-2">
+                        <span className={`font-bold text-lg ${match.playerMatches?.[idx]?.result === 'team1' ? 'text-green-400' : 'text-gray-500'}`}>
+                          {match.playerMatches?.[idx]?.team1Points ?? 0}
+                        </span>
+                        <span className="text-gray-600">-</span>
+                        <span className={`font-bold text-lg ${match.playerMatches?.[idx]?.result === 'team2' ? 'text-green-400' : 'text-gray-500'}`}>
+                          {match.playerMatches?.[idx]?.team2Points ?? 0}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Team 2 Player */}
-                <PlayerScoreInput
-                  player={game.team2.players[idx]}
-                  matchPlayer={match.team2.players[idx]}
-                  teamColor="blue"
-                  teamKey="team2"
-                  playerIdx={idx}
-                  matchIdx={matchIndex}
-                  useHandicap={game.useHandicap}
-                  onUpdateScore={onUpdateScore}
-                  isReadOnly={isReadOnly}
-                  alignment="right"
-                />
+                  {/* Team 2 Player */}
+                  <PlayerScoreInput
+                    player={team2Player}
+                    matchPlayer={team2MatchPlayer}
+                    teamColor="blue"
+                    teamKey="team2"
+                    playerIdx={idx}
+                    matchIdx={matchIndex}
+                    useHandicap={game.useHandicap}
+                    onUpdateScore={onUpdateScore}
+                    isReadOnly={isReadOnly}
+                    alignment="right"
+                  />
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 

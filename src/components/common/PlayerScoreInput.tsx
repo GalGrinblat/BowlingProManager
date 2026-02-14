@@ -1,18 +1,10 @@
 import React from 'react';
 import { Star } from './Icons';
+import { GamePlayer, MatchPlayer } from '@/types';
 
 export interface PlayerScoreInputProps {
-  player: {
-    name: string;
-    rank: number;
-    average: number | string;
-    handicap: number;
-    absent: boolean;
-  };
-  matchPlayer: {
-    pins: string | number;
-    bonusPoints: number;
-  };
+  player: GamePlayer;
+  matchPlayer: MatchPlayer;
   teamColor: 'orange' | 'blue';
   teamKey: 'team1' | 'team2';
   playerIdx: number;
@@ -47,7 +39,7 @@ export const PlayerScoreInput: React.FC<PlayerScoreInputProps> = ({
   const absentScore = parseInt(String(player.average)) - 10;
   const scoreWithHandicap = player.absent
     ? absentScore + player.handicap
-    : matchPlayer.pins !== ''
+    : matchPlayer.pins !== 0
     ? parseInt(String(matchPlayer.pins)) + player.handicap
     : 0;
 

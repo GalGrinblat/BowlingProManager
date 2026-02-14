@@ -404,7 +404,7 @@ export interface PlayerSeasonComparisonProps {
 /** Props for MatchView - Score entry interface for a single match */
 export interface MatchViewProps {
   matchNumber: number;
-  game: any;
+  game: Game;
   onUpdateScore: (matchIndex: number, team: 'team1' | 'team2', playerIndex: number, pins: number | string) => void;
   onToggleAbsent?: (team: 'team1' | 'team2', playerIndex: number) => void;
   onNavigate: (direction: string) => void;
