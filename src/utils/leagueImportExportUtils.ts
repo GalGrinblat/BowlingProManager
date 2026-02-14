@@ -164,6 +164,8 @@ function importLeagueData(
     handicapPercentage: data.league.handicapPercentage,
     defaultPlayersPerTeam: data.league.defaultPlayersPerTeam,
     defaultMatchesPerGame: data.league.defaultMatchesPerGame,
+    defaultNumberOfTeams: data.league.defaultNumberOfTeams,
+    defaultNumberOfRounds: data.league.defaultNumberOfRounds,
     dayOfWeek: data.league.dayOfWeek,
     bonusRules: data.league.bonusRules,
     playerMatchPointsPerWin: data.league.playerMatchPointsPerWin,
@@ -239,6 +241,10 @@ function importLeagueData(
       })) : match.team2,
     })) : []) as GameMatch[];
 
+    // Find the season config for this game to get required fields
+    const seasonConfig = data.seasons.find(s => s.id === game.seasonId);
+    if (!seasonConfig) return;
+
     gamesApi.create({
       seasonId: newSeasonId,
       team1Id: newTeam1Id,
@@ -247,6 +253,14 @@ function importLeagueData(
       matchDay: game.matchDay,
       scheduledDate: game.scheduledDate,
       matches: newMatches,
+      playerMatchPointsPerWin: seasonConfig.playerMatchPointsPerWin,
+      teamMatchPointsPerWin: seasonConfig.teamMatchPointsPerWin,
+      teamGamePointsPerWin: seasonConfig.teamGamePointsPerWin,
+      useHandicap: seasonConfig.useHandicap,
+      matchesPerGame: seasonConfig.matchesPerGame,
+      bonusRules: seasonConfig.bonusRules,
+      postponed: game.postponed || false,
+      originalDate: game.originalDate ?? undefined,
     });
   });
 
@@ -273,6 +287,8 @@ function importSeasonData(
       handicapPercentage: data.league.handicapPercentage,
       defaultPlayersPerTeam: data.league.defaultPlayersPerTeam,
       defaultMatchesPerGame: data.league.defaultMatchesPerGame,
+      defaultNumberOfTeams: data.league.defaultNumberOfTeams,
+      defaultNumberOfRounds: data.league.defaultNumberOfRounds,
       dayOfWeek: data.league.dayOfWeek,
       bonusRules: data.league.bonusRules,
       playerMatchPointsPerWin: data.league.playerMatchPointsPerWin,
@@ -341,6 +357,9 @@ function importSeasonData(
       })) : match.team2,
     })) : []) as GameMatch[];
 
+    // Find the season config for this game to get required fields
+    const seasonConfig = data.season;
+
     gamesApi.create({
       seasonId: newSeason.id,
       team1Id: newTeam1Id,
@@ -349,6 +368,14 @@ function importSeasonData(
       matchDay: game.matchDay,
       scheduledDate: game.scheduledDate,
       matches: newMatches,
+      matchesPerGame: seasonConfig.matchesPerGame,
+      useHandicap: seasonConfig.useHandicap,
+      playerMatchPointsPerWin: seasonConfig.playerMatchPointsPerWin,
+      teamMatchPointsPerWin: seasonConfig.teamMatchPointsPerWin,
+      teamGamePointsPerWin: seasonConfig.teamGamePointsPerWin,
+      bonusRules: seasonConfig.bonusRules,
+      postponed: game.postponed || false,
+      originalDate: game.originalDate ?? undefined,
     });
   });
 

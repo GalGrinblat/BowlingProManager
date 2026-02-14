@@ -1,4 +1,4 @@
-import type { Team, Game, TeamStanding, PlayerStats, CurrentPlayerAverages } from '../types/index';
+import type { Team, Game, TeamStanding, PlayerStats, CurrentPlayerAverages, GameMatch, GamePlayer, MatchPlayer, PlayerMatchResult } from '../types/index';
 import { getTeamData, forEachTeam } from './teamUtils';
 
 /**
@@ -9,12 +9,12 @@ import { getTeamData, forEachTeam } from './teamUtils';
  * Helper to initialize or find player stats
  */
 const initializePlayerStat = (
-  playerStats: any[],
+  playerStats: PlayerStats[],
   teamId: string,
   teamName: string,
   playerName: string,
   playerIdx: number
-): any => {
+): PlayerStats | undefined => {
   let playerStat = playerStats.find(ps => 
     ps.teamId === teamId && ps.playerName === playerName
   );
@@ -30,7 +30,8 @@ const initializePlayerStat = (
       average: 0,
       highGame: 0,
       highSeries: 0,
-      pointsScored: 0
+      pointsScored: 0,
+      seriesCount: 0
     };
     playerStats.push(playerStat);
   }
@@ -42,16 +43,16 @@ const initializePlayerStat = (
  * Helper to process match statistics for a team's players
  */
 const processMatchStats = (
-  gamePlayers: any[],
-  matchPlayers: any[],
-  playerMatches: any[],
+  gamePlayers: GamePlayer[],
+  matchPlayers: MatchPlayer[],
+  playerMatches: PlayerMatchResult[],
   teamId: string,
   teamKey: 'team1' | 'team2',
-  playerStats: any[]
+  playerStats: PlayerStats[]
 ): void => {
   const pointsKey = teamKey === 'team1' ? 'team1Points' : 'team2Points';
   
-  gamePlayers.forEach((player: any, playerIdx: number) => {
+  gamePlayers.forEach((player: GamePlayer, playerIdx: number) => {
     const playerStat = playerStats.find(ps => 
       ps.teamId === teamId && ps.playerName === player.name
     );
@@ -80,21 +81,21 @@ const processMatchStats = (
  * Helper to calculate high series for a team's players
  */
 const calculateHighSeries = (
-  gamePlayers: any[],
-  matches: any[] | undefined,
+  gamePlayers: GamePlayer[],
+  matches: GameMatch[] | undefined,
   teamId: string,
   teamKey: 'team1' | 'team2',
-  playerStats: any[]
+  playerStats: PlayerStats[]
 ): void => {
-  gamePlayers.forEach((player: any, playerIdx: number) => {
-    const playerStat = playerStats.find((ps: any) => 
+  gamePlayers.forEach((player: GamePlayer, playerIdx: number) => {
+    const playerStat = playerStats.find((ps: PlayerStats) => 
       ps.teamId === teamId && ps.playerName === player.name
     );
     
     if (playerStat) {
-      const seriesTotal = matches?.reduce((sum: number, match: any) => {
+      const seriesTotal = matches?.reduce((sum: number, match: GameMatch) => {
         const pins = match[teamKey]?.players[playerIdx]?.pins;
-        return sum + (parseInt(pins) || 0);
+        return sum + (parseInt(pins ?? '') || 0);
       }, 0) || 0;
       
       if (seriesTotal > playerStat.highSeries) {
@@ -108,12 +109,12 @@ const calculateHighSeries = (
  * Helper to process player averages from matches
  */
 const processPlayerAverages = (
-  gamePlayers: any[],
-  matches: any[],
+  gamePlayers: GamePlayer[],
+  matches: GameMatch[],
   teamKey: 'team1' | 'team2',
   playerAverages: CurrentPlayerAverages
 ): void => {
-  gamePlayers.forEach((player: any, playerIdx: number) => {
+  gamePlayers.forEach((player: GamePlayer, playerIdx: number) => {
     if (!player.name) return;
     
     if (!playerAverages[player.name]) {
@@ -125,7 +126,7 @@ const processPlayerAverages = (
     }
     
     // Count pins from all matches in this game
-    matches?.forEach((match: any) => {
+    matches?.forEach((match: GameMatch) => {
       if (match[teamKey] && match[teamKey].players[playerIdx]) {
         const pins = parseInt(match[teamKey].players[playerIdx].pins) || 0;
         if (pins > 0 || match[teamKey].players[playerIdx].pins !== '') {
@@ -176,8 +177,8 @@ export const calculateTeamStandings = (teams: Team[], games: Game[]): TeamStandi
     team2Standing.gamesPlayed++;
 
     // Calculate total points from matches
-    const team1MatchPoints = game.matches?.reduce((sum: number, m: any) => sum + (m.team1?.score || 0), 0) || 0;
-    const team2MatchPoints = game.matches?.reduce((sum: number, m: any) => sum + (m.team2?.score || 0), 0) || 0;
+    const team1MatchPoints = game.matches?.reduce((sum: number, m: GameMatch) => sum + (m.team1?.points || 0), 0) || 0;
+    const team2MatchPoints = game.matches?.reduce((sum: number, m: GameMatch) => sum + (m.team2?.points || 0), 0) || 0;
     
     // Add grand total points
     const team1TotalPoints = team1MatchPoints + (game.grandTotalPoints?.team1 || 0);
@@ -187,7 +188,7 @@ export const calculateTeamStandings = (teams: Team[], games: Game[]): TeamStandi
     team2Standing.points += team2TotalPoints;
 
     // Calculate pins
-    game.matches?.forEach((match: any) => {
+    game.matches?.forEach((match: GameMatch) => {
       if (match.team1 && match.team2) {
         team1Standing.totalPins += match.team1.totalPins || 0;
         team2Standing.totalPins += match.team2.totalPins || 0;
@@ -229,7 +230,7 @@ export const calculateTeamStandings = (teams: Team[], games: Game[]): TeamStandi
  * @returns {Array} Player stats sorted by average
  */
 export const calculatePlayerSeasonStats = (teams: Team[], games: Game[]): PlayerStats[] => {
-  const playerStats: any[] = [];
+  const playerStats: PlayerStats[] = [];
   
   // Initialize player stats from teams
   teams.forEach(team => {
@@ -244,6 +245,7 @@ export const calculatePlayerSeasonStats = (teams: Team[], games: Game[]): Player
         average: 0,
         highGame: 0,
         highSeries: 0,
+        seriesCount: 0,
         pointsScored: 0
       });
     });
@@ -257,14 +259,14 @@ export const calculatePlayerSeasonStats = (teams: Team[], games: Game[]): Player
     forEachTeam((teamKey) => {
       const teamData = getTeamData(game, teamKey);
       if (teamData.data && teamData.players) {
-        teamData.players.forEach((player: any, idx: number) => {
+        teamData.players.forEach((player: GamePlayer, idx: number) => {
           initializePlayerStat(playerStats, teamData.id, teamData.data?.name || '', player.name, idx);
         });
       }
     });
 
     // Calculate stats from matches for both teams
-    game.matches?.forEach((match: any) => {
+    game.matches?.forEach((match: GameMatch) => {
       forEachTeam((teamKey) => {
         const teamData = getTeamData(game, teamKey);
         if (teamData.data && teamData.players && match[teamKey]) {
@@ -314,12 +316,12 @@ export const calculateCurrentPlayerAverages = (_teams: Team[], games: Game[]): C
   // Process completed games only
   const completedGames = games.filter(g => g.status === 'completed');
   
-  completedGames.forEach((game: any) => {
+  completedGames.forEach((game: Game) => {
     // Process both teams' players using team iteration
     forEachTeam((teamKey) => {
       const teamData = getTeamData(game, teamKey);
       if (teamData.data && teamData.players) {
-        processPlayerAverages(teamData.players, game.matches, teamKey, playerAverages);
+        processPlayerAverages(teamData.players, game.matches ?? [], teamKey, playerAverages);
       }
     });
   });

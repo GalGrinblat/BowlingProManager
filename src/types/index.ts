@@ -248,6 +248,7 @@ export interface PlayerStats {
   seriesCount: number;
   teamId?: string;
   teamName?: string;
+  pointsScored: number;
 }
 
 /** CurrentPlayerAverage - Running average calculation for dynamic handicap updates */

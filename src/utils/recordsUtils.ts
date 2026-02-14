@@ -2,6 +2,8 @@
  * Utilities for calculating season records
  */
 
+import { Game, GameMatch, GamePlayer, MatchPlayer, Team } from "@/types";
+
 interface RecordEntry {
   value: number;
   playerName: string;
@@ -29,7 +31,7 @@ interface SeasonRecords {
 /**
  * Calculate all season records from games data
  */
-export function calculateSeasonRecords(teams: any[], games: any[]): SeasonRecords {
+export function calculateSeasonRecords(teams: Team[], games: Game[]): SeasonRecords {
   const completedGames = games.filter(g => g.status === 'completed');
   
   const highestMatchScores: RecordEntry[] = [];
@@ -49,107 +51,111 @@ export function calculateSeasonRecords(teams: any[], games: any[]): SeasonRecord
     let team2GameTotal = 0;
 
     // Process each match
-    game.matches.forEach((match: any, matchIndex: number) => {
+    game.matches.forEach((match: GameMatch, matchIndex: number) => {
       if (!match.team1 || !match.team2) return;
 
       // Process team 1 players
-      game.team1.players?.forEach((player: any, playerIndex: number) => {
-        if (!player) return;
+      if (game.team1 && game.team1.players) {
+        game.team1.players.forEach((player: GamePlayer, playerIndex: number) => {
+          if (!player) return;
 
-        const matchPlayer = match.team1.players?.[playerIndex];
-        if (!matchPlayer || player.absent) return;
+          const matchPlayer = match.team1.players?.[playerIndex];
+          if (!matchPlayer || player.absent) return;
 
-        const pins = parseInt(matchPlayer.pins) || 0;
-        
-        // Add to team game total (pure score only)
-        team1GameTotal += pins;
-
-        // Track highest match score (pure score only)
-        highestMatchScores.push({
-          value: pins,
-          playerName: player.name,
-          teamName: team1.name,
-          matchDay: game.matchDay,
-          date: game.scheduledDate || '',
-          round: game.round
-        });
-
-        // Track player series (sum all matches for this player - pure score only)
-        if (matchIndex === game.matches.length - 1) {
-          let playerSeries = 0;
-          game.matches.forEach((m: any) => {
-            const mp = m.team1?.players?.[playerIndex];
-            const gp = game.team1.players?.[playerIndex];
-            if (mp && gp && !gp.absent && mp.pins !== '') {
-              const p = parseInt(mp.pins) || 0;
-              playerSeries += p;
-            }
-          });
+          const pins = parseInt(matchPlayer.pins) || 0;
           
-          if (playerSeries > 0) {
-            highestSeries.push({
-              value: playerSeries,
-              playerName: player.name,
-              teamName: team1.name,
-              matchDay: game.matchDay,
-              date: game.scheduledDate || '',
-              round: game.round
+          // Add to team game total (pure score only)
+          team1GameTotal += pins;
+
+          // Track highest match score (pure score only)
+          highestMatchScores.push({
+            value: pins,
+            playerName: player.name,
+            teamName: team1.name,
+            matchDay: game.matchDay,
+            date: game.scheduledDate || '',
+            round: game.round
+          });
+
+          // Track player series (sum all matches for this player - pure score only)
+          if (game.matches && matchIndex === game.matches.length - 1) {
+            let playerSeries = 0;
+            game.matches.forEach((m: GameMatch) => {
+              const mp = m.team1?.players?.[playerIndex];
+              const gp = game.team1?.players?.[playerIndex];
+              if (mp && gp && !gp.absent && mp.pins !== '') {
+                const p = parseInt(mp.pins) || 0;
+                playerSeries += p;
+              }
             });
+            
+            if (playerSeries > 0) {
+              highestSeries.push({
+                value: playerSeries,
+                playerName: player.name,
+                teamName: team1.name,
+                matchDay: game.matchDay,
+                date: game.scheduledDate || '',
+                round: game.round
+              });
+            }
           }
-        }
-      });
+        });
+      }
 
       // Process team 2 players
-      game.team2.players?.forEach((player: any, playerIndex: number) => {
-        if (!player) return;
+      if (game.team2 && game.team2.players) {
+        game.team2.players.forEach((player: GamePlayer, playerIndex: number) => {
+          if (!player) return;
 
-        const matchPlayer = match.team2.players?.[playerIndex];
-        if (!matchPlayer || player.absent) return;
+          const matchPlayer = match.team2.players?.[playerIndex];
+          if (!matchPlayer || player.absent) return;
 
-        const pins = parseInt(matchPlayer.pins) || 0;
-        
-        // Add to team game total (pure score only)
-        team2GameTotal += pins;
-
-        // Track highest match score (pure score only)
-        highestMatchScores.push({
-          value: pins,
-          playerName: player.name,
-          teamName: team2.name,
-          matchDay: game.matchDay,
-          date: game.scheduledDate || '',
-          round: game.round
-        });
-
-        // Track player series (pure score only)
-        if (matchIndex === game.matches.length - 1) {
-          let playerSeries = 0;
-          game.matches.forEach((m: any) => {
-            const mp = m.team2?.players?.[playerIndex];
-            const gp = game.team2.players?.[playerIndex];
-            if (mp && gp && !gp.absent && mp.pins !== '') {
-              const p = parseInt(mp.pins) || 0;
-              playerSeries += p;
-            }
-          });
+          const pins = parseInt(matchPlayer.pins) || 0;
           
-          if (playerSeries > 0) {
-            highestSeries.push({
-              value: playerSeries,
-              playerName: player.name,
-              teamName: team2.name,
-              matchDay: game.matchDay,
-              date: game.scheduledDate || '',
-              round: game.round
+          // Add to team game total (pure score only)
+          team2GameTotal += pins;
+
+          // Track highest match score (pure score only)
+          highestMatchScores.push({
+            value: pins,
+            playerName: player.name,
+            teamName: team2.name,
+            matchDay: game.matchDay,
+            date: game.scheduledDate || '',
+            round: game.round
+          });
+
+          // Track player series (pure score only)
+          if (game.matches && matchIndex === game.matches.length - 1) {
+            let playerSeries = 0;
+            game.matches.forEach((m: GameMatch) => {
+              const mp = m.team2?.players?.[playerIndex];
+              const gp = game.team2?.players?.[playerIndex];
+              if (mp && gp && !gp.absent && mp.pins !== '') {
+                const p = parseInt(mp.pins) || 0;
+                playerSeries += p;
+              }
             });
+            
+            if (playerSeries > 0) {
+              highestSeries.push({
+                value: playerSeries,
+                playerName: player.name,
+                teamName: team2.name,
+                matchDay: game.matchDay,
+                date: game.scheduledDate || '',
+                round: game.round
+              });
+            }
           }
-        }
-      });
+        });
+      }
 
       // Track highest team match scores (pure score only)
       let team1MatchTotal = 0;
-      match.team1.players?.forEach((mp: any, idx: number) => {
-        const player = game.team1.players?.[idx];
+      match.team1.players?.forEach((mp: MatchPlayer, idx: number) => {
+        const player = game.team1 && game.team1.players ? game.team1.players[idx] : undefined;
         if (mp && player && !player.absent && mp.pins !== '') {
           const pins = parseInt(mp.pins) || 0;
           team1MatchTotal += pins;
@@ -157,8 +163,8 @@ export function calculateSeasonRecords(teams: any[], games: any[]): SeasonRecord
       });
 
       let team2MatchTotal = 0;
-      match.team2.players?.forEach((mp: any, idx: number) => {
-        const player = game.team2.players?.[idx];
+      match.team2.players?.forEach((mp: MatchPlayer, idx: number) => {
+        const player = (game.team2 && game.team2.players) ? game.team2.players[idx] : undefined;
         if (mp && player && !player.absent && mp.pins !== '') {
           const pins = parseInt(mp.pins) || 0;
           team2MatchTotal += pins;
