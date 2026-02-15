@@ -14,12 +14,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
 
   useEffect(() => {
     const loadData = async () => {
-      console.log('📊 AdminDashboard: Loading data...');
       const [orgData, leaguesData] = await Promise.all([
         organizationApi.get(),
         leaguesApi.getAll()
       ]);
-      console.log('📊 AdminDashboard: Loaded', leaguesData.length, 'leagues');
       setOrg(orgData);
       setLeagues(leaguesData);
 
@@ -40,7 +38,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
 
       setSeasonsMap(seasonsData);
       setGamesMap(allGamesData);
-      console.log('📊 AdminDashboard: Data loading complete');
     };
     loadData();
   }, []);
