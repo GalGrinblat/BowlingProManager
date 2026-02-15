@@ -33,6 +33,8 @@ const en: TranslationDictionary = {
     total: 'Total',
     pts: 'Points',
     completed: 'Completed',
+    matchDay: 'Match Day',
+    round: 'Round',
   },
 
   // Authentication

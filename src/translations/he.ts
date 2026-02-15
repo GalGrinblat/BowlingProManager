@@ -11,8 +11,8 @@ const he: TranslationDictionary = {
     back: 'חזור',
     next: 'הבא',
     view: 'צפה',
-    leftArrow: '←',
-    rightArrow: '→',
+    leftArrow: '→',
+    rightArrow: '←',
     name: 'שם',
     average: 'ממוצע',
     points: 'נקודות',
@@ -33,6 +33,8 @@ const he: TranslationDictionary = {
     total: 'סה"כ',
     pts: 'נקודות',
     completed: 'הושלם',
+    matchDay: 'מחזור',
+    round: 'סיבוב',
   },
 
   // אימות

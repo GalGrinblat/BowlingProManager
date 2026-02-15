@@ -210,11 +210,9 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
                   const team1 = teamsApi.getById(game.team1Id);
                   const team2 = teamsApi.getById(game.team2Id);
                   const isTeam1 = team1?.playerIds.includes(playerId);
-                  
                   const team1TotalPoints = game.matches?.reduce((sum: any, m: GameMatch) => sum + (m.team1?.points || 0), 0) + (game.grandTotalPoints?.team1 || 0);
                   const team2TotalPoints = game.matches?.reduce((sum: any, m: GameMatch) => sum + (m.team2?.points || 0), 0) + (game.grandTotalPoints?.team2 || 0);
                   const playerWon = (isTeam1 && team1TotalPoints > team2TotalPoints) || (!isTeam1 && team2TotalPoints > team1TotalPoints);
-                  
                   return (
                     <div
                       key={game.id}
@@ -227,7 +225,7 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
                             {league?.name}
                           </span>
                           <span className="text-xs text-gray-500">
-                            Round {game.round} • Match Day {game.matchDay}
+                            {t('common.round')} {game.round} • {t('common.matchDay')} {game.matchDay}
                           </span>
                           <span className="text-xs text-gray-400">
                             {new Date(game.completedAt || '').toLocaleDateString()}
