@@ -3,7 +3,7 @@ import { organizationApi, leaguesApi, seasonsApi, gamesApi } from '../../service
 import { formatMatchDate } from '../../utils/scheduleUtils';
 import { useTranslation } from '../../contexts/LanguageContext';
 
-import type { AdminDashboardProps } from '../../types/index';
+import type { AdminDashboardProps, ScheduleMatchDay } from '../../types/index';
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
   const { t } = useTranslation();
@@ -80,7 +80,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
                 const games = gamesApi.getBySeason(activeSeason.id);
                 
                 // Find the next incomplete match day
-                const incompleteMatchDays = activeSeason.schedule.filter((day: any) => {
+                const incompleteMatchDays = activeSeason.schedule.filter((day: ScheduleMatchDay) => {
                   const dayGames = games.filter(g => g.matchDay === day.matchDay);
                   const hasIncomplete = dayGames.some(g => g.status !== 'completed');
                   const dayDate = day.date ? new Date(day.date) : null;
@@ -89,7 +89,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
                 
                 // Sort by date and get the next one
                 if (incompleteMatchDays.length > 0) {
-                  incompleteMatchDays.sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());
+                  incompleteMatchDays.sort((a: ScheduleMatchDay, b: ScheduleMatchDay) => new Date(a.date || '').getTime() - new Date(b.date || '').getTime());
                   nextMatchDay = incompleteMatchDays[0];
                 }
               }

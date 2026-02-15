@@ -201,7 +201,13 @@ export const createGame = ({
   team1Id,
   team2Id,
   status: 'pending',
-  completedAt: undefined
+  completedAt: undefined,
+  matchesPerGame: 0,
+  playerMatchPointsPerWin: 0,
+  teamMatchPointsPerWin: 0,
+  teamGamePointsPerWin: 0,
+  useHandicap: false,
+  postponed: false
 });
 
 // ===== VALIDATION HELPERS =====

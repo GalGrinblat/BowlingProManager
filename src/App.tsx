@@ -15,12 +15,13 @@ import { TeamManagement } from './components/admin/TeamManagement';
 import { PlayerDashboard } from './components/player/PlayerDashboard';
 import { CompletedGameView } from './components/common/CompletedGameView';
 import './styles/globals.css';
+import { Game } from './types';
 
 interface NavigationState {
   leagueId: string | null;
   seasonId: string | null;
   gameId: string | null;
-  gameData?: any;
+  gameData: Game;
 }
 
 function AppContent() {
@@ -31,7 +32,8 @@ function AppContent() {
   const [navigationState, setNavigationState] = useState<NavigationState>({
     leagueId: null,
     seasonId: null,
-    gameId: null
+    gameId: null,
+    gameData: {} as Game,
   });
 
   // Update view when user logs in/out
@@ -119,7 +121,7 @@ function AppContent() {
                 onBack={() => navigateTo('league-detail', { leagueId: navigationState.leagueId })}
 
                 onPlayGame={(gameId: string) => navigateTo('season-game', { gameId })}
-                onViewGame={(gameId: string, game?: any) => navigateTo('game-history', { gameId, gameData: game })}
+                onViewGame={(gameId: string, game?: Game) => navigateTo('game-history', { gameId, gameData: game })}
                 onManageTeams={() => navigateTo('team-management', { seasonId: navigationState.seasonId })}
               />
             )}
@@ -157,7 +159,7 @@ function AppContent() {
         {currentUser && isPlayer() && (
           <>
             {currentView === 'player-dashboard' && (
-              <PlayerDashboard 
+              <PlayerDashboard
                 playerId={currentUser.userId}
                 onViewGame={(gameId: string) => navigateTo('player-game', { gameId })}
                 onViewSeasonComparison={() => navigateTo('player-season-comparison')}

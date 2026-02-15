@@ -181,7 +181,7 @@ export interface ValidationResult {
 /** User - Authenticated user with role-based access */
 export interface User {
   role: 'admin' | 'player';
-  playerId?: string;
+  userId: string;
 }
 
 /** AuthContextType - Authentication context providing user state and actions */

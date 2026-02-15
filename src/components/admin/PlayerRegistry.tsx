@@ -10,11 +10,11 @@ import {
   parseCSVImport,
   booleanConverter 
 } from '../../utils/importExportUtils';
-import type { PlayerRegistryProps } from '../../types/index';
+import type { Player, PlayerRegistryProps } from '../../types/index';
 
 export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
   const { t } = useTranslation();
-  const [players, setPlayers] = useState<any[]>([]);
+  const [players, setPlayers] = useState<Player[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
@@ -23,7 +23,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [showImportModal, setShowImportModal] = useState(false);
-  const [importData, setImportData] = useState<any[]>([]);
+  const [importData, setImportData] = useState<Player[]>([]);
   const [importErrors, setImportErrors] = useState<string[]>([]);
   
   // Pagination state
@@ -74,7 +74,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
     loadPlayers();
   };
 
-  const handleEdit = (player: any) => {
+  const handleEdit = (player: Player) => {
     setFormData({
       name: player.name,
       active: player.active
@@ -152,7 +152,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
 
   const handleParseJSONImport = (content: string) => {
     try {
-      const result = parseJSONImport(
+      const result = parseJSONImport<Player>(
         content,
         (item) => {
           // Ensure required fields exist
@@ -177,7 +177,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
 
   const handleParseCSVImport = (content: string) => {
     try {
-      const result = parseCSVImport(
+      const result = parseCSVImport<Player>(
         content,
         (item) => {
           // Ensure required fields
@@ -384,7 +384,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
           <p className="text-gray-500 text-center py-8">{t('players.noActivePlayers')}</p>
         ) : (
           <div className="p-6 space-y-2">
-            {paginatedActivePlayers.map((player: any) => (
+            {paginatedActivePlayers.map((player: Player) => (
               <div
                 key={player.id}
                 className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors"
@@ -429,7 +429,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
             </h2>
           </div>
           <div className="p-6 space-y-2">
-            {paginatedInactivePlayers.map((player: any) => (
+            {paginatedInactivePlayers.map((player: Player) => (
               <div
                 key={player.id}
                 className="border border-gray-200 rounded-lg p-4 bg-gray-50"
