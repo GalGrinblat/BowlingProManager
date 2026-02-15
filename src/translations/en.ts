@@ -191,7 +191,6 @@ const en: TranslationDictionary = {
     teams: 'teams',
     games: 'games',
     rounds: 'rounds',
-    round: 'round',
     handicapDisplay: 'Handicap: {{percentage}}% to {{basis}}',
     leagueNotFound: 'League not found. It may have been deleted.',
     
@@ -259,7 +258,6 @@ const en: TranslationDictionary = {
     selectRound: 'Select Round',
     selectMatchDay: 'Select Match Day',
     postpone: 'Postpone',
-    matchDay: 'Match Day',
     postponeMatchDay: 'Postpone Match Day {{matchDay}}',
     noGamesInMatchDay: 'No games in this match day',
     gamesPlayed: 'Games Played',
@@ -329,8 +327,6 @@ const en: TranslationDictionary = {
 
   // Game Scoring
   games: {
-    matchDay: 'Match Day',
-    round: 'Round',
     handicap: 'Handicap',
     absent: 'Absent',
     pending: 'Pending',
@@ -369,7 +365,6 @@ const en: TranslationDictionary = {
     gameTotal: 'Game Total',
     noRecords: 'No records',
     noCompletedGames: 'No completed games yet. Records will appear once games are played.',
-    round: 'Round',
     day: 'Day',
   },
 
@@ -487,7 +482,6 @@ const en: TranslationDictionary = {
 
   // Schedule
   schedule: {
-    round: 'Round',
     bye: 'Bye',
     match: 'Match',
   },

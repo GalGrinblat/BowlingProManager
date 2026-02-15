@@ -152,7 +152,7 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
               <h2 className="text-2xl font-bold mb-2">{activeSeason.name}</h2>
               <div className="flex gap-4 text-sm">
                 <span>🏆 <span className="ltr-content">{activeSeason.numberOfTeams}</span> {t('leagues.teams')}</span>
-                <span>🔄 <span className="ltr-content">{activeSeason.numberOfRounds}</span> {activeSeason.numberOfRounds !== 1 ? t('leagues.rounds') : t('leagues.round')}</span>
+                <span>🔄 <span className="ltr-content">{activeSeason.numberOfRounds}</span> {activeSeason.numberOfRounds !== 1 ? t('leagues.rounds') : t('common.round')}</span>
                 <span>👥 <span className="ltr-content">{activeSeason.playersPerTeam}</span> {t('leagues.playersPerTeam')}</span>
               </div>
             </div>

@@ -380,7 +380,7 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
-                    {t('schedule.round')} {round} ({completedInRound}/{roundGamesForRound.length})
+                    {t('common.round')} {round} ({completedInRound}/{roundGamesForRound.length})
                   </button>
                 );
               })}
@@ -431,7 +431,7 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       } ${isPostponed ? 'ring-2 ring-orange-400' : ''}`}
                     >
-                      <div>{t('seasons.matchDay')} {matchDay}</div>
+                      <div>{t('common.matchDay')} {matchDay}</div>
                       {dateDisplay && (
                         <div className="text-xs mt-1 opacity-90">
                           {isPostponed && '⚠️ '}{dateDisplay}
@@ -448,7 +448,7 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
           {/* Games List */}
           <div className="bg-white rounded-xl shadow-lg p-6">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
-              {t('schedule.round')} {selectedRound} - {t('seasons.matchDay')} {selectedMatchDay}
+              {t('common.round')} {selectedRound} - {t('common.matchDay')} {selectedMatchDay}
             </h2>
             {matchDayGames.length === 0 ? (
               <p className="text-gray-500 text-center py-4">{t('seasons.noGamesInMatchDay')}</p>
@@ -627,7 +627,7 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
                           </div>
                           <div className="text-right ml-2">
                             <p className="text-xl font-bold text-purple-600">{record.playerRecordEntry.value}</p>
-                            <p className="text-xs text-gray-500">{t('records.round')}{record.round}, {t('records.day')}{record.matchDay}</p>
+                            <p className="text-xs text-gray-500">{t('common.round')}{record.round}, {t('records.day')}{record.matchDay}</p>
                           </div>
                         </div>
                       ))}
@@ -657,7 +657,7 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
                           </div>
                           <div className="text-right ml-2">
                             <p className="text-xl font-bold text-blue-600">{record.playerRecordEntry.value}</p>
-                            <p className="text-xs text-gray-500">{t('records.round')}{record.round}, {t('records.day')}{record.matchDay}</p>
+                            <p className="text-xs text-gray-500">{t('common.round')}{record.round}, {t('common.matchDay')}{record.matchDay}</p>
                           </div>
                         </div>
                       ))}
@@ -686,7 +686,7 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
                           </div>
                           <div className="text-right ml-2">
                             <p className="text-xl font-bold text-green-600">{record.teamRecordEntry.value}</p>
-                            <p className="text-xs text-gray-500">{t('records.round')}{record.round}, {t('records.day')}{record.matchDay}</p>
+                            <p className="text-xs text-gray-500">{t('common.round')}{record.round}, {t('common.matchDay')}{record.matchDay}</p>
                           </div>
                         </div>
                       ))}
@@ -715,7 +715,7 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
                           </div>
                           <div className="text-right ml-2">
                             <p className="text-xl font-bold text-orange-600">{record.teamRecordEntry.value}</p>
-                            <p className="text-xs text-gray-500">{t('records.round')}{record.round}, {t('records.day')}{record.matchDay}</p>
+                            <p className="text-xs text-gray-500">{t('common.round')}{record.round}, {t('common.matchDay')}{record.matchDay}</p>
                           </div>
                         </div>
                       ))}

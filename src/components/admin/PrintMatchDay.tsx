@@ -151,8 +151,8 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
                     <h1 className="text-3xl font-bold text-gray-900 mb-1">{league.name}</h1>
                     <h2 className="text-xl font-semibold text-gray-700 mb-2">{season.name}</h2>
                     <div className="flex justify-center gap-6 text-base text-gray-600">
-                      <span>📅 {t('schedule.round')} {round}</span>
-                      <span>🎳 {t('seasons.matchDay')} {matchDay}</span>
+                      <span>📅 {t('common.round')} {round}</span>
+                      <span>🎳 {t('common.matchDay')} {matchDay}</span>
                       {scheduleInfo?.date && (
                         <span>📆 {formatMatchDate(scheduleInfo.date)}</span>
                       )}

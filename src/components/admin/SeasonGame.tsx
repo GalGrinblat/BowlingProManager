@@ -491,7 +491,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
             </button>
             <h1 className="text-3xl font-bold mb-2">{t('games.preGameSetup')}</h1>
             <p className="text-gray-400">
-              {t('games.round')} {game.round}, {t('games.matchDay')} {game.matchDay}
+              {t('common.round')} {game.round}, {t('common.matchDay')} {game.matchDay}
             </p>
             <p className="text-gray-400 text-sm mt-1">
               {t('games.reviewPlayers')}

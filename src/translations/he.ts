@@ -191,7 +191,6 @@ const he: TranslationDictionary = {
     teams: 'קבוצות',
     games: 'משחקים',
     rounds: 'סיבובים',
-    round: 'סיבוב',
     handicapDisplay: 'הנדיקאפ: {{percentage}}% ל-{{basis}}',
     leagueNotFound: 'ליגה לא נמצאה. ייתכן שהיא נמחקה.',
     
@@ -259,7 +258,6 @@ const he: TranslationDictionary = {
     selectRound: 'בחר סיבוב',
     selectMatchDay: 'בחר מחזור',
     postpone: 'דחה',
-    matchDay: 'מחזור',
     postponeMatchDay: 'דחה מחזור {{matchDay}}',
     noGamesInMatchDay: 'אין משחקים במחזור זה',
     gamesPlayed: 'משחקים ששוחקו',
@@ -329,8 +327,6 @@ const he: TranslationDictionary = {
 
   // ניקוד משחק
   games: {
-    matchDay: 'יום משחק',
-    round: 'סיבוב',
     handicap: 'הנדיקפ',
     absent: 'נעדר',
     pending: 'ממתין',
@@ -369,7 +365,6 @@ const he: TranslationDictionary = {
     gameTotal: 'סה"כ משחק',
     noRecords: 'אין שיאים',
     noCompletedGames: 'אין עדיין משחקים שהושלמו. שיאים יופיעו לאחר שמשחקים יתקיימו.',
-    round: 'סיבוב',
     day: 'יום',
   },
 
@@ -487,7 +482,6 @@ const he: TranslationDictionary = {
 
   // לוח משחקים
   schedule: {
-    round: 'סיבוב',
     bye: 'חופשי',
     match: 'משחק',
   },
