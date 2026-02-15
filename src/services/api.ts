@@ -151,6 +151,85 @@ export const usersApi = {
   }
 };
 
+// ===== ALLOWED EMAILS =====
+
+export interface AllowedEmail {
+  email: string;
+  addedBy: string | null;
+  addedAt: string;
+  notes: string | null;
+}
+
+export const allowedEmailsApi = {
+  getAll: async (): Promise<AllowedEmail[]> => {
+    try {
+      const { data, error } = await supabase
+        .from('allowed_emails')
+        .select('*')
+        .order('added_at', { ascending: false });
+
+      if (error) throw error;
+
+      return (data || []).map(e => ({
+        email: e.email,
+        addedBy: e.added_by,
+        addedAt: e.added_at,
+        notes: e.notes
+      }));
+    } catch (error) {
+      handleError(error, 'allowedEmailsApi.getAll');
+      return [];
+    }
+  },
+
+  add: async (email: string, notes?: string): Promise<void> => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      const { error } = await supabase
+        .from('allowed_emails')
+        .insert({
+          email: email.toLowerCase().trim(),
+          added_by: user?.id || null,
+          notes: notes || null
+        });
+
+      if (error) throw error;
+    } catch (error) {
+      handleError(error, 'allowedEmailsApi.add');
+      throw error;
+    }
+  },
+
+  remove: async (email: string): Promise<void> => {
+    try {
+      const { error } = await supabase
+        .from('allowed_emails')
+        .delete()
+        .eq('email', email);
+
+      if (error) throw error;
+    } catch (error) {
+      handleError(error, 'allowedEmailsApi.remove');
+      throw error;
+    }
+  },
+
+  update: async (email: string, notes: string): Promise<void> => {
+    try {
+      const { error } = await supabase
+        .from('allowed_emails')
+        .update({ notes })
+        .eq('email', email);
+
+      if (error) throw error;
+    } catch (error) {
+      handleError(error, 'allowedEmailsApi.update');
+      throw error;
+    }
+  }
+};
+
 // ===== PLAYERS =====
 
 export const playersApi = {

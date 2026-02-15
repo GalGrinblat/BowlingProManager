@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { usersApi, playersApi, type DatabaseUser } from '../../services/api';
+import { usersApi, playersApi, allowedEmailsApi, type DatabaseUser, type AllowedEmail } from '../../services/api';
 import type { Player } from '../../types/index';
 import { useTranslation } from '../../contexts/LanguageContext';
 
@@ -11,10 +11,13 @@ export const UserManagement: React.FC<UserManagementProps> = ({ onBack }) => {
   const { t } = useTranslation();
   const [users, setUsers] = useState<DatabaseUser[]>([]);
   const [players, setPlayers] = useState<Player[]>([]);
+  const [allowedEmails, setAllowedEmails] = useState<AllowedEmail[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingUser, setEditingUser] = useState<string | null>(null);
   const [selectedRole, setSelectedRole] = useState<'admin' | 'player'>('player');
   const [selectedPlayer, setSelectedPlayer] = useState<string>('');
+  const [newEmail, setNewEmail] = useState('');
+  const [newEmailNotes, setNewEmailNotes] = useState('');
 
   useEffect(() => {
     loadData();
@@ -23,12 +26,14 @@ export const UserManagement: React.FC<UserManagementProps> = ({ onBack }) => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [usersData, playersData] = await Promise.all([
+      const [usersData, playersData, allowedEmailsData] = await Promise.all([
         usersApi.getAll(),
-        playersApi.getAll()
+        playersApi.getAll(),
+        allowedEmailsApi.getAll()
       ]);
       setUsers(usersData);
       setPlayers(playersData.filter(p => p.active));
+      setAllowedEmails(allowedEmailsData);
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
@@ -83,6 +88,46 @@ export const UserManagement: React.FC<UserManagementProps> = ({ onBack }) => {
     return new Date(dateString).toLocaleDateString();
   };
 
+  const handleAddEmail = async () => {
+    if (!newEmail.trim()) {
+      alert('❌ Please enter an email address');
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newEmail.trim())) {
+      alert('❌ Please enter a valid email address');
+      return;
+    }
+
+    try {
+      await allowedEmailsApi.add(newEmail.trim(), newEmailNotes.trim() || undefined);
+      alert('✅ Email added to whitelist');
+      setNewEmail('');
+      setNewEmailNotes('');
+      await loadData();
+    } catch (error) {
+      console.error('Error adding email:', error);
+      alert('❌ Failed to add email. It may already exist.');
+    }
+  };
+
+  const handleRemoveEmail = async (email: string) => {
+    if (!confirm(`Remove ${email} from whitelist?\n\nUsers with this email will no longer be able to sign in.`)) {
+      return;
+    }
+
+    try {
+      await allowedEmailsApi.remove(email);
+      alert('✅ Email removed from whitelist');
+      await loadData();
+    } catch (error) {
+      console.error('Error removing email:', error);
+      alert('❌ Failed to remove email');
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -113,11 +158,100 @@ export const UserManagement: React.FC<UserManagementProps> = ({ onBack }) => {
       <div className="bg-blue-50 rounded-xl p-6">
         <h3 className="font-bold text-blue-900 mb-2">📌 User Management Guide</h3>
         <ul className="text-sm text-blue-800 space-y-1">
+          <li>• <strong>Email Whitelist</strong> - Only emails in the whitelist can sign in with Google</li>
           <li>• <strong>Admin</strong> - Can manage all data, players, leagues, seasons, and users</li>
           <li>• <strong>Player</strong> - Can view data and enter scores (must be linked to a player account)</li>
           <li>• New users who sign in with Google will appear here with the "player" role by default</li>
           <li>• Link player role users to their bowling player accounts</li>
         </ul>
+      </div>
+
+      {/* Email Whitelist */}
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="p-6 border-b border-gray-200">
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            🔒 Email Whitelist ({allowedEmails.length})
+          </h2>
+          <p className="text-sm text-gray-600">
+            Only emails in this list can sign in with Google
+          </p>
+        </div>
+
+        {/* Add Email Form */}
+        <div className="p-6 bg-gray-50 border-b border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">Add Email to Whitelist</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Email Address *
+              </label>
+              <input
+                type="email"
+                value={newEmail}
+                onChange={(e) => setNewEmail(e.target.value)}
+                placeholder="user@example.com"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Notes (Optional)
+              </label>
+              <input
+                type="text"
+                value={newEmailNotes}
+                onChange={(e) => setNewEmailNotes(e.target.value)}
+                placeholder="e.g., John Smith - Team Captain"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+          <button
+            onClick={handleAddEmail}
+            className="mt-4 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold"
+          >
+            Add to Whitelist
+          </button>
+        </div>
+
+        {/* Email List */}
+        <div className="divide-y divide-gray-200">
+          {allowedEmails.length === 0 ? (
+            <div className="p-6 text-center text-gray-500">
+              <p className="mb-2">No emails in whitelist</p>
+              <p className="text-sm">⚠️ Warning: No one can sign in until you add emails to the whitelist</p>
+            </div>
+          ) : (
+            allowedEmails.map((email) => (
+              <div key={email.email} className="p-4 hover:bg-gray-50 transition-colors">
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-1">
+                      <h3 className="text-lg font-semibold text-gray-900">{email.email}</h3>
+                      {users.some(u => u.email === email.email) && (
+                        <span className="px-2 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                          Registered
+                        </span>
+                      )}
+                    </div>
+                    {email.notes && (
+                      <p className="text-sm text-gray-600">{email.notes}</p>
+                    )}
+                    <p className="text-xs text-gray-500 mt-1">
+                      Added {formatDate(email.addedAt)}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => handleRemoveEmail(email.email)}
+                    className="ml-4 px-4 py-2 text-sm bg-red-100 text-red-700 rounded-lg hover:bg-red-200 font-semibold"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       </div>
 
       {/* Users List */}
