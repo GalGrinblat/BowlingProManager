@@ -12,6 +12,7 @@ import { SeasonDetail } from './components/admin/SeasonDetail';
 import { SeasonGame } from './components/admin/SeasonGame';
 import { Settings } from './components/admin/Settings';
 import { TeamManagement } from './components/admin/TeamManagement';
+import { UserManagement } from './components/admin/UserManagement';
 import { PlayerDashboard } from './components/player/PlayerDashboard';
 import { CompletedGameView } from './components/common/CompletedGameView';
 import './styles/globals.css';
@@ -160,7 +161,13 @@ function AppContent() {
             )}
 
             {currentView === 'settings' && (
-              <Settings 
+              <Settings
+                onBack={() => navigateTo('dashboard')}
+              />
+            )}
+
+            {currentView === 'users' && (
+              <UserManagement
                 onBack={() => navigateTo('dashboard')}
               />
             )}

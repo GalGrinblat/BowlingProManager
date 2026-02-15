@@ -89,6 +89,68 @@ export const organizationApi = {
   }
 };
 
+// ===== USERS =====
+
+export interface DatabaseUser {
+  id: string;
+  email: string;
+  role: 'admin' | 'player';
+  playerId: string | null;
+  createdAt: string;
+}
+
+export const usersApi = {
+  getAll: async (): Promise<DatabaseUser[]> => {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      return (data || []).map(u => ({
+        id: u.id,
+        email: u.email,
+        role: u.role as 'admin' | 'player',
+        playerId: u.player_id,
+        createdAt: u.created_at
+      }));
+    } catch (error) {
+      handleError(error, 'usersApi.getAll');
+      return [];
+    }
+  },
+
+  updateRole: async (userId: string, role: 'admin' | 'player'): Promise<void> => {
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({ role })
+        .eq('id', userId);
+
+      if (error) throw error;
+    } catch (error) {
+      handleError(error, 'usersApi.updateRole');
+      throw error;
+    }
+  },
+
+  linkPlayer: async (userId: string, playerId: string | null): Promise<void> => {
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({ player_id: playerId })
+        .eq('id', userId);
+
+      if (error) throw error;
+    } catch (error) {
+      handleError(error, 'usersApi.linkPlayer');
+      throw error;
+    }
+  }
+};
+
 // ===== PLAYERS =====
 
 export const playersApi = {

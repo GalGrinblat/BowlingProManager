@@ -56,7 +56,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <button
           onClick={() => onNavigate('players')}
           className="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all touch-manipulation"
@@ -73,6 +73,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
           <div className="text-4xl mb-2">🏆</div>
           <h3 className="text-xl font-bold mb-1">{t('dashboard.manageLeagues')}</h3>
           <p className="text-sm text-purple-100">{t('dashboard.manageLeaguesDesc')}</p>
+        </button>
+
+        <button
+          onClick={() => onNavigate('users')}
+          className="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all touch-manipulation"
+        >
+          <div className="text-4xl mb-2">🔐</div>
+          <h3 className="text-xl font-bold mb-1">Manage Users</h3>
+          <p className="text-sm text-orange-100">User roles & permissions</p>
         </button>
 
         <button
