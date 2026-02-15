@@ -58,18 +58,6 @@ export const LoginView: React.FC = () => {
         </svg>
         {isLoading ? 'Signing in...' : 'Sign in with Google'}
       </button>
-
-      <div className="mt-8 p-4 bg-blue-50 rounded-lg space-y-2">
-        <p className="text-sm text-blue-800">
-          <strong>First User:</strong> The first person to sign in becomes the admin automatically
-        </p>
-        <p className="text-sm text-blue-800">
-          <strong>Admin:</strong> Can manage players, leagues, seasons, and assign roles
-        </p>
-        <p className="text-sm text-blue-800">
-          <strong>Player:</strong> Can view standings, stats, and enter scores
-        </p>
-      </div>
     </div>
   );
 };
