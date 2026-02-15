@@ -17,14 +17,14 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
     loadData();
   }, [seasonId]);
 
-  const loadData = () => {
-    const seasonData = seasonsApi.getById(seasonId);
+  const loadData = async () => {
+    const seasonData = await seasonsApi.getById(seasonId);
     setSeason(seasonData);
-    
-    const teamsData = teamsApi.getBySeason(seasonId);
+
+    const teamsData = await teamsApi.getBySeason(seasonId);
     setTeams(teamsData);
-    
-    const playersData = playersApi.getAll();
+
+    const playersData = await playersApi.getAll();
     setAllPlayers(playersData.filter(p => p.active));
   };
 
@@ -33,7 +33,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
     setEditingRoster(true);
   };
 
-  const handleSubstitutePlayer = (team: any, oldPlayerIndex: any, newPlayerId: any) => {
+  const handleSubstitutePlayer = async (team: any, oldPlayerIndex: any, newPlayerId: any) => {
     const oldPlayerId = team.playerIds[oldPlayerIndex];
     const oldPlayer = allPlayers.find(p => p.id === oldPlayerId);
     const newPlayer = allPlayers.find(p => p.id === newPlayerId);
@@ -63,13 +63,13 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
 
     // Save roster changes to team metadata
     const existingChanges = team.rosterChanges || [];
-    teamsApi.update(team.id, {
+    await teamsApi.update(team.id, {
       playerIds: updatedPlayerIds,
       rosterChanges: [...existingChanges, change]
     });
 
     setRosterChanges([change, ...rosterChanges]);
-    loadData();
+    await loadData();
     setEditingRoster(false);
     setSelectedTeam(null);
   };

@@ -9,10 +9,40 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
   const { t } = useTranslation();
   const [org, setOrg] = useState<any>(null);
   const [leagues, setLeagues] = useState<any[]>([]);
+  const [seasonsMap, setSeasonsMap] = useState<Record<string, any[]>>({});
+  const [gamesMap, setGamesMap] = useState<Record<string, any[]>>({});
 
   useEffect(() => {
-    setOrg(organizationApi.get());
-    setLeagues(leaguesApi.getAll());
+    const loadData = async () => {
+      console.log('📊 AdminDashboard: Loading data...');
+      const [orgData, leaguesData] = await Promise.all([
+        organizationApi.get(),
+        leaguesApi.getAll()
+      ]);
+      console.log('📊 AdminDashboard: Loaded', leaguesData.length, 'leagues');
+      setOrg(orgData);
+      setLeagues(leaguesData);
+
+      // Load seasons for each league
+      const seasonsData: Record<string, any[]> = {};
+      const allGamesData: Record<string, any[]> = {};
+
+      for (const league of leaguesData) {
+        const seasons = await seasonsApi.getByLeague(league.id);
+        seasonsData[league.id] = seasons;
+
+        // Load games for each season
+        for (const season of seasons) {
+          const games = await gamesApi.getBySeason(season.id);
+          allGamesData[season.id] = games;
+        }
+      }
+
+      setSeasonsMap(seasonsData);
+      setGamesMap(allGamesData);
+      console.log('📊 AdminDashboard: Data loading complete');
+    };
+    loadData();
   }, []);
 
   const activeLeagues = leagues.filter(l => l.active);
@@ -71,14 +101,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {activeLeagues.map(league => {
-              const seasons = seasonsApi.getByLeague(league.id);
+              const seasons = seasonsMap[league.id] || [];
               const activeSeason = seasons.find(s => s.status === 'active');
-              
+
               // Find next matchday date
               let nextMatchDay = null;
               if (activeSeason && activeSeason.schedule) {
-                const games = gamesApi.getBySeason(activeSeason.id);
-                
+                const games = gamesMap[activeSeason.id] || [];
+
                 // Find the next incomplete match day
                 const incompleteMatchDays = activeSeason.schedule.filter((day: ScheduleMatchDay) => {
                   const dayGames = games.filter(g => g.matchDay === day.matchDay);
@@ -86,7 +116,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) =>
                   const dayDate = day.date ? new Date(day.date) : null;
                   return hasIncomplete && dayDate;
                 });
-                
+
                 // Sort by date and get the next one
                 if (incompleteMatchDays.length > 0) {
                   incompleteMatchDays.sort((a: ScheduleMatchDay, b: ScheduleMatchDay) => new Date(a.date || '').getTime() - new Date(b.date || '').getTime());

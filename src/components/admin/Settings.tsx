@@ -20,24 +20,24 @@ export const Settings: React.FC<SettingsProps> = ({ onBack }) => {
     loadOrganization();
   }, []);
 
-  const loadOrganization = () => {
-    const org = organizationApi.get();
+  const loadOrganization = async () => {
+    const org = await organizationApi.get();
     setOrganization(org);
-    setFormData({ 
+    setFormData({
       name: org.name,
       language: org.language || 'en'
     });
   };
 
-  const handleSave = () => {
-    organizationApi.update({ 
+  const handleSave = async () => {
+    await organizationApi.update({
       name: formData.name,
       language: formData.language
     });
     setLanguage(formData.language); // Update context
     setIsEditing(false);
-    loadOrganization();
-    
+    await loadOrganization();
+
     // Dispatch custom event to notify other components
     window.dispatchEvent(new Event('languageChanged'));
   };

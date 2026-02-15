@@ -29,17 +29,17 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
     loadSeasonData();
   }, [seasonId]);
 
-  const loadSeasonData = () => {
-    const seasonData = seasonsApi.getById(seasonId);
+  const loadSeasonData = async () => {
+    const seasonData = await seasonsApi.getById(seasonId);
     setSeason(seasonData ?? null);
     if (!seasonData) return;
-    const leagueData = leaguesApi.getById(seasonData.leagueId);
+    const leagueData = await leaguesApi.getById(seasonData.leagueId);
     setLeague(leagueData ?? null);
-    
-    const teamsData = teamsApi.getBySeason(seasonId);
+
+    const teamsData = await teamsApi.getBySeason(seasonId);
     setTeams(teamsData);
-    
-    const gamesData = gamesApi.getBySeason(seasonId);
+
+    const gamesData = await gamesApi.getBySeason(seasonId);
     setGames(gamesData);
 
     // Set default to current match day (first incomplete, or latest if all complete)
@@ -57,21 +57,21 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
     }
   };
 
-  const handleCompleteSeason = () => {
+  const handleCompleteSeason = async () => {
     const incompleteGames = games.filter(g => g.status !== 'completed');
-    
+
     if (incompleteGames.length > 0) {
       alert(t('seasons.cannotCompleteIncomplete').replace('{{count}}', String(incompleteGames.length)));
       return;
     }
 
     if (confirm(t('seasons.confirmComplete'))) {
-      seasonsApi.update(seasonId, { status: 'completed' });
-      loadSeasonData();
+      await seasonsApi.update(seasonId, { status: 'completed' });
+      await loadSeasonData();
     }
   };
 
-  const handlePostponeMatchDay = () => {
+  const handlePostponeMatchDay = async () => {
     if (!league?.dayOfWeek) {
       alert(t('seasons.cannotPostponeNoDay'));
       return;
@@ -80,7 +80,7 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
     // Check if any games in this match day are already completed
     const matchDayGamesToCheck = games.filter(g => g.matchDay === selectedMatchDay);
     const hasCompletedGames = matchDayGamesToCheck.some(g => g.status === 'completed');
-    
+
     if (hasCompletedGames) {
       alert(t('seasons.cannotPostponeCompleted'));
       return;
@@ -95,23 +95,23 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
       );
 
       // Update season with new schedule
-      seasonsApi.update(seasonId, { schedule: updatedSchedule });
+      await seasonsApi.update(seasonId, { schedule: updatedSchedule });
 
       // Update all games with new dates from schedule
-      updatedSchedule.forEach((daySchedule: ScheduleMatchDay) => {
+      for (const daySchedule of updatedSchedule) {
         const gamesToUpdate = games.filter(g => g.matchDay === daySchedule.matchDay);
-        gamesToUpdate.forEach(game => {
-          gamesApi.update(game.id, { 
+        for (const game of gamesToUpdate) {
+          await gamesApi.update(game.id, {
             date: daySchedule.date,
             postponed: daySchedule.postponed as boolean | undefined,
             originalDate: daySchedule.originalDate as string | undefined
           } as any);
-        });
-      });
+        }
+      }
 
       setShowPostponeModal(false);
       setPostponeWeeks(1);
-      loadSeasonData();
+      await loadSeasonData();
     }
   };
 

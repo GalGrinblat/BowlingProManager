@@ -181,7 +181,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
       type TeamType = { name: string; playerIds: string[] };
       const createdTeams: { id: string; name: string }[] = [];
       for (const team of teams as TeamType[]) {
-        const newTeam = teamsApi.create({
+        const newTeam = await teamsApi.create({
           name: team.name,
           seasonId: created.id,
           playerIds: team.playerIds,

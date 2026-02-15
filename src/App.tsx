@@ -25,7 +25,7 @@ interface NavigationState {
 }
 
 function AppContent() {
-  const { currentUser, logout, isAdmin, isPlayer } = useAuth();
+  const { currentUser, logout, isAdmin, isPlayer, isLoading } = useAuth();
   const [currentView, setCurrentView] = useState<string>(
     currentUser ? (isAdmin() ? 'dashboard' : 'player-dashboard') : 'login'
   );
@@ -40,10 +40,10 @@ function AppContent() {
   React.useEffect(() => {
     if (currentUser) {
       setCurrentView(isAdmin() ? 'dashboard' : 'player-dashboard');
-    } else {
+    } else if (!isLoading) {
       setCurrentView('login');
     }
-  }, [currentUser, isAdmin, isPlayer]);
+  }, [currentUser, isAdmin, isPlayer, isLoading]);
 
   // Navigation helpers
   const navigateTo = (view: string, params: Partial<NavigationState> = {}): void => {
@@ -51,10 +51,22 @@ function AppContent() {
     setNavigationState({ ...navigationState, ...params });
   };
 
+  // Show loading spinner while auth is initializing
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 text-lg">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
-        <Header 
+        <Header
           currentUser={currentUser}
           onLogout={logout}
         />

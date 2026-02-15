@@ -38,6 +38,7 @@ function getDefaultFormData() {
 export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onViewLeague }) => {
   const { t } = useTranslation();
   const [leagues, setLeagues] = useState<League[]>([]);
+  const [seasonsMap, setSeasonsMap] = useState<Record<string, any[]>>({});
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<{
@@ -68,44 +69,53 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
     loadLeagues();
   }, []);
 
-  const loadLeagues = () => {
-    setLeagues(leaguesApi.getAll());
+  const loadLeagues = async () => {
+    const data = await leaguesApi.getAll();
+    setLeagues(data);
+
+    // Load seasons for each league
+    const seasonsData: Record<string, any[]> = {};
+    for (const league of data) {
+      const seasons = await seasonsApi.getByLeague(league.id);
+      seasonsData[league.id] = seasons;
+    }
+    setSeasonsMap(seasonsData);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const leagueData = createLeague(formData);
     const validation = validateLeague(leagueData);
-    
+
     if (!validation.valid) {
       alert(validation.error);
       return;
     }
 
     // Check for duplicate league names (excluding current league when editing)
-    const duplicateName = leagues.find(l => 
-      l.name.trim().toLowerCase() === formData.name.trim().toLowerCase() && 
+    const duplicateName = leagues.find(l =>
+      l.name.trim().toLowerCase() === formData.name.trim().toLowerCase() &&
       l.id !== editingId
     );
-    
+
     if (duplicateName) {
       alert(t('leagues.duplicateName'));
       return;
     }
 
     if (editingId) {
-      leaguesApi.update(editingId, leagueData);
+      await leaguesApi.update(editingId, leagueData);
       alert(t('leagues.leagueUpdated'));
       setEditingId(null);
     } else {
-      leaguesApi.create(leagueData);
+      await leaguesApi.create(leagueData);
       alert(t('leagues.leagueCreated'));
     }
 
     setFormData(getDefaultFormData());
     setIsAdding(false);
-    loadLeagues();
+    await loadLeagues();
   };
 
   const handleEdit = (league: League) => {
@@ -135,44 +145,44 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
     setIsAdding(true);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     const league = leagues.find(l => l.id === id);
-    const seasons = seasonsApi.getByLeague(id);
-    
+    const seasons = await seasonsApi.getByLeague(id);
+
     if (seasons.length > 0) {
       const activeSeasons = seasons.filter(s => s.status === 'active');
-      
+
       let message = `${t('leagues.cannotDelete')} "${league?.name}" (${seasons.length}):\n\n`;
       if (activeSeasons.length > 0) {
         message += `• ${activeSeasons.length} ${t('seasons.activeSeasons')}\n`;
       }
       message += `\n${t('leagues.completeOrDelete')}`;
-      
+
       alert(message);
       return;
     }
-    
+
     if (confirm(`${t('leagues.deleteConfirm')} "${league?.name}"?\n\n${t('common.deleteWarning')}`)) {
-      leaguesApi.delete(id);
-      loadLeagues();
+      await leaguesApi.delete(id);
+      await loadLeagues();
       alert(t('leagues.leagueDeleted'));
     }
   };
 
-  const toggleActive = (league: League) => {
+  const toggleActive = async (league: League) => {
     if (league.active) {
       // Archiving an active league
       if (confirm(`📦 ${t('leagues.archiveConfirm')} "${league.name}"?\n\n${t('leagues.archiveDesc')}`)) {
-        leaguesApi.update(league.id, { active: false });
+        await leaguesApi.update(league.id, { active: false });
         alert(`✅ "${league.name}" ${t('leagues.archived')}`);
-        loadLeagues();
+        await loadLeagues();
       }
     } else {
       // Restoring an archived league
       if (confirm(`📤 ${t('leagues.restoreConfirm')} "${league.name}"?\n\n${t('leagues.restoreDesc')}`)) {
-        leaguesApi.update(league.id, { active: true });
+        await leaguesApi.update(league.id, { active: true });
         alert(`✅ "${league.name}" ${t('leagues.restored')}`);
-        loadLeagues();
+        await loadLeagues();
       }
     }
   };
@@ -341,7 +351,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
         ) : (
           <div className="space-y-3">
             {activeLeagues.map(league => {
-              const seasons = seasonsApi.getByLeague(league.id);
+              const seasons = seasonsMap[league.id] || [];
               const activeSeason = seasons.find(s => s.status === 'active');
               
               return (
@@ -417,7 +427,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
           </div>
           <div className="space-y-3">
             {archivedLeagues.map(league => {
-              const seasons = seasonsApi.getByLeague(league.id);
+              const seasons = seasonsMap[league.id] || [];
               
               return (
                 <div

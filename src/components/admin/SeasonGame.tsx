@@ -28,40 +28,40 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
     loadGame();
   }, [gameId]);
 
-  const loadGame = () => {
-    const gameData = gamesApi.getById(gameId);
-    
+  const loadGame = async () => {
+    const gameData = await gamesApi.getById(gameId);
+
     if (!gameData) {
       return;
     }
-        
-    fetchAndAssignTeams(gameData);
+
+    await fetchAndAssignTeams(gameData);
 
     // Initialize matches if empty or not present
     if (!gameData.matches || gameData.matches.length === 0) {
       if (!gameData.team1 || !gameData.team2) return;
       const playersPerTeam = gameData.team1.players.length;
       const matchCount = gameData.matchesPerGame;
-      gameData.matches = Array.from({ length: matchCount }, (_, i) => 
+      gameData.matches = Array.from({ length: matchCount }, (_, i) =>
         createEmptyMatch(i + 1, playersPerTeam)
       );
       // Save the initialized matches
-      gamesApi.update(gameId, gameData);
+      await gamesApi.update(gameId, gameData);
     }
-    
+
     // Recalculate player averages and handicaps based on current season performance
-    recalculatePlayerAveragesAndHandicaps(gameData);
+    await recalculatePlayerAveragesAndHandicaps(gameData);
 
     // Save updated player data back to game
-    gamesApi.update(gameId, gameData);  
+    await gamesApi.update(gameId, gameData);
     setGame(gameData);
-    
+
     // Initialize pre-match players state when entering pre-match setup
     if (gameData.team1 && gameData.team2) {
       setTeam1Players(gameData.team1.players);
       setTeam2Players(gameData.team2.players);
     }
-    
+
     // Determine current match based on completion
     if (gameData.status === 'completed') {
       setShowSummary(true);
@@ -72,7 +72,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
         m.team1.players.some((p: MatchPlayer) => p.pins !== '') ||
         m.team2.players.some((p: MatchPlayer) => p.pins !== '')
       );
-      
+
       // Show pre-match setup if no scores entered yet
       if (!hasAnyScores) {
         setShowPreMatch(true);
@@ -88,7 +88,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
           );
           return !team1Complete || !team2Complete;
         });
-        
+
         if (incompleteMatchIndex >= 0) {
           setCurrentMatch(incompleteMatchIndex + 1);
         } else {
@@ -98,7 +98,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
     }
   };
 
-  const handlePreMatchContinue = () => {
+  const handlePreMatchContinue = async () => {
     if (!game || !game.team1 || !game.team2) return;
     // Apply lineup rule if using rule-based strategy
     let finalTeam1Players = team1Players;
@@ -138,7 +138,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
       completedAt: game.completedAt,
       updatedAt: game.updatedAt,
     };
-    gamesApi.update(gameId, updatedGame);
+    await gamesApi.update(gameId, updatedGame);
     setGame(updatedGame);
     setShowPreMatch(false);
     setCurrentMatch(1);
@@ -166,7 +166,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
     }
   };
 
-  const updateMatchScore = (
+  const updateMatchScore = async (
     matchIndex: number,
     team: 'team1' | 'team2',
     playerIndex: number,
@@ -246,10 +246,10 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
       updated.status = 'in-progress';
     }
     setGame(updated);
-    gamesApi.update(gameId, updated);
+    await gamesApi.update(gameId, updated);
   };
 
-  const togglePlayerAbsent = (team: 'team1' | 'team2', playerIndex: number) => {
+  const togglePlayerAbsent = async (team: 'team1' | 'team2', playerIndex: number) => {
     if (!game || !game.team1 || !game.team2 || !game.team1.players || !game.team2.players) return;
     const updated: Game = { ...game };
     if (team === 'team1' && updated.team1 && updated.team1.players && updated.team1.players[playerIndex]) {
@@ -258,7 +258,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
       updated.team2.players[playerIndex].absent = !updated.team2.players[playerIndex].absent;
     }
     setGame(updated);
-    gamesApi.update(gameId, updated);
+    await gamesApi.update(gameId, updated);
   };
 
   const goToNextMatch = () => {
@@ -295,7 +295,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
     }
   };
 
-  const finishGame = () => {
+  const finishGame = async () => {
     if (!game || !game.team1 || !game.team2 || !game.matches) return;
     // Ensure game is marked as completed
     const updated: Game = {
@@ -318,7 +318,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
       team1: game.team1,
       team2: game.team2,
     };
-    gamesApi.update(gameId, updated);
+    await gamesApi.update(gameId, updated);
     onBack();
   };
 
@@ -374,38 +374,43 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
   };
 
   // Fetch teams by ID, build GameTeam objects, and assign to game
-  function fetchAndAssignTeams(gameObj: Game) {
+  async function fetchAndAssignTeams(gameObj: Game) {
     if (!gameObj.team1Id || !gameObj.team2Id) return;
 
     // Fetch teams
-    const team1 = teamsApi.getById(gameObj.team1Id);
-    const team2 = teamsApi.getById(gameObj.team2Id);
+    const team1 = await teamsApi.getById(gameObj.team1Id);
+    const team2 = await teamsApi.getById(gameObj.team2Id);
     if (!team1 || !team2) return;
 
     // Build GameTeam objects with player name from registry
-    const buildGameTeam = (team: Team): GameTeam => ({
-      name: team.name,
-      players: (team.playerIds || []).map((playerId: string, idx: number) => {
-        const player = playersApi.getById(playerId);
-        return {
+    const buildGameTeam = async (team: Team): Promise<GameTeam> => {
+      const players = [];
+      for (let idx = 0; idx < (team.playerIds || []).length; idx++) {
+        const playerId = team.playerIds[idx];
+        const player = await playersApi.getById(playerId);
+        players.push({
           playerId,
           name: player ? player.name : '',
           average: 0,
           handicap: 0,
           rank: idx + 1,
           absent: false,
-        };
-      }),
-    });
-    gameObj.team1 = buildGameTeam(team1);
-    gameObj.team2 = buildGameTeam(team2);
+        });
+      }
+      return {
+        name: team.name,
+        players,
+      };
+    };
+    gameObj.team1 = await buildGameTeam(team1);
+    gameObj.team2 = await buildGameTeam(team2);
   }
 
   // Recalculate player averages and handicaps for both teams
-  function recalculatePlayerAveragesAndHandicaps(gameData: Game) {
-    const season = seasonsApi.getById(gameData.seasonId);
-    const teams = teamsApi.getBySeason(gameData.seasonId);
-    const allGames = gamesApi.getBySeason(gameData.seasonId);
+  async function recalculatePlayerAveragesAndHandicaps(gameData: Game) {
+    const season = await seasonsApi.getById(gameData.seasonId);
+    const teams = await teamsApi.getBySeason(gameData.seasonId);
+    const allGames = await gamesApi.getBySeason(gameData.seasonId);
     if (!season || !teams) return;
 
     const useHandicap = season.useHandicap ?? false;
@@ -448,7 +453,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
         };
       });
     }
-    
+
     // Update both teams
     if (gameData.team1) {
       gameData.team1.players = updatePlayerAveragesAndHandicaps(gameData.team1.players);

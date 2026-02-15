@@ -1,8 +1,9 @@
 /**
- * API Service Layer - Abstraction over localStorage
- * This allows easy migration to backend database later
+ * API Service Layer - Supabase Backend
+ * Maintains same interface as localStorage version for easy migration
  */
 
+import { supabase } from '../lib/supabase';
 import type {
   Organization,
   Player,
@@ -12,325 +13,802 @@ import type {
   Game
 } from '../types/index';
 
-const STORAGE_KEYS = {
-  ORGANIZATION: 'bowling_organization',
-  PLAYERS: 'bowling_players',
-  LEAGUES: 'bowling_leagues',
-  SEASONS: 'bowling_seasons',
-  TEAMS: 'bowling_teams',
-  GAMES: 'bowling_games',
-  CURRENT_USER: 'bowling_current_user'
-} as const;
-
 // ===== HELPER FUNCTIONS =====
 
-const getFromStorage = <T>(key: string): T | null => {
-  try {
-    const data = localStorage.getItem(key);
-    return data ? JSON.parse(data) as T : null;
-  } catch (error) {
-    console.error(`Error reading ${key} from storage:`, error);
-    return null;
-  }
+const handleError = (error: any, context: string): void => {
+  console.error(`Error in ${context}:`, error);
 };
-
-const saveToStorage = <T>(key: string, data: T): boolean => {
-  try {
-    localStorage.setItem(key, JSON.stringify(data));
-    return true;
-  } catch (error) {
-    console.error(`Error saving ${key} to storage:`, error);
-    return false;
-  }
-};
-
-const generateId = (): string => `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
 // ===== ORGANIZATION =====
 
 export const organizationApi = {
-  get: (): Organization => {
-    const org = getFromStorage<Organization>(STORAGE_KEYS.ORGANIZATION);
-    if (!org) {
-      // Create default organization
-      const defaultOrg: Organization = {
+  get: async (): Promise<Organization> => {
+    try {
+      const { data, error } = await supabase
+        .from('organization')
+        .select('*')
+        .limit(1)
+        .single();
+
+      if (error || !data) {
+        // Return default if none exists
+        return {
+          name: 'My Bowling Organization',
+          language: 'en',
+          createdAt: new Date().toISOString()
+        };
+      }
+
+      return {
+        name: data.name,
+        language: data.language as 'en' | 'he',
+        createdAt: data.created_at
+      };
+    } catch (error) {
+      handleError(error, 'organizationApi.get');
+      return {
         name: 'My Bowling Organization',
         language: 'en',
         createdAt: new Date().toISOString()
       };
-      saveToStorage(STORAGE_KEYS.ORGANIZATION, defaultOrg);
-      return defaultOrg;
     }
-    // Ensure language field exists
-    if (!org.language) {
-      org.language = 'en';
-      saveToStorage(STORAGE_KEYS.ORGANIZATION, org);
-    }
-    return org;
   },
-  
-  update: (data: Partial<Organization>): Organization => {
-    const org = organizationApi.get();
-    const updated = { ...org, ...data };
-    saveToStorage(STORAGE_KEYS.ORGANIZATION, updated);
-    return updated;
+
+  update: async (updates: Partial<Organization>): Promise<Organization> => {
+    try {
+      // Get the first (and only) organization record
+      const { data: existing } = await supabase
+        .from('organization')
+        .select('id')
+        .limit(1)
+        .single();
+
+      const updateData: any = {};
+      if (updates.name !== undefined) updateData.name = updates.name;
+      if (updates.language !== undefined) updateData.language = updates.language;
+
+      const { data, error } = await supabase
+        .from('organization')
+        .update(updateData)
+        .eq('id', existing?.id || '')
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return {
+        name: data.name,
+        language: data.language as 'en' | 'he',
+        createdAt: data.created_at
+      };
+    } catch (error) {
+      handleError(error, 'organizationApi.update');
+      // Return current state on error
+      return await organizationApi.get();
+    }
   }
 };
 
 // ===== PLAYERS =====
 
 export const playersApi = {
-  getAll: (): Player[] => {
-    return getFromStorage<Player[]>(STORAGE_KEYS.PLAYERS) || [];
+  getAll: async (): Promise<Player[]> => {
+    try {
+      const { data, error } = await supabase
+        .from('players')
+        .select('*')
+        .order('name');
+
+      if (error) throw error;
+
+      return (data || []).map(p => ({
+        id: p.id,
+        name: p.name,
+        active: p.active,
+        createdAt: p.created_at
+      }));
+    } catch (error) {
+      handleError(error, 'playersApi.getAll');
+      return [];
+    }
   },
-  
-  getById: (id: string): Player | undefined => {
-    const players = playersApi.getAll();
-    return players.find(p => p.id === id);
+
+  getById: async (id: string): Promise<Player | undefined> => {
+    try {
+      const { data, error } = await supabase
+        .from('players')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+
+      return {
+        id: data.id,
+        name: data.name,
+        active: data.active,
+        createdAt: data.created_at
+      };
+    } catch (error) {
+      handleError(error, 'playersApi.getById');
+      return undefined;
+    }
   },
-  
-  create: (playerData: Omit<Player, 'id' | 'createdAt'>): Player => {
-    const players = playersApi.getAll();
-    const newPlayer: Player = {
-      id: generateId(),
-      ...playerData,
-      createdAt: new Date().toISOString()
-    };
-    players.push(newPlayer);
-    saveToStorage(STORAGE_KEYS.PLAYERS, players);
-    return newPlayer;
+
+  create: async (playerData: Omit<Player, 'id' | 'createdAt'>): Promise<Player> => {
+    try {
+      const { data, error } = await supabase
+        .from('players')
+        .insert({
+          name: playerData.name,
+          active: playerData.active
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return {
+        id: data.id,
+        name: data.name,
+        active: data.active,
+        createdAt: data.created_at
+      };
+    } catch (error) {
+      handleError(error, 'playersApi.create');
+      throw error;
+    }
   },
-  
-  update: (id: string, updates: Partial<Player>): Player | null => {
-    const players = playersApi.getAll();
-    const index = players.findIndex(p => p.id === id);
-    if (index === -1) return null;
-    
-    players[index] = {
-      ...players[index],
-      ...updates
-    } as Player;
-    saveToStorage(STORAGE_KEYS.PLAYERS, players);
-    return players[index] || null;
+
+  update: async (id: string, updates: Partial<Player>): Promise<Player | null> => {
+    try {
+      const updateData: any = {};
+      if (updates.name !== undefined) updateData.name = updates.name;
+      if (updates.active !== undefined) updateData.active = updates.active;
+
+      const { data, error } = await supabase
+        .from('players')
+        .update(updateData)
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return {
+        id: data.id,
+        name: data.name,
+        active: data.active,
+        createdAt: data.created_at
+      };
+    } catch (error) {
+      handleError(error, 'playersApi.update');
+      return null;
+    }
   },
-  
-  delete: (id: string): boolean => {
-    const players = playersApi.getAll();
-    const filtered = players.filter(p => p.id !== id);
-    saveToStorage(STORAGE_KEYS.PLAYERS, filtered);
-    return true;
+
+  delete: async (id: string): Promise<boolean> => {
+    try {
+      const { error } = await supabase
+        .from('players')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      handleError(error, 'playersApi.delete');
+      return false;
+    }
   }
 };
 
 // ===== LEAGUES =====
 
+const mapLeagueFromDb = (data: any): League => ({
+  id: data.id,
+  name: data.name,
+  description: data.description || '',
+  defaultNumberOfTeams: data.default_number_of_teams,
+  defaultPlayersPerTeam: data.default_players_per_team,
+  defaultNumberOfRounds: data.default_number_of_rounds,
+  defaultMatchesPerGame: data.default_matches_per_game,
+  dayOfWeek: data.day_of_week,
+  lineupStrategy: data.lineup_strategy,
+  lineupRule: data.lineup_rule,
+  playerMatchPointsPerWin: data.player_match_points_per_win,
+  teamMatchPointsPerWin: data.team_match_points_per_win,
+  teamGamePointsPerWin: data.team_game_points_per_win,
+  useHandicap: data.use_handicap,
+  defaultHandicapBasis: data.default_handicap_basis,
+  handicapPercentage: data.handicap_percentage,
+  teamAllPresentBonusEnabled: data.team_all_present_bonus_enabled,
+  teamAllPresentBonusPoints: data.team_all_present_bonus_points,
+  bonusRules: data.bonus_rules || [],
+  active: data.active,
+  createdAt: data.created_at
+});
+
+const mapLeagueToDb = (data: Partial<League>): any => {
+  const dbData: any = {};
+  if (data.name !== undefined) dbData.name = data.name;
+  if (data.description !== undefined) dbData.description = data.description;
+  if (data.defaultNumberOfTeams !== undefined) dbData.default_number_of_teams = data.defaultNumberOfTeams;
+  if (data.defaultPlayersPerTeam !== undefined) dbData.default_players_per_team = data.defaultPlayersPerTeam;
+  if (data.defaultNumberOfRounds !== undefined) dbData.default_number_of_rounds = data.defaultNumberOfRounds;
+  if (data.defaultMatchesPerGame !== undefined) dbData.default_matches_per_game = data.defaultMatchesPerGame;
+  if (data.dayOfWeek !== undefined) dbData.day_of_week = data.dayOfWeek;
+  if (data.lineupStrategy !== undefined) dbData.lineup_strategy = data.lineupStrategy;
+  if (data.lineupRule !== undefined) dbData.lineup_rule = data.lineupRule;
+  if (data.playerMatchPointsPerWin !== undefined) dbData.player_match_points_per_win = data.playerMatchPointsPerWin;
+  if (data.teamMatchPointsPerWin !== undefined) dbData.team_match_points_per_win = data.teamMatchPointsPerWin;
+  if (data.teamGamePointsPerWin !== undefined) dbData.team_game_points_per_win = data.teamGamePointsPerWin;
+  if (data.useHandicap !== undefined) dbData.use_handicap = data.useHandicap;
+  if (data.defaultHandicapBasis !== undefined) dbData.default_handicap_basis = data.defaultHandicapBasis;
+  if (data.handicapPercentage !== undefined) dbData.handicap_percentage = data.handicapPercentage;
+  if (data.teamAllPresentBonusEnabled !== undefined) dbData.team_all_present_bonus_enabled = data.teamAllPresentBonusEnabled;
+  if (data.teamAllPresentBonusPoints !== undefined) dbData.team_all_present_bonus_points = data.teamAllPresentBonusPoints;
+  if (data.bonusRules !== undefined) dbData.bonus_rules = data.bonusRules;
+  if (data.active !== undefined) dbData.active = data.active;
+  return dbData;
+};
+
 export const leaguesApi = {
-  getAll: (): League[] => {
-    return getFromStorage<League[]>(STORAGE_KEYS.LEAGUES) || [];
+  getAll: async (): Promise<League[]> => {
+    try {
+      const { data, error } = await supabase
+        .from('leagues')
+        .select('*')
+        .order('name');
+
+      if (error) throw error;
+
+      return (data || []).map(mapLeagueFromDb);
+    } catch (error) {
+      handleError(error, 'leaguesApi.getAll');
+      return [];
+    }
   },
-  
-  getById: (id: string): League | undefined => {
-    const leagues = leaguesApi.getAll();
-    return leagues.find(l => l.id === id);
+
+  getById: async (id: string): Promise<League | undefined> => {
+    try {
+      const { data, error } = await supabase
+        .from('leagues')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+
+      return mapLeagueFromDb(data);
+    } catch (error) {
+      handleError(error, 'leaguesApi.getById');
+      return undefined;
+    }
   },
-  
-  create: (leagueData: Omit<League, 'id' | 'createdAt'>): League => {
-    const leagues = leaguesApi.getAll();
-    const newLeague: League = {
-      id: generateId(),
-      ...leagueData,
-      createdAt: new Date().toISOString()
-    };
-    leagues.push(newLeague);
-    saveToStorage(STORAGE_KEYS.LEAGUES, leagues);
-    return newLeague;
+
+  create: async (leagueData: Omit<League, 'id' | 'createdAt'>): Promise<League> => {
+    try {
+      const { data, error} = await supabase
+        .from('leagues')
+        .insert(mapLeagueToDb(leagueData as League))
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return mapLeagueFromDb(data);
+    } catch (error) {
+      handleError(error, 'leaguesApi.create');
+      throw error;
+    }
   },
-  
-  update: (id: string, updates: Partial<League>): League | null => {
-    const leagues = leaguesApi.getAll();
-    const index = leagues.findIndex(l => l.id === id);
-    if (index === -1) return null;
-    
-    leagues[index] = {
-      ...leagues[index],
-      ...updates
-    } as League;
-    saveToStorage(STORAGE_KEYS.LEAGUES, leagues);
-    return leagues[index] || null;
+
+  update: async (id: string, updates: Partial<League>): Promise<League | null> => {
+    try {
+      const { data, error } = await supabase
+        .from('leagues')
+        .update(mapLeagueToDb(updates))
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return mapLeagueFromDb(data);
+    } catch (error) {
+      handleError(error, 'leaguesApi.update');
+      return null;
+    }
   },
-  
-  delete: (id: string): boolean => {
-    const leagues = leaguesApi.getAll();
-    const filtered = leagues.filter(l => l.id !== id);
-    saveToStorage(STORAGE_KEYS.LEAGUES, filtered);
-    return true;
+
+  delete: async (id: string): Promise<boolean> => {
+    try {
+      const { error } = await supabase
+        .from('leagues')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      handleError(error, 'leaguesApi.delete');
+      return false;
+    }
   },
-  
-  // Get seasons for a league
-  getSeasons: (leagueId: string): Season[] => {
-    const seasons = seasonsApi.getAll();
-    return seasons.filter(s => s.leagueId === leagueId);
+
+  getSeasons: async (leagueId: string): Promise<Season[]> => {
+    return await seasonsApi.getByLeague(leagueId);
   }
 };
 
 // ===== SEASONS =====
 
+const mapSeasonFromDb = (data: any): Season => ({
+  id: data.id,
+  leagueId: data.league_id,
+  name: data.name,
+  startDate: data.start_date,
+  endDate: data.end_date,
+  numberOfTeams: data.number_of_teams,
+  playersPerTeam: data.players_per_team,
+  numberOfRounds: data.number_of_rounds,
+  matchesPerGame: data.matches_per_game,
+  lineupStrategy: data.lineup_strategy,
+  lineupRule: data.lineup_rule,
+  playerMatchPointsPerWin: data.player_match_points_per_win,
+  teamMatchPointsPerWin: data.team_match_points_per_win,
+  teamGamePointsPerWin: data.team_game_points_per_win,
+  useHandicap: data.use_handicap,
+  handicapBasis: data.handicap_basis,
+  handicapPercentage: data.handicap_percentage,
+  teamAllPresentBonusEnabled: data.team_all_present_bonus_enabled,
+  teamAllPresentBonusPoints: data.team_all_present_bonus_points,
+  bonusRules: data.bonus_rules || [],
+  status: data.status,
+  schedule: data.schedule,
+  playerAverages: data.player_averages,
+  updatedAt: data.updated_at,
+  createdAt: data.created_at
+});
+
+const mapSeasonToDb = (data: Partial<Season>): any => {
+  const dbData: any = {};
+  if (data.leagueId !== undefined) dbData.league_id = data.leagueId;
+  if (data.name !== undefined) dbData.name = data.name;
+  if (data.startDate !== undefined) dbData.start_date = data.startDate;
+  if (data.endDate !== undefined) dbData.end_date = data.endDate;
+  if (data.numberOfTeams !== undefined) dbData.number_of_teams = data.numberOfTeams;
+  if (data.playersPerTeam !== undefined) dbData.players_per_team = data.playersPerTeam;
+  if (data.numberOfRounds !== undefined) dbData.number_of_rounds = data.numberOfRounds;
+  if (data.matchesPerGame !== undefined) dbData.matches_per_game = data.matchesPerGame;
+  if (data.lineupStrategy !== undefined) dbData.lineup_strategy = data.lineupStrategy;
+  if (data.lineupRule !== undefined) dbData.lineup_rule = data.lineupRule;
+  if (data.playerMatchPointsPerWin !== undefined) dbData.player_match_points_per_win = data.playerMatchPointsPerWin;
+  if (data.teamMatchPointsPerWin !== undefined) dbData.team_match_points_per_win = data.teamMatchPointsPerWin;
+  if (data.teamGamePointsPerWin !== undefined) dbData.team_game_points_per_win = data.teamGamePointsPerWin;
+  if (data.useHandicap !== undefined) dbData.use_handicap = data.useHandicap;
+  if (data.handicapBasis !== undefined) dbData.handicap_basis = data.handicapBasis;
+  if (data.handicapPercentage !== undefined) dbData.handicap_percentage = data.handicapPercentage;
+  if (data.teamAllPresentBonusEnabled !== undefined) dbData.team_all_present_bonus_enabled = data.teamAllPresentBonusEnabled;
+  if (data.teamAllPresentBonusPoints !== undefined) dbData.team_all_present_bonus_points = data.teamAllPresentBonusPoints;
+  if (data.bonusRules !== undefined) dbData.bonus_rules = data.bonusRules;
+  if (data.status !== undefined) dbData.status = data.status;
+  if (data.schedule !== undefined) dbData.schedule = data.schedule;
+  if (data.playerAverages !== undefined) dbData.player_averages = data.playerAverages;
+  return dbData;
+};
+
 export const seasonsApi = {
-  getAll: (): Season[] => {
-    return getFromStorage<Season[]>(STORAGE_KEYS.SEASONS) || [];
+  getAll: async (): Promise<Season[]> => {
+    try {
+      const { data, error } = await supabase
+        .from('seasons')
+        .select('*')
+        .order('start_date', { ascending: false });
+
+      if (error) throw error;
+
+      return (data || []).map(mapSeasonFromDb);
+    } catch (error) {
+      handleError(error, 'seasonsApi.getAll');
+      return [];
+    }
   },
-  
-  getById: (id: string): Season | undefined => {
-    const seasons = seasonsApi.getAll();
-    return seasons.find(s => s.id === id);
+
+  getById: async (id: string): Promise<Season | undefined> => {
+    try {
+      const { data, error } = await supabase
+        .from('seasons')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+
+      return mapSeasonFromDb(data);
+    } catch (error) {
+      handleError(error, 'seasonsApi.getById');
+      return undefined;
+    }
   },
-  
-  getByLeague: (leagueId: string): Season[] => {
-    const seasons = seasonsApi.getAll();
-    return seasons.filter(s => s.leagueId === leagueId);
+
+  getByLeague: async (leagueId: string): Promise<Season[]> => {
+    try {
+      const { data, error } = await supabase
+        .from('seasons')
+        .select('*')
+        .eq('league_id', leagueId)
+        .order('start_date', { ascending: false });
+
+      if (error) throw error;
+
+      return (data || []).map(mapSeasonFromDb);
+    } catch (error) {
+      handleError(error, 'seasonsApi.getByLeague');
+      return [];
+    }
   },
-  
-  create: (seasonData: Omit<Season, 'id' | 'createdAt'>): Season => {
-    const seasons = seasonsApi.getAll();
-    const newSeason: Season = {
-      id: generateId(),
-      ...seasonData,
-      createdAt: new Date().toISOString()
-    };
-    seasons.push(newSeason);
-    saveToStorage(STORAGE_KEYS.SEASONS, seasons);
-    return newSeason;
+
+  create: async (seasonData: Omit<Season, 'id' | 'createdAt'>): Promise<Season> => {
+    try {
+      const { data, error } = await supabase
+        .from('seasons')
+        .insert(mapSeasonToDb(seasonData as Season))
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return mapSeasonFromDb(data);
+    } catch (error) {
+      handleError(error, 'seasonsApi.create');
+      throw error;
+    }
   },
-  
-  update: (id: string, updates: Partial<Season>): Season | null => {
-    const seasons = seasonsApi.getAll();
-    const index = seasons.findIndex(s => s.id === id);
-    if (index === -1) return null;
-    
-    seasons[index] = {
-      ...seasons[index],
-      ...updates
-    } as Season;
-    saveToStorage(STORAGE_KEYS.SEASONS, seasons);
-    return seasons[index] || null;
+
+  update: async (id: string, updates: Partial<Season>): Promise<Season | null> => {
+    try {
+      const { data, error } = await supabase
+        .from('seasons')
+        .update(mapSeasonToDb(updates))
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return mapSeasonFromDb(data);
+    } catch (error) {
+      handleError(error, 'seasonsApi.update');
+      return null;
+    }
   },
-  
-  delete: (id: string): boolean => {
-    const seasons = seasonsApi.getAll();
-    const filtered = seasons.filter(s => s.id !== id);
-    saveToStorage(STORAGE_KEYS.SEASONS, filtered);
-    return true;
+
+  delete: async (id: string): Promise<boolean> => {
+    try {
+      const { error } = await supabase
+        .from('seasons')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      handleError(error, 'seasonsApi.delete');
+      return false;
+    }
   }
 };
 
 // ===== TEAMS =====
 
+const mapTeamFromDb = (data: any): Team => ({
+  id: data.id,
+  seasonId: data.season_id,
+  name: data.name,
+  playerIds: data.player_ids || [],
+  rosterChanges: data.roster_changes || [],
+  createdAt: data.created_at
+});
+
+const mapTeamToDb = (data: Partial<Team>): any => {
+  const dbData: any = {};
+  if (data.seasonId !== undefined) dbData.season_id = data.seasonId;
+  if (data.name !== undefined) dbData.name = data.name;
+  if (data.playerIds !== undefined) dbData.player_ids = data.playerIds;
+  if (data.rosterChanges !== undefined) dbData.roster_changes = data.rosterChanges;
+  return dbData;
+};
+
 export const teamsApi = {
-  getAll: (): Team[] => {
-    return getFromStorage<Team[]>(STORAGE_KEYS.TEAMS) || [];
+  getAll: async (): Promise<Team[]> => {
+    try {
+      const { data, error } = await supabase
+        .from('teams')
+        .select('*')
+        .order('name');
+
+      if (error) throw error;
+
+      return (data || []).map(mapTeamFromDb);
+    } catch (error) {
+      handleError(error, 'teamsApi.getAll');
+      return [];
+    }
   },
-  
-  getById: (id: string): Team | undefined => {
-    const teams = teamsApi.getAll();
-    return teams.find(t => t.id === id);
+
+  getById: async (id: string): Promise<Team | undefined> => {
+    try {
+      const { data, error } = await supabase
+        .from('teams')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+
+      return mapTeamFromDb(data);
+    } catch (error) {
+      handleError(error, 'teamsApi.getById');
+      return undefined;
+    }
   },
-  
-  getBySeason: (seasonId: string): Team[] => {
-    const teams = teamsApi.getAll();
-    return teams.filter(t => t.seasonId === seasonId);
+
+  getBySeason: async (seasonId: string): Promise<Team[]> => {
+    try {
+      const { data, error } = await supabase
+        .from('teams')
+        .select('*')
+        .eq('season_id', seasonId)
+        .order('name');
+
+      if (error) throw error;
+
+      return (data || []).map(mapTeamFromDb);
+    } catch (error) {
+      handleError(error, 'teamsApi.getBySeason');
+      return [];
+    }
   },
-  
-  create: (teamData: Omit<Team, 'id' | 'createdAt'>): Team => {
-    const teams = teamsApi.getAll();
-    const newTeam: Team = {
-      id: generateId(),
-      ...teamData,
-      createdAt: new Date().toISOString()
-    };
-    teams.push(newTeam);
-    saveToStorage(STORAGE_KEYS.TEAMS, teams);
-    return newTeam;
+
+  create: async (teamData: Omit<Team, 'id' | 'createdAt'>): Promise<Team> => {
+    try {
+      const { data, error } = await supabase
+        .from('teams')
+        .insert(mapTeamToDb(teamData as Team))
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return mapTeamFromDb(data);
+    } catch (error) {
+      handleError(error, 'teamsApi.create');
+      throw error;
+    }
   },
-  
-  update: (id: string, updates: Partial<Team>): Team | null => {
-    const teams = teamsApi.getAll();
-    const index = teams.findIndex(t => t.id === id);
-    if (index === -1) return null;
-    
-    teams[index] = {
-      ...teams[index],
-      ...updates
-    } as Team;
-    saveToStorage(STORAGE_KEYS.TEAMS, teams);
-    return teams[index] || null;
+
+  update: async (id: string, updates: Partial<Team>): Promise<Team | null> => {
+    try {
+      const { data, error } = await supabase
+        .from('teams')
+        .update(mapTeamToDb(updates))
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return mapTeamFromDb(data);
+    } catch (error) {
+      handleError(error, 'teamsApi.update');
+      return null;
+    }
   },
-  
-  delete: (id: string): boolean => {
-    const teams = teamsApi.getAll();
-    const filtered = teams.filter(t => t.id !== id);
-    saveToStorage(STORAGE_KEYS.TEAMS, filtered);
-    return true;
+
+  delete: async (id: string): Promise<boolean> => {
+    try {
+      const { error } = await supabase
+        .from('teams')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      handleError(error, 'teamsApi.delete');
+      return false;
+    }
   }
 };
 
 // ===== GAMES =====
 
+const mapGameFromDb = (data: any): Game => ({
+  id: data.id,
+  seasonId: data.season_id,
+  round: data.round,
+  matchDay: data.match_day,
+  team1Id: data.team1_id,
+  team2Id: data.team2_id,
+  status: data.status,
+  completedAt: data.completed_at,
+  createdAt: data.created_at,
+  matches: data.matches,
+  team1: data.team1_data,
+  team2: data.team2_data,
+  matchesPerGame: data.matches_per_game,
+  useHandicap: data.use_handicap,
+  lineupStrategy: data.lineup_strategy,
+  lineupRule: data.lineup_rule,
+  teamAllPresentBonusEnabled: data.team_all_present_bonus_enabled,
+  teamAllPresentBonusPoints: data.team_all_present_bonus_points,
+  bonusRules: data.bonus_rules,
+  playerMatchPointsPerWin: data.player_match_points_per_win,
+  teamMatchPointsPerWin: data.team_match_points_per_win,
+  teamGamePointsPerWin: data.team_game_points_per_win,
+  grandTotalPoints: data.grand_total_points,
+  scheduledDate: data.scheduled_date,
+  postponed: data.postponed,
+  originalDate: data.original_date,
+  updatedAt: data.updated_at
+});
+
+const mapGameToDb = (data: Partial<Game>): any => {
+  const dbData: any = {};
+  if (data.seasonId !== undefined) dbData.season_id = data.seasonId;
+  if (data.round !== undefined) dbData.round = data.round;
+  if (data.matchDay !== undefined) dbData.match_day = data.matchDay;
+  if (data.team1Id !== undefined) dbData.team1_id = data.team1Id;
+  if (data.team2Id !== undefined) dbData.team2_id = data.team2Id;
+  if (data.status !== undefined) dbData.status = data.status;
+  if (data.completedAt !== undefined) dbData.completed_at = data.completedAt;
+  if (data.matches !== undefined) dbData.matches = data.matches;
+  if (data.team1 !== undefined) dbData.team1_data = data.team1;
+  if (data.team2 !== undefined) dbData.team2_data = data.team2;
+  if (data.matchesPerGame !== undefined) dbData.matches_per_game = data.matchesPerGame;
+  if (data.useHandicap !== undefined) dbData.use_handicap = data.useHandicap;
+  if (data.lineupStrategy !== undefined) dbData.lineup_strategy = data.lineupStrategy;
+  if (data.lineupRule !== undefined) dbData.lineup_rule = data.lineupRule;
+  if (data.teamAllPresentBonusEnabled !== undefined) dbData.team_all_present_bonus_enabled = data.teamAllPresentBonusEnabled;
+  if (data.teamAllPresentBonusPoints !== undefined) dbData.team_all_present_bonus_points = data.teamAllPresentBonusPoints;
+  if (data.bonusRules !== undefined) dbData.bonus_rules = data.bonusRules;
+  if (data.playerMatchPointsPerWin !== undefined) dbData.player_match_points_per_win = data.playerMatchPointsPerWin;
+  if (data.teamMatchPointsPerWin !== undefined) dbData.team_match_points_per_win = data.teamMatchPointsPerWin;
+  if (data.teamGamePointsPerWin !== undefined) dbData.team_game_points_per_win = data.teamGamePointsPerWin;
+  if (data.grandTotalPoints !== undefined) dbData.grand_total_points = data.grandTotalPoints;
+  if (data.scheduledDate !== undefined) dbData.scheduled_date = data.scheduledDate;
+  if (data.postponed !== undefined) dbData.postponed = data.postponed;
+  if (data.originalDate !== undefined) dbData.original_date = data.originalDate;
+  return dbData;
+};
+
 export const gamesApi = {
-  getAll: (): Game[] => {
-    return getFromStorage<Game[]>(STORAGE_KEYS.GAMES) || [];
+  getAll: async (): Promise<Game[]> => {
+    try {
+      const { data, error } = await supabase
+        .from('games')
+        .select('*')
+        .order('round', { ascending: false });
+
+      if (error) throw error;
+
+      return (data || []).map(mapGameFromDb);
+    } catch (error) {
+      handleError(error, 'gamesApi.getAll');
+      return [];
+    }
   },
-  
-  getById: (id: string): Game | undefined => {
-    const games = gamesApi.getAll();
-    return games.find(g => g.id === id);
+
+  getById: async (id: string): Promise<Game | undefined> => {
+    try {
+      const { data, error } = await supabase
+        .from('games')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+
+      return mapGameFromDb(data);
+    } catch (error) {
+      handleError(error, 'gamesApi.getById');
+      return undefined;
+    }
   },
-  
-  getBySeason: (seasonId: string): Game[] => {
-    const games = gamesApi.getAll();
-    return games.filter(g => g.seasonId === seasonId);
+
+  getBySeason: async (seasonId: string): Promise<Game[]> => {
+    try {
+      const { data, error } = await supabase
+        .from('games')
+        .select('*')
+        .eq('season_id', seasonId)
+        .order('round', { ascending: true })
+        .order('match_day', { ascending: true });
+
+      if (error) throw error;
+
+      return (data || []).map(mapGameFromDb);
+    } catch (error) {
+      handleError(error, 'gamesApi.getBySeason');
+      return [];
+    }
   },
-  
-  getByRound: (seasonId: string, round: number): Game[] => {
-    const games = gamesApi.getAll();
-    return games.filter(g => g.seasonId === seasonId && g.round === round);
+
+  getByRound: async (seasonId: string, round: number): Promise<Game[]> => {
+    try {
+      const { data, error } = await supabase
+        .from('games')
+        .select('*')
+        .eq('season_id', seasonId)
+        .eq('round', round)
+        .order('match_day', { ascending: true });
+
+      if (error) throw error;
+
+      return (data || []).map(mapGameFromDb);
+    } catch (error) {
+      handleError(error, 'gamesApi.getByRound');
+      return [];
+    }
   },
-  
-  create: (gameData: Omit<Game, 'id' | 'createdAt' | 'status'>): Game => {
-    const games = gamesApi.getAll();
-    const newGame: Game = {
-      id: generateId(),
-      status: 'pending', // pending, in-progress, completed
-      ...gameData,
-      createdAt: new Date().toISOString()
-    };
-    games.push(newGame);
-    saveToStorage(STORAGE_KEYS.GAMES, games);
-    return newGame;
+
+  create: async (gameData: Omit<Game, 'id' | 'createdAt' | 'status'>): Promise<Game> => {
+    try {
+      const dbData = mapGameToDb(gameData as Game);
+      dbData.status = 'pending'; // Default status
+
+      const { data, error } = await supabase
+        .from('games')
+        .insert(dbData)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return mapGameFromDb(data);
+    } catch (error) {
+      handleError(error, 'gamesApi.create');
+      throw error;
+    }
   },
-  
-  update: (id: string, updates: Partial<Game>): Game | null => {
-    const games = gamesApi.getAll();
-    const index = games.findIndex(g => g.id === id);
-    if (index === -1) return null;
-    
-    games[index] = {
-      ...games[index],
-      ...updates
-    } as Game;
-    saveToStorage(STORAGE_KEYS.GAMES, games);
-    return games[index] || null;
+
+  update: async (id: string, updates: Partial<Game>): Promise<Game | null> => {
+    try {
+      const { data, error } = await supabase
+        .from('games')
+        .update(mapGameToDb(updates))
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return mapGameFromDb(data);
+    } catch (error) {
+      handleError(error, 'gamesApi.update');
+      return null;
+    }
   },
-  
-  delete: (id: string): boolean => {
-    const games = gamesApi.getAll();
-    const filtered = games.filter(g => g.id !== id);
-    saveToStorage(STORAGE_KEYS.GAMES, filtered);
-    return true;
+
+  delete: async (id: string): Promise<boolean> => {
+    try {
+      const { error } = await supabase
+        .from('games')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      handleError(error, 'gamesApi.delete');
+      return false;
+    }
   }
 };
 
-// ===== AUTH (Simple role-based) =====
-// Note: Using AuthUser to avoid conflict with imported User type
+// ===== AUTH (OAuth-based) =====
 
 interface AuthUser {
   userId: string;
@@ -338,22 +816,40 @@ interface AuthUser {
 }
 
 export const authApi = {
-  getCurrentUser: (): AuthUser | null => {
-    return getFromStorage<AuthUser>(STORAGE_KEYS.CURRENT_USER);
+  getCurrentUser: async (): Promise<AuthUser | null> => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      const { data, error } = await supabase
+        .from('users')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+
+      if (error) return null;
+
+      return {
+        userId: user.id,
+        role: data.role as 'admin' | 'player'
+      };
+    } catch (error) {
+      return null;
+    }
   },
-  
-  login: (userId: string, role: 'admin' | 'player' = 'player'): AuthUser => {
-    const user: AuthUser = { userId, role };
-    saveToStorage(STORAGE_KEYS.CURRENT_USER, user);
-    return user;
+
+  login: async (userId: string, role: 'admin' | 'player' = 'player'): Promise<AuthUser> => {
+    // OAuth-based, this method is deprecated
+    console.warn('authApi.login is deprecated - use OAuth instead');
+    return { userId, role };
   },
-  
-  logout: (): void => {
-    localStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+
+  logout: async (): Promise<void> => {
+    await supabase.auth.signOut();
   },
-  
-  isAdmin: (): boolean => {
-    const user = authApi.getCurrentUser();
+
+  isAdmin: async (): Promise<boolean> => {
+    const user = await authApi.getCurrentUser();
     return user !== null && user.role === 'admin';
   }
 };
@@ -361,9 +857,9 @@ export const authApi = {
 // ===== UTILITY =====
 
 export const utilApi = {
-  clearAll: (): void => {
-    Object.values(STORAGE_KEYS).forEach(key => {
-      localStorage.removeItem(key);
-    });
+  clearAll: async (): Promise<void> => {
+    // This would require admin privileges to delete all data
+    // Not implementing for safety reasons
+    console.warn('utilApi.clearAll is not implemented for Supabase');
   }
 };

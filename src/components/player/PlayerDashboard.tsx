@@ -11,37 +11,39 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
   const [recentCompletedGames, setRecentCompletedGames] = useState<Game[]>([]);
   const [view, setView] = useState('dashboard'); // dashboard, stats, leagues, history
   const [playerStats, setPlayerStats] = useState<PlayerStats | null>(null);
+  const [gameDetailsMap, setGameDetailsMap] = useState<Record<string, { season: Season | null, league: League | null, team1: any, team2: any }>>({});
 
   useEffect(() => {
     loadPlayerData();
   }, [playerId]);
 
-  const loadPlayerData = () => {
-    const playerData = playersApi.getById(playerId);
+  const loadPlayerData = async () => {
+    const playerData = await playersApi.getById(playerId);
     setPlayer(playerData ?? null);
 
     // Find all teams this player is on
-    const allTeams = teamsApi.getAll();
+    const allTeams = await teamsApi.getAll();
     const playerTeams = allTeams.filter(team => team.playerIds.includes(playerId));
 
     // Get unique seasons the player is in
     const seasonIds = [...new Set(playerTeams.map(t => t.seasonId))];
-    const seasons = seasonIds.map(id => seasonsApi.getById(id)).filter(Boolean);
+    const seasons = await Promise.all(seasonIds.map(id => seasonsApi.getById(id)));
+    const validSeasons = seasons.filter(Boolean);
 
     // Get leagues for those seasons
-    const leagueIds = [...new Set(seasons.filter((s): s is Season => s !== undefined).map(s => s.leagueId))];
-    const leagues = leagueIds
-      .map(id => leaguesApi.getById(id))
+    const leagueIds = [...new Set(validSeasons.filter((s): s is Season => s !== undefined).map(s => s.leagueId))];
+    const leaguesData = await Promise.all(leagueIds.map(id => leaguesApi.getById(id)));
+    const leagues = leaguesData
       .filter((league): league is League => !!league && typeof league.id === 'string')
       .map(league => {
-        const leagueSeasons = seasons.filter((s): s is Season => s !== undefined && s.leagueId === league.id);
+        const leagueSeasons = validSeasons.filter((s): s is Season => s !== undefined && s.leagueId === league.id);
         const activeSeasons = leagueSeasons.filter((s: Season) => s.status === 'active');
-        
+
         return {
           ...league,
           seasons: leagueSeasons,
           activeSeasons: activeSeasons,
-          playerTeams: playerTeams.filter(t => 
+          playerTeams: playerTeams.filter(t =>
             leagueSeasons.some((s: Season) => s.id === t.seasonId)
           )
         };
@@ -50,13 +52,17 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
     setPlayerLeagues(leagues);
 
     // Get recent completed games
-    const allGames = gamesApi.getAll();
-    const completedPlayerGames = allGames.filter(game => {
-      const team1 = teamsApi.getById(game.team1Id);
-      const team2 = teamsApi.getById(game.team2Id);
-      return (team1?.playerIds.includes(playerId) || team2?.playerIds.includes(playerId)) &&
+    const allGames = await gamesApi.getAll();
+    const completedPlayerGamesPromises = allGames.map(async game => {
+      const team1 = await teamsApi.getById(game.team1Id);
+      const team2 = await teamsApi.getById(game.team2Id);
+      const isPlayerGame = (team1?.playerIds.includes(playerId) || team2?.playerIds.includes(playerId)) &&
              game.status === 'completed';
+      return isPlayerGame ? game : null;
     });
+
+    const completedPlayerGamesResults = await Promise.all(completedPlayerGamesPromises);
+    const completedPlayerGames = completedPlayerGamesResults.filter((game): game is Game => game !== null);
 
     // Sort by completion date (most recent first)
     const sortedCompletedGames = completedPlayerGames.sort((a, b) => {
@@ -65,14 +71,26 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
       return dateB.getTime() - dateA.getTime();
     });
 
-    setRecentCompletedGames(sortedCompletedGames.slice(0, 5)); // Show last 5 completed games
+    const topGames = sortedCompletedGames.slice(0, 5);
+    setRecentCompletedGames(topGames); // Show last 5 completed games
+
+    // Preload game details for rendering
+    const detailsMap: Record<string, { season: Season | null, league: League | null, team1: any, team2: any }> = {};
+    for (const game of topGames) {
+      const season = await seasonsApi.getById(game.seasonId);
+      const league = season ? await leaguesApi.getById(season.leagueId) : null;
+      const team1 = await teamsApi.getById(game.team1Id);
+      const team2 = await teamsApi.getById(game.team2Id);
+      detailsMap[game.id] = { season, league, team1, team2 };
+    }
+    setGameDetailsMap(detailsMap);
 
     // Calculate player statistics across all games
-    calculatePlayerStats(allGames);
+    await calculatePlayerStats(allGames);
   };
 
-  const calculatePlayerStats = (allGames: Game[]) => {
-    const playerData = playersApi.getById(playerId);
+  const calculatePlayerStats = async (allGames: Game[]) => {
+    const playerData = await playersApi.getById(playerId);
     const stats: PlayerStats = {
       playerId: playerId,
       playerName: playerData?.name || '',
@@ -87,15 +105,15 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
 
     // Process all completed games
     const completedGames = allGames.filter((g: Game) => g.status === 'completed');
-    
-    completedGames.forEach((game: Game) => {
-      const team1 = teamsApi.getById(game.team1Id);
-      const team2 = teamsApi.getById(game.team2Id);
+
+    for (const game of completedGames) {
+      const team1 = await teamsApi.getById(game.team1Id);
+      const team2 = await teamsApi.getById(game.team2Id);
       const isOnTeam1 = team1?.playerIds.includes(playerId);
       const isOnTeam2 = team2?.playerIds.includes(playerId);
-      if (!isOnTeam1 && !isOnTeam2) return;
+      if (!isOnTeam1 && !isOnTeam2) continue;
       const playerIndex = (isOnTeam1 ? team1 : team2)?.playerIds.indexOf(playerId);
-      if (playerIndex === undefined || playerIndex === -1) return;
+      if (playerIndex === undefined || playerIndex === -1) continue;
 
       let seriesPins = 0;
       let seriesPoints = 0;
@@ -118,8 +136,8 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
             }
             // Calculate points scored
             if (match.playerMatches && match.playerMatches[playerIndex]) {
-              const points = isOnTeam1 
-                ? match.playerMatches[playerIndex].team1Points 
+              const points = isOnTeam1
+                ? match.playerMatches[playerIndex].team1Points
                 : match.playerMatches[playerIndex].team2Points;
               stats.pointsScored += points;
               seriesPoints += points;
@@ -134,7 +152,7 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
         }
         stats.seriesCount++;
       }
-    });
+    }
 
     // Calculate averages
     if (stats.gamesPlayed > 0) {
@@ -205,10 +223,9 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
               <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('playerDashboard.recentCompletedGames')}</h2>
               <div className="space-y-3">
                 {recentCompletedGames.map(game => {
-                  const season = seasonsApi.getById(game.seasonId);
-                  const league = season ? leaguesApi.getById(season.leagueId) : null;
-                  const team1 = teamsApi.getById(game.team1Id);
-                  const team2 = teamsApi.getById(game.team2Id);
+                  const details = gameDetailsMap[game.id];
+                  if (!details) return null;
+                  const { season, league, team1, team2 } = details;
                   const isTeam1 = team1?.playerIds.includes(playerId);
                   const team1TotalPoints = game.matches?.reduce((sum: any, m: GameMatch) => sum + (m.team1?.points || 0), 0) + (game.grandTotalPoints?.team1 || 0);
                   const team2TotalPoints = game.matches?.reduce((sum: any, m: GameMatch) => sum + (m.team2?.points || 0), 0) + (game.grandTotalPoints?.team2 || 0);

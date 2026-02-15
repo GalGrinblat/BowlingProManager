@@ -27,6 +27,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('🔐 Initial session check:', !!session);
       setSession(session);
       if (session) {
         loadUserProfile(session.user.id);
@@ -37,14 +38,43 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        setSession(session);
-        if (session) {
-          await loadUserProfile(session.user.id);
-        } else {
+      async (event, session) => {
+        console.log('🔐 Auth state change:', event, 'Session exists:', !!session, 'User:', session?.user?.email);
+
+        // Only clear user data on explicit sign-out, not on token refresh
+        if (event === 'SIGNED_OUT') {
+          console.log('👋 User signed out - clearing data');
+          setSession(null);
           setCurrentUser(null);
           setPlayerData(null);
           setIsLoading(false);
+        } else if (event === 'TOKEN_REFRESHED') {
+          // Just update session, don't reload user profile
+          console.log('🔄 Token refreshed - updating session only');
+          setSession(session);
+        } else if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
+          console.log('✅ Auth event:', event, '- checking if user profile needs loading');
+          setSession(session);
+          // Only load profile if user ID changed or not loaded yet
+          if (session && session.user) {
+            setCurrentUser((current) => {
+              // If user already loaded with same ID, don't reload
+              if (current?.userId === session.user.id) {
+                console.log('👤 User already loaded, skipping profile reload');
+                return current;
+              }
+              // User changed or not loaded, reload profile
+              console.log('👤 Loading user profile for', session.user.email);
+              loadUserProfile(session.user.id);
+              return current; // Return current for now, loadUserProfile will update it
+            });
+          }
+        } else if (session) {
+          // For other events, just update session if it exists
+          console.log('🔄 Other auth event:', event, '- updating session');
+          setSession(session);
+        } else {
+          console.warn('⚠️ Unknown auth event with no session:', event);
         }
       }
     );

@@ -4,26 +4,48 @@ import { calculateTeamStandings } from '../../utils/standingsUtils';
 import { useTranslation } from '../../contexts/LanguageContext';
 import { exportLeague, downloadExportFile, readImportFile, importLeagueOrSeason } from '../../utils/leagueImportExportUtils';
 
-import type { LeagueDetailProps, League, Season } from '../../types/index';
+import type { LeagueDetailProps, League, Season, Team } from '../../types/index';
 
 export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, onViewSeason, onCreateSeason }) => {
   const { t } = useTranslation();
   const [league, setLeague] = useState<League | null>(null);
   const [seasons, setSeasons] = useState<Season[]>([]);
+  const [seasonStandings, setSeasonStandings] = useState<Record<string, any[]>>({});
+  const [seasonTeams, setSeasonTeams] = useState<Record<string, Team[]>>({});
+  const [seasonGames, setSeasonGames] = useState<Record<string, any[]>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     loadLeagueData();
   }, [leagueId]);
 
-  const loadLeagueData = () => {
-    const leagueData = leaguesApi.getById(leagueId);
+  const loadLeagueData = async () => {
+    const leagueData = await leaguesApi.getById(leagueId);
     if (!leagueData) {
       return;
     }
     setLeague(leagueData);
-    const seasonsData = seasonsApi.getByLeague(leagueId);
+    const seasonsData = await seasonsApi.getByLeague(leagueId);
     setSeasons(seasonsData.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
+
+    // Preload data for completed seasons
+    const standingsData: Record<string, any[]> = {};
+    const teamsData: Record<string, Team[]> = {};
+    const gamesData: Record<string, any[]> = {};
+
+    for (const season of seasonsData.filter(s => s.status === 'completed')) {
+      const teams = await teamsApi.getBySeason(season.id);
+      const games = await gamesApi.getBySeason(season.id);
+      const standings = calculateTeamStandings(teams, games);
+
+      standingsData[season.id] = standings;
+      teamsData[season.id] = teams;
+      gamesData[season.id] = games;
+    }
+
+    setSeasonStandings(standingsData);
+    setSeasonTeams(teamsData);
+    setSeasonGames(gamesData);
   };
 
   const activeSeason = seasons.find(s => s.status === 'active');
@@ -172,13 +194,12 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
           <h2 className="text-xl font-bold text-gray-800 mb-4">{t('seasons.seasonArchives')}</h2>
           <div className="space-y-3">
             {completedSeasons.map(season => {
-              const teams = teamsApi.getBySeason(season.id);
-              const games = gamesApi.getBySeason(season.id);
-              
-              // Calculate champion
-              const standings = calculateTeamStandings(teams, games);
+              // Get preloaded data
+              const standings = seasonStandings[season.id] || [];
               const champion = standings[0];
-                            
+              const teams = seasonTeams[season.id] || [];
+              const games = seasonGames[season.id] || [];
+
               return (
                 <div
                   key={season.id}

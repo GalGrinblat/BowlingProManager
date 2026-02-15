@@ -34,44 +34,45 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
     loadPlayers();
   }, []);
 
-  const loadPlayers = () => {
-    setPlayers(playersApi.getAll());
+  const loadPlayers = async () => {
+    const data = await playersApi.getAll();
+    setPlayers(data);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     const playerData = createPlayer(formData);
     const validation = validatePlayer(playerData);
-    
+
     if (!validation.valid) {
       alert(validation.error);
       return;
     }
 
     // Check for duplicate player names (case-insensitive, excluding current player if editing)
-    const existingPlayer = players.find(p => 
-      p.name.toLowerCase() === playerData.name.toLowerCase() && 
+    const existingPlayer = players.find(p =>
+      p.name.toLowerCase() === playerData.name.toLowerCase() &&
       p.id !== editingId
     );
-    
+
     if (existingPlayer) {
       alert(`❌ ${t('players.duplicateName')}`);
       return;
     }
 
     if (editingId) {
-      playersApi.update(editingId, playerData);
+      await playersApi.update(editingId, playerData);
       alert(`✅ "${playerData.name}" ${t('players.updated')}`);
       setEditingId(null);
     } else {
-      playersApi.create(playerData);
+      await playersApi.create(playerData);
       alert(`✅ "${playerData.name}" ${t('players.created')}`);
     }
 
     setFormData({ name: '', active: true });
     setIsAdding(false);
-    loadPlayers();
+    await loadPlayers();
   };
 
   const handleEdit = (player: Player) => {
@@ -83,28 +84,30 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
     setIsAdding(true);
   };
 
-  const handleDelete = (id: string) => {
-    const player = playersApi.getById(id);
-    
+  const handleDelete = async (id: string) => {
+    const player = await playersApi.getById(id);
+
     // Check if player is assigned to any teams
-    const allTeams = teamsApi.getAll();
+    const allTeams = await teamsApi.getAll();
     const teamsWithPlayer = allTeams.filter(team => team.playerIds.includes(id));
-    
+
     if (teamsWithPlayer.length > 0) {
       // Get season names for better context
-      const seasonNames = teamsWithPlayer.map(team => {
-        const season = seasonsApi.getById(team.seasonId);
-        return season ? season.name : 'Unknown Season';
-      });
-      
+      const seasonNames = await Promise.all(
+        teamsWithPlayer.map(async team => {
+          const season = await seasonsApi.getById(team.seasonId);
+          return season ? season.name : 'Unknown Season';
+        })
+      );
+
       alert(`❌ ${t('players.cannotDeleteAssigned')} "${player?.name}" (${teamsWithPlayer.length} ${t('players.assignedToTeams')}):\n\n${[...new Set(seasonNames)].map(s => `• ${s}`).join('\n')}\n\n${t('players.removeFromTeamsFirst')}`);
       return;
     }
-    
+
     if (confirm(`⚠️ ${t('players.deleteConfirm')} "${player?.name}"?\n\n${t('common.deleteWarning')}`)) {
-      playersApi.delete(id);
+      await playersApi.delete(id);
       alert(`✅ "${player?.name}" ${t('players.deleted')}`);
-      loadPlayers();
+      await loadPlayers();
     }
   };
 
@@ -204,29 +207,29 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
     }
   };
 
-  const handleConfirmImport = () => {
+  const handleConfirmImport = async () => {
     let successCount = 0;
     let duplicateCount = 0;
 
-    importData.forEach(playerData => {
+    for (const playerData of importData) {
       // Check for duplicates
-      const existingPlayer = players.find(p => 
+      const existingPlayer = players.find(p =>
         p.name.toLowerCase() === playerData.name.toLowerCase()
       );
 
       if (existingPlayer) {
         duplicateCount++;
-        return;
+        continue;
       }
 
-      playersApi.create(playerData);
+      await playersApi.create(playerData);
       successCount++;
-    });
+    }
 
     setShowImportModal(false);
     setImportData([]);
     setImportErrors([]);
-    loadPlayers();
+    await loadPlayers();
 
     let message = `✅ ${t('players.importComplete')}\n\n`;
     message += `• ${successCount} ${t('players.playersImported')}\n`;
