@@ -612,21 +612,21 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
                   <h4 className="text-base font-bold text-purple-800 mb-3 flex items-center gap-2">
                     🎯 {t('records.matchScore')}
                   </h4>
-                  {seasonRecords.highestMatchScores.length > 0 ? (
+                  {seasonRecords.highestPlayerMatchScores.length > 0 ? (
                     <div className="space-y-2">
-                      {seasonRecords.highestMatchScores.map((record, index) => (
+                      {seasonRecords.highestPlayerMatchScores.map((record, index) => (
                         <div key={index} className="flex items-center justify-between bg-white rounded-lg p-2 shadow-sm border border-purple-100">
                           <div className="flex items-center gap-2 flex-1 min-w-0">
                             <span className="text-xl font-bold text-purple-600">
                               {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
                             </span>
                             <div className="min-w-0 flex-1">
-                              <p className="font-bold text-gray-800 text-sm truncate">{record.playerName}</p>
-                              <p className="text-xs text-gray-600 truncate">{record.teamName}</p>
+                              <p className="font-bold text-gray-800 text-sm truncate">{record.playerRecordEntry.playerId}</p>
+                              <p className="text-xs text-gray-600 truncate">{record.teamId}</p>
                             </div>
                           </div>
                           <div className="text-right ml-2">
-                            <p className="text-xl font-bold text-purple-600">{record.value}</p>
+                            <p className="text-xl font-bold text-purple-600">{record.playerRecordEntry.value}</p>
                             <p className="text-xs text-gray-500">{t('records.round')}{record.round}, {t('records.day')}{record.matchDay}</p>
                           </div>
                         </div>
@@ -642,21 +642,21 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
                   <h4 className="text-base font-bold text-blue-800 mb-3 flex items-center gap-2">
                     🎳 {t('records.series')}
                   </h4>
-                  {seasonRecords.highestSeries.length > 0 ? (
+                  {seasonRecords.highestPlayerSeries.length > 0 ? (
                     <div className="space-y-2">
-                      {seasonRecords.highestSeries.map((record, index) => (
+                      {seasonRecords.highestPlayerSeries.map((record, index) => (
                         <div key={index} className="flex items-center justify-between bg-white rounded-lg p-2 shadow-sm border border-blue-100">
                           <div className="flex items-center gap-2 flex-1 min-w-0">
                             <span className="text-xl font-bold text-blue-600">
                               {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
                             </span>
                             <div className="min-w-0 flex-1">
-                              <p className="font-bold text-gray-800 text-sm truncate">{record.playerName}</p>
-                              <p className="text-xs text-gray-600 truncate">{record.teamName}</p>
+                              <p className="font-bold text-gray-800 text-sm truncate">{record.playerRecordEntry.playerId}</p>
+                              <p className="text-xs text-gray-600 truncate">{record.teamId}</p>
                             </div>
                           </div>
                           <div className="text-right ml-2">
-                            <p className="text-xl font-bold text-blue-600">{record.value}</p>
+                            <p className="text-xl font-bold text-blue-600">{record.playerRecordEntry.value}</p>
                             <p className="text-xs text-gray-500">{t('records.round')}{record.round}, {t('records.day')}{record.matchDay}</p>
                           </div>
                         </div>
@@ -681,11 +681,11 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
                               {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
                             </span>
                             <div className="min-w-0 flex-1">
-                              <p className="font-bold text-gray-800 text-sm truncate">{record.teamName}</p>
+                              <p className="font-bold text-gray-800 text-sm truncate">{record.teamRecordEntry.teamId}</p>
                             </div>
                           </div>
                           <div className="text-right ml-2">
-                            <p className="text-xl font-bold text-green-600">{record.value}</p>
+                            <p className="text-xl font-bold text-green-600">{record.teamRecordEntry.value}</p>
                             <p className="text-xs text-gray-500">{t('records.round')}{record.round}, {t('records.day')}{record.matchDay}</p>
                           </div>
                         </div>
@@ -710,11 +710,11 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
                               {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
                             </span>
                             <div className="min-w-0 flex-1">
-                              <p className="font-bold text-gray-800 text-sm truncate">{record.teamName}</p>
+                              <p className="font-bold text-gray-800 text-sm truncate">{record.teamRecordEntry.teamId}</p>
                             </div>
                           </div>
                           <div className="text-right ml-2">
-                            <p className="text-xl font-bold text-orange-600">{record.value}</p>
+                            <p className="text-xl font-bold text-orange-600">{record.teamRecordEntry.value}</p>
                             <p className="text-xs text-gray-500">{t('records.round')}{record.round}, {t('records.day')}{record.matchDay}</p>
                           </div>
                         </div>

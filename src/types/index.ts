@@ -263,6 +263,23 @@ export interface CurrentPlayerAverages {
   [playerId: string]: CurrentPlayerAverage;
 }
 
+export interface PlayerRecordEntry {
+  playerId: string;
+  recordType: 'singleMatch' | 'series';
+  value: number;
+  numberOfGames: number;  
+  date: string;
+}
+
+export interface TeamRecordEntry {
+  teamId: string;
+  recordType: 'singleMatch' | 'series';
+  value: number;
+  numberOfGames: number;  
+  date: string;
+  playerIds: string[]; // For team records, we can also track which players were involved
+}
+
 // ============================================================================
 // Scheduling Types - Round-robin schedule generation and match day tracking
 // ============================================================================

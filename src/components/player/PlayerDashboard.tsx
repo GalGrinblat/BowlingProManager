@@ -211,8 +211,8 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
                   const team2 = teamsApi.getById(game.team2Id);
                   const isTeam1 = team1?.playerIds.includes(playerId);
                   
-                  const team1TotalPoints = game.matches?.reduce((sum: any, m: any) => sum + (m.team1?.score || 0), 0) + (game.grandTotalPoints?.team1 || 0);
-                  const team2TotalPoints = game.matches?.reduce((sum: any, m: any) => sum + (m.team2?.score || 0), 0) + (game.grandTotalPoints?.team2 || 0);
+                  const team1TotalPoints = game.matches?.reduce((sum: any, m: GameMatch) => sum + (m.team1?.points || 0), 0) + (game.grandTotalPoints?.team1 || 0);
+                  const team2TotalPoints = game.matches?.reduce((sum: any, m: GameMatch) => sum + (m.team2?.points || 0), 0) + (game.grandTotalPoints?.team2 || 0);
                   const playerWon = (isTeam1 && team1TotalPoints > team2TotalPoints) || (!isTeam1 && team2TotalPoints > team1TotalPoints);
                   
                   return (
