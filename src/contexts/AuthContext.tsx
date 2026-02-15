@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { authApi, playersApi } from '../services/api';
-import type { AuthContextType } from '../types/index';
+import { supabase } from '../lib/supabase';
+import { playersApi } from '../services/api';
+import type { AuthContextType, User } from '../types/index';
+import type { Session } from '@supabase/supabase-js';
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -17,47 +19,131 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [playerData, setPlayerData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
-    // Check if user is already logged in
-    const user = authApi.getCurrentUser();
-    if (user) {
-      setCurrentUser(user);
-      if (user.role === 'player') {
-        const player = playersApi.getById(user.userId);
-        setPlayerData(player);
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session) {
+        loadUserProfile(session.user.id);
+      } else {
+        setIsLoading(false);
       }
-    }
-    setIsLoading(false);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+        setSession(session);
+        if (session) {
+          await loadUserProfile(session.user.id);
+        } else {
+          setCurrentUser(null);
+          setPlayerData(null);
+          setIsLoading(false);
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  const login = (userId: string, role: 'admin' | 'player' = 'player') => {
-    const user = authApi.login(userId, role);
-    setCurrentUser(user);
-    
-    if (role === 'player') {
-      const player = playersApi.getById(userId);
-      setPlayerData(player);
+  const loadUserProfile = async (userId: string) => {
+    try {
+      // First, check if user exists in users table
+      let { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      // If user doesn't exist, create them
+      if (userError && userError.code === 'PGRST116') {
+        const { data: authUser } = await supabase.auth.getUser();
+        if (authUser.user) {
+          const { data: newUser, error: insertError } = await supabase
+            .from('users')
+            .insert({
+              id: authUser.user.id,
+              email: authUser.user.email || '',
+            })
+            .select()
+            .single();
+
+          if (insertError) {
+            console.error('Error creating user:', insertError);
+            setIsLoading(false);
+            return;
+          }
+          userData = newUser;
+        }
+      } else if (userError) {
+        throw userError;
+      }
+
+      if (userData) {
+        const user: User = {
+          userId: userData.id,
+          role: userData.role as 'admin' | 'player',
+        };
+
+        setCurrentUser(user);
+
+        // Load player data if user is a player and has a linked player
+        if (userData.role === 'player' && userData.player_id) {
+          const player = await playersApi.getById(userData.player_id);
+          setPlayerData(player);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading user profile:', error);
+    } finally {
+      setIsLoading(false);
     }
-    
-    return user;
   };
 
-  const logout = () => {
-    authApi.logout();
-    setCurrentUser(null);
-    setPlayerData(null);
+  const loginWithGoogle = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/`,
+        },
+      });
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error signing in with Google:', error);
+      throw error;
+    }
+  };
+
+  const logout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      setCurrentUser(null);
+      setPlayerData(null);
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   };
 
   const isAdmin = () => {
-    return currentUser && currentUser.role === 'admin';
+    return currentUser?.role === 'admin';
   };
 
   const isPlayer = () => {
-    return currentUser && currentUser.role === 'player';
+    return currentUser?.role === 'player';
+  };
+
+  // Legacy login function for backward compatibility (deprecated)
+  const login = async (userId: string, role: 'admin' | 'player' = 'player') => {
+    console.warn('Legacy login function called - OAuth should be used instead');
+    return null;
   };
 
   const value = {
@@ -65,9 +151,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     playerData,
     isLoading,
     login,
+    loginWithGoogle,
     logout,
     isAdmin,
-    isPlayer
+    isPlayer,
+    session,
   };
 
   return (

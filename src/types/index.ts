@@ -191,9 +191,11 @@ export interface AuthContextType {
   isLoading?: boolean;
   user?: User | null;
   login: (userId: string, role: 'admin' | 'player') => any;
+  loginWithGoogle?: () => Promise<void>;
   logout: () => void;
   isAdmin: () => boolean;
   isPlayer: () => boolean;
+  session?: any;
 }
 
 /** TranslationDictionary - Nested translation key-value structure */

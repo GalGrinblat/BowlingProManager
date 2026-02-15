@@ -25,7 +25,7 @@ interface NavigationState {
 }
 
 function AppContent() {
-  const { currentUser, login, logout, isAdmin, isPlayer } = useAuth();
+  const { currentUser, logout, isAdmin, isPlayer } = useAuth();
   const [currentView, setCurrentView] = useState<string>(
     currentUser ? (isAdmin() ? 'dashboard' : 'player-dashboard') : 'login'
   );
@@ -61,7 +61,7 @@ function AppContent() {
 
         {/* Login View */}
         {!currentUser && (
-          <LoginView onLogin={login} />
+          <LoginView />
         )}
 
         {/* Admin Views */}
