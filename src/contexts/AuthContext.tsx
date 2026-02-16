@@ -160,7 +160,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   // Legacy login function for backward compatibility (deprecated)
-  const login = async (userId: string, role: 'admin' | 'player' = 'player') => {
+  const login = async (_userId: string, _role: 'admin' | 'player' = 'player') => {
     console.warn('Legacy login function called - OAuth should be used instead');
     return null;
   };

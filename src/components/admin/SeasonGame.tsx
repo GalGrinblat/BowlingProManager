@@ -387,7 +387,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
     const buildGameTeam = async (team: Team): Promise<GameTeam> => {
       const players = [];
       for (let idx = 0; idx < (team.playerIds || []).length; idx++) {
-        const playerId = team.playerIds[idx];
+        const playerId = team.playerIds[idx]!;
         const player = await playersApi.getById(playerId);
         players.push({
           playerId,

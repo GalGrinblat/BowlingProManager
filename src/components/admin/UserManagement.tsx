@@ -9,7 +9,7 @@ interface UserManagementProps {
 }
 
 export const UserManagement: React.FC<UserManagementProps> = ({ onBack }) => {
-  const { t } = useTranslation();
+  const { t: _t } = useTranslation();
   const [users, setUsers] = useState<DatabaseUser[]>([]);
   const [players, setPlayers] = useState<Player[]>([]);
   const [allowedEmails, setAllowedEmails] = useState<AllowedEmail[]>([]);

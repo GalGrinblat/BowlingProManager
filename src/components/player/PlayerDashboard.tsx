@@ -82,7 +82,7 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
       const league = season ? await leaguesApi.getById(season.leagueId) : null;
       const team1 = await teamsApi.getById(game.team1Id);
       const team2 = await teamsApi.getById(game.team2Id);
-      detailsMap[game.id] = { season, league, team1, team2 };
+      detailsMap[game.id] = { season: season ?? null, league: league ?? null, team1, team2 };
     }
     setGameDetailsMap(detailsMap);
 
@@ -226,7 +226,7 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
                 {recentCompletedGames.map(game => {
                   const details = gameDetailsMap[game.id];
                   if (!details) return null;
-                  const { season, league, team1, team2 } = details;
+                  const { league, team1, team2 } = details;
                   const isTeam1 = team1?.playerIds.includes(playerId);
                   const team1TotalPoints = game.matches?.reduce((sum: any, m: GameMatch) => sum + (m.team1?.points || 0), 0) + (game.grandTotalPoints?.team1 || 0);
                   const team2TotalPoints = game.matches?.reduce((sum: any, m: GameMatch) => sum + (m.team2?.points || 0), 0) + (game.grandTotalPoints?.team2 || 0);

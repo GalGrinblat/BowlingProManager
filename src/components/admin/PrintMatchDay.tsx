@@ -21,7 +21,7 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
   const [games, setGames] = useState<any[]>([]);
   const [matchDayGames, setMatchDayGames] = useState<any[]>([]);
   const [teamStandings, setTeamStandings] = useState<any[]>([]);
-  const [currentAverages, setCurrentAverages] = useState<any>({});
+  const [, setCurrentAverages] = useState<any>({});
   const [teamPlayersMap, setTeamPlayersMap] = useState<Record<string, any[]>>({});
 
   useEffect(() => {

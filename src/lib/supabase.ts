@@ -47,7 +47,9 @@ export type Database = {
       players: {
         Row: {
           id: string;
-          name: string;
+          first_name: string;
+          last_name: string;
+          middle_name: string | null;
           active: boolean;
           created_at: string;
           updated_at: string;
@@ -60,10 +62,10 @@ export type Database = {
           id: string;
           name: string;
           description: string | null;
-          default_number_of_teams: number;
-          default_players_per_team: number;
-          default_number_of_rounds: number;
-          default_matches_per_game: number;
+          number_of_teams: number;
+          players_per_team: number;
+          number_of_rounds: number;
+          matches_per_game: number;
           day_of_week: string;
           lineup_strategy: 'flexible' | 'fixed' | 'rule-based' | null;
           lineup_rule: 'standard' | 'balanced' | null;
@@ -71,7 +73,7 @@ export type Database = {
           team_match_points_per_win: number;
           team_game_points_per_win: number;
           use_handicap: boolean;
-          default_handicap_basis: number;
+          handicap_basis: number;
           handicap_percentage: number;
           team_all_present_bonus_enabled: boolean | null;
           team_all_present_bonus_points: number | null;

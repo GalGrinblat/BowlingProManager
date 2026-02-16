@@ -279,8 +279,8 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
 
   // Sort players by selected option
   const sortedPlayers = [...filteredPlayers].sort((a, b) => {
-    const key = sortOption?.key as 'firstName' | 'lastName';
-    if (key === 'firstName' || key === 'lastName') {
+    const key = sortOption?.key as 'firstName' | 'lastName' | undefined;
+    if (sortOption && (key === 'firstName' || key === 'lastName')) {
       if (sortOption.direction === 'asc') {
         return a[key].localeCompare(b[key], undefined, { sensitivity: 'base' });
       } else {
