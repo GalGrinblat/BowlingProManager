@@ -238,6 +238,10 @@ const he: TranslationDictionary = {
 
   // ניהול עונות
   seasons: {
+    assignPlayers: 'שיבוץ שחקנים',
+    assignPlayersDesc: 'שבץ שחקנים לכל קבוצה ({{count}} שחקנים בקבוצה)',
+    addPlayer: 'הוסף שחקן',
+    selectPlayer: 'בחר שחקן',
     teamRoster: 'סגל קבוצה',
     title: 'ניהול עונות',
     createSeason: 'צור עונה',
@@ -312,7 +316,6 @@ const he: TranslationDictionary = {
     roundExplanation: 'כל קבוצה משחקת נגד כל הקבוצות בכל סיבוב',
     matchesExplanation: 'מספר המשחקים בכל מחזור',
     configureTeams: 'הגדרת קבוצות',
-    assignPlayersDesc: 'הקצה שחקנים לכל קבוצה ({{count}} שחקנים לקבוצה)',
     noAvailablePlayers: 'אין שחקנים זמינים',
     reviewPlayerAverages: 'סקור ממוצעי שחקנים',
     reviewPlayerAveragesDesc: 'סקור והתאם ממוצעי שחקנים לפני יצירת העונה. אלו ישמשו כממוצעי התחלה.',

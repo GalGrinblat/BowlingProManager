@@ -238,6 +238,10 @@ const en: TranslationDictionary = {
 
   // Season Management
   seasons: {
+    assignPlayers: 'Assign Players',
+    assignPlayersDesc: 'Assign players to each team ({{count}} players per team)',
+    addPlayer: 'Add Player',
+    selectPlayer: 'Select Player',
     teamRoster: 'Team Roster',
     title: 'Season Management',
     createSeason: 'Create Season',
@@ -312,7 +316,6 @@ const en: TranslationDictionary = {
     roundExplanation: 'Each team plays all others per round',
     matchesExplanation: 'Number of matches in each game',
     configureTeams: 'Configure Teams',
-    assignPlayersDesc: 'Assign players to each team ({{count}} players per team)',
     noAvailablePlayers: 'No available players',
     reviewPlayerAverages: 'Review Player Averages',
     reviewPlayerAveragesDesc: 'Review and adjust player averages before creating the season. These will be used as starting averages.',
