@@ -21,7 +21,9 @@ export interface Organization {
 /** Player - Individual bowler in the organization's player registry (can participate in multiple leagues) */
 export interface Player {
   id: string;
-  name: string;
+  firstName: string;
+  middleName?: string;
+  lastName: string;
   active: boolean;
   createdAt: DateString;
 }

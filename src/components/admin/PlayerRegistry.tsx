@@ -1,15 +1,23 @@
 import React, { useState, useEffect } from 'react';
+// Sorting options
+const SORT_OPTIONS = [
+  { key: 'lastName', label: 'Last Name (A-Z)', direction: 'asc' },
+  { key: 'lastName', label: 'Last Name (Z-A)', direction: 'desc' },
+  { key: 'firstName', label: 'First Name (A-Z)', direction: 'asc' },
+  { key: 'firstName', label: 'First Name (Z-A)', direction: 'desc' },
+];
 import { playersApi, teamsApi, seasonsApi } from '../../services/api';
 import { createPlayer, validatePlayer } from '../../models';
 import { Pagination, usePagination } from '../common/Pagination';
 import { useTranslation } from '../../contexts/LanguageContext';
-import { 
-  exportToCSV, 
-  exportToJSON, 
-  parseJSONImport, 
+import {
+  exportToCSV,
+  exportToJSON,
+  parseJSONImport,
   parseCSVImport,
-  booleanConverter 
+  booleanConverter
 } from '../../utils/importExportUtils';
+import { getPlayerDisplayName } from '../../utils/playerUtils';
 import type { Player, PlayerRegistryProps } from '../../types/index';
 
 export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
@@ -18,13 +26,16 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
-    name: '',
+    firstName: '',
+    middleName: '',
+    lastName: '',
     active: true
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [showImportModal, setShowImportModal] = useState(false);
   const [importData, setImportData] = useState<Player[]>([]);
   const [importErrors, setImportErrors] = useState<string[]>([]);
+  const [sortOption, setSortOption] = useState(SORT_OPTIONS[0]);
   
   // Pagination state
   const activePagination = usePagination(20); // 20 players per page
@@ -51,8 +62,10 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
     }
 
     // Check for duplicate player names (case-insensitive, excluding current player if editing)
+    const displayName = getPlayerDisplayName(playerData);
     const existingPlayer = players.find(p =>
-      p.name.toLowerCase() === playerData.name.toLowerCase() &&
+      p.firstName.toLowerCase() === playerData.firstName.toLowerCase() &&
+      p.lastName.toLowerCase() === playerData.lastName.toLowerCase() &&
       p.id !== editingId
     );
 
@@ -63,21 +76,23 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
 
     if (editingId) {
       await playersApi.update(editingId, playerData);
-      alert(`✅ "${playerData.name}" ${t('players.updated')}`);
+      alert(`✅ "${displayName}" ${t('players.updated')}`);
       setEditingId(null);
     } else {
       await playersApi.create(playerData);
-      alert(`✅ "${playerData.name}" ${t('players.created')}`);
+      alert(`✅ "${displayName}" ${t('players.created')}`);
     }
 
-    setFormData({ name: '', active: true });
+    setFormData({ firstName: '', middleName: '', lastName: '', active: true });
     setIsAdding(false);
     await loadPlayers();
   };
 
   const handleEdit = (player: Player) => {
     setFormData({
-      name: player.name,
+      firstName: player.firstName,
+      middleName: player.middleName || '',
+      lastName: player.lastName,
       active: player.active
     });
     setEditingId(player.id);
@@ -100,19 +115,21 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
         })
       );
 
-      alert(`❌ ${t('players.cannotDeleteAssigned')} "${player?.name}" (${teamsWithPlayer.length} ${t('players.assignedToTeams')}):\n\n${[...new Set(seasonNames)].map(s => `• ${s}`).join('\n')}\n\n${t('players.removeFromTeamsFirst')}`);
+      const playerDisplayName = player ? getPlayerDisplayName(player) : 'Unknown';
+      alert(`❌ ${t('players.cannotDeleteAssigned')} "${playerDisplayName}" (${teamsWithPlayer.length} ${t('players.assignedToTeams')}):\n\n${[...new Set(seasonNames)].map(s => `• ${s}`).join('\n')}\n\n${t('players.removeFromTeamsFirst')}`);
       return;
     }
 
-    if (confirm(`⚠️ ${t('players.deleteConfirm')} "${player?.name}"?\n\n${t('common.deleteWarning')}`)) {
+    const playerDisplayName = player ? getPlayerDisplayName(player) : 'Unknown';
+    if (confirm(`⚠️ ${t('players.deleteConfirm')} "${playerDisplayName}"?\n\n${t('common.deleteWarning')}`)) {
       await playersApi.delete(id);
-      alert(`✅ "${player?.name}" ${t('players.deleted')}`);
+      alert(`✅ "${playerDisplayName}" ${t('players.deleted')}`);
       await loadPlayers();
     }
   };
 
   const handleCancel = () => {
-    setFormData({ name: '', active: true });
+    setFormData({ firstName: '', middleName: '', lastName: '', active: true });
     setIsAdding(false);
     setEditingId(null);
   };
@@ -158,11 +175,12 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
       const result = parseJSONImport<Player>(
         content,
         (item) => {
-          // Ensure required fields exist
-          if (!item.name) {
-            return { valid: false, error: 'Missing required field \'name\'' };
+          if (!item.firstName) {
+            return { valid: false, error: 'Missing required field \'firstName\'' };
           }
-          // Set defaults for missing optional fields
+          if (!item.lastName) {
+            return { valid: false, error: 'Missing required field \'lastName\'' };
+          }
           if (item.active === undefined) {
             item.active = true;
           }
@@ -183,11 +201,12 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
       const result = parseCSVImport<Player>(
         content,
         (item) => {
-          // Ensure required fields
-          if (!item.name) {
-            return { valid: false, error: 'Missing required field \'name\'' };
+          if (!item.firstName) {
+            return { valid: false, error: 'Missing required field \'firstName\'' };
           }
-          // Set defaults
+          if (!item.lastName) {
+            return { valid: false, error: 'Missing required field \'lastName\'' };
+          }
           if (item.active === undefined) {
             item.active = true;
           }
@@ -214,7 +233,8 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
     for (const playerData of importData) {
       // Check for duplicates
       const existingPlayer = players.find(p =>
-        p.name.toLowerCase() === playerData.name.toLowerCase()
+        p.firstName.toLowerCase() === playerData.firstName.toLowerCase() &&
+        p.lastName.toLowerCase() === playerData.lastName.toLowerCase()
       );
 
       if (existingPlayer) {
@@ -249,17 +269,34 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
     setImportErrors([]);
   };
 
-  const filteredPlayers = players.filter(p =>
-    p.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filtered and sorted players
+  const filteredPlayers = players.filter(p => {
+    const term = searchTerm.toLowerCase();
+    return p.firstName.toLowerCase().includes(term) ||
+      p.lastName.toLowerCase().includes(term) ||
+      getPlayerDisplayName(p).toLowerCase().includes(term);
+  });
+
+  // Sort players by selected option
+  const sortedPlayers = [...filteredPlayers].sort((a, b) => {
+    const key = sortOption?.key as 'firstName' | 'lastName';
+    if (key === 'firstName' || key === 'lastName') {
+      if (sortOption.direction === 'asc') {
+        return a[key].localeCompare(b[key], undefined, { sensitivity: 'base' });
+      } else {
+        return b[key].localeCompare(a[key], undefined, { sensitivity: 'base' });
+      }
+    }
+    return 0;
+  });
   // Reset pagination when search changes
   React.useEffect(() => {
     activePagination.resetPage();
     inactivePagination.resetPage();
   }, [searchTerm]);
 
-  const activePlayers = filteredPlayers.filter(p => p.active);
-  const inactivePlayers = filteredPlayers.filter(p => !p.active);
+  const activePlayers = sortedPlayers.filter(p => p.active);
+  const inactivePlayers = sortedPlayers.filter(p => !p.active);
   
   // Paginated lists
   const paginatedActivePlayers = activePagination.paginate(activePlayers);
@@ -290,17 +327,42 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
             {editingId ? t('players.editPlayer') : t('players.addNewPlayer')}
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                {t('common.name')} *
-              </label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                required
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  {t('players.firstName')} *
+                </label>
+                <input
+                  type="text"
+                  value={formData.firstName}
+                  onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  {t('players.middleName')}
+                </label>
+                <input
+                  type="text"
+                  value={formData.middleName}
+                  onChange={(e) => setFormData({ ...formData, middleName: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  {t('players.lastName')} *
+                </label>
+                <input
+                  type="text"
+                  value={formData.lastName}
+                  onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  required
+                />
+              </div>
             </div>
             <div className="flex gap-3">
               <button
@@ -337,6 +399,24 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
                 + {t('players.addPlayer')}
               </button>
             </div>
+          </div>
+
+          {/* Sort Dropdown */}
+          <div className="flex items-center gap-4 my-4">
+            <label htmlFor="sortPlayers" className="text-sm font-semibold text-gray-700">{t('players.sortBy') || 'Sort by'}:</label>
+            <select
+              id="sortPlayers"
+              value={sortOption?.label}
+              onChange={e => {
+                const selected = SORT_OPTIONS.find(opt => opt.label === e.target.value);
+                if (selected) setSortOption(selected);
+              }}
+              className="px-3 py-1 border border-gray-300 rounded-lg text-sm"
+            >
+              {SORT_OPTIONS.map(opt => (
+                <option key={opt.label} value={opt.label}>{opt.label}</option>
+              ))}
+            </select>
           </div>
 
           {/* Import/Export Section */}
@@ -394,7 +474,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
               >
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="font-semibold text-gray-800">{player.name}</h3>
+                    <h3 className="font-semibold text-gray-800">{getPlayerDisplayName(player)}</h3>
                   </div>
                   <div className="flex gap-2">
                     <button
@@ -439,7 +519,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
               >
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="font-semibold text-gray-600">{player.name}</h3>
+                    <h3 className="font-semibold text-gray-600">{getPlayerDisplayName(player)}</h3>
                   </div>
                   <div className="flex gap-2">
                     <button
@@ -494,8 +574,9 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
                   </h3>
                   <div className="space-y-2 max-h-96 overflow-y-auto">
                     {importData.map((player, idx) => {
-                      const isDuplicate = players.some(p => 
-                        p.name.toLowerCase() === player.name.toLowerCase()
+                      const isDuplicate = players.some(p =>
+                        p.firstName.toLowerCase() === player.firstName.toLowerCase() &&
+                        p.lastName.toLowerCase() === player.lastName.toLowerCase()
                       );
                       
                       return (
@@ -509,13 +590,13 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
                         >
                           <div className="flex items-center justify-between">
                             <div>
-                              <span className="font-semibold text-gray-800">{player.name}</span>
+                              <span className="font-semibold text-gray-800">{getPlayerDisplayName(player)}</span>
                               <span className="text-sm text-gray-600 ml-3">
                                 Status: {player.active ? `✅ ${t('players.statusActive')}` : `❌ ${t('players.statusInactive')}`}
                               </span>
                               {/* Display any additional fields */}
                               {Object.entries(player).map(([key, value]) => {
-                                if (key === 'name' || key === 'active' || key === 'id' || key === 'createdAt') return null;
+                                if (key === 'firstName' || key === 'middleName' || key === 'lastName' || key === 'active' || key === 'id' || key === 'createdAt') return null;
                                 return (
                                   <span key={key} className="text-sm text-gray-600 ml-3">
                                     {key}: {String(value)}

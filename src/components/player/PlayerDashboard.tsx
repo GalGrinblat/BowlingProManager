@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { playersApi, leaguesApi, seasonsApi, teamsApi, gamesApi } from '../../services/api';
 import { useTranslation } from '../../contexts/LanguageContext';
+import { getPlayerDisplayName } from '../../utils/playerUtils';
 
 import type { Game, GameMatch, League, Player, PlayerDashboardProps, PlayerStats, Season } from '../../types/index';
 
@@ -93,7 +94,7 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
     const playerData = await playersApi.getById(playerId);
     const stats: PlayerStats = {
       playerId: playerId,
-      playerName: playerData?.name || '',
+      playerName: playerData ? getPlayerDisplayName(playerData) : '',
       gamesPlayed: 0,
       totalPins: 0,
       average: 0,
@@ -167,7 +168,7 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-gradient-to-r from-purple-500 to-blue-600 rounded-xl shadow-lg p-6 text-white">
-        <h1 className="text-3xl font-bold mb-2">{t('playerDashboard.welcome')}, {player.name}!</h1>
+        <h1 className="text-3xl font-bold mb-2">{t('playerDashboard.welcome')}, {getPlayerDisplayName(player)}!</h1>
         <p className="text-purple-100">{t('playerDashboard.playerDashboard')}</p>
         <div className="flex gap-4 mt-4 text-sm">
           <span>🎳 {playerLeagues.length} {playerLeagues.length === 1 ? t('playerDashboard.activeLeagues') : t('playerDashboard.activeLeaguesPlural')}</span>

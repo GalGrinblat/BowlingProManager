@@ -42,7 +42,9 @@ CREATE TABLE public.organization (
 -- Players
 CREATE TABLE public.players (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name TEXT NOT NULL,
+  first_name TEXT NOT NULL,
+  middle_name TEXT,
+  last_name TEXT NOT NULL,
   active BOOLEAN NOT NULL DEFAULT TRUE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -145,6 +147,14 @@ CREATE TABLE public.games (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- Allowed Emails (whitelist for who can sign up)
+CREATE TABLE public.allowed_emails (
+  email TEXT PRIMARY KEY,
+  added_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  added_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  notes TEXT
+);
+
 -- Add foreign key constraint for users.player_id after players table is created
 ALTER TABLE public.users ADD CONSTRAINT fk_users_player_id FOREIGN KEY (player_id) REFERENCES players(id) ON DELETE SET NULL;
 
@@ -204,6 +214,8 @@ ALTER TABLE public.leagues ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.seasons ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.teams ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.games ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE public.allowed_emails ENABLE ROW LEVEL SECURITY;
 
 -- Helper function to check if user is admin
 CREATE OR REPLACE FUNCTION is_admin()
@@ -337,6 +349,26 @@ CREATE POLICY "Admins can insert games" ON public.games
 CREATE POLICY "Admins can update games" ON public.games
   FOR UPDATE USING (is_admin());
 CREATE POLICY "Admins can delete games" ON public.games
+  FOR DELETE USING (is_admin());
+
+-- ============================================================================
+-- ALLOWED EMAILS TABLE POLICIES
+-- ============================================================================
+
+-- Admins can read allowed emails
+CREATE POLICY "Admins can read allowed emails" ON public.allowed_emails
+  FOR SELECT USING (is_admin());
+
+-- Admins can insert allowed emails
+CREATE POLICY "Admins can insert allowed emails" ON public.allowed_emails
+  FOR INSERT WITH CHECK (is_admin());
+
+-- Admins can update allowed emails
+CREATE POLICY "Admins can update allowed emails" ON public.allowed_emails
+  FOR UPDATE USING (is_admin());
+
+-- Admins can delete allowed emails
+CREATE POLICY "Admins can delete allowed emails" ON public.allowed_emails
   FOR DELETE USING (is_admin());
 
 -- ============================================================================

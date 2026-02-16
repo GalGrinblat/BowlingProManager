@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { teamsApi, playersApi, seasonsApi } from '../../services/api';
 import { useTranslation } from '../../contexts/LanguageContext';
+import { getPlayerDisplayName } from '../../utils/playerUtils';
 
 import type { TeamManagementProps } from '../../types/index';
 
@@ -48,11 +49,11 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
       type: 'substitution',
       oldPlayer: {
         id: oldPlayerId,
-        name: oldPlayer.name
+        name: getPlayerDisplayName(oldPlayer)
       },
       newPlayer: {
         id: newPlayerId,
-        name: newPlayer.name
+        name: getPlayerDisplayName(newPlayer)
       },
       position: oldPlayerIndex
     };
@@ -144,7 +145,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
                         {idx + 1}
                       </div>
                       <div>
-                        <div className="font-semibold text-gray-800">{player.name}</div>
+                        <div className="font-semibold text-gray-800">{getPlayerDisplayName(player)}</div>
                       </div>
                     </div>
                   </div>
@@ -196,7 +197,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
                             {idx + 1}
                           </div>
                           <div>
-                            <div className="font-semibold text-gray-800">{currentPlayer?.name}</div>
+                            <div className="font-semibold text-gray-800">{currentPlayer ? getPlayerDisplayName(currentPlayer) : ''}</div>
                           </div>
                         </div>
                       </div>
@@ -207,7 +208,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
                         </label>
                         <select
                           onChange={(e) => {
-                            if (e.target.value && confirm(`Replace ${currentPlayer?.name} with this player?`)) {
+                            if (e.target.value && confirm(`Replace ${currentPlayer ? getPlayerDisplayName(currentPlayer) : ''} with this player?`)) {
                               handleSubstitutePlayer(selectedTeam, idx, e.target.value);
                             }
                           }}
@@ -217,7 +218,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
                           <option value="">Select player...</option>
                           {availablePlayers.map(player => (
                             <option key={player.id} value={player.id}>
-                              {player.name}
+                              {getPlayerDisplayName(player)}
                             </option>
                           ))}
                         </select>

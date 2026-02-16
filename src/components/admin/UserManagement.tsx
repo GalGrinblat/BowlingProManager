@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { usersApi, playersApi, allowedEmailsApi, type DatabaseUser, type AllowedEmail } from '../../services/api';
 import type { Player } from '../../types/index';
 import { useTranslation } from '../../contexts/LanguageContext';
+import { getPlayerDisplayName } from '../../utils/playerUtils';
 
 interface UserManagementProps {
   onBack: () => void;
@@ -81,7 +82,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({ onBack }) => {
   const getPlayerName = (playerId: string | null): string => {
     if (!playerId) return 'Not linked';
     const player = players.find(p => p.id === playerId);
-    return player?.name || 'Unknown Player';
+    return player ? getPlayerDisplayName(player) : 'Unknown Player';
   };
 
   const formatDate = (dateString: string): string => {
@@ -303,7 +304,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({ onBack }) => {
                           <option value="">Not linked</option>
                           {players.map((player) => (
                             <option key={player.id} value={player.id}>
-                              {player.name}
+                              {getPlayerDisplayName(player)}
                             </option>
                           ))}
                         </select>

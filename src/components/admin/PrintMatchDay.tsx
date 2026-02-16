@@ -4,6 +4,7 @@ import { calculateTeamStandings, calculateCurrentPlayerAverages } from '../../ut
 import { calculateHeadToHead } from '../../utils/headToHeadUtils';
 import { formatMatchDate } from '../../utils/scheduleUtils';
 import { useTranslation } from '../../contexts/LanguageContext';
+import { getPlayerDisplayName } from '../../utils/playerUtils';
 
 import type { PrintMatchDayProps } from '../../types/index';
 
@@ -70,7 +71,7 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
   const getTeamPlayers = async (team: any, seasonData: any, averages: any) => {
     const playerPromises = team.playerIds.map(async (playerId: string) => {
       const player = await playersApi.getById(playerId);
-      const playerName = player?.name || 'Unknown';
+      const playerName = player ? getPlayerDisplayName(player) : 'Unknown';
       const currentAvg = averages[playerName]?.average || 0;
       const currentGamesPlayed = averages[playerName]?.gamesPlayed || 0;
 

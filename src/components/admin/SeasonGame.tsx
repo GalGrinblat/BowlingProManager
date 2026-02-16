@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { gamesApi, teamsApi, seasonsApi, playersApi } from '../../services/api';
 import { useTranslation } from '../../contexts/LanguageContext';
+import { getPlayerDisplayName } from '../../utils/playerUtils';
 import { MatchView } from '../common/MatchView';
 import { SummaryView } from '../common/SummaryView';
 import { calculateMatchResults, calculateBonusPoints } from '../../utils/matchUtils';
@@ -390,7 +391,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
         const player = await playersApi.getById(playerId);
         players.push({
           playerId,
-          name: player ? player.name : '',
+          name: player ? getPlayerDisplayName(player) : '',
           average: 0,
           handicap: 0,
           rank: idx + 1,

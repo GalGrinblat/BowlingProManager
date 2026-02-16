@@ -4,8 +4,11 @@
  */
 
 function validatePlayer(player) {
-  if (!player.name || player.name.trim() === '') {
-    return { valid: false, error: 'Player name is required' };
+  if (!player.firstName || player.firstName.trim() === '') {
+    return { valid: false, error: 'First name is required' };
+  }
+  if (!player.lastName || player.lastName.trim() === '') {
+    return { valid: false, error: 'Last name is required' };
   }
   return { valid: true };
 }
@@ -63,20 +66,29 @@ const tests = [
   {
     name: 'Player - Valid player',
     test: () => {
-      const result = validatePlayer({ name: 'John Doe' });
+      const result = validatePlayer({ firstName: 'John', lastName: 'Doe' });
       return result.valid === true;
     },
     expected: 'valid',
     description: 'Should accept valid player data'
   },
   {
-    name: 'Player - Empty name',
+    name: 'Player - Empty first name',
     test: () => {
-      const result = validatePlayer({ name: '' });
-      return result.valid === false && result.error.includes('name is required');
+      const result = validatePlayer({ firstName: '', lastName: 'Doe' });
+      return result.valid === false && result.error.includes('First name is required');
     },
     expected: 'invalid',
-    description: 'Should reject empty player name'
+    description: 'Should reject empty first name'
+  },
+  {
+    name: 'Player - Empty last name',
+    test: () => {
+      const result = validatePlayer({ firstName: 'John', lastName: '' });
+      return result.valid === false && result.error.includes('Last name is required');
+    },
+    expected: 'invalid',
+    description: 'Should reject empty last name'
   },
   {
     name: 'League - Valid league',

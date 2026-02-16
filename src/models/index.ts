@@ -28,13 +28,19 @@ export const createOrganization = ({
 
 // ===== PLAYER MODEL =====
 export const createPlayer = ({
-  name = '',
+  firstName = '',
+  middleName = '',
+  lastName = '',
   active = true
 }: {
-  name?: string;
+  firstName?: string;
+  middleName?: string;
+  lastName?: string;
   active?: boolean;
 }): Omit<Player, 'id' | 'createdAt'> => ({
-  name,
+  firstName,
+  middleName: middleName || undefined,
+  lastName,
   active
 });
 
@@ -213,8 +219,11 @@ export const createGame = ({
 // ===== VALIDATION HELPERS =====
 
 export const validatePlayer = (player: Partial<Player>): ValidationResult => {
-  if (!player.name || player.name.trim() === '') {
-    return { valid: false, error: 'Player name is required' };
+  if (!player.firstName || player.firstName.trim() === '') {
+    return { valid: false, error: 'First name is required' };
+  }
+  if (!player.lastName || player.lastName.trim() === '') {
+    return { valid: false, error: 'Last name is required' };
   }
   return { valid: true };
 };

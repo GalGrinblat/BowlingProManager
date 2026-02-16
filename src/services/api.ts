@@ -238,13 +238,16 @@ export const playersApi = {
       const { data, error } = await supabase
         .from('players')
         .select('*')
-        .order('name');
+        .order('last_name')
+        .order('first_name');
 
       if (error) throw error;
 
       return (data || []).map(p => ({
         id: p.id,
-        name: p.name,
+        firstName: p.first_name,
+        middleName: p.middle_name || undefined,
+        lastName: p.last_name,
         active: p.active,
         createdAt: p.created_at
       }));
@@ -266,7 +269,9 @@ export const playersApi = {
 
       return {
         id: data.id,
-        name: data.name,
+        firstName: data.first_name,
+        middleName: data.middle_name || undefined,
+        lastName: data.last_name,
         active: data.active,
         createdAt: data.created_at
       };
@@ -281,7 +286,9 @@ export const playersApi = {
       const { data, error } = await supabase
         .from('players')
         .insert({
-          name: playerData.name,
+          first_name: playerData.firstName,
+          middle_name: playerData.middleName || null,
+          last_name: playerData.lastName,
           active: playerData.active
         })
         .select()
@@ -291,7 +298,9 @@ export const playersApi = {
 
       return {
         id: data.id,
-        name: data.name,
+        firstName: data.first_name,
+        middleName: data.middle_name || undefined,
+        lastName: data.last_name,
         active: data.active,
         createdAt: data.created_at
       };
@@ -304,7 +313,9 @@ export const playersApi = {
   update: async (id: string, updates: Partial<Player>): Promise<Player | null> => {
     try {
       const updateData: any = {};
-      if (updates.name !== undefined) updateData.name = updates.name;
+      if (updates.firstName !== undefined) updateData.first_name = updates.firstName;
+      if (updates.middleName !== undefined) updateData.middle_name = updates.middleName || null;
+      if (updates.lastName !== undefined) updateData.last_name = updates.lastName;
       if (updates.active !== undefined) updateData.active = updates.active;
 
       const { data, error } = await supabase
@@ -318,7 +329,9 @@ export const playersApi = {
 
       return {
         id: data.id,
-        name: data.name,
+        firstName: data.first_name,
+        middleName: data.middle_name || undefined,
+        lastName: data.last_name,
         active: data.active,
         createdAt: data.created_at
       };

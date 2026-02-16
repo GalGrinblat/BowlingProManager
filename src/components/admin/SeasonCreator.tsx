@@ -5,6 +5,7 @@ import { GeneralConfiguration } from './shared/GeneralConfiguration';
 import { BonusRulesConfiguration } from './shared/BonusRulesConfiguration';
 import { playersApi, leaguesApi } from '../../services/api';
 import { useTranslation } from '../../contexts/LanguageContext';
+import { getPlayerDisplayName } from '../../utils/playerUtils';
 import type { SeasonCreatorProps, BonusRule, LineupStrategy, LineupRule, League } from '../../types/index';
 import { DEFAULT_HANDICAP_BASIS, DEFAULT_HANDICAP_PERCENTAGE, DEFAULT_NUMBER_OF_TEAMS, DEFAULT_NUMBER_OF_ROUNDS, DEFAULT_PLAYERS_PER_TEAM, DEFAULT_MATCHES_PER_GAME, DEFAULT_PLAYER_MATCH_POINTS, DEFAULT_TEAM_MATCH_POINTS, DEFAULT_TEAM_GAME_POINTS, DEFAULT_USE_HANDICAP, DEFAULT_LINEUP_STRATEGY, DEFAULT_LINEUP_RULE, DEFAULT_TEAM_ALL_PRESENT_BONUS_ENABLED, DEFAULT_TEAM_ALL_PRESENT_BONUS_POINTS } from '../../constants/bowling';
 import { PlayerMatchupConfiguration } from './shared/PlayerMatchupConfiguration';
@@ -38,7 +39,9 @@ type Team = {
 
 type Player = {
   id: string;
-  name: string;
+  firstName: string;
+  middleName?: string;
+  lastName: string;
   [key: string]: any;
 };
 
@@ -450,7 +453,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
                       const player = availablePlayers.find((p: Player) => p.id === playerId);
                       return (
                         <li key={playerId} className="flex items-center justify-between mb-1">
-                          <span>{player?.name || 'Unknown'}</span>
+                          <span>{player ? getPlayerDisplayName(player) : 'Unknown'}</span>
                           <button type="button" onClick={() => handleRemovePlayer(teamIdx, playerId)} className="text-xs text-red-500 ml-2">{t('common.remove')}</button>
                         </li>
                       );
@@ -466,7 +469,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
                   >
                     <option value="">{t('seasons.selectPlayer')}</option>
                     {availablePlayers.filter(p => !getAssignedPlayers(teamIdx).has(p.id)).map((player: Player) => (
-                      <option key={player.id} value={player.id}>{player.name}</option>
+                      <option key={player.id} value={player.id}>{getPlayerDisplayName(player)}</option>
                     ))}
                   </select>
                 </div>
@@ -488,7 +491,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
       const player = availablePlayers.find((p: Player) => p.id === playerId);
       return {
         playerId,
-        playerName: player?.name || 'Unknown',
+        playerName: player ? getPlayerDisplayName(player) : 'Unknown',
         teamName: team.name,
         average: playerAverages[playerId] || 0
       };
