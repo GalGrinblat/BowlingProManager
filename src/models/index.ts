@@ -217,6 +217,11 @@ export const createGame = ({
   teamMatchPointsPerWin: 0,
   teamGamePointsPerWin: 0,
   useHandicap: false,
+  lineupStrategy: 'flexible',
+  lineupRule: 'standard',
+  teamAllPresentBonusEnabled: false,
+  teamAllPresentBonusPoints: 1,
+  bonusRules: [],
   postponed: false
 });
 

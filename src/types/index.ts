@@ -48,16 +48,16 @@ export interface SeasonConfigurations {
   playersPerTeam: number;
   numberOfRounds: number;
   matchesPerGame: number;
-  lineupStrategy?: LineupStrategy;
-  lineupRule?: LineupRule;
+  lineupStrategy: LineupStrategy;
+  lineupRule: LineupRule;
   playerMatchPointsPerWin: number;
   teamMatchPointsPerWin: number;
   teamGamePointsPerWin: number;
   useHandicap: boolean;
   handicapBasis: number;
   handicapPercentage: number;
-  teamAllPresentBonusEnabled?: boolean;
-  teamAllPresentBonusPoints?: number;
+  teamAllPresentBonusEnabled: boolean;
+  teamAllPresentBonusPoints: number;
   bonusRules: BonusRule[];
 }
 
@@ -152,14 +152,14 @@ export interface Game {
   // Config snapshot (copied from season at creation)
   matchesPerGame: number;
   useHandicap: boolean;
-  lineupStrategy?: LineupStrategy;
-  lineupRule?: LineupRule;
+  lineupStrategy: LineupStrategy;
+  lineupRule: LineupRule;
   playerMatchPointsPerWin: number;
   teamMatchPointsPerWin: number;
   teamGamePointsPerWin: number;
-  teamAllPresentBonusEnabled?: boolean;
-  teamAllPresentBonusPoints?: number;
-  bonusRules?: BonusRule[];
+  teamAllPresentBonusEnabled: boolean;
+  teamAllPresentBonusPoints: number;
+  bonusRules: BonusRule[];
 
   // Scoring data (lazily populated on first load, then persisted as JSON)
   team1?: GameTeam;

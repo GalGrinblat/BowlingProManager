@@ -134,16 +134,16 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
         playersPerTeam: cfg.playersPerTeam || DEFAULT_PLAYERS_PER_TEAM,
         numberOfRounds: cfg.numberOfRounds || DEFAULT_NUMBER_OF_ROUNDS,
         matchesPerGame: cfg.matchesPerGame || DEFAULT_MATCHES_PER_GAME,
-        lineupStrategy: cfg.lineupStrategy || DEFAULT_LINEUP_STRATEGY,
-        lineupRule: cfg.lineupRule || DEFAULT_LINEUP_RULE,
+        lineupStrategy: cfg.lineupStrategy,
+        lineupRule: cfg.lineupRule,
         playerMatchPointsPerWin: cfg.playerMatchPointsPerWin || DEFAULT_PLAYER_MATCH_POINTS,
         teamMatchPointsPerWin: cfg.teamMatchPointsPerWin || DEFAULT_TEAM_MATCH_POINTS,
         teamGamePointsPerWin: cfg.teamGamePointsPerWin || DEFAULT_TEAM_GAME_POINTS,
         useHandicap: cfg.useHandicap !== undefined ? cfg.useHandicap : DEFAULT_USE_HANDICAP,
         handicapBasis: cfg.handicapBasis,
         handicapPercentage: cfg.handicapPercentage || DEFAULT_HANDICAP_PERCENTAGE,
-        teamAllPresentBonusEnabled: cfg.teamAllPresentBonusEnabled || false,
-        teamAllPresentBonusPoints: cfg.teamAllPresentBonusPoints || 1,
+        teamAllPresentBonusEnabled: cfg.teamAllPresentBonusEnabled,
+        teamAllPresentBonusPoints: cfg.teamAllPresentBonusPoints,
         bonusRules: cfg.bonusRules || [],
       },
       active: league.active
@@ -274,8 +274,8 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
 
             {/* Player Matchup Configuration Section */}
             <PlayerMatchupConfiguration
-              lineupStrategy={formData.defaultSeasonConfigurations.lineupStrategy || DEFAULT_LINEUP_STRATEGY}
-              lineupRule={formData.defaultSeasonConfigurations.lineupRule || DEFAULT_LINEUP_RULE}
+              lineupStrategy={formData.defaultSeasonConfigurations.lineupStrategy}
+              lineupRule={formData.defaultSeasonConfigurations.lineupRule}
               onLineupStrategyChange={value => updateConfig('lineupStrategy', value as LineupStrategy)}
               onLineupRuleChange={value => updateConfig('lineupRule', value as LineupRule)}
             />
@@ -305,8 +305,8 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
             <div className="border-t pt-4 mt-4">
               <BonusRulesConfiguration
                 bonusRules={formData.defaultSeasonConfigurations.bonusRules}
-                teamAllPresentBonusEnabled={formData.defaultSeasonConfigurations.teamAllPresentBonusEnabled || false}
-                teamAllPresentBonusPoints={formData.defaultSeasonConfigurations.teamAllPresentBonusPoints || 1}
+                teamAllPresentBonusEnabled={formData.defaultSeasonConfigurations.teamAllPresentBonusEnabled}
+                teamAllPresentBonusPoints={formData.defaultSeasonConfigurations.teamAllPresentBonusPoints}
                 onBonusRulesChange={rules => updateConfig('bonusRules', rules)}
                 onTeamAllPresentBonusEnabledChange={enabled => updateConfig('teamAllPresentBonusEnabled', enabled)}
                 onTeamAllPresentBonusPointsChange={points => updateConfig('teamAllPresentBonusPoints', points)}
