@@ -80,7 +80,7 @@ export interface Season {
   startDate: DateString;
   endDate: DateString;
   seasonConfigurations: SeasonConfigurations;
-  status: 'setup' | 'active' | 'completed';
+  status: SeasonStatus;
   schedule?: ScheduleMatchDay[];
   /** Initial player averages for this season, keyed by playerId */
   playerAverages?: { [playerId: string]: number };
@@ -124,37 +124,49 @@ export interface GameTeam {
   players: GamePlayer[];
 }
 
+// Status type aliases
+export type GameStatus = 'pending' | 'in-progress' | 'completed';
+export type SeasonStatus = 'setup' | 'active' | 'completed';
+
 /** Game - Multi-match bowling game between two teams with scoring and status tracking */
 export interface Game {
+  // Identity
   id: string;
   seasonId: string;
+
+  // Schedule
   round: number;
   matchDay: number;
   team1Id: string;
   team2Id: string;
-  status: 'pending' | 'in-progress' | 'completed';
+  scheduledDate?: DateString;
+  postponed: boolean;
+  originalDate?: DateString;
+
+  // Status
+  status: GameStatus;
   completedAt?: DateString;
   createdAt: DateString;
-  // Extended runtime properties (populated by components for scoring)
-  matches?: GameMatch[];
-  team1?: GameTeam;
-  team2?: GameTeam;
+  updatedAt?: DateString;
+
+  // Config snapshot (copied from season at creation)
   matchesPerGame: number;
   useHandicap: boolean;
   lineupStrategy?: LineupStrategy;
   lineupRule?: LineupRule;
-  teamAllPresentBonusEnabled?: boolean;
-  teamAllPresentBonusPoints?: number;  
-  bonusRules?: BonusRule[];
   playerMatchPointsPerWin: number;
   teamMatchPointsPerWin: number;
   teamGamePointsPerWin: number;
-  /** Points awarded for highest total pins across all matches (calculated at runtime) */
+  teamAllPresentBonusEnabled?: boolean;
+  teamAllPresentBonusPoints?: number;
+  bonusRules?: BonusRule[];
+
+  // Scoring data (lazily populated on first load, then persisted as JSON)
+  team1?: GameTeam;
+  team2?: GameTeam;
+  matches?: GameMatch[];
+  /** Points awarded for highest total pins across all matches */
   grandTotalPoints?: { team1: number; team2: number };
-  scheduledDate?: DateString;
-  postponed: boolean;
-  originalDate?: DateString;
-  updatedAt?: DateString;
 }
 
 // ============================================================================

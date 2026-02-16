@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import type { GameStatus, SeasonStatus } from '../types/index';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -107,7 +108,7 @@ export type Database = {
           team_all_present_bonus_enabled: boolean | null;
           team_all_present_bonus_points: number | null;
           bonus_rules: any;
-          status: 'setup' | 'active' | 'completed';
+          status: SeasonStatus;
           schedule: any;
           player_averages: any;
           created_at: string;
@@ -137,7 +138,7 @@ export type Database = {
           match_day: number;
           team1_id: string;
           team2_id: string;
-          status: 'pending' | 'in-progress' | 'completed';
+          status: GameStatus;
           matches: any;
           team1_data: any;
           team2_data: any;
