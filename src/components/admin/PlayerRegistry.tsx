@@ -1,11 +1,4 @@
 import React, { useState, useEffect } from 'react';
-// Sorting options
-const SORT_OPTIONS = [
-  { key: 'lastName', label: 'Last Name (A-Z)', direction: 'asc' },
-  { key: 'lastName', label: 'Last Name (Z-A)', direction: 'desc' },
-  { key: 'firstName', label: 'First Name (A-Z)', direction: 'asc' },
-  { key: 'firstName', label: 'First Name (Z-A)', direction: 'desc' },
-];
 import { playersApi, teamsApi, seasonsApi } from '../../services/api';
 import { createPlayer, validatePlayer } from '../../models';
 import { Pagination, usePagination } from '../common/Pagination';
@@ -19,6 +12,8 @@ import {
 } from '../../utils/importExportUtils';
 import { getPlayerDisplayName } from '../../utils/playerUtils';
 import type { Player, PlayerRegistryProps } from '../../types/index';
+import { PLAYER_SORT_OPTIONS } from '../../constants/sortOptions';
+import { sortByOption, SortOption } from '../../utils/sortUtils';
 
 export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
   const { t } = useTranslation();
@@ -35,7 +30,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
   const [showImportModal, setShowImportModal] = useState(false);
   const [importData, setImportData] = useState<Player[]>([]);
   const [importErrors, setImportErrors] = useState<string[]>([]);
-  const [sortOption, setSortOption] = useState(SORT_OPTIONS[0]);
+  const [sortOption, setSortOption] = useState(PLAYER_SORT_OPTIONS[0]);
   
   // Pagination state
   const activePagination = usePagination(20); // 20 players per page
@@ -278,17 +273,8 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
   });
 
   // Sort players by selected option
-  const sortedPlayers = [...filteredPlayers].sort((a, b) => {
-    const key = sortOption?.key as 'firstName' | 'lastName' | undefined;
-    if (sortOption && (key === 'firstName' || key === 'lastName')) {
-      if (sortOption.direction === 'asc') {
-        return a[key].localeCompare(b[key], undefined, { sensitivity: 'base' });
-      } else {
-        return b[key].localeCompare(a[key], undefined, { sensitivity: 'base' });
-      }
-    }
-    return 0;
-  });
+  const DEFAULT_SORT_OPTION: SortOption<Player> = { key: 'lastName', labelKey: 'sort.lastNameAsc', direction: 'asc' };
+  const sortedPlayers = sortByOption(filteredPlayers, sortOption ?? DEFAULT_SORT_OPTION);
   // Reset pagination when search changes
   React.useEffect(() => {
     activePagination.resetPage();
@@ -403,18 +389,18 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
 
           {/* Sort Dropdown */}
           <div className="flex items-center gap-4 my-4">
-            <label htmlFor="sortPlayers" className="text-sm font-semibold text-gray-700">{t('players.sortBy') || 'Sort by'}:</label>
+            <label htmlFor="sortPlayers" className="text-sm font-semibold text-gray-700">{t('sort.by')}:</label>
             <select
               id="sortPlayers"
-              value={sortOption?.label}
+              value={sortOption?.labelKey}
               onChange={e => {
-                const selected = SORT_OPTIONS.find(opt => opt.label === e.target.value);
+                const selected = PLAYER_SORT_OPTIONS.find(opt => opt.labelKey === e.target.value);
                 if (selected) setSortOption(selected);
               }}
               className="px-3 py-1 border border-gray-300 rounded-lg text-sm"
             >
-              {SORT_OPTIONS.map(opt => (
-                <option key={opt.label} value={opt.label}>{opt.label}</option>
+              {PLAYER_SORT_OPTIONS.map(opt => (
+                <option key={opt.labelKey} value={opt.labelKey}>{t(opt.labelKey)}</option>
               ))}
             </select>
           </div>

@@ -93,6 +93,15 @@ const en: TranslationDictionary = {
     statusInactive: 'Inactive',
   },
 
+  // Sort options (shared)
+  sort: {
+    by: 'Sort by',
+    lastNameAsc: 'Last Name (A-Z)',
+    lastNameDesc: 'Last Name (Z-A)',
+    firstNameAsc: 'First Name (A-Z)',
+    firstNameDesc: 'First Name (Z-A)',
+  },
+
   // League Management
   leagues: {
     generalConfiguration: 'General Configuration',

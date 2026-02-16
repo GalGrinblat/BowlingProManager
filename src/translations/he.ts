@@ -92,6 +92,15 @@ const he: TranslationDictionary = {
     statusActive: 'פעיל',
     statusInactive: 'לא פעיל',
   },
+  
+  // אפשרויות מיון (משותפות)
+  sort: {
+    by: 'מיין לפי',
+    lastNameAsc: 'שם משפחה (א-ת)',
+    lastNameDesc: 'שם משפחה (ת-א)',
+    firstNameAsc: 'שם פרטי (א-ת)',
+    firstNameDesc: 'שם פרטי (ת-א)',
+  },
 
   // ניהול ליגות
   leagues: {
