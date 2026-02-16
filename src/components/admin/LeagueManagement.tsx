@@ -9,28 +9,34 @@ import { PointsConfiguration } from './shared/PointsConfiguration';
 import { GeneralConfiguration } from './shared/GeneralConfiguration';
 import { BonusRulesConfiguration } from './shared/BonusRulesConfiguration';
 
-import type { League, LeagueManagementProps, BonusRule, LineupStrategy, LineupRule } from '../../types/index';
+import type { League, LeagueManagementProps, SeasonConfigurations, LineupStrategy, LineupRule } from '../../types/index';
 
-function getDefaultFormData() {
+function getDefaultSeasonConfigurations(): SeasonConfigurations {
   return {
-    name: '',
-    description: '',
-    defaultNumberOfTeams: DEFAULT_NUMBER_OF_TEAMS,
-    defaultPlayersPerTeam: DEFAULT_PLAYERS_PER_TEAM,
-    defaultNumberOfRounds: DEFAULT_NUMBER_OF_ROUNDS,
-    defaultMatchesPerGame: DEFAULT_MATCHES_PER_GAME,
-    dayOfWeek: '',
+    numberOfTeams: DEFAULT_NUMBER_OF_TEAMS,
+    playersPerTeam: DEFAULT_PLAYERS_PER_TEAM,
+    numberOfRounds: DEFAULT_NUMBER_OF_ROUNDS,
+    matchesPerGame: DEFAULT_MATCHES_PER_GAME,
     lineupStrategy: DEFAULT_LINEUP_STRATEGY,
     lineupRule: DEFAULT_LINEUP_RULE,
     playerMatchPointsPerWin: DEFAULT_PLAYER_MATCH_POINTS,
     teamMatchPointsPerWin: DEFAULT_TEAM_MATCH_POINTS,
     teamGamePointsPerWin: DEFAULT_TEAM_GAME_POINTS,
     useHandicap: DEFAULT_USE_HANDICAP,
-    defaultHandicapBasis: DEFAULT_HANDICAP_BASIS,
+    handicapBasis: DEFAULT_HANDICAP_BASIS,
     handicapPercentage: DEFAULT_HANDICAP_PERCENTAGE,
     teamAllPresentBonusEnabled: false,
     teamAllPresentBonusPoints: 1,
     bonusRules: [],
+  };
+}
+
+function getDefaultFormData() {
+  return {
+    name: '',
+    description: '',
+    dayOfWeek: '',
+    defaultSeasonConfigurations: getDefaultSeasonConfigurations(),
     active: true
   };
 }
@@ -44,26 +50,21 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
   const [formData, setFormData] = useState<{
     name: string;
     description: string;
-    defaultNumberOfTeams: number;
-    defaultPlayersPerTeam: number;
-    defaultNumberOfRounds: number;
-    defaultMatchesPerGame: number;
     dayOfWeek: string;
-    lineupStrategy: LineupStrategy;
-    lineupRule: LineupRule;
-    playerMatchPointsPerWin: number;
-    teamMatchPointsPerWin: number;
-    teamGamePointsPerWin: number;
-    useHandicap: boolean;
-    defaultHandicapBasis: number;
-    handicapPercentage: number;
-    teamAllPresentBonusEnabled: boolean;
-    teamAllPresentBonusPoints: number;
-    bonusRules: BonusRule[];
+    defaultSeasonConfigurations: SeasonConfigurations;
     active: boolean;
   }>({
     ...getDefaultFormData()
   });
+
+  const updateConfig = (field: keyof SeasonConfigurations, value: any) =>
+    setFormData(prev => ({
+      ...prev,
+      defaultSeasonConfigurations: {
+        ...prev.defaultSeasonConfigurations,
+        [field]: value
+      }
+    }));
 
   useEffect(() => {
     loadLeagues();
@@ -85,7 +86,10 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const leagueData = createLeague(formData);
+    const leagueData = createLeague({
+      ...formData,
+      ...formData.defaultSeasonConfigurations,
+    });
     const validation = validateLeague(leagueData);
 
     if (!validation.valid) {
@@ -119,26 +123,29 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
   };
 
   const handleEdit = (league: League) => {
+    const cfg = league.defaultSeasonConfigurations;
     setFormData({
       ...getDefaultFormData(),
       name: league.name,
       description: league.description || '',
-      defaultNumberOfTeams: league.defaultNumberOfTeams || DEFAULT_NUMBER_OF_TEAMS,
-      defaultPlayersPerTeam: league.defaultPlayersPerTeam || DEFAULT_PLAYERS_PER_TEAM,
-      defaultNumberOfRounds: league.defaultNumberOfRounds || DEFAULT_NUMBER_OF_ROUNDS,
-      defaultMatchesPerGame: league.defaultMatchesPerGame || DEFAULT_MATCHES_PER_GAME,
       dayOfWeek: league.dayOfWeek || '',
-      lineupStrategy: (league.lineupStrategy || DEFAULT_LINEUP_STRATEGY),
-      lineupRule: (league.lineupRule || DEFAULT_LINEUP_RULE),
-      playerMatchPointsPerWin: league.playerMatchPointsPerWin || DEFAULT_PLAYER_MATCH_POINTS,
-      teamMatchPointsPerWin: league.teamMatchPointsPerWin || DEFAULT_TEAM_MATCH_POINTS,
-      teamGamePointsPerWin: league.teamGamePointsPerWin || DEFAULT_TEAM_GAME_POINTS,
-      useHandicap: league.useHandicap !== undefined ? league.useHandicap : DEFAULT_USE_HANDICAP,
-      defaultHandicapBasis: league.defaultHandicapBasis,
-      handicapPercentage: league.handicapPercentage || DEFAULT_HANDICAP_PERCENTAGE,
-      teamAllPresentBonusEnabled: league.teamAllPresentBonusEnabled || false,
-      teamAllPresentBonusPoints: league.teamAllPresentBonusPoints || 1,
-      bonusRules: league.bonusRules || [],
+      defaultSeasonConfigurations: {
+        numberOfTeams: cfg.numberOfTeams || DEFAULT_NUMBER_OF_TEAMS,
+        playersPerTeam: cfg.playersPerTeam || DEFAULT_PLAYERS_PER_TEAM,
+        numberOfRounds: cfg.numberOfRounds || DEFAULT_NUMBER_OF_ROUNDS,
+        matchesPerGame: cfg.matchesPerGame || DEFAULT_MATCHES_PER_GAME,
+        lineupStrategy: cfg.lineupStrategy || DEFAULT_LINEUP_STRATEGY,
+        lineupRule: cfg.lineupRule || DEFAULT_LINEUP_RULE,
+        playerMatchPointsPerWin: cfg.playerMatchPointsPerWin || DEFAULT_PLAYER_MATCH_POINTS,
+        teamMatchPointsPerWin: cfg.teamMatchPointsPerWin || DEFAULT_TEAM_MATCH_POINTS,
+        teamGamePointsPerWin: cfg.teamGamePointsPerWin || DEFAULT_TEAM_GAME_POINTS,
+        useHandicap: cfg.useHandicap !== undefined ? cfg.useHandicap : DEFAULT_USE_HANDICAP,
+        handicapBasis: cfg.handicapBasis,
+        handicapPercentage: cfg.handicapPercentage || DEFAULT_HANDICAP_PERCENTAGE,
+        teamAllPresentBonusEnabled: cfg.teamAllPresentBonusEnabled || false,
+        teamAllPresentBonusPoints: cfg.teamAllPresentBonusPoints || 1,
+        bonusRules: cfg.bonusRules || [],
+      },
       active: league.active
     });
     setEditingId(league.id);
@@ -253,57 +260,56 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
 
             {/* General Configurations */}
             <GeneralConfiguration
-              numberOfTeams={formData.defaultNumberOfTeams}
-              playersPerTeam={formData.defaultPlayersPerTeam}
-              numberOfRounds={formData.defaultNumberOfRounds}
-              matchesPerGame={formData.defaultMatchesPerGame}
+              numberOfTeams={formData.defaultSeasonConfigurations.numberOfTeams}
+              playersPerTeam={formData.defaultSeasonConfigurations.playersPerTeam}
+              numberOfRounds={formData.defaultSeasonConfigurations.numberOfRounds}
+              matchesPerGame={formData.defaultSeasonConfigurations.matchesPerGame}
               dayOfWeek={formData.dayOfWeek}
-              onNumberOfTeamsChange={value => setFormData({ ...formData, defaultNumberOfTeams: value })}
-              onPlayersPerTeamChange={value => setFormData({ ...formData, defaultPlayersPerTeam: value })}
-              onNumberOfRoundsChange={value => setFormData({ ...formData, defaultNumberOfRounds: value })}
-              onMatchesPerGameChange={value => setFormData({ ...formData, defaultMatchesPerGame: value })}
+              onNumberOfTeamsChange={value => updateConfig('numberOfTeams', value)}
+              onPlayersPerTeamChange={value => updateConfig('playersPerTeam', value)}
+              onNumberOfRoundsChange={value => updateConfig('numberOfRounds', value)}
+              onMatchesPerGameChange={value => updateConfig('matchesPerGame', value)}
               onDayOfWeekChange={value => setFormData({ ...formData, dayOfWeek: value })}
             />
 
             {/* Player Matchup Configuration Section */}
             <PlayerMatchupConfiguration
-              lineupStrategy={formData.lineupStrategy}
-              lineupRule={formData.lineupRule}
-              onLineupStrategyChange={value => setFormData({ ...formData, lineupStrategy: value as LineupStrategy })}
-              onLineupRuleChange={value => setFormData({ ...formData, lineupRule: value as LineupRule })}
+              lineupStrategy={formData.defaultSeasonConfigurations.lineupStrategy || DEFAULT_LINEUP_STRATEGY}
+              lineupRule={formData.defaultSeasonConfigurations.lineupRule || DEFAULT_LINEUP_RULE}
+              onLineupStrategyChange={value => updateConfig('lineupStrategy', value as LineupStrategy)}
+              onLineupRuleChange={value => updateConfig('lineupRule', value as LineupRule)}
             />
 
             {/* Point Configuration Section */}
             <PointsConfiguration
-              playerMatchPointsPerWin={formData.playerMatchPointsPerWin}
-              teamMatchPointsPerWin={formData.teamMatchPointsPerWin}
-              teamGamePointsPerWin={formData.teamGamePointsPerWin}
-              onPlayerMatchPointsPerWinChange={value => setFormData({ ...formData, playerMatchPointsPerWin: value })}
-              onTeamMatchPointsPerWinChange={value => setFormData({ ...formData, teamMatchPointsPerWin: value })}
-              onTeamGamePointsPerWinChange={value => setFormData({ ...formData, teamGamePointsPerWin: value })}
+              playerMatchPointsPerWin={formData.defaultSeasonConfigurations.playerMatchPointsPerWin}
+              teamMatchPointsPerWin={formData.defaultSeasonConfigurations.teamMatchPointsPerWin}
+              teamGamePointsPerWin={formData.defaultSeasonConfigurations.teamGamePointsPerWin}
+              onPlayerMatchPointsPerWinChange={value => updateConfig('playerMatchPointsPerWin', value)}
+              onTeamMatchPointsPerWinChange={value => updateConfig('teamMatchPointsPerWin', value)}
+              onTeamGamePointsPerWinChange={value => updateConfig('teamGamePointsPerWin', value)}
             />
 
             {/* Handicap Configuration Section */}
             <HandicapConfigurationForm
-              useHandicap={formData.useHandicap}
-              handicapBasis={formData.defaultHandicapBasis}
-              handicapPercentage={formData.handicapPercentage}
-              onUseHandicapChange={(value: boolean) => setFormData({ ...formData, useHandicap: value })}
-              onHandicapBasisChange={(value: number) => setFormData({ ...formData, defaultHandicapBasis: value })}
-              onHandicapPercentageChange={(value: number) => setFormData({ ...formData, handicapPercentage: value })}
-              basisFieldName="defaultHandicapBasis"
+              useHandicap={formData.defaultSeasonConfigurations.useHandicap}
+              handicapBasis={formData.defaultSeasonConfigurations.handicapBasis}
+              handicapPercentage={formData.defaultSeasonConfigurations.handicapPercentage}
+              onUseHandicapChange={(value: boolean) => updateConfig('useHandicap', value)}
+              onHandicapBasisChange={(value: number) => updateConfig('handicapBasis', value)}
+              onHandicapPercentageChange={(value: number) => updateConfig('handicapPercentage', value)}
               showDescription={true}
             />
 
             {/* Bonus Rules Configuration Section */}
             <div className="border-t pt-4 mt-4">
               <BonusRulesConfiguration
-                bonusRules={formData.bonusRules}
-                teamAllPresentBonusEnabled={formData.teamAllPresentBonusEnabled}
-                teamAllPresentBonusPoints={formData.teamAllPresentBonusPoints}
-                onBonusRulesChange={rules => setFormData({ ...formData, bonusRules: rules })}
-                onTeamAllPresentBonusEnabledChange={enabled => setFormData({ ...formData, teamAllPresentBonusEnabled: enabled })}
-                onTeamAllPresentBonusPointsChange={points => setFormData({ ...formData, teamAllPresentBonusPoints: points })}
+                bonusRules={formData.defaultSeasonConfigurations.bonusRules}
+                teamAllPresentBonusEnabled={formData.defaultSeasonConfigurations.teamAllPresentBonusEnabled || false}
+                teamAllPresentBonusPoints={formData.defaultSeasonConfigurations.teamAllPresentBonusPoints || 1}
+                onBonusRulesChange={rules => updateConfig('bonusRules', rules)}
+                onTeamAllPresentBonusEnabledChange={enabled => updateConfig('teamAllPresentBonusEnabled', enabled)}
+                onTeamAllPresentBonusPointsChange={points => updateConfig('teamAllPresentBonusPoints', points)}
                 disabled={false}
               />
             </div>
@@ -367,8 +373,8 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                       )}
                       <div className="flex gap-4 mt-2 text-sm text-gray-500">
                         {league.dayOfWeek && <span>📅 {t(`days.${league.dayOfWeek.toLowerCase()}Plural`)}</span>}
-                        <span>📊 {t('leagues.handicap.use')}: <span className="ltr-content">{league.useHandicap !== false ? `${league.defaultHandicapBasis} (${league.handicapPercentage || 100}%)` : t('leagues.handicap.disabled')}</span></span>
-                        <span>👥 <span className="ltr-content">{league.defaultPlayersPerTeam}</span> {t('leagues.playersPerTeam')}</span>
+                        <span>📊 {t('leagues.handicap.use')}: <span className="ltr-content">{league.defaultSeasonConfigurations.useHandicap !== false ? `${league.defaultSeasonConfigurations.handicapBasis} (${league.defaultSeasonConfigurations.handicapPercentage || 100}%)` : t('leagues.handicap.disabled')}</span></span>
+                        <span>👥 <span className="ltr-content">{league.defaultSeasonConfigurations.playersPerTeam}</span> {t('leagues.playersPerTeam')}</span>
                         <span>🎳 <span className="ltr-content">{seasons.length}</span> {seasons.length === 1 ? t('leagues.season') : t('leagues.seasons')}</span>
                       </div>
                       {activeSeason && (

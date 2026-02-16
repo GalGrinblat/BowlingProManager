@@ -115,8 +115,8 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
     }
   };
 
-  const handleExportSeason = () => {
-    const exportData = exportSeason(seasonId);
+  const handleExportSeason = async () => {
+    const exportData = await exportSeason(seasonId);
     if (exportData && season) {
       const filename = `${season.name.replace(/[^a-z0-9]/gi, '_')}_${new Date().toISOString().split('T')[0]}.json`;
       downloadExportFile(exportData, filename);
@@ -134,8 +134,8 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
 
     try {
       const importData = await readImportFile(file);
-      const result = importLeagueOrSeason(importData);
-      
+      const result = await importLeagueOrSeason(importData);
+
       if (result.success) {
         alert(t('seasons.importSuccess'));
         window.location.reload(); // Reload to show imported data
@@ -186,7 +186,7 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
             <div className="flex gap-4 mt-4 text-sm text-gray-600">
               <span>🏆 {t('seasons.teamsCount').replace('{{count}}', String(teams.length))}</span>
               <span>🎳 {t('seasons.gamesComplete').replace('{{completed}}', String(completedGames)).replace('{{total}}', String(totalGames))}</span>
-              <span>🔄 {t('seasons.roundOf').replace('{{current}}', String(selectedRound)).replace('{{total}}', String(season.numberOfRounds))}</span>
+              <span>🔄 {t('seasons.roundOf').replace('{{current}}', String(selectedRound)).replace('{{total}}', String(season.seasonConfigurations.numberOfRounds))}</span>
             </div>
           </div>
           <div className="flex flex-col items-end gap-2">
@@ -355,7 +355,7 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
           <div className="bg-white rounded-xl shadow-lg p-4">
             <h3 className="text-sm font-semibold text-gray-600 mb-2">{t('seasons.selectRound')}</h3>
             <div className="flex gap-2 flex-wrap">
-              {Array.from({ length: season.numberOfRounds }, (_, i) => i + 1).map(round => {
+              {Array.from({ length: season.seasonConfigurations.numberOfRounds }, (_, i) => i + 1).map(round => {
                 const roundGamesForRound = games.filter(g => g.round === round);
                 const completedInRound = roundGamesForRound.filter(g => g.status === 'completed').length;
                 

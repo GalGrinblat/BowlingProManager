@@ -414,9 +414,9 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
     const allGames = await gamesApi.getBySeason(gameData.seasonId);
     if (!season || !teams) return;
 
-    const useHandicap = season.useHandicap ?? false;
-    const handicapBasis = season.handicapBasis ?? 0;
-    const handicapPercentage = season.handicapPercentage ?? 0;
+    const useHandicap = season.seasonConfigurations.useHandicap ?? false;
+    const handicapBasis = season.seasonConfigurations.handicapBasis ?? 0;
+    const handicapPercentage = season.seasonConfigurations.handicapPercentage ?? 0;
 
 
     // Get games completed before this one (same round or earlier)

@@ -42,38 +42,8 @@ export type LineupStrategy = 'flexible' | 'fixed' | 'rule-based';
 /** LineupRule - Rule for automatic player ordering in rule-based lineup */
 export type LineupRule = 'standard' | 'balanced';
 
-/** League - Independent league with its own rules, seasons, and scoring configuration */
-export interface League {
-  id: string;
-  name: string;
-  description: string;
-  defaultNumberOfTeams: number;
-  defaultPlayersPerTeam: number;
-  defaultNumberOfRounds: number;
-  defaultMatchesPerGame: number;
-  dayOfWeek: string;
-  lineupStrategy?: LineupStrategy;
-  lineupRule?: LineupRule;
-  playerMatchPointsPerWin: number;
-  teamMatchPointsPerWin: number;
-  teamGamePointsPerWin: number;
-  useHandicap: boolean;
-  defaultHandicapBasis: number;
-  handicapPercentage: number;
-  teamAllPresentBonusEnabled?: boolean;
-  teamAllPresentBonusPoints?: number;  
-  bonusRules: BonusRule[];
-  active: boolean;
-  createdAt: DateString;
-}
-
-/** Season - Time-bound competition within a league with teams and schedule */
-export interface Season {
-  id: string;
-  leagueId: string;
-  name: string;
-  startDate: DateString;
-  endDate: DateString;
+/** SeasonConfigurations - Shared configuration for league defaults and season instances */
+export interface SeasonConfigurations {
   numberOfTeams: number;
   playersPerTeam: number;
   numberOfRounds: number;
@@ -87,8 +57,29 @@ export interface Season {
   handicapBasis: number;
   handicapPercentage: number;
   teamAllPresentBonusEnabled?: boolean;
-  teamAllPresentBonusPoints?: number;  
+  teamAllPresentBonusPoints?: number;
   bonusRules: BonusRule[];
+}
+
+/** League - Independent league with its own rules, seasons, and scoring configuration */
+export interface League {
+  id: string;
+  name: string;
+  description: string;
+  dayOfWeek: string;
+  defaultSeasonConfigurations: SeasonConfigurations;
+  active: boolean;
+  createdAt: DateString;
+}
+
+/** Season - Time-bound competition within a league with teams and schedule */
+export interface Season {
+  id: string;
+  leagueId: string;
+  name: string;
+  startDate: DateString;
+  endDate: DateString;
+  seasonConfigurations: SeasonConfigurations;
   status: 'setup' | 'active' | 'completed';
   schedule?: ScheduleMatchDay[];
   /** Initial player averages for this season, keyed by playerId */

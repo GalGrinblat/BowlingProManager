@@ -51,8 +51,8 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
   const activeSeason = seasons.find(s => s.status === 'active');
   const completedSeasons = seasons.filter(s => s.status === 'completed');
 
-  const handleExportLeague = () => {
-    const exportData = exportLeague(leagueId);
+  const handleExportLeague = async () => {
+    const exportData = await exportLeague(leagueId);
     if (exportData) {
       const filename = `${league?.name.replace(/[^a-z0-9]/gi, '_')}_${new Date().toISOString().split('T')[0]}.json`;
       downloadExportFile(exportData, filename);
@@ -70,7 +70,7 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
 
     try {
       const importData = await readImportFile(file);
-      const result = importLeagueOrSeason(importData);
+      const result = await importLeagueOrSeason(importData);
       
       if (result.success) {
         alert(t('leagues.importSuccess'));
@@ -126,9 +126,9 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
         </div>
         <div className="flex gap-4 text-sm text-gray-600">
           {league.dayOfWeek && <span>📅 {t(`days.${league.dayOfWeek.toLowerCase()}Plural`)}</span>}
-          <span>👥 <span className="ltr-content">{league.defaultPlayersPerTeam}</span> {t('leagues.playersPerTeam')}</span>
-          <span>🎳 <span className="ltr-content">{league.defaultMatchesPerGame || 3}</span> {t('leagues.matchesPerGame')}</span>
-          {league.useHandicap && <span>⚖️ {t('leagues.handicapDisplay').replace('{{percentage}}', String(league.handicapPercentage || 100)).replace('{{basis}}', String(league.defaultHandicapBasis))}</span>}
+          <span>👥 <span className="ltr-content">{league.defaultSeasonConfigurations.playersPerTeam}</span> {t('leagues.playersPerTeam')}</span>
+          <span>🎳 <span className="ltr-content">{league.defaultSeasonConfigurations.matchesPerGame || 3}</span> {t('leagues.matchesPerGame')}</span>
+          {league.defaultSeasonConfigurations.useHandicap && <span>⚖️ {t('leagues.handicapDisplay').replace('{{percentage}}', String(league.defaultSeasonConfigurations.handicapPercentage || 100)).replace('{{basis}}', String(league.defaultSeasonConfigurations.handicapBasis))}</span>}
         </div>
       </div>
 
@@ -173,9 +173,9 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
               <div className="text-sm font-semibold mb-1">{t('common.active').toUpperCase()}</div>
               <h2 className="text-2xl font-bold mb-2">{activeSeason.name}</h2>
               <div className="flex gap-4 text-sm">
-                <span>🏆 <span className="ltr-content">{activeSeason.numberOfTeams}</span> {t('leagues.teams')}</span>
-                <span>🔄 <span className="ltr-content">{activeSeason.numberOfRounds}</span> {activeSeason.numberOfRounds !== 1 ? t('leagues.rounds') : t('common.round')}</span>
-                <span>👥 <span className="ltr-content">{activeSeason.playersPerTeam}</span> {t('leagues.playersPerTeam')}</span>
+                <span>🏆 <span className="ltr-content">{activeSeason.seasonConfigurations.numberOfTeams}</span> {t('leagues.teams')}</span>
+                <span>🔄 <span className="ltr-content">{activeSeason.seasonConfigurations.numberOfRounds}</span> {activeSeason.seasonConfigurations.numberOfRounds !== 1 ? t('leagues.rounds') : t('common.round')}</span>
+                <span>👥 <span className="ltr-content">{activeSeason.seasonConfigurations.playersPerTeam}</span> {t('leagues.playersPerTeam')}</span>
               </div>
             </div>
             <button

@@ -1,4 +1,5 @@
 import { leaguesApi, seasonsApi, teamsApi, gamesApi, playersApi } from '../services/api';
+import { getPlayerDisplayName } from './playerUtils';
 import type { League, Season, Team, Game, Player, GameMatch } from '../types/index';
 
 interface LeagueExportData {
@@ -26,20 +27,20 @@ interface SeasonExportData {
 /**
  * Export a complete league with all its seasons, teams, and games
  */
-export function exportLeague(leagueId: string): LeagueExportData | null {
-  const league = leaguesApi.getById(leagueId);
+export async function exportLeague(leagueId: string): Promise<LeagueExportData | null> {
+  const league = await leaguesApi.getById(leagueId);
   if (!league) return null;
 
-  const seasons = seasonsApi.getByLeague(leagueId);
+  const seasons = await seasonsApi.getByLeague(leagueId);
   const allTeams: Team[] = [];
   const allGames: Game[] = [];
   const playerIds = new Set<string>();
 
   // Gather all teams and games from all seasons
-  seasons.forEach(season => {
-    const teams = teamsApi.getBySeason(season.id);
-    const games = gamesApi.getBySeason(season.id);
-    
+  for (const season of seasons) {
+    const teams = await teamsApi.getBySeason(season.id);
+    const games = await gamesApi.getBySeason(season.id);
+
     allTeams.push(...teams);
     allGames.push(...games);
 
@@ -47,12 +48,13 @@ export function exportLeague(leagueId: string): LeagueExportData | null {
     teams.forEach(team => {
       team.playerIds.forEach(id => playerIds.add(id));
     });
-  });
+  }
 
   // Get all referenced players
-  const players = Array.from(playerIds)
-    .map(id => playersApi.getById(id))
-    .filter((p): p is Player => p !== null);
+  const playerResults = await Promise.all(
+    Array.from(playerIds).map(id => playersApi.getById(id))
+  );
+  const players = playerResults.filter((p): p is Player => p !== undefined && p !== null);
 
   return {
     version: '1.0.0',
@@ -69,15 +71,15 @@ export function exportLeague(leagueId: string): LeagueExportData | null {
 /**
  * Export a single season with its teams and games
  */
-export function exportSeason(seasonId: string): SeasonExportData | null {
-  const season = seasonsApi.getById(seasonId);
+export async function exportSeason(seasonId: string): Promise<SeasonExportData | null> {
+  const season = await seasonsApi.getById(seasonId);
   if (!season) return null;
 
-  const league = leaguesApi.getById(season.leagueId);
+  const league = await leaguesApi.getById(season.leagueId);
   if (!league) return null;
 
-  const teams = teamsApi.getBySeason(seasonId);
-  const games = gamesApi.getBySeason(seasonId);
+  const teams = await teamsApi.getBySeason(seasonId);
+  const games = await gamesApi.getBySeason(seasonId);
   const playerIds = new Set<string>();
 
   // Collect player IDs from teams
@@ -86,9 +88,10 @@ export function exportSeason(seasonId: string): SeasonExportData | null {
   });
 
   // Get all referenced players
-  const players = Array.from(playerIds)
-    .map(id => playersApi.getById(id))
-    .filter((p): p is Player => p !== null);
+  const playerResults = await Promise.all(
+    Array.from(playerIds).map(id => playersApi.getById(id))
+  );
+  const players = playerResults.filter((p): p is Player => p !== undefined && p !== null);
 
   return {
     version: '1.0.0',
@@ -105,9 +108,9 @@ export function exportSeason(seasonId: string): SeasonExportData | null {
 /**
  * Import a league or season from exported data
  */
-export function importLeagueOrSeason(
+export async function importLeagueOrSeason(
   data: LeagueExportData | SeasonExportData
-): { success: boolean; error?: string; leagueId?: string; seasonId?: string } {
+): Promise<{ success: boolean; error?: string; leagueId?: string; seasonId?: string }> {
   try {
     // Validate data structure
     if (!data.version || !data.exportDate || !data.type) {
@@ -116,12 +119,13 @@ export function importLeagueOrSeason(
 
     // Map old player IDs to new ones (or existing ones)
     const playerIdMap = new Map<string, string>();
-    const existingPlayers = playersApi.getAll();
+    const existingPlayers = await playersApi.getAll();
 
-    data.players.forEach(exportedPlayer => {
-      // Check if player already exists by name
+    for (const exportedPlayer of data.players) {
+      // Check if player already exists by first + last name
+      const exportedDisplayName = getPlayerDisplayName(exportedPlayer);
       const existing = existingPlayers.find(
-        p => p.name.toLowerCase() === exportedPlayer.name.toLowerCase()
+        p => getPlayerDisplayName(p).toLowerCase() === exportedDisplayName.toLowerCase()
       );
 
       if (existing) {
@@ -129,48 +133,40 @@ export function importLeagueOrSeason(
         playerIdMap.set(exportedPlayer.id, existing.id);
       } else {
         // Create new player
-        const newPlayer = playersApi.create({
-          name: exportedPlayer.name,
+        const newPlayer = await playersApi.create({
+          firstName: exportedPlayer.firstName,
+          lastName: exportedPlayer.lastName,
+          middleName: exportedPlayer.middleName,
           active: exportedPlayer.active,
         });
         playerIdMap.set(exportedPlayer.id, newPlayer.id);
       }
-    });
+    }
 
     if (data.type === 'league') {
-      return importLeagueData(data, playerIdMap);
+      return await importLeagueData(data, playerIdMap);
     } else {
-      return importSeasonData(data, playerIdMap);
+      return await importSeasonData(data, playerIdMap);
     }
   } catch (error) {
     console.error('Import error:', error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : 'Unknown error during import' 
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error during import'
     };
   }
 }
 
-function importLeagueData(
+async function importLeagueData(
   data: LeagueExportData,
   playerIdMap: Map<string, string>
-): { success: boolean; error?: string; leagueId?: string } {
+): Promise<{ success: boolean; error?: string; leagueId?: string }> {
   // Create new league (with new ID)
-  const newLeague = leaguesApi.create({
+  const newLeague = await leaguesApi.create({
     name: `${data.league.name} (Imported)`,
     description: data.league.description,
-    defaultHandicapBasis: data.league.defaultHandicapBasis,
-    useHandicap: data.league.useHandicap,
-    handicapPercentage: data.league.handicapPercentage,
-    defaultPlayersPerTeam: data.league.defaultPlayersPerTeam,
-    defaultMatchesPerGame: data.league.defaultMatchesPerGame,
-    defaultNumberOfTeams: data.league.defaultNumberOfTeams,
-    defaultNumberOfRounds: data.league.defaultNumberOfRounds,
     dayOfWeek: data.league.dayOfWeek,
-    bonusRules: data.league.bonusRules,
-    playerMatchPointsPerWin: data.league.playerMatchPointsPerWin,
-    teamMatchPointsPerWin: data.league.teamMatchPointsPerWin,
-    teamGamePointsPerWin: data.league.teamGamePointsPerWin,
+    defaultSeasonConfigurations: data.league.defaultSeasonConfigurations,
     active: data.league.active,
   });
 
@@ -179,54 +175,44 @@ function importLeagueData(
   const teamIdMap = new Map<string, string>();
 
   // Import seasons
-  data.seasons.forEach(season => {
-    const newSeason = seasonsApi.create({
+  for (const season of data.seasons) {
+    const newSeason = await seasonsApi.create({
       name: season.name,
       leagueId: newLeague.id,
       startDate: season.startDate,
       endDate: season.endDate || season.startDate,
-      numberOfTeams: season.numberOfTeams,
-      numberOfRounds: season.numberOfRounds,
-      playersPerTeam: season.playersPerTeam,
-      matchesPerGame: season.matchesPerGame,
+      seasonConfigurations: season.seasonConfigurations,
       status: season.status,
-      useHandicap: season.useHandicap,
-      handicapBasis: season.handicapBasis,
-      handicapPercentage: season.handicapPercentage,
-      bonusRules: season.bonusRules,
-      playerMatchPointsPerWin: season.playerMatchPointsPerWin,
-      teamMatchPointsPerWin: season.teamMatchPointsPerWin,
-      teamGamePointsPerWin: season.teamGamePointsPerWin,
     });
     seasonIdMap.set(season.id, newSeason.id);
-  });
+  }
 
   // Import teams
-  data.teams.forEach(team => {
+  for (const team of data.teams) {
     const newSeasonId = seasonIdMap.get(team.seasonId);
-    if (!newSeasonId) return;
+    if (!newSeasonId) continue;
 
     // Map player IDs
     const newPlayerIds = team.playerIds
       .map(oldId => playerIdMap.get(oldId))
       .filter((id): id is string => id !== undefined);
 
-    const newTeam = teamsApi.create({
+    const newTeam = await teamsApi.create({
       name: team.name,
       seasonId: newSeasonId,
       playerIds: newPlayerIds,
       rosterChanges: team.rosterChanges || [],
     });
     teamIdMap.set(team.id, newTeam.id);
-  });
+  }
 
   // Import games
-  data.games.forEach(game => {
+  for (const game of data.games) {
     const newSeasonId = seasonIdMap.get(game.seasonId);
     const newTeam1Id = teamIdMap.get(game.team1Id);
     const newTeam2Id = teamIdMap.get(game.team2Id);
 
-    if (!newSeasonId || !newTeam1Id || !newTeam2Id) return;
+    if (!newSeasonId || !newTeam1Id || !newTeam2Id) continue;
 
     // Map player IDs in matches if they exist
     const newMatches = (game.matches ? game.matches.map(match => ({
@@ -243,9 +229,10 @@ function importLeagueData(
 
     // Find the season config for this game to get required fields
     const seasonConfig = data.seasons.find(s => s.id === game.seasonId);
-    if (!seasonConfig) return;
+    if (!seasonConfig) continue;
+    const sCfg = seasonConfig.seasonConfigurations;
 
-    gamesApi.create({
+    await gamesApi.create({
       seasonId: newSeasonId,
       team1Id: newTeam1Id,
       team2Id: newTeam2Id,
@@ -253,96 +240,76 @@ function importLeagueData(
       matchDay: game.matchDay,
       scheduledDate: game.scheduledDate,
       matches: newMatches,
-      playerMatchPointsPerWin: seasonConfig.playerMatchPointsPerWin,
-      teamMatchPointsPerWin: seasonConfig.teamMatchPointsPerWin,
-      teamGamePointsPerWin: seasonConfig.teamGamePointsPerWin,
-      useHandicap: seasonConfig.useHandicap,
-      matchesPerGame: seasonConfig.matchesPerGame,
-      bonusRules: seasonConfig.bonusRules,
+      playerMatchPointsPerWin: sCfg.playerMatchPointsPerWin,
+      teamMatchPointsPerWin: sCfg.teamMatchPointsPerWin,
+      teamGamePointsPerWin: sCfg.teamGamePointsPerWin,
+      useHandicap: sCfg.useHandicap,
+      matchesPerGame: sCfg.matchesPerGame,
+      bonusRules: sCfg.bonusRules,
       postponed: game.postponed || false,
       originalDate: game.originalDate ?? undefined,
     });
-  });
+  }
 
   return { success: true, leagueId: newLeague.id };
 }
 
-function importSeasonData(
+async function importSeasonData(
   data: SeasonExportData,
   playerIdMap: Map<string, string>
-): { success: boolean; error?: string; seasonId?: string } {
+): Promise<{ success: boolean; error?: string; seasonId?: string }> {
   // Check if league already exists (by name)
-  const existingLeagues = leaguesApi.getAll();
+  const existingLeagues = await leaguesApi.getAll();
   let targetLeague = existingLeagues.find(
     l => l.name.toLowerCase() === data.league.name.toLowerCase()
   );
 
   // If league doesn't exist, create it
   if (!targetLeague) {
-    targetLeague = leaguesApi.create({
+    targetLeague = await leaguesApi.create({
       name: data.league.name,
       description: data.league.description,
-      defaultHandicapBasis: data.league.defaultHandicapBasis,
-      useHandicap: data.league.useHandicap,
-      handicapPercentage: data.league.handicapPercentage,
-      defaultPlayersPerTeam: data.league.defaultPlayersPerTeam,
-      defaultMatchesPerGame: data.league.defaultMatchesPerGame,
-      defaultNumberOfTeams: data.league.defaultNumberOfTeams,
-      defaultNumberOfRounds: data.league.defaultNumberOfRounds,
       dayOfWeek: data.league.dayOfWeek,
-      bonusRules: data.league.bonusRules,
-      playerMatchPointsPerWin: data.league.playerMatchPointsPerWin,
-      teamMatchPointsPerWin: data.league.teamMatchPointsPerWin,
-      teamGamePointsPerWin: data.league.teamGamePointsPerWin,
+      defaultSeasonConfigurations: data.league.defaultSeasonConfigurations,
       active: data.league.active,
     });
   }
 
   // Create season
-  const newSeason = seasonsApi.create({
+  const newSeason = await seasonsApi.create({
     name: `${data.season.name} (Imported)`,
     leagueId: targetLeague.id,
     startDate: data.season.startDate,
     endDate: data.season.endDate || data.season.startDate,
-    numberOfTeams: data.season.numberOfTeams,
-    numberOfRounds: data.season.numberOfRounds,
-    playersPerTeam: data.season.playersPerTeam,
-    matchesPerGame: data.season.matchesPerGame,
+    seasonConfigurations: data.season.seasonConfigurations,
     status: data.season.status,
-    useHandicap: data.season.useHandicap,
-    handicapBasis: data.season.handicapBasis,
-    handicapPercentage: data.season.handicapPercentage,
-    bonusRules: data.season.bonusRules,
-    playerMatchPointsPerWin: data.season.playerMatchPointsPerWin,
-    teamMatchPointsPerWin: data.season.teamMatchPointsPerWin,
-    teamGamePointsPerWin: data.season.teamGamePointsPerWin,
   });
 
   // Map team IDs
   const teamIdMap = new Map<string, string>();
 
   // Import teams
-  data.teams.forEach(team => {
+  for (const team of data.teams) {
     // Map player IDs
     const newPlayerIds = team.playerIds
       .map(oldId => playerIdMap.get(oldId))
       .filter((id): id is string => id !== undefined);
 
-    const newTeam = teamsApi.create({
+    const newTeam = await teamsApi.create({
       name: team.name,
       seasonId: newSeason.id,
       playerIds: newPlayerIds,
       rosterChanges: team.rosterChanges || [],
     });
     teamIdMap.set(team.id, newTeam.id);
-  });
+  }
 
   // Import games
-  data.games.forEach(game => {
+  for (const game of data.games) {
     const newTeam1Id = teamIdMap.get(game.team1Id);
     const newTeam2Id = teamIdMap.get(game.team2Id);
 
-    if (!newTeam1Id || !newTeam2Id) return;
+    if (!newTeam1Id || !newTeam2Id) continue;
 
     // Map player IDs in matches if they exist
     const newMatches = (game.matches ? game.matches.map(match => ({
@@ -358,9 +325,9 @@ function importSeasonData(
     })) : []) as GameMatch[];
 
     // Find the season config for this game to get required fields
-    const seasonConfig = data.season;
+    const sCfg = data.season.seasonConfigurations;
 
-    gamesApi.create({
+    await gamesApi.create({
       seasonId: newSeason.id,
       team1Id: newTeam1Id,
       team2Id: newTeam2Id,
@@ -368,16 +335,16 @@ function importSeasonData(
       matchDay: game.matchDay,
       scheduledDate: game.scheduledDate,
       matches: newMatches,
-      matchesPerGame: seasonConfig.matchesPerGame,
-      useHandicap: seasonConfig.useHandicap,
-      playerMatchPointsPerWin: seasonConfig.playerMatchPointsPerWin,
-      teamMatchPointsPerWin: seasonConfig.teamMatchPointsPerWin,
-      teamGamePointsPerWin: seasonConfig.teamGamePointsPerWin,
-      bonusRules: seasonConfig.bonusRules,
+      matchesPerGame: sCfg.matchesPerGame,
+      useHandicap: sCfg.useHandicap,
+      playerMatchPointsPerWin: sCfg.playerMatchPointsPerWin,
+      teamMatchPointsPerWin: sCfg.teamMatchPointsPerWin,
+      teamGamePointsPerWin: sCfg.teamGamePointsPerWin,
+      bonusRules: sCfg.bonusRules,
       postponed: game.postponed || false,
       originalDate: game.originalDate ?? undefined,
     });
-  });
+  }
 
   return { success: true, seasonId: newSeason.id };
 }
@@ -422,7 +389,7 @@ export function downloadExportFile(
 export function readImportFile(file: File): Promise<LeagueExportData | SeasonExportData> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    
+
     reader.onload = (e) => {
       try {
         const text = e.target?.result as string;
@@ -432,11 +399,11 @@ export function readImportFile(file: File): Promise<LeagueExportData | SeasonExp
         reject(new Error('Failed to parse JSON file'));
       }
     };
-    
+
     reader.onerror = () => {
       reject(new Error('Failed to read file'));
     };
-    
+
     reader.readAsText(file);
   });
 }

@@ -363,22 +363,24 @@ const mapLeagueFromDb = (data: any): League => ({
   id: data.id,
   name: data.name,
   description: data.description || '',
-  defaultNumberOfTeams: data.default_number_of_teams,
-  defaultPlayersPerTeam: data.default_players_per_team,
-  defaultNumberOfRounds: data.default_number_of_rounds,
-  defaultMatchesPerGame: data.default_matches_per_game,
   dayOfWeek: data.day_of_week,
-  lineupStrategy: data.lineup_strategy,
-  lineupRule: data.lineup_rule,
-  playerMatchPointsPerWin: data.player_match_points_per_win,
-  teamMatchPointsPerWin: data.team_match_points_per_win,
-  teamGamePointsPerWin: data.team_game_points_per_win,
-  useHandicap: data.use_handicap,
-  defaultHandicapBasis: data.default_handicap_basis,
-  handicapPercentage: data.handicap_percentage,
-  teamAllPresentBonusEnabled: data.team_all_present_bonus_enabled,
-  teamAllPresentBonusPoints: data.team_all_present_bonus_points,
-  bonusRules: data.bonus_rules || [],
+  defaultSeasonConfigurations: {
+    numberOfTeams: data.number_of_teams,
+    playersPerTeam: data.players_per_team,
+    numberOfRounds: data.number_of_rounds,
+    matchesPerGame: data.matches_per_game,
+    lineupStrategy: data.lineup_strategy,
+    lineupRule: data.lineup_rule,
+    playerMatchPointsPerWin: data.player_match_points_per_win,
+    teamMatchPointsPerWin: data.team_match_points_per_win,
+    teamGamePointsPerWin: data.team_game_points_per_win,
+    useHandicap: data.use_handicap,
+    handicapBasis: data.handicap_basis,
+    handicapPercentage: data.handicap_percentage,
+    teamAllPresentBonusEnabled: data.team_all_present_bonus_enabled,
+    teamAllPresentBonusPoints: data.team_all_present_bonus_points,
+    bonusRules: data.bonus_rules || [],
+  },
   active: data.active,
   createdAt: data.created_at
 });
@@ -387,23 +389,26 @@ const mapLeagueToDb = (data: Partial<League>): any => {
   const dbData: any = {};
   if (data.name !== undefined) dbData.name = data.name;
   if (data.description !== undefined) dbData.description = data.description;
-  if (data.defaultNumberOfTeams !== undefined) dbData.default_number_of_teams = data.defaultNumberOfTeams;
-  if (data.defaultPlayersPerTeam !== undefined) dbData.default_players_per_team = data.defaultPlayersPerTeam;
-  if (data.defaultNumberOfRounds !== undefined) dbData.default_number_of_rounds = data.defaultNumberOfRounds;
-  if (data.defaultMatchesPerGame !== undefined) dbData.default_matches_per_game = data.defaultMatchesPerGame;
   if (data.dayOfWeek !== undefined) dbData.day_of_week = data.dayOfWeek;
-  if (data.lineupStrategy !== undefined) dbData.lineup_strategy = data.lineupStrategy;
-  if (data.lineupRule !== undefined) dbData.lineup_rule = data.lineupRule;
-  if (data.playerMatchPointsPerWin !== undefined) dbData.player_match_points_per_win = data.playerMatchPointsPerWin;
-  if (data.teamMatchPointsPerWin !== undefined) dbData.team_match_points_per_win = data.teamMatchPointsPerWin;
-  if (data.teamGamePointsPerWin !== undefined) dbData.team_game_points_per_win = data.teamGamePointsPerWin;
-  if (data.useHandicap !== undefined) dbData.use_handicap = data.useHandicap;
-  if (data.defaultHandicapBasis !== undefined) dbData.default_handicap_basis = data.defaultHandicapBasis;
-  if (data.handicapPercentage !== undefined) dbData.handicap_percentage = data.handicapPercentage;
-  if (data.teamAllPresentBonusEnabled !== undefined) dbData.team_all_present_bonus_enabled = data.teamAllPresentBonusEnabled;
-  if (data.teamAllPresentBonusPoints !== undefined) dbData.team_all_present_bonus_points = data.teamAllPresentBonusPoints;
-  if (data.bonusRules !== undefined) dbData.bonus_rules = data.bonusRules;
   if (data.active !== undefined) dbData.active = data.active;
+  if (data.defaultSeasonConfigurations) {
+    const cfg = data.defaultSeasonConfigurations;
+    if (cfg.numberOfTeams !== undefined) dbData.number_of_teams = cfg.numberOfTeams;
+    if (cfg.playersPerTeam !== undefined) dbData.players_per_team = cfg.playersPerTeam;
+    if (cfg.numberOfRounds !== undefined) dbData.number_of_rounds = cfg.numberOfRounds;
+    if (cfg.matchesPerGame !== undefined) dbData.matches_per_game = cfg.matchesPerGame;
+    if (cfg.lineupStrategy !== undefined) dbData.lineup_strategy = cfg.lineupStrategy;
+    if (cfg.lineupRule !== undefined) dbData.lineup_rule = cfg.lineupRule;
+    if (cfg.playerMatchPointsPerWin !== undefined) dbData.player_match_points_per_win = cfg.playerMatchPointsPerWin;
+    if (cfg.teamMatchPointsPerWin !== undefined) dbData.team_match_points_per_win = cfg.teamMatchPointsPerWin;
+    if (cfg.teamGamePointsPerWin !== undefined) dbData.team_game_points_per_win = cfg.teamGamePointsPerWin;
+    if (cfg.useHandicap !== undefined) dbData.use_handicap = cfg.useHandicap;
+    if (cfg.handicapBasis !== undefined) dbData.handicap_basis = cfg.handicapBasis;
+    if (cfg.handicapPercentage !== undefined) dbData.handicap_percentage = cfg.handicapPercentage;
+    if (cfg.teamAllPresentBonusEnabled !== undefined) dbData.team_all_present_bonus_enabled = cfg.teamAllPresentBonusEnabled;
+    if (cfg.teamAllPresentBonusPoints !== undefined) dbData.team_all_present_bonus_points = cfg.teamAllPresentBonusPoints;
+    if (cfg.bonusRules !== undefined) dbData.bonus_rules = cfg.bonusRules;
+  }
   return dbData;
 };
 
@@ -504,21 +509,23 @@ const mapSeasonFromDb = (data: any): Season => ({
   name: data.name,
   startDate: data.start_date,
   endDate: data.end_date,
-  numberOfTeams: data.number_of_teams,
-  playersPerTeam: data.players_per_team,
-  numberOfRounds: data.number_of_rounds,
-  matchesPerGame: data.matches_per_game,
-  lineupStrategy: data.lineup_strategy,
-  lineupRule: data.lineup_rule,
-  playerMatchPointsPerWin: data.player_match_points_per_win,
-  teamMatchPointsPerWin: data.team_match_points_per_win,
-  teamGamePointsPerWin: data.team_game_points_per_win,
-  useHandicap: data.use_handicap,
-  handicapBasis: data.handicap_basis,
-  handicapPercentage: data.handicap_percentage,
-  teamAllPresentBonusEnabled: data.team_all_present_bonus_enabled,
-  teamAllPresentBonusPoints: data.team_all_present_bonus_points,
-  bonusRules: data.bonus_rules || [],
+  seasonConfigurations: {
+    numberOfTeams: data.number_of_teams,
+    playersPerTeam: data.players_per_team,
+    numberOfRounds: data.number_of_rounds,
+    matchesPerGame: data.matches_per_game,
+    lineupStrategy: data.lineup_strategy,
+    lineupRule: data.lineup_rule,
+    playerMatchPointsPerWin: data.player_match_points_per_win,
+    teamMatchPointsPerWin: data.team_match_points_per_win,
+    teamGamePointsPerWin: data.team_game_points_per_win,
+    useHandicap: data.use_handicap,
+    handicapBasis: data.handicap_basis,
+    handicapPercentage: data.handicap_percentage,
+    teamAllPresentBonusEnabled: data.team_all_present_bonus_enabled,
+    teamAllPresentBonusPoints: data.team_all_present_bonus_points,
+    bonusRules: data.bonus_rules || [],
+  },
   status: data.status,
   schedule: data.schedule,
   playerAverages: data.player_averages,
@@ -532,21 +539,24 @@ const mapSeasonToDb = (data: Partial<Season>): any => {
   if (data.name !== undefined) dbData.name = data.name;
   if (data.startDate !== undefined) dbData.start_date = data.startDate;
   if (data.endDate !== undefined) dbData.end_date = data.endDate;
-  if (data.numberOfTeams !== undefined) dbData.number_of_teams = data.numberOfTeams;
-  if (data.playersPerTeam !== undefined) dbData.players_per_team = data.playersPerTeam;
-  if (data.numberOfRounds !== undefined) dbData.number_of_rounds = data.numberOfRounds;
-  if (data.matchesPerGame !== undefined) dbData.matches_per_game = data.matchesPerGame;
-  if (data.lineupStrategy !== undefined) dbData.lineup_strategy = data.lineupStrategy;
-  if (data.lineupRule !== undefined) dbData.lineup_rule = data.lineupRule;
-  if (data.playerMatchPointsPerWin !== undefined) dbData.player_match_points_per_win = data.playerMatchPointsPerWin;
-  if (data.teamMatchPointsPerWin !== undefined) dbData.team_match_points_per_win = data.teamMatchPointsPerWin;
-  if (data.teamGamePointsPerWin !== undefined) dbData.team_game_points_per_win = data.teamGamePointsPerWin;
-  if (data.useHandicap !== undefined) dbData.use_handicap = data.useHandicap;
-  if (data.handicapBasis !== undefined) dbData.handicap_basis = data.handicapBasis;
-  if (data.handicapPercentage !== undefined) dbData.handicap_percentage = data.handicapPercentage;
-  if (data.teamAllPresentBonusEnabled !== undefined) dbData.team_all_present_bonus_enabled = data.teamAllPresentBonusEnabled;
-  if (data.teamAllPresentBonusPoints !== undefined) dbData.team_all_present_bonus_points = data.teamAllPresentBonusPoints;
-  if (data.bonusRules !== undefined) dbData.bonus_rules = data.bonusRules;
+  if (data.seasonConfigurations) {
+    const cfg = data.seasonConfigurations;
+    if (cfg.numberOfTeams !== undefined) dbData.number_of_teams = cfg.numberOfTeams;
+    if (cfg.playersPerTeam !== undefined) dbData.players_per_team = cfg.playersPerTeam;
+    if (cfg.numberOfRounds !== undefined) dbData.number_of_rounds = cfg.numberOfRounds;
+    if (cfg.matchesPerGame !== undefined) dbData.matches_per_game = cfg.matchesPerGame;
+    if (cfg.lineupStrategy !== undefined) dbData.lineup_strategy = cfg.lineupStrategy;
+    if (cfg.lineupRule !== undefined) dbData.lineup_rule = cfg.lineupRule;
+    if (cfg.playerMatchPointsPerWin !== undefined) dbData.player_match_points_per_win = cfg.playerMatchPointsPerWin;
+    if (cfg.teamMatchPointsPerWin !== undefined) dbData.team_match_points_per_win = cfg.teamMatchPointsPerWin;
+    if (cfg.teamGamePointsPerWin !== undefined) dbData.team_game_points_per_win = cfg.teamGamePointsPerWin;
+    if (cfg.useHandicap !== undefined) dbData.use_handicap = cfg.useHandicap;
+    if (cfg.handicapBasis !== undefined) dbData.handicap_basis = cfg.handicapBasis;
+    if (cfg.handicapPercentage !== undefined) dbData.handicap_percentage = cfg.handicapPercentage;
+    if (cfg.teamAllPresentBonusEnabled !== undefined) dbData.team_all_present_bonus_enabled = cfg.teamAllPresentBonusEnabled;
+    if (cfg.teamAllPresentBonusPoints !== undefined) dbData.team_all_present_bonus_points = cfg.teamAllPresentBonusPoints;
+    if (cfg.bonusRules !== undefined) dbData.bonus_rules = cfg.bonusRules;
+  }
   if (data.status !== undefined) dbData.status = data.status;
   if (data.schedule !== undefined) dbData.schedule = data.schedule;
   if (data.playerAverages !== undefined) dbData.player_averages = data.playerAverages;

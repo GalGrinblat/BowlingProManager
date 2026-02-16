@@ -9,7 +9,6 @@ interface HandicapConfigurationFormProps {
 	onUseHandicapChange: (value: boolean) => void;
 	onHandicapBasisChange: (value: number) => void;
 	onHandicapPercentageChange: (value: number) => void;
-	basisFieldName?: string;
 	showDescription?: boolean;
 	disabled?: boolean;
 }
@@ -25,7 +24,6 @@ export const HandicapConfigurationForm: React.FC<HandicapConfigurationFormProps>
 	onUseHandicapChange,
 	onHandicapBasisChange,
 	onHandicapPercentageChange,
-	basisFieldName = 'handicapBasis',
 	showDescription = true,
 	disabled = false
 }) => {
@@ -39,7 +37,7 @@ export const HandicapConfigurationForm: React.FC<HandicapConfigurationFormProps>
 					{t('leagues.handicap.ConfigurationDesc')}
 				</p>
 			)}
-      
+
 			<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 				<div>
 					<label className="flex items-center space-x-2 cursor-pointer">
@@ -53,9 +51,7 @@ export const HandicapConfigurationForm: React.FC<HandicapConfigurationFormProps>
 						<span className="text-sm font-semibold text-gray-700">{t('leagues.handicap.use')}</span>
 					</label>
 					<p className="text-xs text-gray-500 mt-1">
-						{basisFieldName === 'defaultHandicapBasis' 
-							? t('leagues.handicap.enableDisable')
-							: t('leagues.handicap.toggleDesc')}
+						{t('leagues.handicap.enableDisable')}
 					</p>
 				</div>
 				<div>
@@ -72,9 +68,7 @@ export const HandicapConfigurationForm: React.FC<HandicapConfigurationFormProps>
 						className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent${(!useHandicap || disabled) ? ' bg-gray-100 cursor-not-allowed' : ''}`}
 					/>
 					<p className="text-xs text-gray-500 mt-1">
-						{basisFieldName === 'defaultHandicapBasis'
-							? t('leagues.handicap.basisCalculation')
-							: t('leagues.handicap.basisDesc')}
+						{t('leagues.handicap.basisCalculation')}
 					</p>
 				</div>
 				<div>
@@ -91,9 +85,7 @@ export const HandicapConfigurationForm: React.FC<HandicapConfigurationFormProps>
 						className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent${(!useHandicap || disabled) ? ' bg-gray-100 cursor-not-allowed' : ''}`}
 					/>
 					<p className="text-xs text-gray-500 mt-1">
-						{basisFieldName === 'defaultHandicapBasis'
-							? t('leagues.handicap.percentageExplanation')
-							: t('leagues.handicap.percentageDesc')}
+						{t('leagues.handicap.percentageExplanation')}
 					</p>
 				</div>
 			</div>

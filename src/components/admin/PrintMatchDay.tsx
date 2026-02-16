@@ -169,11 +169,11 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
                         <span>📆 {formatMatchDate(scheduleInfo.date)}</span>
                       )}
                     </div>
-                    {season.useHandicap && (
+                    {season.seasonConfigurations.useHandicap && (
                       <div className="mt-2 text-sm text-gray-600">
                         ⚖️ {t('leagues.handicapDisplay')
-                          .replace('{{percentage}}', String(season.handicapPercentage || 100))
-                          .replace('{{basis}}', String(season.handicapBasis))}
+                          .replace('{{percentage}}', String(season.seasonConfigurations.handicapPercentage || 100))
+                          .replace('{{basis}}', String(season.seasonConfigurations.handicapBasis))}
                       </div>
                     )}
                   </div>
