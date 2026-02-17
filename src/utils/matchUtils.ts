@@ -2,18 +2,19 @@ import type { BonusRule, Game, PlayerMatchResult, GameMatch, MatchPlayer, GamePl
 import { compareTeamScores, applyMatchWinnerPoints } from './comparisonUtils';
 
 export const createEmptyMatch = (matchNumber: number, playersPerTeam: number): GameMatch => {
-  const emptyPlayers: MatchPlayer[] = Array.from({ length: playersPerTeam }, () => ({ 
-    pins: '', 
-    bonusPoints: 0 
-  }));
-  
-  const emptyPlayerMatches: PlayerMatchResult[] = Array.from({ length: playersPerTeam }, (_, i) => ({ 
-    player: i + 1, 
+  const createEmptyPlayers = (): MatchPlayer[] =>
+    Array.from({ length: playersPerTeam }, () => ({
+      pins: '',
+      bonusPoints: 0
+    }));
+
+  const emptyPlayerMatches: PlayerMatchResult[] = Array.from({ length: playersPerTeam }, (_, i) => ({
+    player: i + 1,
     result: null,
     team1Points: 0,
     team2Points: 0
   }));
-  
+
   return {
     matchNumber,
     team1: {
@@ -21,14 +22,14 @@ export const createEmptyMatch = (matchNumber: number, playersPerTeam: number): G
       totalPins: 0,
       totalWithHandicap: 0,
       bonusPoints: 0,
-      players: emptyPlayers
+      players: createEmptyPlayers()
     },
     team2: {
       points: 0,
       totalPins: 0,
       totalWithHandicap: 0,
       bonusPoints: 0,
-      players: [...emptyPlayers]
+      players: createEmptyPlayers()
     },
     playerMatches: emptyPlayerMatches
   };
