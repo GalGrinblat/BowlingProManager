@@ -213,7 +213,7 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
 
                       {/* VS */}
                       <div className="col-span-1 text-center">
-                        <div className="text-5xl font-bold text-gray-400">VS</div>
+                        <div className="text-5xl font-bold text-gray-400">{t('print.vs')}</div>
                         {h2h.gamesPlayed > 0 && (
                           <div className="mt-2 text-xs text-gray-600">
                             {t('seasons.headToHead')}: {h2h.team1Wins}-{h2h.team2Wins}
@@ -243,9 +243,9 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
                           <thead className="bg-gray-100">
                             <tr>
                               <th className={`${isRTL ? 'text-right' : 'text-left'} px-2 py-2 font-semibold`}>{t('common.player')}</th>
+                              <th className="text-center px-2 py-2 font-semibold">{t('seasons.gamesPlayed')}</th>
                               <th className="text-center px-2 py-2 font-semibold">{t('common.average')}</th>
                               <th className="text-center px-2 py-2 font-semibold">{t('common.handicap')}</th>
-                              <th className="text-center px-2 py-2 font-semibold">{t('seasons.gamesPlayed')}</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -254,14 +254,14 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
                                 <td className="px-2 py-2">
                                   <div className={`font-semibold ${isRTL ? 'text-right' : 'text-left'}`}>{idx + 1}. {player.name}</div>
                                 </td>
+                                <td className="text-center px-2 py-2 text-gray-600">
+                                  {player.gamesPlayed}
+                                </td>
                                 <td className="text-center px-2 py-2 font-semibold">
                                   {player.average > 0 ? player.average.toFixed(2) : '-'}
                                 </td>
                                 <td className="text-center px-2 py-2 text-blue-600 font-bold">
                                   {player.handicap > 0 ? player.handicap : '-'}
-                                </td>
-                                <td className="text-center px-2 py-2 text-gray-600">
-                                  {player.gamesPlayed}
                                 </td>
                               </tr>
                             ))}
@@ -269,13 +269,13 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
                           <tfoot className="bg-gray-50">
                             <tr>
                               <td className={`px-2 py-2 font-semibold ${isRTL ? 'text-right' : 'text-left'}`}>{t('common.total')}</td>
+                              <td></td>
                               <td className="text-center px-2 py-2 font-bold">
                                 {(team1Players.reduce((sum: number, p: any) => sum + p.average, 0) / team1Players.length || 0).toFixed(2)}
                               </td>
                               <td className="text-center px-2 py-2 font-bold text-blue-600">
                                 {team1Players.reduce((sum: number, p: any) => sum + p.handicap, 0)}
                               </td>
-                              <td></td>
                             </tr>
                           </tfoot>
                         </table>
@@ -290,9 +290,9 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
                           <thead className="bg-gray-100">
                             <tr>
                               <th className={`${isRTL ? 'text-right' : 'text-left'} px-2 py-2 font-semibold`}>{t('common.player')}</th>
+                              <th className="text-center px-2 py-2 font-semibold">{t('seasons.gamesPlayed')}</th>
                               <th className="text-center px-2 py-2 font-semibold">{t('common.average')}</th>
                               <th className="text-center px-2 py-2 font-semibold">{t('common.handicap')}</th>
-                              <th className="text-center px-2 py-2 font-semibold">{t('seasons.gamesPlayed')}</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -301,14 +301,14 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
                                 <td className="px-2 py-2">
                                   <div className={`font-semibold ${isRTL ? 'text-right' : 'text-left'}`}>{idx + 1}. {player.name}</div>
                                 </td>
+                                <td className="text-center px-2 py-2 text-gray-600">
+                                  {player.gamesPlayed}
+                                </td>
                                 <td className="text-center px-2 py-2 font-semibold">
                                   {player.average > 0 ? player.average.toFixed(2) : '-'}
                                 </td>
                                 <td className="text-center px-2 py-2 text-purple-600 font-bold">
                                   {player.handicap > 0 ? player.handicap : '-'}
-                                </td>
-                                <td className="text-center px-2 py-2 text-gray-600">
-                                  {player.gamesPlayed}
                                 </td>
                               </tr>
                             ))}
@@ -316,16 +316,139 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
                           <tfoot className="bg-gray-50">
                             <tr>
                               <td className={`px-2 py-2 font-semibold ${isRTL ? 'text-right' : 'text-left'}`}>{t('common.total')}</td>
+                              <td></td>
                               <td className="text-center px-2 py-2 font-bold">
                                 {(team2Players.reduce((sum: number, p: any) => sum + p.average, 0) / team2Players.length || 0).toFixed(2)}
                               </td>
                               <td className="text-center px-2 py-2 font-bold text-purple-600">
                                 {team2Players.reduce((sum: number, p: any) => sum + p.handicap, 0)}
                               </td>
-                              <td></td>
                             </tr>
                           </tfoot>
                         </table>
+                      </div>
+                    </div>
+
+                    {/* Score Sheet Section */}
+                    <div className="mt-8 border-t-2 border-gray-300 pt-6">
+                      <h5 className="text-xl font-bold text-gray-800 mb-4 text-center">{t('print.scoreSheet')}</h5>
+                      <div className="grid grid-cols-2 gap-8">
+                        {/* Team 1 Score Sheet */}
+                        <div>
+                          <h6 className="text-md font-bold text-blue-700 mb-3 text-center border-b-2 border-blue-500 pb-2">
+                            {team1.name}
+                          </h6>
+                          <table className="w-full border-2 border-gray-800">
+                            <thead>
+                              <tr className="bg-gray-200">
+                                <th className="border border-gray-800 px-2 py-2 text-sm font-bold">{t('print.match')}</th>
+                                {Array.from({ length: game.matchesPerGame }, (_, i) => (
+                                  <th key={i} className="border border-gray-800 px-2 py-2 text-sm font-bold">
+                                    {i + 1}
+                                  </th>
+                                ))}
+                                <th className="border border-gray-800 px-2 py-2 text-sm font-bold bg-gray-300">{t('common.total')}</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {team1Players.map((player: any, idx: number) => (
+                                <tr key={player.id}>
+                                  <td className="border border-gray-800 px-2 py-2 text-xs font-semibold">
+                                    {idx + 1}. {player.name.split(' ')[0]}
+                                  </td>
+                                  {Array.from({ length: game.matchesPerGame }, (_, i) => (
+                                    <td key={i} className="border border-gray-800 px-2 py-6"></td>
+                                  ))}
+                                  <td className="border border-gray-800 px-2 py-6 bg-gray-100"></td>
+                                </tr>
+                              ))}
+                              <tr className="bg-blue-50 font-bold">
+                                <td className="border border-gray-800 px-2 py-2 text-sm">{t('common.total')}</td>
+                                {Array.from({ length: game.matchesPerGame }, (_, i) => (
+                                  <td key={i} className="border border-gray-800 px-2 py-6"></td>
+                                ))}
+                                <td className="border border-gray-800 px-2 py-6 bg-blue-100"></td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+
+                        {/* Team 2 Score Sheet */}
+                        <div>
+                          <h6 className="text-md font-bold text-purple-700 mb-3 text-center border-b-2 border-purple-500 pb-2">
+                            {team2.name}
+                          </h6>
+                          <table className="w-full border-2 border-gray-800">
+                            <thead>
+                              <tr className="bg-gray-200">
+                                <th className="border border-gray-800 px-2 py-2 text-sm font-bold">{t('print.match')}</th>
+                                {Array.from({ length: game.matchesPerGame }, (_, i) => (
+                                  <th key={i} className="border border-gray-800 px-2 py-2 text-sm font-bold">
+                                    {i + 1}
+                                  </th>
+                                ))}
+                                <th className="border border-gray-800 px-2 py-2 text-sm font-bold bg-gray-300">{t('common.total')}</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {team2Players.map((player: any, idx: number) => (
+                                <tr key={player.id}>
+                                  <td className="border border-gray-800 px-2 py-2 text-xs font-semibold">
+                                    {idx + 1}. {player.name.split(' ')[0]}
+                                  </td>
+                                  {Array.from({ length: game.matchesPerGame }, (_, i) => (
+                                    <td key={i} className="border border-gray-800 px-2 py-6"></td>
+                                  ))}
+                                  <td className="border border-gray-800 px-2 py-6 bg-gray-100"></td>
+                                </tr>
+                              ))}
+                              <tr className="bg-purple-50 font-bold">
+                                <td className="border border-gray-800 px-2 py-2 text-sm">{t('common.total')}</td>
+                                {Array.from({ length: game.matchesPerGame }, (_, i) => (
+                                  <td key={i} className="border border-gray-800 px-2 py-6"></td>
+                                ))}
+                                <td className="border border-gray-800 px-2 py-6 bg-purple-100"></td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Signature Section */}
+                    <div className="mt-8 border-t-2 border-gray-300 pt-6">
+                      <div className="grid grid-cols-2 gap-8">
+                        {/* Team 1 Signature */}
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                              {team1.name} - {t('print.teamCaptainSignature')}:
+                            </label>
+                            <div className="border-b-2 border-gray-400 pb-8"></div>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                              {t('print.date')}:
+                            </label>
+                            <div className="border-b-2 border-gray-400 w-48"></div>
+                          </div>
+                        </div>
+
+                        {/* Team 2 Signature */}
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                              {team2.name} - {t('print.teamCaptainSignature')}:
+                            </label>
+                            <div className="border-b-2 border-gray-400 pb-8"></div>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                              {t('print.date')}:
+                            </label>
+                            <div className="border-b-2 border-gray-400 w-48"></div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>

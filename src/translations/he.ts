@@ -8,6 +8,15 @@ const he: TranslationDictionary = {
     teamsNotComplete: 'אנא וודא שלכל הקבוצות יש בדיוק {{count}} שחקנים לפני המשך.',
     saveError: 'שגיאה בשמירת העונה. אנא נסה שוב.'
   },
+  print: {
+    vs: 'נגד',
+    scoreSheet: 'גיליון ניקוד',
+    match: 'משחק',
+    game: 'משחק',
+    score: 'ניקוד',
+    teamCaptainSignature: 'חתימת קפטן הקבוצה',
+    date: 'תאריך'
+  },
   // מילים ופעולות נפוצות
   common: {
     remove: 'הסר',

@@ -8,6 +8,15 @@ const en: TranslationDictionary = {
     teamsNotComplete: 'Please ensure all teams have exactly {{count}} players before proceeding.',
     saveError: 'Error saving season. Please try again.'
   },
+  print: {
+    vs: 'VS',
+    scoreSheet: 'Score Sheet',
+    match: 'Match',
+    game: 'Game',
+    score: 'Score',
+    teamCaptainSignature: 'Team Captain Signature',
+    date: 'Date'
+  },
   // Common words and actions
   common: {
     remove: 'Remove',
