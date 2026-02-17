@@ -109,9 +109,20 @@ const he: TranslationDictionary = {
     firstNameDesc: 'שם פרטי (ת-א)',
   },
 
+  // הגדרות (משותפות בין ליגות ועונות)
+  config: {
+    playersPerTeam: 'שחקנים בקבוצה',
+    playersPerTeamDesc: 'מספר שחקנים בכל קבוצה',
+    matchesPerGame: 'משחקים למחזור',
+    matchesPerGameDesc: 'מספר משחקים בכל מחזור',
+    numberOfTeams: 'מספר קבוצות',
+    numberOfTeamsDesc: 'מספר קבוצות',
+    numberOfRounds: 'מספר סיבובים',
+    numberOfRoundsDesc: 'מספר סיבובים',
+  },
+
   // ניהול ליגות
   leagues: {
-    generalConfiguration: 'הגדרות כלליות',
     title: 'ניהול ליגות',
     createLeague: 'צור ליגה חדשה',
     editLeague: 'ערוך ליגה',
@@ -120,13 +131,10 @@ const he: TranslationDictionary = {
     description: 'תיאור',
     briefDescription: 'תיאור קצר של הליגה',
     exampleName: 'לדוגמה: ליגת יום שני בערב',
+    generalConfiguration: 'הגדרות כלליות',
     leagueDay: 'יום הליגה',
     selectDay: 'בחר יום (אופציונלי)',
     dayPlayed: 'יום בשבוע שבו מתקיימים המשחקים',
-    defaultPlayersPerTeam: 'שחקנים בקבוצה (ברירת מחדל)',
-    canChangePerSeason: 'ניתן לשנות לכל עונה',
-    defaultMatchesPerGame: 'משחקים למחזור (ברירת מחדל)',
-    matchesInGame: 'מספר המשחקים בכל מחזור',
     
     // הגדרות הנדיקפ
     handicap: {
@@ -192,10 +200,6 @@ const he: TranslationDictionary = {
     },
     
     // סטטוס ותצוגה
-    defaultNumberOfTeams: 'מספר קבוצות ברירת מחדל',
-    defaultNumberOfTeamsDesc: 'הגדר את מספר הקבוצות ברירת המחדל לעונות חדשות בליגה זו.',
-    defaultNumberOfRounds: 'מספר סיבובי ברירת מחדל',
-    defaultNumberOfRoundsDesc: 'הגדר את מספר הסיבובים ברירת המחדל לעונה.',
     totalLeagues: 'סה"כ {{count}} ליגות',
     activeLeagues: 'ליגות פעילות',
     archivedLeagues: 'ליגות בארכיון',
@@ -255,7 +259,6 @@ const he: TranslationDictionary = {
     backToLeague: 'חזרה לליגה',
     seasonName: 'שם עונה',
     startDate: 'תאריך התחלה',
-    numberOfRounds: 'מספר סיבובים',
     completed: 'הושלם',
     completeSeason: 'השלם עונה',
     teams: 'קבוצות',
@@ -317,9 +320,6 @@ const he: TranslationDictionary = {
     noSeasonsYet: 'עדיין אין עונות',
     createFirstSeason: 'צור את העונה הראשונה שלך כדי להתחיל',
     createSeasonStep1: 'צור עונה חדשה - שלב 1',
-    numberOfTeams: 'מספר קבוצות',
-    playersPerTeam: 'שחקנים לקבוצה',
-    matchesPerGame: 'מספר משחקים במחזור',
     roundExplanation: 'כל קבוצה משחקת נגד כל הקבוצות בכל סיבוב',
     matchesExplanation: 'מספר המשחקים בכל מחזור',
     configureTeams: 'הגדרת קבוצות',
@@ -410,13 +410,13 @@ const he: TranslationDictionary = {
     seeding: 'יוצר נתוני הדגמה...',
     systemInfo: 'מידע מערכת',
     storageType: 'סוג אחסון',
-    localStorage: 'אחסון מקומי',
-    localStorageDesc: 'הנתונים מאוחסנים בדפדפן שלך',
+    localStorage: 'מסד נתונים Supabase',
+    localStorageDesc: 'הנתונים מאוחסנים בצורה מאובטחת בענן',
     important: 'חשוב',
-    dataWarning: 'הנתונים שלך מאוחסנים מקומית בדפדפן זה. כדי למנוע אובדן נתונים:',
-    warningItem1: 'אל תמחק נתוני דפדפן',
-    warningItem2: 'ייצא באופן קבוע את הנתונים שלך באמצעות תכונת הגיבוי למעלה',
-    warningItem3: 'שקול לעבור למסד נתונים לשימוש בייצור',
+    dataWarning: 'הנתונים שלך מאוחסנים במסד נתונים בענן:',
+    warningItem1: 'הנתונים מגובים אוטומטית',
+    warningItem2: 'ניתן לייצא את הנתונים בכל עת באמצעות תכונת הגיבוי למעלה',
+    warningItem3: 'הנתונים נגישים מכל מכשיר עם החשבון שלך',
     dangerZone: 'אזור סכנה',
     clearDataTitle: 'מחק את כל הנתונים',
     clearDataDesc: 'פעולה זו תמחק לצמיתות את כל השחקנים, הליגות, העונות, הקבוצות והמשחקים. פעולה זו לא ניתנת לביטול.',

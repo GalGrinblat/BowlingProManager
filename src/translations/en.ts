@@ -109,9 +109,20 @@ const en: TranslationDictionary = {
     firstNameDesc: 'First Name (Z-A)',
   },
 
+  // Configuration (shared between leagues and seasons)
+  config: {
+    playersPerTeam: 'Players per Team',
+    playersPerTeamDesc: 'Number of players per team',
+    matchesPerGame: 'Matches per Game',
+    matchesPerGameDesc: 'Number of matches per game',
+    numberOfTeams: 'Number of Teams',
+    numberOfTeamsDesc: 'Number of teams',
+    numberOfRounds: 'Number of Rounds',
+    numberOfRoundsDesc: 'Number of round-robins',
+  },
+
   // League Management
   leagues: {
-    generalConfiguration: 'General Configuration',
     title: 'League Management',
     createLeague: 'Create New League',
     editLeague: 'Edit League',
@@ -120,14 +131,11 @@ const en: TranslationDictionary = {
     description: 'Description',
     briefDescription: 'Brief description of the league',
     exampleName: 'e.g., Monday Night League',
+    generalConfiguration: 'General Configuration',
     leagueDay: 'League Day',
     selectDay: 'Select day (optional)',
     dayPlayed: 'Day of the week games are played',
-    defaultPlayersPerTeam: 'Default Players per Team',
-    canChangePerSeason: 'Can be changed per season',
-    defaultMatchesPerGame: 'Default Matches per Game',
-    matchesInGame: 'Number of matches in each game',
-    
+
     // Handicap settings
     handicap: {
       Configuration: 'Handicap Configuration',
@@ -192,10 +200,6 @@ const en: TranslationDictionary = {
     },
     
     // Status and display
-    defaultNumberOfTeams: 'Default Number of Teams',
-    defaultNumberOfTeamsDesc: 'Set the default number of teams for new seasons in this league.',
-    defaultNumberOfRounds: 'Default Number of Rounds',
-    defaultNumberOfRoundsDesc: 'Set the default number of round-robins per season.',
     totalLeagues: '{{count}} total leagues',
     activeLeagues: 'Active Leagues',
     archivedLeagues: 'Archived Leagues',
@@ -255,7 +259,6 @@ const en: TranslationDictionary = {
     backToLeague: 'Back to League',
     seasonName: 'Season Name',
     startDate: 'Start Date',
-    numberOfRounds: 'Number of Rounds',
     completed: 'Completed',
     completeSeason: 'Complete Season',
     teams: 'Teams',
@@ -317,9 +320,6 @@ const en: TranslationDictionary = {
     noSeasonsYet: 'No Seasons Yet',
     createFirstSeason: 'Create your first season to get started',
     createSeasonStep1: 'Create New Season - Step 1',
-    numberOfTeams: 'Number of Teams',
-    playersPerTeam: 'Players per Team',
-    matchesPerGame: 'Matches per Game',
     roundExplanation: 'Each team plays all others per round',
     matchesExplanation: 'Number of matches in each game',
     configureTeams: 'Configure Teams',
@@ -410,13 +410,13 @@ const en: TranslationDictionary = {
     seeding: 'Creating Demo Data...',
     systemInfo: 'System Information',
     storageType: 'Storage Type',
-    localStorage: 'Local Storage',
-    localStorageDesc: 'Data is stored in your browser',
+    localStorage: 'Supabase Database',
+    localStorageDesc: 'Data is stored securely in the cloud',
     important: 'Important',
-    dataWarning: 'Your data is stored locally in this browser. To prevent data loss:',
-    warningItem1: "Don't clear browser data",
-    warningItem2: 'Regularly export your data using the backup feature above',
-    warningItem3: 'Consider migrating to a database for production use',
+    dataWarning: 'Your data is stored in a cloud database:',
+    warningItem1: 'Data is automatically backed up',
+    warningItem2: 'You can export your data anytime using the backup feature above',
+    warningItem3: 'Data is accessible from any device with your account',
     dangerZone: 'Danger Zone',
     clearDataTitle: 'Clear All Data',
     clearDataDesc: 'This will permanently delete all players, leagues, seasons, teams, and games. This action cannot be undone.',

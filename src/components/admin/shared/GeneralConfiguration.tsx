@@ -36,7 +36,7 @@ export const GeneralConfiguration: React.FC<GeneralConfigurationProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">
-            {t('leagues.defaultNumberOfTeams')}
+            {t('config.numberOfTeams')}
           </label>
           <input
             type="number"
@@ -47,11 +47,11 @@ export const GeneralConfiguration: React.FC<GeneralConfigurationProps> = ({
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             disabled={disabled}
           />
-          <p className="text-xs text-gray-500 mt-1">{t('leagues.defaultNumberOfTeamsDesc')}</p>
+          <p className="text-xs text-gray-500 mt-1">{t('config.numberOfTeamsDesc')}</p>
         </div>
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">
-            {t('leagues.defaultPlayersPerTeam')}
+            {t('config.playersPerTeam')}
           </label>
           <input
             type="number"
@@ -62,11 +62,11 @@ export const GeneralConfiguration: React.FC<GeneralConfigurationProps> = ({
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             disabled={disabled}
           />
-          <p className="text-xs text-gray-500 mt-1">{t('leagues.canChangePerSeason')}</p>
+          <p className="text-xs text-gray-500 mt-1">{t('config.playersPerTeamDesc')}</p>
         </div>
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">
-            {t('leagues.defaultNumberOfRounds')}
+            {t('config.numberOfRounds')}
           </label>
           <input
             type="number"
@@ -77,11 +77,11 @@ export const GeneralConfiguration: React.FC<GeneralConfigurationProps> = ({
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             disabled={disabled}
           />
-          <p className="text-xs text-gray-500 mt-1">{t('leagues.defaultNumberOfRoundsDesc')}</p>
+          <p className="text-xs text-gray-500 mt-1">{t('config.numberOfRoundsDesc')}</p>
         </div>
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">
-            {t('leagues.defaultMatchesPerGame')}
+            {t('config.matchesPerGame')}
           </label>
           <input
             type="number"
@@ -92,7 +92,7 @@ export const GeneralConfiguration: React.FC<GeneralConfigurationProps> = ({
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             disabled={disabled}
           />
-          <p className="text-xs text-gray-500 mt-1">{t('leagues.matchesInGame')}</p>
+          <p className="text-xs text-gray-500 mt-1">{t('config.matchesPerGameDesc')}</p>
         </div>
         <div>
           <label className="block text-sm font-semibold text-gray-700 mb-2">
