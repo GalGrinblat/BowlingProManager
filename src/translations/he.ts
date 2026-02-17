@@ -15,7 +15,16 @@ const he: TranslationDictionary = {
     game: 'משחק',
     score: 'ניקוד',
     teamCaptainSignature: 'חתימת קפטן הקבוצה',
-    date: 'תאריך'
+    date: 'תאריך',
+    printOptions: 'אפשרויות הדפסה',
+    selectWhatToPrint: 'בחר מה להדפיס',
+    matchDayDetails: 'פרטי מחזור',
+    matchDayDetailsDesc: 'גיליונות ניקוד, סגלים ומידע על המשחקים',
+    teamStandingsDesc: 'דירוג קבוצות ונתונים סטטיסטיים עדכניים',
+    playerStandingsDesc: 'דירוג שחקנים ונתונים סטטיסטיים עדכניים',
+    printSelected: 'הדפס נבחרים',
+    selectAtLeastOne: 'אנא בחר לפחות אפשרות אחת להדפסה',
+    printPreview: 'תצוגה מקדימה להדפסה'
   },
   // מילים ופעולות נפוצות
   common: {
@@ -289,6 +298,7 @@ const he: TranslationDictionary = {
     teamStandings: 'טבלת קבוצות',
     headToHead: 'התמודדות ישירות',
     playerStandings: 'טבלת שחקנים',
+    noStandings: 'אין עדיין דירוגים זמינים',
     seasonRecords: 'שיאי עונה',
     selectRound: 'בחר סיבוב',
     selectMatchDay: 'בחר מחזור',

@@ -8,6 +8,11 @@ import { useTranslation } from '../../contexts/LanguageContext';
 import { useDateFormat } from '../../hooks/useDateFormat';
 import { exportSeason, downloadExportFile, readImportFile, importLeagueOrSeason } from '../../utils/leagueImportExportUtils';
 import { PrintMatchDay } from './PrintMatchDay';
+import { PrintMatchDayOptions } from './print/PrintMatchDayOptions';
+import { PrintTeamStandings } from './print/PrintTeamStandings';
+import { PrintPlayerStandings } from './print/PrintPlayerStandings';
+import { TeamStandingsTable } from './shared/TeamStandingsTable';
+import { PlayerStandingsTable } from './shared/PlayerStandingsTable';
 
 import type { GameMatch, ScheduleMatchDay, SeasonDetailProps } from '../../types/index';
 import type { Season, League, Team, Game } from '../../types/index';
@@ -24,6 +29,9 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
   const [selectedMatchDay, setSelectedMatchDay] = useState<number | null>(null);
   const [showPostponeModal, setShowPostponeModal] = useState(false);
   const [showPrintModal, setShowPrintModal] = useState(false);
+  const [showPrintOptionsModal, setShowPrintOptionsModal] = useState(false);
+  const [showPrintTeamStandings, setShowPrintTeamStandings] = useState(false);
+  const [showPrintPlayerStandings, setShowPrintPlayerStandings] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [postponeWeeks, setPostponeWeeks] = useState(1);
 
@@ -397,10 +405,10 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
                 <div className="flex gap-2">
                   {selectedMatchDay && (
                     <button
-                      onClick={() => setShowPrintModal(true)}
+                      onClick={() => setShowPrintOptionsModal(true)}
                       className="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 font-semibold text-xs"
                     >
-                      🖨️ {t('common.print')}
+                      🖨️ {t('print.printOptions')}
                     </button>
                   )}
                   {season.status === 'active' && selectedMatchDay && (
@@ -482,44 +490,21 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
       {/* Team Standings View */}
       {view === 'teamStandings' && (
         <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('seasons.teamStandings')}</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-bold text-gray-800">{t('seasons.teamStandings')}</h2>
+            <button
+              onClick={() => setShowPrintTeamStandings(true)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold text-sm"
+            >
+              🖨️ {t('common.print')}
+            </button>
+          </div>
           <div className="overflow-x-auto -mx-4 sm:mx-0">
-            <div className="inline-block min-w-full align-middle">
-              <div className="overflow-hidden">
-                <table className="min-w-full" dir={direction}>
-                  <thead className="bg-gray-100">
-                    <tr>
-                      <th className={`px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm ${isRTL ? 'text-right' : 'text-left'}`}>{t('seasons.rank')}</th>
-                      <th className={`px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm ${isRTL ? 'text-right' : 'text-left'}`}>{t('common.team')}</th>
-                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm">{t('seasons.gamesPlayed')}</th>
-                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm">{t('common.wins')}</th>
-                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm">{t('common.losses')}</th>
-                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm hidden sm:table-cell">{t('common.draws')}</th>
-                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm">{t('common.points')}</th>
-                      <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm hidden md:table-cell">{t('seasons.pins')}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {teamStandings.map((standing, index) => (
-                      <tr key={standing.teamId} className="border-b border-gray-200 hover:bg-gray-50">
-                        <td className="px-3 sm:px-4 py-3">
-                          <span className="font-bold text-gray-800">#{index + 1}</span>
-                        </td>
-                        <td className="px-3 sm:px-4 py-3 font-semibold text-gray-800 text-sm">{standing.teamName}</td>
-                        <td className="px-3 sm:px-4 py-3 text-center text-gray-600 text-sm">{standing.gamesPlayed}</td>
-                        <td className="px-3 sm:px-4 py-3 text-center text-green-600 font-semibold text-sm">{standing.wins}</td>
-                        <td className="px-3 sm:px-4 py-3 text-center text-red-600 font-semibold text-sm">{standing.losses}</td>
-                        <td className="px-3 sm:px-4 py-3 text-center text-gray-600 text-sm hidden sm:table-cell">{standing.draws}</td>
-                        <td className="px-3 sm:px-4 py-3 text-center">
-                          <span className="font-bold text-blue-600 text-base sm:text-lg">{standing.points}</span>
-                        </td>
-                        <td className="px-3 sm:px-4 py-3 text-center text-gray-600 text-sm hidden md:table-cell">{standing.totalPinsWithHandicap}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+            <TeamStandingsTable
+              standings={teamStandings}
+              direction={direction}
+              t={t}
+            />
           </div>
         </div>
       )}
@@ -736,46 +721,21 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
       {view === 'playerStandings' && (
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="p-4 sm:p-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('seasons.playerStandings')} ({playerStats.length} {t('common.players').toLowerCase()})</h2>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold text-gray-800">{t('seasons.playerStandings')} ({playerStats.length} {t('common.players').toLowerCase()})</h2>
+              <button
+                onClick={() => setShowPrintPlayerStandings(true)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold text-sm"
+              >
+                🖨️ {t('common.print')}
+              </button>
+            </div>
             <div className="overflow-x-auto -mx-4 sm:mx-0">
-              <div className="inline-block min-w-full align-middle">
-                <div className="overflow-hidden">
-                  <table className="min-w-full" dir={direction}>
-                    <thead className="bg-gray-100">
-                      <tr>
-                        <th className={`px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm ${isRTL ? 'text-right' : 'text-left'}`}>{t('seasons.rank')}</th>
-                        <th className={`px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm ${isRTL ? 'text-right' : 'text-left'}`}>{t('common.player')}</th>
-                        <th className={`px-3 sm:px-4 py-3 font-semibold text-gray-700 text-sm hidden lg:table-cell ${isRTL ? 'text-right' : 'text-left'}`}>{t('common.team')}</th>
-                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm">{t('seasons.gamesPlayed')}</th>
-                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm">{t('seasons.avg')}</th>
-                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm hidden sm:table-cell">{t('seasons.highGame')}</th>
-                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm hidden md:table-cell">{t('seasons.highSeries')}</th>
-                        <th className="px-3 sm:px-4 py-3 font-semibold text-gray-700 text-center text-sm hidden lg:table-cell">{t('seasons.pins')}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {playerStats.map((stat, index) => {
-                        return (
-                          <tr key={`${stat.teamId}-${stat.playerName}`} className="border-b border-gray-200 hover:bg-gray-50">
-                            <td className="px-3 sm:px-4 py-3">
-                              <span className="font-bold text-gray-800">#{index + 1}</span>
-                            </td>
-                            <td className="px-3 sm:px-4 py-3 font-semibold text-gray-800 text-sm">{stat.playerName}</td>
-                            <td className="px-3 sm:px-4 py-3 text-gray-600 text-sm hidden lg:table-cell">{stat.teamName}</td>
-                            <td className="px-3 sm:px-4 py-3 text-center text-gray-600 text-sm">{stat.gamesPlayed}</td>
-                            <td className="px-3 sm:px-4 py-3 text-center">
-                              <span className="font-bold text-blue-600 text-base sm:text-lg">{stat.average.toFixed(1)}</span>
-                            </td>
-                            <td className="px-3 sm:px-4 py-3 text-center text-purple-600 font-semibold text-sm hidden sm:table-cell">{stat.highGame}</td>
-                            <td className="px-3 sm:px-4 py-3 text-center text-green-600 font-semibold text-sm hidden md:table-cell">{stat.highSeries}</td>
-                            <td className="px-3 sm:px-4 py-3 text-center text-gray-600 text-sm hidden lg:table-cell">{stat.totalPins}</td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+              <PlayerStandingsTable
+                playerStats={playerStats}
+                direction={direction}
+                t={t}
+              />
             </div>
           </div>
         </div>
@@ -787,6 +747,31 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
           seasonId={seasonId}
           matchDay={selectedMatchDay}
           onClose={() => setShowPrintModal(false)}
+        />
+      )}
+
+      {/* Print Options Modal */}
+      {showPrintOptionsModal && selectedMatchDay && (
+        <PrintMatchDayOptions
+          seasonId={seasonId}
+          matchDay={selectedMatchDay}
+          onClose={() => setShowPrintOptionsModal(false)}
+        />
+      )}
+
+      {/* Print Team Standings Modal */}
+      {showPrintTeamStandings && (
+        <PrintTeamStandings
+          seasonId={seasonId}
+          onClose={() => setShowPrintTeamStandings(false)}
+        />
+      )}
+
+      {/* Print Player Standings Modal */}
+      {showPrintPlayerStandings && (
+        <PrintPlayerStandings
+          seasonId={seasonId}
+          onClose={() => setShowPrintPlayerStandings(false)}
         />
       )}
 

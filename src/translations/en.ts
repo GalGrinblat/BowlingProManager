@@ -15,7 +15,16 @@ const en: TranslationDictionary = {
     game: 'Game',
     score: 'Score',
     teamCaptainSignature: 'Team Captain Signature',
-    date: 'Date'
+    date: 'Date',
+    printOptions: 'Print Options',
+    selectWhatToPrint: 'Select what you want to print',
+    matchDayDetails: 'Match Day Details',
+    matchDayDetailsDesc: 'Score sheets, rosters, and match information',
+    teamStandingsDesc: 'Current team standings and statistics',
+    playerStandingsDesc: 'Current player standings and statistics',
+    printSelected: 'Print Selected',
+    selectAtLeastOne: 'Please select at least one option to print',
+    printPreview: 'Print Preview'
   },
   // Common words and actions
   common: {
@@ -289,6 +298,7 @@ const en: TranslationDictionary = {
     teamStandings: 'Team Standings',
     headToHead: 'Head-to-Head',
     playerStandings: 'Player Standings',
+    noStandings: 'No standings available yet',
     seasonRecords: 'Season Records',
     selectRound: 'Select Round',
     selectMatchDay: 'Select Match Day',
