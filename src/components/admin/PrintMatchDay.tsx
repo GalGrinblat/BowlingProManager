@@ -21,7 +21,6 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
   const [games, setGames] = useState<Game[]>([]);
   const [matchDayGames, setMatchDayGames] = useState<Game[]>([]);
   const [teamStandings, setTeamStandings] = useState<TeamStanding[]>([]);
-  const [currentAverages, setCurrentAverages] = useState<CurrentPlayerAverages>({});
   const [teamPlayersMap, setTeamPlayersMap] = useState<Record<string, any[]>>({});
 
   useEffect(() => {
@@ -61,7 +60,6 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
     else {
       averagesToUse = calculateCurrentPlayerAverages(previousGames);
     }
-    setCurrentAverages(averagesToUse);
 
     // Preload team players for all teams
     const playersMap: Record<string, any[]> = {};
