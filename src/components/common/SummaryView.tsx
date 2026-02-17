@@ -103,6 +103,7 @@ export const SummaryView: React.FC<SummaryViewProps> = ({ game, totals, playerSt
           teamColor="orange"
           playerStats={playerStats.team1Stats}
           teamAverage={playerStats.team1Average}
+          matchCount={lastMatchNumber}
         />
 
         <TeamStatsCard
@@ -110,6 +111,7 @@ export const SummaryView: React.FC<SummaryViewProps> = ({ game, totals, playerSt
           teamColor="blue"
           playerStats={playerStats.team2Stats}
           teamAverage={playerStats.team2Average}
+          matchCount={lastMatchNumber}
         />
       </div>
 

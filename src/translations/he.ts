@@ -562,6 +562,10 @@ const he: TranslationDictionary = {
     gameStatistics: 'סטטיסטיקות משחק',
     backToMatch: 'חזרה למשחק {{matchNumber}}',
     saveGame: 'שמור משחק',
+    matchAvg: 'ממוצע {{count}} משחקים',
+    pointsEarned: 'נקודות שנצברו',
+    teamTotal: 'סה"כ קבוצה',
+    teamAverage: 'ממוצע קבוצה',
   },
 
   // ניהול משתמשים

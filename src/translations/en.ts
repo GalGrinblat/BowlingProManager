@@ -562,6 +562,10 @@ const en: TranslationDictionary = {
     gameStatistics: 'GAME STATISTICS',
     backToMatch: 'Back to Match {{matchNumber}}',
     saveGame: 'Save Game',
+    matchAvg: '{{count}}-Match Avg',
+    pointsEarned: 'Points Earned',
+    teamTotal: 'TEAM TOTAL',
+    teamAverage: 'Team Average',
   },
 
   // User Management

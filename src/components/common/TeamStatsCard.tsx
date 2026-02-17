@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from '../../contexts/LanguageContext';
 
 export interface TeamStatsCardProps {
   teamName: string;
@@ -11,6 +12,7 @@ export interface TeamStatsCardProps {
     isAbsent: boolean;
   }>;
   teamAverage: number;
+  matchCount?: number;
 }
 
 export const TeamStatsCard: React.FC<TeamStatsCardProps> = ({
@@ -18,7 +20,9 @@ export const TeamStatsCard: React.FC<TeamStatsCardProps> = ({
   teamColor,
   playerStats,
   teamAverage,
+  matchCount = 3,
 }) => {
+  const { t } = useTranslation();
   const titleColor = teamColor === 'orange' ? 'text-orange-500' : 'text-blue-400';
   const bgColor = teamColor === 'orange' ? 'bg-orange-600' : 'bg-blue-600';
 
@@ -36,18 +40,20 @@ export const TeamStatsCard: React.FC<TeamStatsCardProps> = ({
               </div>
               {player.isAbsent ? (
                 <div className="col-span-2 text-center">
-                  <div className="text-red-400 font-bold">ABSENT</div>
+                  <div className="text-red-400 font-bold">{t('common.absent')}</div>
                 </div>
               ) : (
                 <>
                   <div className="text-center">
-                    <div className="text-gray-400 text-xs font-semibold">3-Game Avg</div>
+                    <div className="text-gray-400 text-xs font-semibold">
+                      {t('summary.matchAvg').replace('{{count}}', String(matchCount))}
+                    </div>
                     <div className={`font-bold ${parseInt(String(player.average)) <= player.gameAverage ? 'text-green-400' : 'text-red-400'}`}>
                       {player.gameAverage.toFixed(1)}
                     </div>
                   </div>
                   <div className="text-center">
-                    <div className="text-gray-400 text-xs font-semibold">Points Earned</div>
+                    <div className="text-gray-400 text-xs font-semibold">{t('summary.pointsEarned')}</div>
                     <div className="text-green-400 font-bold">{player.pointsScored}</div>
                   </div>
                 </>
@@ -58,10 +64,10 @@ export const TeamStatsCard: React.FC<TeamStatsCardProps> = ({
         <div className={`${bgColor} rounded p-3 h-14`}>
           <div className="grid grid-cols-4 gap-3 items-center h-full">
             <div className="col-span-2">
-              <div className="text-white font-semibold text-lg">TEAM TOTAL</div>
+              <div className="text-white font-semibold text-lg">{t('summary.teamTotal')}</div>
             </div>
             <div className="text-center">
-              <div className="text-gray-400 text-xs font-semibold">Team Average</div>
+              <div className="text-gray-400 text-xs font-semibold">{t('summary.teamAverage')}</div>
               <div className="text-white font-bold">{teamAverage.toFixed(1)}</div>
             </div>
             <div></div>
