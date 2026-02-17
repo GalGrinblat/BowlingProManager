@@ -15,9 +15,13 @@ import type { Player, PlayerRegistryProps } from '../../types/index';
 import { PLAYER_SORT_OPTIONS } from '../../constants/sortOptions';
 import { sortByOption, SortOption } from '../../utils/sortUtils';
 
-export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
+export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({
+  onBack,
+  players,
+  isLoadingPlayers,
+  onRefreshPlayers
+}) => {
   const { t } = useTranslation();
-  const [players, setPlayers] = useState<Player[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
@@ -31,19 +35,10 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
   const [importData, setImportData] = useState<Player[]>([]);
   const [importErrors, setImportErrors] = useState<string[]>([]);
   const [sortOption, setSortOption] = useState(PLAYER_SORT_OPTIONS[0]);
-  
+
   // Pagination state
   const activePagination = usePagination(20); // 20 players per page
   const inactivePagination = usePagination(20);
-
-  useEffect(() => {
-    loadPlayers();
-  }, []);
-
-  const loadPlayers = async () => {
-    const data = await playersApi.getAll();
-    setPlayers(data);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,7 +75,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
 
     setFormData({ firstName: '', middleName: '', lastName: '', active: true });
     setIsAdding(false);
-    await loadPlayers();
+    await onRefreshPlayers();
   };
 
   const handleEdit = (player: Player) => {
@@ -119,7 +114,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
     if (confirm(`⚠️ ${t('players.deleteConfirm')} "${playerDisplayName}"?\n\n${t('common.deleteWarning')}`)) {
       await playersApi.delete(id);
       alert(`✅ "${playerDisplayName}" ${t('players.deleted')}`);
-      await loadPlayers();
+      await onRefreshPlayers();
     }
   };
 
@@ -244,7 +239,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
     setShowImportModal(false);
     setImportData([]);
     setImportErrors([]);
-    await loadPlayers();
+    await onRefreshPlayers();
 
     let message = `✅ ${t('players.importComplete')}\n\n`;
     message += `• ${successCount} ${t('players.playersImported')}\n`;
@@ -263,6 +258,31 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({ onBack }) => {
     setImportData([]);
     setImportErrors([]);
   };
+
+  if (isLoadingPlayers) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('players.title')}</h1>
+              <p className="text-gray-600">Loading players...</p>
+            </div>
+            <button
+              onClick={onBack}
+              className="text-gray-600 hover:text-gray-800"
+            >
+              {t('common.leftArrow')} {t('players.backToDashboard')}
+            </button>
+          </div>
+        </div>
+        <div className="bg-white rounded-xl shadow-lg p-12 text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 text-lg">Loading players data...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Filtered and sorted players
   const filteredPlayers = players.filter(p => {

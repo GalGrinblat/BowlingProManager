@@ -41,7 +41,7 @@ function getDefaultFormData() {
   };
 }
 
-export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onViewLeague }) => {
+export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onViewLeague, onRefreshData }) => {
   const { t } = useTranslation();
   const [leagues, setLeagues] = useState<League[]>([]);
   const [seasonsMap, setSeasonsMap] = useState<Record<string, any[]>>({});
@@ -120,6 +120,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
     setFormData(getDefaultFormData());
     setIsAdding(false);
     await loadLeagues();
+    await onRefreshData?.();
   };
 
   const handleEdit = (league: League) => {
@@ -172,6 +173,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
     if (confirm(`${t('leagues.deleteConfirm')} "${league?.name}"?\n\n${t('common.deleteWarning')}`)) {
       await leaguesApi.delete(id);
       await loadLeagues();
+      await onRefreshData?.();
       alert(t('leagues.leagueDeleted'));
     }
   };
@@ -183,6 +185,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
         await leaguesApi.update(league.id, { active: false });
         alert(`✅ "${league.name}" ${t('leagues.archived')}`);
         await loadLeagues();
+        await onRefreshData?.();
       }
     } else {
       // Restoring an archived league
@@ -190,6 +193,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
         await leaguesApi.update(league.id, { active: true });
         alert(`✅ "${league.name}" ${t('leagues.restored')}`);
         await loadLeagues();
+        await onRefreshData?.();
       }
     }
   };

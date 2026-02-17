@@ -45,7 +45,7 @@ type Player = {
   [key: string]: any;
 };
 
-export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, onSuccess }) => {
+export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, onSuccess, onRefreshData }) => {
   const { t, direction } = useTranslation();
   const [step, setStep] = useState(1);
   const [league, setLeague] = useState<League | null>(null);
@@ -245,6 +245,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
       
       // 4. Update season with schedule
       await seasonsApi.update(created.id, { schedule });
+      await onRefreshData?.();
       if (typeof onSuccess === 'function') onSuccess(created.id);
     } catch (err) {
       alert(t('validation.saveError'));

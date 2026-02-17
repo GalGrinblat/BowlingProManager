@@ -4,7 +4,7 @@ import { useTranslation } from '../../contexts/LanguageContext';
 
 import type { SettingsProps } from '../../types/index';
 
-export const Settings: React.FC<SettingsProps> = ({ onBack }) => {
+export const Settings: React.FC<SettingsProps> = ({ onBack, onRefreshData }) => {
   const { t, setLanguage } = useTranslation();
   const [organization, setOrganization] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -37,6 +37,7 @@ export const Settings: React.FC<SettingsProps> = ({ onBack }) => {
     setLanguage(formData.language); // Update context
     setIsEditing(false);
     await loadOrganization();
+    await onRefreshData?.();
 
     // Dispatch custom event to notify other components
     window.dispatchEvent(new Event('languageChanged'));

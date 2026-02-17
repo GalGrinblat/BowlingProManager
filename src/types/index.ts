@@ -351,17 +351,27 @@ export interface PlayerMatchResult {
 /** Props for AdminDashboard - Main admin hub for league management */
 export interface AdminDashboardProps {
   onNavigate: (view: string, params?: Record<string, string>) => void;
+  org: any;
+  leagues: any[];
+  seasonsMap: Record<string, any[]>;
+  gamesMap: Record<string, any[]>;
+  isLoadingData: boolean;
+  onRefreshData: () => Promise<void>;
 }
 
 /** Props for PlayerRegistry - CRUD operations on organization's player roster */
 export interface PlayerRegistryProps {
   onBack: () => void;
+  players: Player[];
+  isLoadingPlayers: boolean;
+  onRefreshPlayers: () => Promise<void>;
 }
 
 /** Props for LeagueManagement - Create and manage leagues */
 export interface LeagueManagementProps {
   onBack: () => void;
   onViewLeague: (leagueId: string) => void;
+  onRefreshData?: () => Promise<void>;
 }
 
 /** Props for LeagueDetail - View league details and seasons */
@@ -370,6 +380,7 @@ export interface LeagueDetailProps {
   onBack: () => void;
   onViewSeason: (seasonId: string) => void;
   onCreateSeason: (leagueId: string) => void;
+  onRefreshData?: () => Promise<void>;
 }
 
 /** Props for SeasonCreator - Create new season with team configuration */
@@ -377,6 +388,7 @@ export interface SeasonCreatorProps {
   leagueId: string;
   onBack: () => void;
   onSuccess: (seasonId: string) => void;
+  onRefreshData?: () => Promise<void>;
 }
 
 /** Props for SeasonDetail - View season schedule, standings, and games */
@@ -410,6 +422,7 @@ export interface PrintMatchDayProps {
 /** Props for Settings - Organization settings and data export/import */
 export interface SettingsProps {
   onBack: () => void;
+  onRefreshData?: () => Promise<void>;
 }
 
 // --- Player Components ---

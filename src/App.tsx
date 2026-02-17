@@ -15,6 +15,7 @@ import { TeamManagement } from './components/admin/TeamManagement';
 import { UserManagement } from './components/admin/UserManagement';
 import { PlayerDashboard } from './components/player/PlayerDashboard';
 import { CompletedGameView } from './components/common/CompletedGameView';
+import { organizationApi, leaguesApi, seasonsApi, gamesApi, playersApi } from './services/api';
 import './styles/globals.css';
 import { Game } from './types';
 
@@ -37,14 +38,81 @@ function AppContent() {
     gameData: {} as Game,
   });
 
+  // Dashboard data state
+  const [org, setOrg] = useState<any>(null);
+  const [leagues, setLeagues] = useState<any[]>([]);
+  const [seasonsMap, setSeasonsMap] = useState<Record<string, any[]>>({});
+  const [gamesMap, setGamesMap] = useState<Record<string, any[]>>({});
+  const [isLoadingData, setIsLoadingData] = useState(false);
+
+  // Players data state
+  const [players, setPlayers] = useState<any[]>([]);
+  const [isLoadingPlayers, setIsLoadingPlayers] = useState(false);
+
+  // Load dashboard and players data when admin user is authenticated
+  React.useEffect(() => {
+    if (currentUser && isAdmin() && !isLoading) {
+      loadDashboardData();
+      loadPlayers();
+    }
+  }, [currentUser, isAdmin, isLoading]);
+
+  const loadDashboardData = async () => {
+    setIsLoadingData(true);
+    try {
+      const [orgData, leaguesData] = await Promise.all([
+        organizationApi.get(),
+        leaguesApi.getAll()
+      ]);
+      setOrg(orgData);
+      setLeagues(leaguesData);
+
+      // Load seasons for each league
+      const seasonsData: Record<string, any[]> = {};
+      const allGamesData: Record<string, any[]> = {};
+
+      for (const league of leaguesData) {
+        const seasons = await seasonsApi.getByLeague(league.id);
+        seasonsData[league.id] = seasons;
+
+        // Load games for each season
+        for (const season of seasons) {
+          const games = await gamesApi.getBySeason(season.id);
+          allGamesData[season.id] = games;
+        }
+      }
+
+      setSeasonsMap(seasonsData);
+      setGamesMap(allGamesData);
+    } catch (error) {
+      console.error('Error loading dashboard data:', error);
+    } finally {
+      setIsLoadingData(false);
+    }
+  };
+
+  const loadPlayers = async () => {
+    setIsLoadingPlayers(true);
+    try {
+      const playersData = await playersApi.getAll();
+      setPlayers(playersData);
+    } catch (error) {
+      console.error('Error loading players:', error);
+    } finally {
+      setIsLoadingPlayers(false);
+    }
+  };
+
   // Update view when user logs in/out
   React.useEffect(() => {
-    if (currentUser) {
+    // Only reset view if we're on login page and user logs in,
+    // or if user logs out and we need to show login
+    if (currentUser && currentView === 'login') {
       setCurrentView(isAdmin() ? 'dashboard' : 'player-dashboard');
-    } else if (!isLoading) {
+    } else if (!currentUser && !isLoading && currentView !== 'login') {
       setCurrentView('login');
     }
-  }, [currentUser, isAdmin, isPlayer, isLoading]);
+  }, [currentUser, isLoading, currentView, isAdmin, isPlayer]);
 
   // Navigation helpers
   const navigateTo = (view: string, params: Partial<NavigationState> = {}): void => {
@@ -81,7 +149,7 @@ function AppContent() {
         {currentUser && isAdmin() && (
           <>
             {currentView === 'dashboard' && (
-              <AdminDashboard 
+              <AdminDashboard
                 onNavigate={(view, params) => {
                   if (view === 'league-detail' && params?.leagueId) {
                     navigateTo(view, { leagueId: params.leagueId });
@@ -89,24 +157,34 @@ function AppContent() {
                     navigateTo(view, params);
                   }
                 }}
+                org={org}
+                leagues={leagues}
+                seasonsMap={seasonsMap}
+                gamesMap={gamesMap}
+                isLoadingData={isLoadingData}
+                onRefreshData={loadDashboardData}
               />
             )}
 
             {currentView === 'players' && (
-              <PlayerRegistry 
+              <PlayerRegistry
                 onBack={() => navigateTo('dashboard')}
+                players={players}
+                isLoadingPlayers={isLoadingPlayers}
+                onRefreshPlayers={loadPlayers}
               />
             )}
 
             {currentView === 'leagues' && (
-              <LeagueManagement 
+              <LeagueManagement
                 onBack={() => navigateTo('dashboard')}
                 onViewLeague={(leagueId) => navigateTo('league-detail', { leagueId })}
+                onRefreshData={loadDashboardData}
               />
             )}
 
             {currentView === 'league-detail' && navigationState.leagueId && (
-              <LeagueDetail 
+              <LeagueDetail
                 leagueId={navigationState.leagueId}
                 onBack={() => navigateTo('leagues')}
                 onViewSeason={(seasonId: string) => {
@@ -115,16 +193,18 @@ function AppContent() {
                 onCreateSeason={(leagueId: string) => {
                   navigateTo('season-creator', { leagueId });
                 }}
+                onRefreshData={loadDashboardData}
               />
             )}
 
             {currentView === 'season-creator' && navigationState.leagueId && (
-              <SeasonCreator 
+              <SeasonCreator
                 leagueId={navigationState.leagueId}
                 onBack={() => navigateTo('league-detail', { leagueId: navigationState.leagueId })}
                 onSuccess={(seasonId: string) => {
                   navigateTo('season-detail', { leagueId: navigationState.leagueId, seasonId });
                 }}
+                onRefreshData={loadDashboardData}
               />
             )}
 
@@ -163,6 +243,7 @@ function AppContent() {
             {currentView === 'settings' && (
               <Settings
                 onBack={() => navigateTo('dashboard')}
+                onRefreshData={loadDashboardData}
               />
             )}
 

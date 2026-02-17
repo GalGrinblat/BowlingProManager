@@ -6,7 +6,7 @@ import { exportLeague, downloadExportFile, readImportFile, importLeagueOrSeason 
 
 import type { LeagueDetailProps, League, Season, Team } from '../../types/index';
 
-export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, onViewSeason, onCreateSeason }) => {
+export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, onViewSeason, onCreateSeason, onRefreshData }) => {
   const { t } = useTranslation();
   const [league, setLeague] = useState<League | null>(null);
   const [seasons, setSeasons] = useState<Season[]>([]);
@@ -71,10 +71,11 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
     try {
       const importData = await readImportFile(file);
       const result = await importLeagueOrSeason(importData);
-      
+
       if (result.success) {
         alert(t('leagues.importSuccess'));
-        window.location.reload(); // Reload to show imported data
+        await onRefreshData?.();
+        await loadLeagueData();
       } else {
         alert(`${t('leagues.importError')}: ${result.error}`);
       }

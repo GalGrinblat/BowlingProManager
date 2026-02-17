@@ -1,48 +1,34 @@
-import React, { useState, useEffect } from 'react';
-import { organizationApi, leaguesApi, seasonsApi, gamesApi } from '../../services/api';
+import React from 'react';
 import { formatMatchDate } from '../../utils/scheduleUtils';
 import { useTranslation } from '../../contexts/LanguageContext';
 
 import type { AdminDashboardProps, ScheduleMatchDay } from '../../types/index';
 
-export const AdminDashboard: React.FC<AdminDashboardProps> = ({ onNavigate }) => {
+export const AdminDashboard: React.FC<AdminDashboardProps> = ({
+  onNavigate,
+  org,
+  leagues,
+  seasonsMap,
+  gamesMap,
+  isLoadingData,
+}) => {
   const { t } = useTranslation();
-  const [org, setOrg] = useState<any>(null);
-  const [leagues, setLeagues] = useState<any[]>([]);
-  const [seasonsMap, setSeasonsMap] = useState<Record<string, any[]>>({});
-  const [gamesMap, setGamesMap] = useState<Record<string, any[]>>({});
-
-  useEffect(() => {
-    const loadData = async () => {
-      const [orgData, leaguesData] = await Promise.all([
-        organizationApi.get(),
-        leaguesApi.getAll()
-      ]);
-      setOrg(orgData);
-      setLeagues(leaguesData);
-
-      // Load seasons for each league
-      const seasonsData: Record<string, any[]> = {};
-      const allGamesData: Record<string, any[]> = {};
-
-      for (const league of leaguesData) {
-        const seasons = await seasonsApi.getByLeague(league.id);
-        seasonsData[league.id] = seasons;
-
-        // Load games for each season
-        for (const season of seasons) {
-          const games = await gamesApi.getBySeason(season.id);
-          allGamesData[season.id] = games;
-        }
-      }
-
-      setSeasonsMap(seasonsData);
-      setGamesMap(allGamesData);
-    };
-    loadData();
-  }, []);
-
   const activeLeagues = leagues.filter(l => l.active);
+
+  if (isLoadingData) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('dashboard.adminTitle')}</h1>
+          <p className="text-gray-600">{org?.name || 'My Bowling Organization'}</p>
+        </div>
+        <div className="bg-white rounded-xl shadow-lg p-12 text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 text-lg">Loading dashboard data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
