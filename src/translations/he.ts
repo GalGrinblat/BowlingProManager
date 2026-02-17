@@ -524,9 +524,7 @@ const he: TranslationDictionary = {
     bonusPoints: 'נקודות בונוס',
     matchScore: 'ניקוד משחק',
     teamTotal: 'סה"כ קבוצה',
-    grandTotalPoints: 'נקודות סה"כ כלליות',
-    grandTotalDesc: '2 נקודות מוענקות לקבוצה עם הפינים המשולבים הגבוהים ביותר בכל {{count}} המשחקים',
-    championBanner: 'מנצחת המשחק',
+    championBanner: 'מנצח המשחק',
     gameSummary: 'סיכום משחק',
   },
 

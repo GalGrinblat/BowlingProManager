@@ -524,8 +524,6 @@ const en: TranslationDictionary = {
     bonusPoints: 'Bonus Points',
     matchScore: 'Match Score',
     teamTotal: 'Team Total',
-    grandTotalPoints: 'Grand Total Points',
-    grandTotalDesc: '2 points awarded to team with highest combined pins across all {{count}} matches',
     championBanner: 'Game Winner',
     gameSummary: 'Game Summary',
   },
