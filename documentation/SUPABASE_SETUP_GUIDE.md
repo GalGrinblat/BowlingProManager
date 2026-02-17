@@ -105,6 +105,7 @@ You can verify your database setup in Supabase:
    - `seasons`
    - `teams`
    - `games`
+   - `allowed_emails`
 
 ## Next Steps
 

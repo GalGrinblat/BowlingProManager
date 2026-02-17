@@ -7,23 +7,21 @@ Welcome testers! This guide will help you get started and explore the features o
 ### First-Time Access
 
 1. **Open the App**: Navigate to the URL provided
-2. **Login**: Use these credentials (or create your own):
-   - **Admin Access**:
-     - Username: `admin`
-     - Password: `admin123`
-   - **Player Access**:
-     - Username: `player1`
-     - Password: `player123`
+2. **Login**: Click **"Sign in with Google"** using your Google account
+   - **First user** to sign up automatically becomes **Admin**
+   - Subsequent users are assigned the **Player** role by default
+   - Admins can promote players to admin via **User Management**
+   - Your email must be in the **allowed emails** list (configured by the admin)
 
-3. **Load Demo Data** (Recommended):
+3. **Load Demo Data** (Recommended for Admins):
    - Click **Settings** (gear icon in top right)
    - Scroll to **Getting Started Guide** section
    - Click **"Seed Demo Data"** button
-   - Wait ~5 seconds for data creation
+   - Wait for data creation
    - Page will automatically reload
 
 **You're ready!** Demo data includes:
-- 40 players with realistic names and averages
+- 40 players with realistic names
 - 2 active leagues (Monday & Thursday nights)
 - 16 teams (8 per league, 4 players each)
 - Complete schedules for 4 rounds
@@ -36,11 +34,12 @@ Welcome testers! This guide will help you get started and explore the features o
 ### 1. Admin Features (Login as Admin)
 
 #### **Player Management**
-- ✅ View all 40 players in the registry
-- ✅ Add a new player (your name!)
-- ✅ Edit a player's average or name
+- ✅ View all players in the registry
+- ✅ Add a new player (first name, last name, optional middle name)
+- ✅ Edit a player's name or status
 - ✅ Search/filter players
 - ✅ Mark players active/inactive
+- ✅ Import/export players (CSV or JSON)
 
 #### **League Management**
 - ✅ View both leagues (Monday & Thursday)
@@ -103,15 +102,19 @@ Welcome testers! This guide will help you get started and explore the features o
 - ✅ Switch language (English ↔ Hebrew)
 - ✅ View system information
 
+#### **User Management**
+- ✅ View all registered users
+- ✅ Promote/demote user roles (admin/player)
+- ✅ Link users to player profiles
+- ✅ Manage allowed email addresses for signup
+
 ### 2. Player Features (Login as Player)
 
 - ✅ View personal dashboard
 - ✅ See your assigned teams and leagues
 - ✅ View your personal statistics
 - ✅ View game history
-- ✅ Enter scores for your own games
 - ✅ View standings for your leagues
-- ✅ Compare your performance across seasons
 
 ---
 
@@ -158,13 +161,13 @@ Welcome testers! This guide will help you get started and explore the features o
 3. Try marking both players in a matchup as absent
 4. **Verify**: Automatic draw (50% points to each)
 
-### Scenario 5: Season Comparison (Player View)
-**Goal**: Track player improvement across seasons
+### Scenario 5: Player Dashboard (Player View)
+**Goal**: Verify player dashboard shows correct data
 
-1. Login as a player
-2. Go to **Season Comparison** view
-3. Select 2+ seasons to compare
-4. **Verify**: Charts show average trends, high games, consistency
+1. Login as a player (ensure your user is linked to a player profile)
+2. View the **Player Dashboard**
+3. Check league participation, recent games, and personal statistics
+4. **Verify**: Stats match actual game results
 
 ### Scenario 6: Postpone Match Days
 **Goal**: Test schedule management
@@ -179,21 +182,19 @@ Welcome testers! This guide will help you get started and explore the features o
 ## ⚠️ Important Notes for Testing
 
 ### Data Persistence
-- **Data is browser-local**: Your data stays in your browser's localStorage
-- **Not shared**: Each tester has their own independent data
-- **Device-specific**: Data won't sync across devices
-- **Cache-sensitive**: Don't clear browser cache during testing
+- **Data is stored in Supabase**: Your data is stored in a shared PostgreSQL database
+- **Shared across users**: All testers share the same data
+- **Authentication required**: Google OAuth login required to access the app
+- **Role-based access**: Admins and players see different views
 
 ### Recommended Testing Workflow
-1. **Export data regularly**: Settings → Export All Data
-2. **Test destructive actions**: Try deleting, then restore from backup
-3. **Use multiple browsers**: Test isolation (Chrome vs Firefox vs Edge)
-4. **Try both roles**: Test as admin and player
+1. **Export data regularly**: Settings → Export All Data (as backup)
+2. **Test destructive actions carefully**: Data changes affect all users
+3. **Try both roles**: Test as admin and player (use User Management to switch roles)
+4. **Test on multiple browsers**: Chrome, Firefox, Edge
 
 ### Known Limitations (By Design)
-- No real-time sync (localStorage is local)
-- No multi-user collaboration
-- No server-side validation
+- No real-time sync between browser tabs
 - No email notifications
 - No PDF export (coming soon)
 
@@ -272,13 +273,13 @@ When reporting issues, please include:
 A: Yes! Settings → Danger Zone → Delete All Data (then seed demo data again)
 
 **Q: What happens if I close the browser?**
-A: Your data is saved! It persists in localStorage until cleared.
+A: Your data is saved in the Supabase database. Just log in again to continue.
 
 **Q: Can multiple testers share data?**
-A: No, each browser has independent data. Use export/import to share backups.
+A: Yes! All users share the same Supabase database. Changes are visible to all.
 
-**Q: Why use localStorage instead of a database?**
-A: This is a testing/demo deployment. Production would use a real database.
+**Q: How do I get admin access?**
+A: The first user to sign up automatically becomes admin. Existing admins can promote other users via User Management.
 
 **Q: Can I test with my own league data?**
 A: Absolutely! Create new leagues and seasons with your real team data.

@@ -79,27 +79,67 @@ The Bowling League Management System includes a comprehensive test suite coverin
 **Purpose**: Tests data model validation logic
 
 **Coverage**:
-- Player validation (name, average ranges)
+- Player validation (firstName, lastName required)
 - League validation (name, handicap settings, team size)
-- Season validation (league ID, team count, rounds)
+- Season validation (league ID, name, rounds)
 - Team validation (name, player count, duplicates)
 - Handicap percentage validation (0-100 range)
 
 **Key Tests**:
 - ✅ Valid player data acceptance
-- ✅ Reject invalid averages (<0 or >300)
+- ✅ Reject missing firstName or lastName
 - ✅ Reject invalid handicap basis or percentage
 - ✅ Reject teams with duplicate players
-- ✅ Reject seasons with <2 teams
+- ✅ Reject invalid season configuration
 - ✅ Empty/whitespace name rejection
 
 **Run**: `node tests/test-validation.js`
 
-**Expected**: 15 tests passing
+**Expected**: 14 tests passing
+
+---
+
+### 5. test-dynamic-handicap.js
+**Purpose**: Tests dynamic handicap recalculation during a season
+
+**Coverage**:
+- Handicap updates based on changing player averages
+- Recalculation after game completion
+- Edge cases for new players without game history
+
+**Run**: `node tests/test-dynamic-handicap.js`
+
+**Note**: This test currently has a module resolution issue and may need updating.
+
+---
+
+### 6. test-i18n.js
+**Purpose**: Validates internationalization and translation system
+
+**Coverage**:
+- Translation key completeness (English and Hebrew)
+- Missing key detection across languages
+- RTL layout support verification
+- Translation pattern guidelines
+
+**Key Tests**:
+- ✅ All English keys have Hebrew counterparts
+- ✅ All Hebrew keys have English counterparts
+- ✅ Translation functions return correct values
+- ✅ RTL/LTR direction handling
+
+**Run**: `node tests/test-i18n.js`
+
+**Expected**: 21 tests passing
 
 ---
 
 ## Running All Tests
+
+### Using npm (Recommended)
+```bash
+npm test
+```
 
 ### Individual Test Execution
 ```bash
@@ -108,25 +148,8 @@ node tests/test-handicap.js
 node tests/test-scoring.js
 node tests/test-schedule.js
 node tests/test-validation.js
-```
-
-### Run All Tests (PowerShell)
-```powershell
-# Run all tests and collect results
-$tests = @("test-handicap.js", "test-scoring.js", "test-schedule.js", "test-validation.js")
-foreach ($test in $tests) {
-    Write-Host "`nRunning $test..." -ForegroundColor Cyan
-    node tests/$test
-}
-```
-
-### Run All Tests (Bash)
-```bash
-# Run all tests
-for test in test-handicap.js test-scoring.js test-schedule.js test-validation.js; do
-    echo -e "\nRunning $test..."
-    node tests/$test
-done
+node tests/test-dynamic-handicap.js
+node tests/test-i18n.js
 ```
 
 ## Test Statistics
@@ -134,10 +157,12 @@ done
 | Test Suite | Tests | Coverage Area |
 |------------|-------|---------------|
 | test-handicap.js | 8 | Handicap calculation |
-| test-scoring.js | 10 | Scoring & bonus points |
+| test-scoring.js | 21 | Scoring & bonus points |
 | test-schedule.js | 10 | Round-robin scheduling |
-| test-validation.js | 15 | Data validation |
-| **Total** | **43** | **Core business logic** |
+| test-validation.js | 14 | Data validation |
+| test-dynamic-handicap.js | — | Dynamic handicap (needs fix) |
+| test-i18n.js | 21 | Internationalization |
+| **Total** | **74+** | **Core business logic & i18n** |
 
 ## Test Design Principles
 
@@ -216,7 +241,8 @@ node tests/test-handicap.js
 - [ ] Player statistics aggregation tests
 - [ ] Match winner determination tests
 - [ ] Absent player edge case tests
-- [ ] API service layer tests (when migrated to backend)
+- [ ] Fix test-dynamic-handicap.js module resolution issue
+- [ ] Supabase API integration tests
 
 ### Test Framework Migration
 Consider migrating to a test framework (Jest, Mocha) when:
@@ -248,15 +274,16 @@ Consider migrating to a test framework (Jest, Mocha) when:
 ✅ **Individual Games**: 100% (wins, losses, draws)
 ✅ **Schedule Generation**: 100% (all team counts and scenarios)
 ✅ **Data Validation**: 100% (all models and constraints)
+✅ **Internationalization**: 100% (translation completeness and RTL)
 
 ### Not Yet Covered
 ⚠️ UI Components (requires different testing approach)
-⚠️ API/Storage layer (covered by integration tests later)
+⚠️ API/Supabase layer (covered by integration tests later)
 ⚠️ State management (React-specific testing)
 ⚠️ User interactions (requires E2E testing)
 
 ---
 
-**Last Updated**: January 30, 2026
-**Total Tests**: 43
-**All Tests Status**: ✅ Passing
+**Last Updated**: February 17, 2026
+**Total Tests**: 74+
+**All Tests Status**: ✅ Passing (except test-dynamic-handicap which needs module fix)

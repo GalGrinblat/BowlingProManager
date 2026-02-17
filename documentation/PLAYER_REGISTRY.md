@@ -47,8 +47,8 @@ Organization
 - ✅ **Pagination**: 20 players per page for both active and inactive lists
 
 ### 4. **Data Validation**
-- ✅ **Name Validation**: Required, non-empty
-- ✅ **Duplicate Prevention**: Case-insensitive duplicate name detection
+- ✅ **Name Validation**: First name and last name required, non-empty
+- ✅ **Duplicate Prevention**: Case-insensitive duplicate full name detection
 - ✅ **Referential Integrity**: Cannot delete players assigned to teams
 
 ### 5. **Safety Features**
@@ -77,7 +77,9 @@ Organization
 ```typescript
 interface Player {
   id: string;                    // Unique identifier (auto-generated)
-  name: string;                  // Player's full name (required)
+  firstName: string;             // Player's first name (required)
+  middleName?: string;           // Player's middle name (optional)
+  lastName: string;              // Player's last name (required)
   active: boolean;               // Active status (default: true)
   createdAt: string;            // ISO timestamp of creation
 }
@@ -86,8 +88,8 @@ interface Player {
 ### Storage Layer
 - **API**: `src/services/api.ts` → `playersApi`
 - **Model**: `src/models/index.ts` → `createPlayer`, `validatePlayer`
-- **Storage**: localStorage (key: `bowling_players`)
-- **Format**: JSON array of Player objects
+- **Storage**: Supabase PostgreSQL database (`players` table)
+- **Name Utilities**: `src/utils/playerUtils.ts` → `getPlayerDisplayName`, `getPlayerFullName`
 
 ### API Methods
 ```typescript
@@ -101,7 +103,7 @@ playersApi.delete(id: string): boolean                     // Delete player
 ## Business Rules
 
 ### 1. **Name Uniqueness**
-- Player names must be unique (case-insensitive)
+- Player full names (firstName + lastName combination) must be unique (case-insensitive)
 - Duplicate detection runs on both create and update
 - Excludes current player when editing (allows keeping same name)
 
@@ -121,7 +123,7 @@ playersApi.delete(id: string): boolean                     // Delete player
 
 ### Creating a Player
 1. Click "Add Player" button
-2. Enter player name (required)
+2. Enter player first name (required), optional middle name, and last name (required)
 3. Click "Add Player" to save
 4. System validates and creates player
 5. Player appears in Active Players list
@@ -129,7 +131,7 @@ playersApi.delete(id: string): boolean                     // Delete player
 ### Editing a Player
 1. Click "Edit" button on player card
 2. Form appears with current data pre-filled
-3. Modify name or active status
+3. Modify name fields or active status
 4. Click "Update Player" to save
 5. Changes apply immediately across all references
 
@@ -165,18 +167,18 @@ playersApi.delete(id: string): boolean                     // Delete player
 
 **CSV Format Example:**
 ```csv
-name,active
-John Doe,true
-Jane Smith,true
-Bob Johnson,false
+firstName,lastName,middleName,active
+John,Doe,,true
+Jane,Smith,,true
+Bob,Johnson,A,false
 ```
 
 **JSON Format Example:**
 ```json
 [
-  { "name": "John Doe", "active": true },
-  { "name": "Jane Smith", "active": true },
-  { "name": "Bob Johnson", "active": false }
+  { "firstName": "John", "lastName": "Doe", "active": true },
+  { "firstName": "Jane", "lastName": "Smith", "active": true },
+  { "firstName": "Bob", "middleName": "A", "lastName": "Johnson", "active": false }
 ]
 ```
 
@@ -205,11 +207,11 @@ import { MAX_BOWLING_SCORE } from '../../constants/bowling';
 
 ### State Management
 ```typescript
-const [players, setPlayers] = useState<any[]>([]);          // All players
-const [isAdding, setIsAdding] = useState(false);            // Form visibility
+const [players, setPlayers] = useState<Player[]>([]);        // All players
+const [isAdding, setIsAdding] = useState(false);             // Form visibility
 const [editingId, setEditingId] = useState<string | null>(); // Editing mode
-const [formData, setFormData] = useState({...});            // Form state
-const [searchTerm, setSearchTerm] = useState('');           // Search filter
+const [formData, setFormData] = useState({...});             // Form state (firstName, middleName, lastName, active)
+const [searchTerm, setSearchTerm] = useState('');            // Search filter
 
 // Pagination hooks
 const activePagination = usePagination(20);
@@ -261,8 +263,8 @@ t('players.created')                // Success message
 
 ### Validation Tests
 Located in: `tests/test-validation.js`
-- Name required validation
-- Duplicate name detection
+- First name and last name required validation
+- Duplicate full name detection
 - Empty string handling
 
 ## Known Limitations & Edge Cases
@@ -274,6 +276,7 @@ Located in: `tests/test-validation.js`
 4. **No Contact Info**: No email, phone, or other contact fields
 5. **No Player Notes**: Cannot add notes or comments about players
 6. **No Profile Pictures**: No avatar or photo support
+7. **No Middle Name Search**: Search may not include middle name in filtering
 
 ### Edge Cases Handled
 - ✅ Empty player list (shows appropriate message)
@@ -286,7 +289,7 @@ Located in: `tests/test-validation.js`
 - ⚠️ Player name changes affect standings history display (shows current name)
 - ⚠️ Very long player names may overflow in some views
 - ⚠️ No handling for special characters or emojis in names
-- ⚠️ No duplicate detection across similar names (John Smith vs. J. Smith)
+- ⚠️ No duplicate detection across similar names (John Smith vs. J. Smith vs. Jon Smith)
 
 ## Suggested Next Steps
 
@@ -472,14 +475,14 @@ Located in: `tests/test-validation.js`
 ### When Adding Features, Consider:
 
 1. **Data Model Changes**
-   - Update `models/index.ts` (Player type)
-   - Update `createPlayer()` factory
+   - Update `src/types/index.ts` (Player type)
+   - Update `createPlayer()` factory in `src/models/index.ts`
    - Update `validatePlayer()` rules
-   - Migrate existing data if needed
+   - Update Supabase schema if needed (`supabase-schema.sql`)
 
 2. **API Changes**
    - Add new methods to `playersApi` if needed
-   - Keep localStorage abstraction for DB migration
+   - Update Supabase queries in `src/services/api.ts`
    - Test all CRUD operations
 
 3. **Component Updates**
@@ -500,56 +503,42 @@ Located in: `tests/test-validation.js`
    - Test data migration path
    - Test referential integrity
 
-## Database Migration Path
+## Database
 
-When moving from localStorage to database:
+The Player Registry uses Supabase PostgreSQL as its backend:
 
-1. **Keep API Interface Unchanged**
-   - `playersApi` methods stay the same
-   - Only implementation changes (HTTP calls instead of localStorage)
-
-2. **Add Backend Endpoints**
-   - `GET /api/players` → getAll()
-   - `GET /api/players/:id` → getById()
-   - `POST /api/players` → create()
-   - `PUT /api/players/:id` → update()
-   - `DELETE /api/players/:id` → delete()
-
-3. **Considerations**
-   - Add proper error handling (network failures)
-   - Implement loading states
-   - Add optimistic updates
-   - Consider caching strategy
-   - Handle concurrent updates
+- **Table**: `players` (columns: `id`, `first_name`, `last_name`, `middle_name`, `active`, `created_at`)
+- **Row Level Security**: Enabled, admin-only write access
+- **API**: All CRUD operations go through `playersApi` in `src/services/api.ts`
 
 ## Performance Notes
 
 ### Current Performance
-- **Load Time**: Instant (localStorage read)
-- **Search**: Real-time, no lag with 100+ players
-- **Pagination**: Efficient, only renders 20 players
-- **Updates**: Immediate, no network delay
+- **Load Time**: Fast (Supabase query)
+- **Search**: Real-time client-side filtering
+- **Pagination**: Efficient, only renders 20 players per page
+- **Updates**: Near-immediate via Supabase
 
 ### Potential Optimizations
 - Virtual scrolling for 1000+ players
-- Debounced search for large datasets
+- Server-side search for large datasets
 - Lazy loading of player statistics
 - Indexed search for faster filtering
 
 ## Related Documentation
-- [VALIDATION_ENHANCEMENTS.md](./VALIDATION_ENHANCEMENTS.md) - Validation rules
-- [SEED_DEMO_DATA.md](./SEED_DEMO_DATA.md) - Demo player data
-- [HEBREW_I18N_IMPLEMENTATION.md](./HEBREW_I18N_IMPLEMENTATION.md) - RTL support
-- [copilot-instructions.md](../.github/copilot-instructions.md) - System architecture
+- [TESTING.md](./TESTING.md) - Test suite including validation tests
+- [SUPABASE_SETUP_GUIDE.md](./SUPABASE_SETUP_GUIDE.md) - Database setup
+- [ADMIN_DASHBOARD.md](./ADMIN_DASHBOARD.md) - Admin portal overview
 
 ## Summary
 
 The Player Registry is a **mature, well-tested component** with solid CRUD operations, validation, and safety features. It serves as the foundation for the entire player management system.
 
 **Recent Changes**:
-- ✅ **Removed Starting Average Field** (February 2026): Simplified player model by removing the starting average field. Player averages are now calculated dynamically from actual game performance. Initial handicaps for new players default to maximum handicap (based on handicap basis) until they complete their first game.
-- ✅ **Added Import/Export Feature** (February 2026): Added CSV and JSON import/export functionality with validation, preview, and duplicate detection. Import/export utilities extracted to `src/utils/importExportUtils.ts` for reuse across the application.
-- ✅ **Added Import/Export** (February 2026): Added CSV and JSON import/export functionality with validation, error reporting, and duplicate detection. Designed to be future-proof by automatically handling any new fields added to the Player model.
+- ✅ **Migrated to Supabase** (February 2026): Moved from localStorage to Supabase PostgreSQL with OAuth authentication and Row Level Security.
+- ✅ **Split Name Fields** (February 2026): Changed from single `name` field to `firstName`, `middleName` (optional), and `lastName` fields for better data structure.
+- ✅ **Removed Starting Average Field** (February 2026): Simplified player model by removing the starting average field. Player averages are now calculated dynamically from actual game performance.
+- ✅ **Added Import/Export Feature** (February 2026): Added CSV and JSON import/export functionality with validation, preview, and duplicate detection. Import/export utilities in `src/utils/importExportUtils.ts`.
 
 **Strengths**:
 - ✅ Robust validation and error handling
@@ -557,12 +546,12 @@ The Player Registry is a **mature, well-tested component** with solid CRUD opera
 - ✅ Clean, user-friendly interface
 - ✅ Full internationalization support
 - ✅ Proper pagination for scalability
-- ✅ Simplified data model (name and status only)
+- ✅ Structured data model (firstName, middleName, lastName, status)
 
 **Areas for Growth**:
 - 📊 Enhanced player statistics and analytics
 - 📇 Additional player metadata (contact, notes)
-- 🔄 Bulk operations and data import/export
+- 🔄 Bulk operations beyond import/export
 - 📷 Visual enhancements (photos, tags)
 - 🔗 Deeper integration with game history
 

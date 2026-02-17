@@ -4,12 +4,7 @@
 
 Run one of these commands at the beginning of your development session:
 
-### Windows PowerShell (Recommended for Windows)
-```powershell
-npm run check:ps
-```
-
-### Node.js (Cross-platform)
+### Node.js (Recommended, Cross-platform)
 ```bash
 npm run check
 ```
@@ -44,7 +39,7 @@ node scripts/start-of-day.js
 - **Console.log statements** - Find leftover debugging code
 - **TODO/FIXME comments** - Track unfinished work
 - **Large files (>500 lines)** - Identify refactoring candidates
-- **localStorage Health** - Check for localStorage usage consistency
+- **Code Health** - Check for common code issues
 - **Component Complexity** - Identify components with too many lines
 - **Unused Imports** - Find unused dependencies in files
 - **Bundle Size** - Monitor production build size
@@ -181,7 +176,7 @@ npm audit fix --force
 
 ### Add Your Own Checks
 
-Edit `scripts/start-of-day.js` or `scripts/start-of-day.ps1` to add custom checks:
+Edit `scripts/start-of-day.js` to add custom checks:
 
 ```javascript
 // Example: Check for specific patterns

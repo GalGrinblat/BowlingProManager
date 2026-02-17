@@ -49,22 +49,7 @@ Leagues are managed by admins and serve as independent competitions within the o
 
 ---
 
----
-
-## 1. Creating a League
-
-Leagues are managed by admins and serve as independent competitions within the organization. Each league can have its own rules, seasons, and teams.
-
-**To create a league:**
-1. Go to the **Admin Dashboard**.
-2. Navigate to **League Management**.
-3. Click **Create League**.
-4. Fill in the league details and configuration options (see below).
-5. Save to add the league to the system.
-
----
-
-## 2. League Configuration Options
+## League Configuration Options
 
 When creating or editing a league, the following configuration options are available:
 
@@ -124,7 +109,7 @@ When creating or editing a league, the following configuration options are avail
 
 ---
 
-## 3. Default Values Summary
+## Default Values Summary
 
 | Option                        | Default Value                |
 |-------------------------------|------------------------------|
@@ -137,11 +122,12 @@ When creating or editing a league, the following configuration options are avail
 | Handicap Basis                | 160                          |
 | Handicap Percentage           | 100%                         |
 | Bonus Rules                   | +1 (avg+50), +2 (avg+70)     |
+| All Present Team Bonus        | Disabled                     |
 | Schedule Type                 | Round-robin                  |
 
 ---
 
-## 4. Editing League Configuration
+## Editing League Configuration
 
 - League configuration can be edited from the **League Management** or **League Detail** views.
 - Some settings (like players per team) may be locked after the first season is created.
@@ -149,7 +135,7 @@ When creating or editing a league, the following configuration options are avail
 
 ---
 
-## 5. Notes
+## Notes
 - Leagues are independent: each can have different rules and configurations.
 - Players are assigned to teams during season setup, not at league creation.
 - All configuration options are validated for consistency and completeness.

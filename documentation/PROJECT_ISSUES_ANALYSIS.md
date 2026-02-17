@@ -1,274 +1,335 @@
 # BowlingAppAi - Project Issues Analysis
-**Date:** February 15, 2026
-**Status:** Comprehensive codebase review completed
+**Date:** February 17, 2026
+**Previous Review:** February 15, 2026
+**Status:** Comprehensive codebase review completed (updated)
+
+---
+
+## Changes Since Last Review (Feb 15)
+
+| Area | Change |
+|------|--------|
+| **Authentication** | Upgraded to Supabase OAuth (Google). Old client-only role picker replaced. |
+| **Data Storage** | Migrated from localStorage to Supabase PostgreSQL backend. |
+| **API Layer** | `src/services/api.ts` rewritten for Supabase (1,029 lines). |
+| **Translations** | SummaryView and other components now use `t()` function. |
+| **Score Input** | Bug fix applied (commit `31b8a3e`). |
+| **Print/Summary** | Improved game summary view, print options, removed grand total section. |
+
+**Previous issue count:** 21 issues (1 critical, 5 high, 9 medium, 6 low)
+**Current issue count:** 23 issues (0 critical, 5 high, 11 medium, 7 low)
 
 ---
 
 ## Executive Summary
 
-This is a functional bowling league management application built with React + TypeScript + Vite. However, it has **significant security, type safety, and architecture issues** that need addressing before production deployment.
+This is a functional bowling league management application built with React 18 + TypeScript + Vite, now backed by Supabase for authentication and data storage. The previous **critical authentication issue has been resolved** with OAuth integration. However, **significant type safety, architecture, and reliability issues** remain, and several new issues have been identified around React patterns and data consistency.
 
-**Critical Issues:** 1 (Authentication)
+**Codebase size:** ~12,800 lines of TypeScript/TSX across 50+ files
+
+**Critical Issues:** 0 (down from 1)
 **High-Priority Issues:** 5
-**Medium-Priority Issues:** 9
-**Low-Priority Issues:** 6
+**Medium-Priority Issues:** 11 (up from 9)
+**Low-Priority Issues:** 7 (up from 6)
 
 ---
 
-## 🔴 Critical Issues
+## Resolved Issues
 
-### 1. No Real Authentication/Authorization
-**Location:** `src/contexts/AuthContext.tsx`
-**Severity:** CRITICAL
+### Previously Critical: No Real Authentication/Authorization
+**Status:** RESOLVED
+**What changed:** Supabase OAuth (Google sign-in) now handles authentication. User sessions are managed server-side.
+**Remaining concern:** Admin role assignment logic could be tightened; no Row-Level Security (RLS) policies observed in Supabase configuration.
 
-- Users can arbitrarily select "admin" or "player" roles without validation
-- Hardcoded role checking (`'admin-user'` string in LoginView:22)
-- Client-side only - no backend validation
-- User data stored in plain localStorage
-- **Risk:** Anyone can access all data and admin functions by changing role in localStorage
-
-**Impact:** Complete security bypass if deployed
-**Fix Required:** Implement proper backend authentication with session management
+### Previously High: Unencrypted Client-Side Data Storage
+**Status:** LARGELY RESOLVED
+**What changed:** Application data now stored in Supabase PostgreSQL, not plain localStorage.
+**Remaining concern:** Some localStorage usage may remain for caching/preferences.
 
 ---
 
-## 🟠 High-Priority Issues
+## High-Priority Issues
 
-### 2. Dependency Vulnerabilities
-**Location:** `package.json`, `package-lock.json`
+### 1. Excessive Use of `any` Type (~98 occurrences)
 **Severity:** HIGH
 
-- `esbuild <= 0.24.2` - Enables arbitrary requests to dev server
-- `vite@4.5.14` has moderate-severity vulnerabilities
-- **Impact:** Development environment vulnerable to CSRF attacks
-- **Fix:** Run `npm audit fix --force` or update to `vite@7.3.1+`
+The `any` count has increased from 55+ to ~98 across the codebase, partly due to the new Supabase API layer.
 
-### 3. Unencrypted Client-Side Data Storage
-**Location:** `src/services/api.ts` (lines 27-45)
-**Severity:** HIGH
-
-- All application data stored in plain localStorage
-- 18 direct localStorage access points across codebase
-- Player data, league configurations, game results all unencrypted
-- **Risk:** Sensitive bowling league data exposed if user's browser is compromised
-- **Fix:** Implement encryption for sensitive data or move to backend storage
-
-### 4. Excessive Use of `any` Type (55+ occurrences)
-**Severity:** HIGH
-
-Files with problematic `any` usage:
-- `src/types/index.ts:193` - `login: (userId: string, role: 'admin' | 'player') => any;`
-- `src/contexts/AuthContext.tsx:20-21` - `useState<any>(null)` for currentUser and playerData
-- `src/contexts/LanguageContext.tsx:47,72` - `any` type assertions
-- `src/components/common/LoginView.tsx:10` - `useState<any[]>([])`
-- `src/App.tsx:36` - `gameData: {} as Game` (empty object cast)
-- `src/components/admin/SeasonDetail.tsx:108` - `} as any` in critical update logic
+Key problem files:
+- `src/App.tsx:42-49` — All dashboard state typed as `any`: `useState<any>(null)`, `useState<any[]>([])`
+- `src/components/admin/TeamManagement.tsx:12-17,34,39` — 10+ `any` types including function parameters: `handleEditRoster(team: any)`, `handleSubstitutePlayer(team: any, oldPlayerIndex: any, newPlayerId: any)`
+- `src/components/admin/print/PrintCombined.tsx` — 9 occurrences in sort comparators: `(a: any, b: any) => ...`
+- `src/services/api.ts:18` — `handleError(error: any, context: string)`
+- `src/contexts/LanguageContext.tsx:47,72` — Event handler and translation lookup typed as `any`
+- `src/components/player/PlayerDashboard.tsx:17,81` — Game context records use `any`
+- `src/utils/statsUtils.ts` — Multiple `any` in calculation functions
 
 **Impact:** Loss of type safety, harder to catch runtime errors, increased maintenance burden
 **Fix:** Replace all `any` types with proper TypeScript interfaces
 
-### 5. Monolithic Components (Unmaintainable Size)
+### 2. Monolithic Components (Unmaintainable Size)
 **Severity:** HIGH
 
-Large component files:
-- `src/components/admin/SeasonDetail.tsx` - **931 lines**
-  - Contains 12 hooks (useState, useEffect, useRef)
-  - Handles schedule management, standings, records, exports/imports
-  - Difficult to test, maintain, and reason about
-- `src/components/admin/SeasonGame.tsx` - 579 lines
-- `src/components/admin/PlayerRegistry.tsx` - 567 lines
-- `src/components/admin/SeasonCreator.tsx` - 552 lines
+Six files exceed 580 lines:
+
+| File | Lines | Concerns Handled |
+|------|-------|-----------------|
+| `src/services/api.ts` | 1,029 | All CRUD operations for 6 entities |
+| `src/components/admin/SeasonDetail.tsx` | 918 | Schedule, standings, records, import/export, print |
+| `src/components/admin/PlayerRegistry.tsx` | 657 | Player CRUD, bulk import, validation |
+| `src/components/admin/print/PrintCombined.tsx` | 634 | Combined print layout for all data |
+| `src/components/admin/SeasonCreator.tsx` | 603 | Season configuration, team assignment, scheduling |
+| `src/components/admin/SeasonGame.tsx` | 585 | Game play, scoring, match management |
 
 **Impact:** Hard to maintain, test, and debug
 **Recommendation:** Break into smaller, composable components (target: <300 lines per file)
 
-### 6. No Data Migration Strategy
-**Location:** `src/services/api.ts:15-23`
-**Severity:** HIGH
+### 3. Race Conditions in Game State Updates
+**Severity:** HIGH (NEW)
+**Location:** `src/components/admin/SeasonGame.tsx:249-250`
 
-- localStorage keys are hardcoded (`bowling_organization`, `bowling_players`, etc.)
-- No version tracking for schema changes
-- No validation before JSON parsing
-- Example at `api.ts:30`:
+State is updated immediately before API call completes:
 ```typescript
-const data = localStorage.getItem(key);
-return data ? JSON.parse(data) as T : null; // Bypasses validation
+setGame(updated);                       // UI updates immediately
+await gamesApi.update(gameId, updated); // API call may fail
 ```
 
-**Impact:** Schema changes break existing user data
-**Fix:** Implement data versioning and migration utilities
+If the API call fails, the UI shows data that was never persisted. The user believes their score was saved when it wasn't.
+
+**Impact:** Silent data loss — scores appear saved but may not persist
+**Fix:** Wait for API confirmation before updating state, or implement optimistic update with rollback
+
+### 4. No Error Boundaries
+**Severity:** HIGH (NEW)
+**Location:** Entire application
+
+Zero `ErrorBoundary` components exist. If any component throws during render, the entire app crashes with a white screen.
+
+**Impact:** Single component error takes down the whole application
+**Fix:** Add `<ErrorBoundary>` wrappers around major sections (dashboard, game view, settings)
+
+### 5. Hardcoded Business Constants
+**Severity:** HIGH (NEW)
+**Location:** `src/utils/matchUtils.ts:89,121,122` and `src/utils/statsUtils.ts:36,63`
+
+The absent player penalty (`average - 10`) is hardcoded in 5 locations instead of using the `ABSENT_PLAYER_PENALTY` constant defined in `src/constants/bowling.ts:28`.
+
+```typescript
+// Current (hardcoded in 5 places):
+const score = player.absent ? player.average - 10 : ...
+
+// Should be:
+const score = player.absent ? player.average - ABSENT_PLAYER_PENALTY : ...
+```
+
+**Impact:** If the penalty value needs to change, 5 separate locations must be updated — easy to miss one
+**Fix:** Import and use `ABSENT_PLAYER_PENALTY` from constants
 
 ---
 
-## 🟡 Medium-Priority Issues
+## Medium-Priority Issues
 
-### 7. Inadequate Error Handling
+### 6. Inadequate Error Handling
 **Severity:** MEDIUM
 
-- Only 18 `try/catch` blocks across 50+ files
-- Critical paths without error handling:
-  - Game score calculations
-  - Season schedule generation
-  - Import/export operations (`src/utils/leagueImportExportUtils.ts`)
-  - localStorage operations in non-API components
+65 `try/catch` blocks exist across the codebase (up from 18, due to Supabase API layer), but critical paths still lack error handling:
+- `src/components/player/PlayerDashboard.tsx` — `loadPlayerData()` has no try/catch
+- `src/App.tsx:88,100` — Errors only logged to console, no user feedback
+- `src/components/admin/SeasonDetail.tsx:42` — `loadSeasonData()` has no error handling
+- API layer returns `null` or empty arrays on failure, masking errors
 
-**Examples:**
-- `src/contexts/LanguageContext.tsx:47` - Event listeners with `any` type, no error handling
-- `src/components/admin/SeasonDetail.tsx:141` - `window.location.reload()` without confirmation
+**Fix:** Add error states to components, implement toast/notification system
 
-**Fix:** Add error boundaries, try/catch blocks, and user-friendly error messages
+### 7. Memory Leaks — Missing Async Cleanup
+**Severity:** MEDIUM (NEW)
+**Location:** `src/components/admin/SeasonGame.tsx:28-30`, `src/components/admin/SeasonDetail.tsx:38-40`
 
-### 8. Outdated Dependencies
+```typescript
+useEffect(() => {
+  loadGame();  // async, no AbortController
+}, [gameId]);
+```
+
+If the component unmounts while the async operation is in flight, React will attempt to update state on an unmounted component. No cleanup or AbortController is implemented.
+
+**Impact:** Console warnings, potential state corruption on fast navigation
+**Fix:** Add AbortController or mounted-flag pattern to async useEffects
+
+### 8. useEffect Dependency Issues
+**Severity:** MEDIUM (NEW)
+**Location:** `src/App.tsx:53-58`
+
+```typescript
+React.useEffect(() => {
+  if (currentUser && isAdmin() && !isLoading) {
+    loadDashboardData();
+    loadPlayers();
+  }
+}, [currentUser, isAdmin, isLoading]); // isAdmin is a function reference
+```
+
+`isAdmin` is a function that may be recreated on each render, causing unnecessary re-executions. `loadDashboardData` and `loadPlayers` are also missing from the dependency array.
+
+**Fix:** Remove function references from dependency arrays or stabilize with useCallback
+
+### 9. Index-Based React Keys (35+ occurrences)
+**Severity:** MEDIUM (NEW)
+
+35+ instances of `key={idx}`, `key={i}`, or `key={index}` across 10 files:
+- `src/components/admin/TeamPanel.tsx:116`
+- `src/components/admin/TeamManagement.tsx:144,163,195,258`
+- `src/components/common/CompletedGameView.tsx:87,147,171,201,261,285`
+- `src/components/common/MatchView.tsx:47`
+- `src/components/common/SummaryView.tsx:48`
+- `src/components/admin/print/PrintCombined.tsx:440,454,462,480,494,502`
+- `src/components/admin/PrintMatchDay.tsx:346,360,368,386,400,408`
+- `src/components/admin/SeasonDetail.tsx:605,635,665,694`
+- `src/components/admin/shared/BonusRulesConfiguration.tsx:126`
+
+**Impact:** Can cause incorrect rendering when lists are reordered, filtered, or modified
+**Fix:** Use unique identifiers (player IDs, match IDs) instead of array indices
+
+### 10. Zero Memoization
+**Severity:** MEDIUM (NEW)
+
+No `useMemo`, `useCallback`, or `React.memo` found anywhere in the codebase.
+
+Expensive calculations run on every render:
+- `src/components/admin/SeasonDetail.tsx` — `calculateTeamStandings()`, `calculatePlayerSeasonStats()`, `calculateSeasonRecords()` called inline without memoization
+- `src/components/admin/PlayerRegistry.tsx` — Filter/sort operations on every render
+- `src/components/admin/print/PrintCombined.tsx` — Player sorting recalculated every render
+
+**Impact:** Unnecessary CPU work and re-renders, especially noticeable with large datasets
+**Fix:** Add `useMemo` for expensive computations, `useCallback` for handler props
+
+### 11. Outdated Dependencies
 **Severity:** MEDIUM
 
-- `vite@4.5.14` - Current stable version is 6.x+
-- `typescript@5.9.3` - Security patches available
-- `tailwindcss@3.4.19` - Version 4.x available
+| Package | Current | Latest | Gap |
+|---------|---------|--------|-----|
+| `vite` | 4.5.14 | 7.3.1+ | 3 major versions behind |
+| `react` | 18.3.1 | 19.x | 1 major version behind |
+| `tailwindcss` | 3.4.19 | 4.x | 1 major version behind |
+| `@vitejs/plugin-react` | 4.7.0 | 5.x | 1 major version behind |
 
-**Note:** Not critical vulnerabilities, but indicates maintenance lag
-**Fix:** Regular dependency updates
+**Fix:** Plan incremental upgrades, starting with Vite
 
-### 9. Client-Side Performance Issues
+### 12. Client-Side Performance Issues
 **Severity:** MEDIUM
 
-**N+1 Query Pattern:**
-- `src/utils/leagueImportExportUtils.ts:53-55` - Iterates through player IDs calling `playersApi.getById()` individually
-- Should fetch all players once and filter
+**N+1 Query Pattern in PlayerDashboard:**
+- `src/components/player/PlayerDashboard.tsx` — Loads ALL games, then fetches team data for each game individually
+- Should fetch player-specific games with a single query
 
-**No Caching:**
-- Every data access re-reads from localStorage (api.ts:83-85, 128-130)
-- Entire data arrays loaded for simple queries
-- 20+ instances of `.filter()`, `.map()`, `.find()` on potentially large arrays
+**No Pagination:**
+- `src/App.tsx:74-82` — Loads all seasons and games for all leagues on initial auth
+- O(leagues x seasons) API calls on dashboard load
 
-**Fix:** Implement caching layer and batch data operations
+**Fix:** Add server-side filtering and pagination
 
-### 10. No Transaction/Atomic Operations
-**Location:** `src/utils/leagueImportExportUtils.ts`
+### 13. No Data Migration Strategy
 **Severity:** MEDIUM
 
-- Import logic creates players, leagues, seasons without transaction safety
-- If import fails mid-process, data becomes inconsistent
-- Multiple sequential storage operations without rollback capability
+Now using Supabase, but still no schema versioning or migration tooling observed. Database schema changes could break existing data.
 
-**Fix:** Implement transaction wrapper or backend with proper ACID properties
+**Fix:** Implement Supabase migrations with version tracking
 
-### 11. Missing Environment Configuration
+### 14. Missing Input Validation in Business Logic
+**Severity:** MEDIUM (NEW)
+
+Score validation (0-300) exists only as HTML `min`/`max` attributes on input elements (`src/components/common/PlayerScoreInput.tsx:124-132`). No validation in the calculation functions:
+- `src/utils/matchUtils.ts` — Accepts any numeric value
+- `src/utils/statsUtils.ts` — No bounds checking on scores
+
+Also: `src/models/index.ts:93-104` — `parseInt(String(x)) || DEFAULT` treats `0` as falsy, falling back to default when 0 might be valid.
+
+**Fix:** Add validation in business logic layer, not just UI
+
+### 15. RTL/i18n Incomplete
 **Severity:** MEDIUM
 
-- No `.env` file support
-- Hardcoded values scattered throughout
-- No development/production differentiation
-- **Risk:** Build artifacts identical regardless of environment
+- Many hardcoded English strings remain across admin components
+- `src/components/common/LoginView.tsx:59` — "Sign in with Google" not translated
+- RTL CSS configured but not all components tested for RTL layout
+- No pluralization support in translation system
 
-**Fix:** Add environment variable support via Vite
+**Fix:** Complete i18n implementation, test RTL layout for all views
 
-### 12. Missing Null/Undefined Checks
+### 16. Minimal Vite Configuration
 **Severity:** MEDIUM
+**Location:** `vite.config.ts`
 
-- Many operations assume data existence without validation
-- No defensive programming for edge cases
-- Example: `gamesApi.getAll()` returns empty array, but some code expects it populated
+Missing production optimizations:
+- No source map configuration
+- No chunk splitting strategy
+- No CSP headers
+- No build optimization rules
 
-**Fix:** Add null checks and default values
-
-### 13. Minimal Vite Configuration
-**Location:** `vite.config.ts` (only 12 lines)
-**Severity:** MEDIUM
-
-Missing configurations:
-- Source map configuration
-- Chunk splitting strategy
-- Optimization rules
-- CSP headers configuration
-
-**Fix:** Enhance build configuration for production
-
-### 14. RTL Support Issues
-**Location:** `tailwind.config.js`, `src/contexts/LanguageContext.tsx`
-**Severity:** MEDIUM
-
-- RTL support configured but no direction variants enabled
-- Hardcoded English text in some places (e.g., `LoginView:125`: "Continue as Player" not translated)
-- Custom event listener for language changes (LanguageContext.tsx:54) - fragile pattern
-
-**Fix:** Complete i18n implementation and test RTL properly
-
-### 15. Data Integrity Risk
-**Severity:** MEDIUM
-
-- No validation before JSON parsing
-- No schema validation after deserialization
-- Type assertions bypass validation
-
-**Fix:** Implement Zod or similar validation library
+**Fix:** Enhance build config for production deployment
 
 ---
 
-## 🟢 Low-Priority Issues
+## Low-Priority Issues
 
-### 16. Limited Test Coverage
-**Location:** `tests/` directory
+### 17. Limited Test Coverage
 **Severity:** LOW
 
-6 test files exist but only for utility functions:
-- test-scoring.js
-- test-schedule.js
-- test-handicap.js
-- test-dynamic-handicap.js
-- test-i18n.js
-- test-validation.js
+6 test files exist as vanilla Node.js scripts (no framework):
+- `test-scoring.js`, `test-schedule.js`, `test-handicap.js`, `test-dynamic-handicap.js`, `test-i18n.js`, `test-validation.js`
 
 **Missing:**
-- Component tests
-- Integration tests
-- E2E tests
-- API/data layer tests
-- Edge case coverage for scoring logic
+- No test framework (Vitest/Jest) configured
+- No component tests (React Testing Library)
+- No integration or E2E tests
+- No API/service layer tests
+- No CI/CD test pipeline
 
-**Fix:** Add comprehensive test suite with Vitest/React Testing Library
+**Fix:** Set up Vitest + React Testing Library, add component and integration tests
 
-### 17. No Linting/Formatting Tools
+### 18. No Linting/Formatting Tools
 **Severity:** LOW
 
-Missing development dependencies:
-- No ESLint configuration
-- No Prettier configuration
-- Inconsistent code style
+No ESLint or Prettier configuration. Code style is inconsistent across files.
 
 **Fix:** Add ESLint + Prettier with shared configs
 
-### 18. Console Logging in Production
+### 19. Console Logging in Production
 **Severity:** LOW
 
-- Only 3 files use console.error (api.ts, LanguageContext.tsx, leagueImportExportUtils.ts)
-- Should be replaced with proper error logging/reporting
+API errors logged only to `console.error`. No structured logging or error reporting service.
 
 **Fix:** Implement logging service with environment-based levels
 
-### 19. No Lazy Loading
+### 20. No Code Splitting / Lazy Loading
 **Severity:** LOW
 
-- All seasons, teams, games for a league loaded at once
-- No pagination in list views (except explicitly in Pagination component)
-- Could impact performance with large datasets
+All routes and components loaded upfront. No `React.lazy()` or dynamic imports used.
 
-**Fix:** Implement lazy loading and virtual scrolling
+**Fix:** Add route-based code splitting with React.lazy and Suspense
 
-### 20. Accessibility Issues
+### 21. Accessibility Issues
 **Severity:** LOW
 
-- Heavy use of alerts/confirms instead of proper modal dialogs
-  - `src/components/admin/SeasonDetail.tsx:64, 68, 76, 82, 89`
-- Screen reader unfriendly
-- No ARIA labels observed
+- No ARIA labels on interactive elements
+- Emoji-based button labels (e.g., icons without screen reader text)
+- Heavy use of `window.alert()` / `window.confirm()` instead of accessible modal dialogs
+- No visible focus indicators on some elements
+- Missing `<label>` elements for form inputs
 
-**Fix:** Add ARIA labels, keyboard navigation, and semantic HTML
+**Fix:** Add ARIA labels, keyboard navigation, semantic HTML, and accessible modals
 
-### 21. Validation Not Enforced Consistently
+### 22. No URL-Based Routing
+**Severity:** LOW
+**Location:** `src/App.tsx:31-38`
+
+Navigation uses component state (`currentView`, `navigationState`) instead of URL routing. Page refresh loses all navigation context.
+
+**Fix:** Implement React Router for proper URL-based navigation with browser history support
+
+### 23. Validation Not Enforced Consistently
 **Severity:** LOW
 
-- Validation functions exist but not always called
-- Form inputs accept user data without type validation
+Validation functions exist in `src/models/index.ts` but are not always called before data operations. Form inputs accept user data without server-side validation.
 
 **Fix:** Enforce validation at all data entry points
 
@@ -278,81 +339,84 @@ Missing development dependencies:
 
 | Severity | Count | Primary Categories |
 |----------|-------|-------------------|
-| **Critical** | 1 | Security (Authentication) |
-| **High** | 5 | Security, Type Safety, Architecture, Data Integrity |
-| **Medium** | 9 | Error Handling, Performance, Configuration, Dependencies |
-| **Low** | 6 | Testing, Accessibility, Developer Experience |
+| **Critical** | 0 | *(resolved: auth now uses Supabase OAuth)* |
+| **High** | 5 | Type Safety, Architecture, Data Integrity, Error Handling |
+| **Medium** | 11 | React Patterns, Performance, Dependencies, Validation, i18n |
+| **Low** | 7 | Testing, Accessibility, Developer Experience, Routing |
+
+---
+
+## Comparison: Feb 15 vs Feb 17
+
+| Metric | Feb 15 | Feb 17 | Trend |
+|--------|--------|--------|-------|
+| Critical issues | 1 | 0 | Improved |
+| High issues | 5 | 5 | Same (2 resolved, 3 new) |
+| Medium issues | 9 | 11 | Worse (new React pattern issues) |
+| Low issues | 6 | 7 | Slightly worse |
+| `any` type count | 55+ | ~98 | Worse (API layer added more) |
+| `try/catch` blocks | 18 | 65 | Improved (API layer) |
+| Test files | 6 | 6 | Same |
+| Monolithic files (>500 lines) | 4 | 6 | Worse (API layer, PrintCombined) |
+| Memoization usage | 0 | 0 | Same |
+| Error boundaries | 0 | 0 | Same |
+
+---
+
+## Technical Debt Assessment
+
+| Area | Feb 15 | Feb 17 | Notes |
+|------|--------|--------|-------|
+| **Security Posture** | Poor | Fair | Supabase OAuth approach is solid; RLS needed |
+| **Type Safety** | Poor | Poor | `any` count increased with Supabase migration |
+| **Error Handling** | Poor | Fair | More try/catch in API layer, but UI still silent |
+| **Maintainability** | Fair | Fair | Monolithic components unchanged |
+| **Performance** | Fair | Fair | No memoization, N+1 queries remain |
+| **Testing** | Poor | Poor | No improvements |
+| **Overall** | Fair | Fair | Auth improved, but new issues offset gains |
 
 ---
 
 ## Immediate Action Items
 
 ### Must Fix Before Production:
-1. ✅ **Implement proper authentication** - Backend required with session management
-2. ✅ **Fix dependency vulnerabilities** - `npm audit fix --force` or update Vite
-3. ✅ **Add type safety** - Replace 55+ `any` types with proper interfaces
-4. ✅ **Add error boundaries** - Wrap components, add try-catch to critical paths
-5. ✅ **Implement data migration** - Add schema versioning to localStorage data
+1. **Add error boundaries** — Wrap major sections to prevent full-app crashes
+2. **Fix race condition in SeasonGame** — API confirmation before state update
+3. **Replace `any` types** — Start with App.tsx and TeamManagement.tsx
+4. **Use ABSENT_PLAYER_PENALTY constant** — Replace 5 hardcoded instances
+5. **Add async cleanup** — AbortController in useEffects with async operations
 
 ### Should Fix Soon:
-6. ⚠️ **Refactor SeasonDetail component** - Split 931-line file into smaller components
-7. ⚠️ **Add comprehensive error handling** - Especially for scoring and import/export
-8. ⚠️ **Implement caching layer** - Reduce localStorage reads
-9. ⚠️ **Add transaction support** - For import/export operations
-10. ⚠️ **Update dependencies** - Keep tooling current
+6. **Add memoization** — useMemo for standings/stats calculations in SeasonDetail
+7. **Fix useEffect dependencies** — App.tsx dependency array
+8. **Replace index-based keys** — Use unique IDs in 10+ components
+9. **Add input validation in logic layer** — Score bounds checking
+10. **Refactor SeasonDetail** — Split 918-line file into sub-components
 
 ### Nice to Have:
-11. 💡 **Add test coverage** - Component and integration tests
-12. 💡 **Implement lazy loading** - For large datasets
-13. 💡 **Improve accessibility** - ARIA labels, keyboard navigation
-14. 💡 **Add linting/formatting** - ESLint + Prettier
-15. 💡 **Environment configuration** - .env file support
-
----
-
-## Technical Debt Assessment
-
-**Overall Code Quality:** Fair (functional but needs hardening)
-**Security Posture:** Poor (critical auth issues)
-**Type Safety:** Poor (extensive `any` usage)
-**Maintainability:** Fair (monolithic components reduce maintainability)
-**Performance:** Fair (works but inefficient data access)
-**Testing:** Poor (minimal coverage)
+11. **Set up Vitest** — Component and integration tests
+12. **Add ESLint + Prettier** — Code quality tooling
+13. **Implement React Router** — URL-based navigation
+14. **Update dependencies** — Vite 4 to 7, React 18 to 19
+15. **Complete i18n** — Translate remaining hardcoded strings
+16. **Add code splitting** — React.lazy for route components
+17. **Improve accessibility** — ARIA labels, keyboard navigation
 
 ---
 
 ## Recommendations
 
-This is a **functional prototype** suitable for local/demo use, but requires **significant hardening** for production deployment.
+The Supabase migration resolved the most critical security issue from the previous review. However, the migration introduced additional type safety concerns (`any` count nearly doubled), and several React best-practice issues have been identified that weren't flagged previously.
 
 **Priority Order:**
-1. Security fixes (authentication, data encryption)
-2. Type safety improvements (remove `any` types)
-3. Architecture refactoring (break up large components)
-4. Error handling and data integrity
-5. Performance optimization
-6. Testing and documentation
-
-**Estimated Effort:**
-- Security fixes: 2-3 weeks (requires backend development)
-- Type safety: 1 week
-- Component refactoring: 2-3 weeks
-- Error handling: 1 week
-- Testing setup: 1-2 weeks
-
-**Total:** 7-10 weeks for production-ready state
-
----
-
-## Next Steps
-
-1. Prioritize which issues to address based on deployment timeline
-2. Decide on authentication strategy (backend required)
-3. Set up development workflow (linting, testing, CI/CD)
-4. Create technical debt backlog
-5. Schedule refactoring sprints
+1. Reliability fixes (error boundaries, race conditions, async cleanup)
+2. Type safety improvements (reduce ~98 `any` types)
+3. React patterns (memoization, proper keys, dependency arrays)
+4. Architecture refactoring (break up large components)
+5. Performance optimization (pagination, code splitting)
+6. Testing and developer experience
 
 ---
 
 **Generated by:** Claude Code - Comprehensive Project Analysis
-**Last Updated:** 2026-02-15
+**Last Updated:** 2026-02-17
