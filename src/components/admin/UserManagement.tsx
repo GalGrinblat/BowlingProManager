@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { usersApi, playersApi, allowedEmailsApi, type DatabaseUser, type AllowedEmail } from '../../services/api';
 import type { Player } from '../../types/index';
 import { useTranslation } from '../../contexts/LanguageContext';
+import { useDateFormat } from '../../hooks/useDateFormat';
 import { getPlayerDisplayName } from '../../utils/playerUtils';
 
 interface UserManagementProps {
@@ -9,7 +10,8 @@ interface UserManagementProps {
 }
 
 export const UserManagement: React.FC<UserManagementProps> = ({ onBack }) => {
-  const { t, locale } = useTranslation();
+  const { t } = useTranslation();
+  const { formatDate } = useDateFormat();
   const [users, setUsers] = useState<DatabaseUser[]>([]);
   const [players, setPlayers] = useState<Player[]>([]);
   const [allowedEmails, setAllowedEmails] = useState<AllowedEmail[]>([]);
@@ -83,10 +85,6 @@ export const UserManagement: React.FC<UserManagementProps> = ({ onBack }) => {
     if (!playerId) return t('userManagement.notLinked');
     const player = players.find(p => p.id === playerId);
     return player ? getPlayerDisplayName(player) : t('userManagement.unknownPlayer');
-  };
-
-  const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleDateString(locale);
   };
 
   const handleAddEmail = async () => {

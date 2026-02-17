@@ -2,12 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { leaguesApi, seasonsApi, teamsApi, gamesApi } from '../../services/api';
 import { calculateTeamStandings } from '../../utils/standingsUtils';
 import { useTranslation } from '../../contexts/LanguageContext';
+import { useDateFormat } from '../../hooks/useDateFormat';
 import { exportLeague, downloadExportFile, readImportFile, importLeagueOrSeason } from '../../utils/leagueImportExportUtils';
 
 import type { LeagueDetailProps, League, Season, Team } from '../../types/index';
 
 export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, onViewSeason, onCreateSeason, onRefreshData }) => {
-  const { t, locale } = useTranslation();
+  const { t } = useTranslation();
+  const { formatDate } = useDateFormat();
   const [league, setLeague] = useState<League | null>(null);
   const [seasons, setSeasons] = useState<Season[]>([]);
   const [seasonStandings, setSeasonStandings] = useState<Record<string, any[]>>({});
@@ -225,9 +227,9 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
                       <div className="flex gap-4 text-sm text-gray-600">
                         <span>👥 <span className="ltr-content">{teams.length}</span> {t('leagues.teams')}</span>
                         <span>🎳 <span className="ltr-content">{games.length}</span> {t('leagues.games')}</span>
-                        <span>📅 <span className="ltr-content">{new Date(season.startDate).toLocaleDateString(locale)}</span></span>
+                        <span>📅 <span className="ltr-content">{formatDate(season.startDate)}</span></span>
                         {season.updatedAt && (
-                          <span>✓ {new Date(season.updatedAt).toLocaleDateString(locale)}</span>
+                          <span>✓ {formatDate(season.updatedAt)}</span>
                         )}
                       </div>
                     </div>

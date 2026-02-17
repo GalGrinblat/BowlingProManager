@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { playersApi, leaguesApi, seasonsApi, teamsApi, gamesApi } from '../../services/api';
 import { useTranslation } from '../../contexts/LanguageContext';
+import { useDateFormat } from '../../hooks/useDateFormat';
 import { getPlayerDisplayName } from '../../utils/playerUtils';
 
 import type { Game, GameMatch, League, Player, PlayerDashboardProps, PlayerStats, Season } from '../../types/index';
 
 export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNavigate }) => {
-  const { t, locale } = useTranslation();
+  const { t } = useTranslation();
+  const { formatDate } = useDateFormat();
   const [player, setPlayer] = useState<Player | null>(null);
   const [playerLeagues, setPlayerLeagues] = useState<League[]>([]);
   const [recentCompletedGames, setRecentCompletedGames] = useState<Game[]>([]);
@@ -246,7 +248,7 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
                             {t('common.round')} {game.round} • {t('common.matchDay')} {game.matchDay}
                           </span>
                           <span className="text-xs text-gray-400">
-                            {new Date(game.completedAt || '').toLocaleDateString(locale)}
+                            {formatDate(game.completedAt || '')}
                           </span>
                         </div>
                         <div className="flex items-center gap-4">

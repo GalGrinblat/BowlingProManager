@@ -1,8 +1,10 @@
 import { useTranslation } from '../../contexts/LanguageContext';
+import { useDateFormat } from '../../hooks/useDateFormat';
 import type { CompletedGameViewProps, GameMatch, GamePlayer } from '../../types/index';
 
 export const CompletedGameView: React.FC<CompletedGameViewProps> = ({ game, onBack }) => {
-  const { t, locale } = useTranslation();
+  const { t } = useTranslation();
+  const { formatDate } = useDateFormat();
   if (!game) return <div>Loading...</div>;
 
   const matches = game.matches ?? [];
@@ -32,7 +34,7 @@ export const CompletedGameView: React.FC<CompletedGameViewProps> = ({ game, onBa
           <div>
             <h1 className="text-3xl font-bold text-gray-800">{t('gameHistory.title')}</h1>
             <p className="text-sm text-gray-500 mt-1">
-              {t('common.round')} {game.round} • {t('common.matchDay')} {game.matchDay} • {t('playerDashboard.completedOn')} {new Date(game.completedAt ?? '').toLocaleDateString(locale)}
+              {t('common.round')} {game.round} • {t('common.matchDay')} {game.matchDay} • {t('playerDashboard.completedOn')} {formatDate(game.completedAt ?? '')}
             </p>
           </div>
           {winner !== 'tie' && (

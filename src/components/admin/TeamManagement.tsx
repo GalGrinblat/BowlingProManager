@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { teamsApi, playersApi, seasonsApi } from '../../services/api';
 import { useTranslation } from '../../contexts/LanguageContext';
+import { useDateFormat } from '../../hooks/useDateFormat';
 import { getPlayerDisplayName } from '../../utils/playerUtils';
 
 import type { TeamManagementProps } from '../../types/index';
 
 export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack }) => {
-  const { t, locale } = useTranslation();
+  const { t } = useTranslation();
+  const { formatDate } = useDateFormat();
   const [season, setSeason] = useState<any>(null);
   const [teams, setTeams] = useState<any[]>([]);
   const [allPlayers, setAllPlayers] = useState<any[]>([]);
@@ -163,7 +165,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
                         {' '}{t('common.rightArrow')}{' '}
                         <span className="font-semibold">{change.newPlayer.name}</span>
                         <span className="text-gray-500 ml-2">
-                          ({new Date(change.date).toLocaleDateString(locale)})
+                          ({formatDate(change.date)})
                         </span>
                       </div>
                     ))}
@@ -271,7 +273,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
                     </div>
                   </div>
                   <div className="text-sm text-gray-500">
-                    {new Date(change.date).toLocaleDateString(locale)}
+                    {formatDate(change.date)}
                   </div>
                 </div>
               ))}

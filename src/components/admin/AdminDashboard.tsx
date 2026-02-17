@@ -1,6 +1,6 @@
 import React from 'react';
-import { formatMatchDate } from '../../utils/scheduleUtils';
 import { useTranslation } from '../../contexts/LanguageContext';
+import { useDateFormat } from '../../hooks/useDateFormat';
 
 import type { AdminDashboardProps, ScheduleMatchDay } from '../../types/index';
 
@@ -12,7 +12,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   gamesMap,
   isLoadingData,
 }) => {
-  const { t, locale } = useTranslation();
+  const { t } = useTranslation();
+  const { formatMatchDate } = useDateFormat();
   const activeLeagues = leagues.filter(l => l.active);
 
   if (isLoadingData) {
@@ -135,7 +136,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           </p>
                           {nextMatchDay && (
                             <p className="text-sm text-blue-600 font-medium">
-                              📅 {t('dashboard.next')}: {formatMatchDate(nextMatchDay.date || null, locale)}
+                              📅 {t('dashboard.next')}: {formatMatchDate(nextMatchDay.date || null)}
                               {nextMatchDay.postponed && <span className="text-orange-600 ml-1">({t('dashboard.postponed')})</span>}
                             </p>
                           )}

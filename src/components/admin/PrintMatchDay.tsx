@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { seasonsApi, teamsApi, gamesApi, leaguesApi, playersApi } from '../../services/api';
 import { calculateTeamStandings, calculateCurrentPlayerAverages } from '../../utils/standingsUtils';
 import { calculateHeadToHead } from '../../utils/headToHeadUtils';
-import { formatMatchDate } from '../../utils/scheduleUtils';
 import { useTranslation } from '../../contexts/LanguageContext';
+import { useDateFormat } from '../../hooks/useDateFormat';
 import { getPlayerDisplayName } from '../../utils/playerUtils';
 
 import type { Game, League, PrintMatchDayProps, ScheduleMatchDay, Season, Team, TeamStanding, CurrentPlayerAverages } from '../../types/index';
@@ -13,7 +13,8 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
   matchDay,
   onClose
 }) => {
-  const { t, language, locale } = useTranslation();
+  const { t, language } = useTranslation();
+  const { formatMatchDate, formatDate, formatTime } = useDateFormat();
   const isRTL = language === 'he';
   const [season, setSeason] = useState<Season | null>(null);
   const [league, setLeague] = useState<League | null>(null);
@@ -171,7 +172,7 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
                       <span>📅 {t('common.round')} {round}</span>
                       <span>🎳 {t('common.matchDay')} {matchDay}</span>
                       {scheduleInfo?.date && (
-                        <span>📆 {formatMatchDate(scheduleInfo.date, locale)}</span>
+                        <span>📆 {formatMatchDate(scheduleInfo.date)}</span>
                       )}
                     </div>
                     {season.seasonConfigurations.useHandicap && (
@@ -336,7 +337,7 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
 
         {/* Footer */}
         <div className="mt-12 pt-6 border-t-2 border-gray-300 text-center text-sm text-gray-600">
-          <p>{t('common.printedOn')}: {new Date().toLocaleDateString(locale)} {new Date().toLocaleTimeString(locale)}</p>
+          <p>{t('common.printedOn')}: {formatDate(new Date().toISOString())} {formatTime(new Date().toISOString())}</p>
           <p className="mt-1">{league.name} • {season.name}</p>
         </div>
       </div>
