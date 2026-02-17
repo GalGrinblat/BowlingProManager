@@ -54,18 +54,19 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
       g.status === 'completed' && g.matchDay < matchDay
     );
 
+    let averagesToUse: CurrentPlayerAverages;
     if (previousGames.length === 0) {
-      setCurrentAverages(seasonData.initialPlayerAverages || {});
+      averagesToUse = seasonData.initialPlayerAverages || {};
     }
     else {
-      const averages = calculateCurrentPlayerAverages(previousGames);
-      setCurrentAverages(averages);
+      averagesToUse = calculateCurrentPlayerAverages(previousGames);
     }
+    setCurrentAverages(averagesToUse);
 
     // Preload team players for all teams
     const playersMap: Record<string, any[]> = {};
     for (const team of teamsData) {
-      playersMap[team.id] = await getTeamPlayers(team, seasonData, currentAverages);
+      playersMap[team.id] = await getTeamPlayers(team, seasonData, averagesToUse);
     }
     setTeamPlayersMap(playersMap);
   };
@@ -78,8 +79,8 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
     const playerPromises = team.playerIds.map(async (playerId: string) => {
       const player = await playersApi.getById(playerId);
       const playerName = player ? getPlayerDisplayName(player) : 'Unknown';
-      const currentAvg = averages[playerName]?.average || 0;
-      const currentGamesPlayed = averages[playerName]?.gamesPlayed || 0;
+      const currentAvg = averages[playerId]?.average || 0;
+      const currentGamesPlayed = averages[playerId]?.gamesPlayed || 0;
 
       // Calculate handicap for this match
       let handicap = 0;
@@ -255,7 +256,7 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
                                   <div className={`font-semibold ${isRTL ? 'text-right' : 'text-left'}`}>{idx + 1}. {player.name}</div>
                                 </td>
                                 <td className="text-center px-2 py-2 font-semibold">
-                                  {player.average > 0 ? player.average.toFixed(1) : '-'}
+                                  {player.average > 0 ? player.average.toFixed(2) : '-'}
                                 </td>
                                 <td className="text-center px-2 py-2 text-blue-600 font-bold">
                                   {player.handicap > 0 ? player.handicap : '-'}
@@ -270,7 +271,7 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
                             <tr>
                               <td className={`px-2 py-2 font-semibold ${isRTL ? 'text-right' : 'text-left'}`}>{t('common.total')}</td>
                               <td className="text-center px-2 py-2 font-bold">
-                                {(team1Players.reduce((sum: number, p: any) => sum + p.average, 0) / team1Players.length || 0).toFixed(1)}
+                                {(team1Players.reduce((sum: number, p: any) => sum + p.average, 0) / team1Players.length || 0).toFixed(2)}
                               </td>
                               <td className="text-center px-2 py-2 font-bold text-blue-600">
                                 {team1Players.reduce((sum: number, p: any) => sum + p.handicap, 0)}
@@ -302,7 +303,7 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
                                   <div className={`font-semibold ${isRTL ? 'text-right' : 'text-left'}`}>{idx + 1}. {player.name}</div>
                                 </td>
                                 <td className="text-center px-2 py-2 font-semibold">
-                                  {player.average > 0 ? player.average.toFixed(1) : '-'}
+                                  {player.average > 0 ? player.average.toFixed(2) : '-'}
                                 </td>
                                 <td className="text-center px-2 py-2 text-purple-600 font-bold">
                                   {player.handicap > 0 ? player.handicap : '-'}
@@ -317,7 +318,7 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
                             <tr>
                               <td className={`px-2 py-2 font-semibold ${isRTL ? 'text-right' : 'text-left'}`}>{t('common.total')}</td>
                               <td className="text-center px-2 py-2 font-bold">
-                                {(team2Players.reduce((sum: number, p: any) => sum + p.average, 0) / team2Players.length || 0).toFixed(1)}
+                                {(team2Players.reduce((sum: number, p: any) => sum + p.average, 0) / team2Players.length || 0).toFixed(2)}
                               </td>
                               <td className="text-center px-2 py-2 font-bold text-purple-600">
                                 {team2Players.reduce((sum: number, p: any) => sum + p.handicap, 0)}

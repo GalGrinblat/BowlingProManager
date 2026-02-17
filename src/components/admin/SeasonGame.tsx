@@ -432,12 +432,12 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
     function updatePlayerAveragesAndHandicaps(players: GamePlayer[] | undefined) {
       if (!players) return [];
       return players.map((player: GamePlayer) => {
-        const currentAvg = currentAverages[player.name];
+        const currentAvg = currentAverages[player.playerId];
         let playerAvg: number;
         if (currentAvg && currentAvg.gamesPlayed > 0) {
           playerAvg = currentAvg.average;
         } else {
-          // Use season.playerAverages if available, fallback to player.average
+          // Use season.initialPlayerAverages if available, fallback to player.average
           playerAvg = (season && season.initialPlayerAverages && season.initialPlayerAverages[player.playerId] !== undefined)
             ? (season.initialPlayerAverages[player.playerId]?.average ?? 0)
             : (player.average || 0);

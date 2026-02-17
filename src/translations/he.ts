@@ -1,6 +1,13 @@
 import type { TranslationDictionary } from '../types/index';
 
 const he: TranslationDictionary = {
+  validation: {
+    incompleteTeams: 'אנא השלם את כל הקבוצות ומלא את כל השדות הנדרשים.',
+    teamFull: 'קבוצה זו כבר מכילה את מספר השחקנים המקסימלי ({{count}}).',
+    seasonNameRequired: 'אנא הכנס שם עונה.',
+    teamsNotComplete: 'אנא וודא שלכל הקבוצות יש בדיוק {{count}} שחקנים לפני המשך.',
+    saveError: 'שגיאה בשמירת העונה. אנא נסה שוב.'
+  },
   // מילים ופעולות נפוצות
   common: {
     remove: 'הסר',

@@ -46,7 +46,7 @@ type Player = {
 };
 
 export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, onSuccess }) => {
-  const { t } = useTranslation();
+  const { t, direction } = useTranslation();
   const [step, setStep] = useState(1);
   const [league, setLeague] = useState<League | null>(null);
   const [formData, setFormData] = useState<SeasonFormData>({
@@ -115,6 +115,11 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
   const handleAssignPlayer = (teamIndex: number, playerId: string) => {
     const newTeams = [...teams];
     if (newTeams[teamIndex] && !newTeams[teamIndex].playerIds.includes(playerId)) {
+      // Check if team already has max players
+      if (newTeams[teamIndex].playerIds.length >= formData.playersPerTeam) {
+        alert(t('validation.teamFull').replace('{{count}}', String(formData.playersPerTeam)));
+        return;
+      }
       newTeams[teamIndex].playerIds.push(playerId);
       setTeams(newTeams);
     }
@@ -140,7 +145,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
   const handleFinalSubmit = async () => {
     // Basic validation
     if (!formData.name || teams.length < 2 || teams.some(t => t.playerIds.length !== formData.playersPerTeam)) {
-      alert(t('validation.incompleteTeams') || 'Please complete all teams and fill in all required fields.');
+      alert(t('validation.incompleteTeams'));
       return;
     }
     // Prepare season data (all required fields for Season)
@@ -173,7 +178,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
         name: team.name,
         playerIds: team.playerIds,
       })),
-      playerAverages,
+      initialPlayerAverages: playerAverages,
     };
 
     // Save via API
@@ -242,7 +247,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
       await seasonsApi.update(created.id, { schedule });
       if (typeof onSuccess === 'function') onSuccess(created.id);
     } catch (err) {
-      alert(t('validation.saveError') || 'Error saving season.');
+      alert(t('validation.saveError'));
     }
   };
   
@@ -311,7 +316,13 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
           </div>
         </div>
         <div className="bg-white rounded-xl shadow-lg p-6">
-          <form onSubmit={e => { e.preventDefault();
+          <form onSubmit={e => {
+            e.preventDefault();
+            // Validate season name before proceeding
+            if (!formData.name.trim()) {
+              alert(t('validation.seasonNameRequired'));
+              return;
+            }
             const newTeams = Array.from({ length: getValue('numberOfTeams') }, (_, i) => ({ name: `Team ${i + 1}`, playerIds: [] }));
             setTeams(newTeams);
             setStep(2);
@@ -448,12 +459,26 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
           </div>
         </div>
         <div className="bg-white rounded-xl shadow-lg p-6">
-          <form onSubmit={e => { e.preventDefault(); setStep(3); }}>
+          <form onSubmit={e => {
+            e.preventDefault();
+            // Validate all teams have correct number of players
+            const incompleteTeams = teams.filter(team => team.playerIds.length !== formData.playersPerTeam);
+            if (incompleteTeams.length > 0) {
+              alert(t('validation.teamsNotComplete').replace('{{count}}', String(formData.playersPerTeam)));
+              return;
+            }
+            setStep(3);
+          }}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {teams.map((team, teamIdx) => (
-                <div key={teamIdx} className="border rounded-lg p-4 bg-gray-50">
+                <div key={teamIdx} className={`border rounded-lg p-4 ${team.playerIds.length === formData.playersPerTeam ? 'bg-green-50 border-green-300' : 'bg-gray-50'}`}>
                   <input type="text" value={team.name} onChange={e => handleTeamNameChange(teamIdx, e.target.value)} className="mb-2 w-full px-2 py-1 border border-gray-300 rounded" />
-                  <div className="mb-2 text-xs text-gray-500">{t('seasons.teamRoster')}</div>
+                  <div className="mb-2 text-xs font-semibold flex justify-between items-center">
+                    <span className="text-gray-700">{t('seasons.teamRoster')}</span>
+                    <span className={`${team.playerIds.length === formData.playersPerTeam ? 'text-green-600' : team.playerIds.length > formData.playersPerTeam ? 'text-red-600' : 'text-gray-500'}`}>
+                      {team.playerIds.length}/{formData.playersPerTeam}
+                    </span>
+                  </div>
                   <ul className="mb-2">
                     {team.playerIds.map((playerId: string) => {
                       const player = availablePlayers.find((p: Player) => p.id === playerId);
@@ -467,13 +492,18 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
                   </ul>
                   <div className="mb-1 text-xs text-gray-500">{t('seasons.addPlayer')}</div>
                   <select
-                    className="w-full px-2 py-1 border border-gray-300 rounded"
+                    className="w-full px-2 py-1 border border-gray-300 rounded disabled:bg-gray-100 disabled:cursor-not-allowed"
                     value=""
                     onChange={e => {
                       if (e.target.value) handleAssignPlayer(teamIdx, e.target.value);
                     }}
+                    disabled={team.playerIds.length >= formData.playersPerTeam}
                   >
-                    <option value="">{t('seasons.selectPlayer')}</option>
+                    <option value="">
+                      {team.playerIds.length >= formData.playersPerTeam
+                        ? t('validation.teamFull').replace('{{count}}', String(formData.playersPerTeam))
+                        : t('seasons.selectPlayer')}
+                    </option>
                     {availablePlayers.filter(p => !getAssignedPlayers(teamIdx).has(p.id)).map((player: Player) => (
                       <option key={player.id} value={player.id}>{getPlayerDisplayName(player)}</option>
                     ))}
@@ -523,17 +553,17 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('seasons.playerName')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('common.team')}</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('seasons.average')}</th>
+                <th className={`px-6 py-3 ${direction === 'rtl' ? 'text-right' : 'text-left'} text-xs font-medium text-gray-500 uppercase tracking-wider`}>{t('seasons.playerName')}</th>
+                <th className={`px-6 py-3 ${direction === 'rtl' ? 'text-right' : 'text-left'} text-xs font-medium text-gray-500 uppercase tracking-wider`}>{t('common.team')}</th>
+                <th className={`px-6 py-3 ${direction === 'rtl' ? 'text-right' : 'text-left'} text-xs font-medium text-gray-500 uppercase tracking-wider`}>{t('seasons.average')}</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {allPlayersWithTeams.map((player) => (
                 <tr key={player.playerId} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{player.playerName}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{player.teamName}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 ${direction === 'rtl' ? 'text-right' : 'text-left'}`}>{player.playerName}</td>
+                  <td className={`px-6 py-4 whitespace-nowrap text-sm text-gray-500 ${direction === 'rtl' ? 'text-right' : 'text-left'}`}>{player.teamName}</td>
+                  <td className={`px-6 py-4 whitespace-nowrap text-sm text-gray-500 ${direction === 'rtl' ? 'text-right' : 'text-left'}`}>
                     <input
                       type="number"
                       min="0"

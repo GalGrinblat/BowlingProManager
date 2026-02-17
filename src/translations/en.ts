@@ -1,6 +1,13 @@
 import type { TranslationDictionary } from '../types/index';
 
 const en: TranslationDictionary = {
+  validation: {
+    incompleteTeams: 'Please complete all teams and fill in all required fields.',
+    teamFull: 'This team already has the maximum number of players ({{count}}).',
+    seasonNameRequired: 'Please enter a season name.',
+    teamsNotComplete: 'Please ensure all teams have exactly {{count}} players before proceeding.',
+    saveError: 'Error saving season. Please try again.'
+  },
   // Common words and actions
   common: {
     remove: 'Remove',

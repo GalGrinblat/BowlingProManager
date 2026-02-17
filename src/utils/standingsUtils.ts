@@ -115,22 +115,22 @@ const processPlayerAverages = (
   playerAverages: CurrentPlayerAverages
 ): void => {
   gamePlayers.forEach((player: GamePlayer, playerIdx: number) => {
-    if (!player.name) return;
-    
-    if (!playerAverages[player.name]) {
-      playerAverages[player.name] = {
+    if (!player.playerId) return;
+
+    if (!playerAverages[player.playerId]) {
+      playerAverages[player.playerId] = {
         totalPins: 0,
         gamesPlayed: 0,
         average: 0
       };
     }
-    
+
     // Count pins from all matches in this game
     matches?.forEach((match: GameMatch) => {
       if (match[teamKey] && match[teamKey].players[playerIdx]) {
         const pins = parseInt(match[teamKey].players[playerIdx].pins) || 0;
         if (pins > 0 || match[teamKey].players[playerIdx].pins !== '') {
-          const playerAvg = playerAverages[player.name];
+          const playerAvg = playerAverages[player.playerId];
           if (playerAvg) {
             playerAvg.totalPins += pins;
             playerAvg.gamesPlayed++;
@@ -326,8 +326,8 @@ export const calculateCurrentPlayerAverages = (games: Game[]): CurrentPlayerAver
   });
   
   // Calculate averages
-  Object.keys(playerAverages).forEach(playerName => {
-    const data = playerAverages[playerName];
+  Object.keys(playerAverages).forEach(playerId => {
+    const data = playerAverages[playerId];
     if (data && data.gamesPlayed > 0) {
       data.average = data.totalPins / data.gamesPlayed;
     }
