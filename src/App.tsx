@@ -17,7 +17,8 @@ import { PlayerDashboard } from './components/player/PlayerDashboard';
 import { CompletedGameView } from './components/common/CompletedGameView';
 import { organizationApi, leaguesApi, seasonsApi, gamesApi, playersApi } from './services/api';
 import './styles/globals.css';
-import { Game } from './types';
+import type { Game, Organization, League, Season, Player } from './types';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 
 interface NavigationState {
   leagueId: string | null;
@@ -39,23 +40,24 @@ function AppContent() {
   });
 
   // Dashboard data state
-  const [org, setOrg] = useState<any>(null);
-  const [leagues, setLeagues] = useState<any[]>([]);
-  const [seasonsMap, setSeasonsMap] = useState<Record<string, any[]>>({});
-  const [gamesMap, setGamesMap] = useState<Record<string, any[]>>({});
+  const [org, setOrg] = useState<Organization | null>(null);
+  const [leagues, setLeagues] = useState<League[]>([]);
+  const [seasonsMap, setSeasonsMap] = useState<Record<string, Season[]>>({});
+  const [gamesMap, setGamesMap] = useState<Record<string, Game[]>>({});
   const [isLoadingData, setIsLoadingData] = useState(false);
 
   // Players data state
-  const [players, setPlayers] = useState<any[]>([]);
+  const [players, setPlayers] = useState<Player[]>([]);
   const [isLoadingPlayers, setIsLoadingPlayers] = useState(false);
 
   // Load dashboard and players data when admin user is authenticated
+  const isAdminUser = !isLoading && currentUser && isAdmin();
   React.useEffect(() => {
-    if (currentUser && isAdmin() && !isLoading) {
+    if (isAdminUser) {
       loadDashboardData();
       loadPlayers();
     }
-  }, [currentUser, isAdmin, isLoading]);
+  }, [isAdminUser]);
 
   const loadDashboardData = async () => {
     setIsLoadingData(true);
@@ -68,8 +70,8 @@ function AppContent() {
       setLeagues(leaguesData);
 
       // Load seasons for each league
-      const seasonsData: Record<string, any[]> = {};
-      const allGamesData: Record<string, any[]> = {};
+      const seasonsData: Record<string, Season[]> = {};
+      const allGamesData: Record<string, Game[]> = {};
 
       for (const league of leaguesData) {
         const seasons = await seasonsApi.getByLeague(league.id);
@@ -289,10 +291,12 @@ function AppContent() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <LanguageProvider>
-        <AppContent />
-      </LanguageProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <LanguageProvider>
+          <AppContent />
+        </LanguageProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }

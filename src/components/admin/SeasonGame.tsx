@@ -26,78 +26,82 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
   const [team2Players, setTeam2Players] = useState<GamePlayer[]>([]);
 
   useEffect(() => {
-    loadGame();
-  }, [gameId]);
+    let cancelled = false;
 
-  const loadGame = async () => {
-    const gameData = await gamesApi.getById(gameId);
+    const loadGame = async () => {
+      const gameData = await gamesApi.getById(gameId);
 
-    if (!gameData) {
-      return;
-    }
+      if (cancelled || !gameData) {
+        return;
+      }
 
-    await fetchAndAssignTeams(gameData);
+      await fetchAndAssignTeams(gameData);
 
-    // Initialize matches if empty or not present
-    if (!gameData.matches || gameData.matches.length === 0) {
-      if (!gameData.team1 || !gameData.team2) return;
-      const playersPerTeam = gameData.team1.players.length;
-      const matchCount = gameData.matchesPerGame;
-      gameData.matches = Array.from({ length: matchCount }, (_, i) =>
-        createEmptyMatch(i + 1, playersPerTeam)
-      );
-      // Save the initialized matches
-      await gamesApi.update(gameId, gameData);
-    }
-
-    // Recalculate player averages and handicaps based on current season performance
-    await recalculatePlayerAveragesAndHandicaps(gameData);
-
-    // Save updated player data back to game
-    await gamesApi.update(gameId, gameData);
-    setGame(gameData);
-
-    // Initialize pre-match players state when entering pre-match setup
-    if (gameData.team1 && gameData.team2) {
-      setTeam1Players(gameData.team1.players);
-      setTeam2Players(gameData.team2.players);
-    }
-
-    // Determine current match based on completion
-    if (gameData.status === 'completed') {
-      setShowSummary(true);
-    } else {
-      // Check if this is the first time entering the game (no scores entered yet)
-      // Any positive pins value means scores have been entered
-      const hasAnyScores = gameData.matches.some((m: GameMatch) =>
-        m.team1.players.some((p: MatchPlayer) => p.pins !== '') ||
-        m.team2.players.some((p: MatchPlayer) => p.pins !== '')
-      );
-
-      // Show pre-match setup if no scores entered yet
-      if (!hasAnyScores) {
-        setShowPreMatch(true);
-      } else {
-        // Find first incomplete match
+      // Initialize matches if empty or not present
+      if (!gameData.matches || gameData.matches.length === 0) {
         if (!gameData.team1 || !gameData.team2) return;
-        const incompleteMatchIndex = gameData.matches.findIndex((m: GameMatch) => {
-          const team1Complete = gameData.team1!.players.every((p: GamePlayer, idx: number) =>
-            p.absent || (m.team1.players[idx] && m.team1.players[idx].pins !== '')
-          );
-          const team2Complete = gameData.team2!.players.every((p: GamePlayer, idx: number) =>
-            p.absent || (m.team2.players[idx] && m.team2.players[idx].pins !== '')
-          );
-          return !team1Complete || !team2Complete;
-        });
+        const playersPerTeam = gameData.team1.players.length;
+        const matchCount = gameData.matchesPerGame;
+        gameData.matches = Array.from({ length: matchCount }, (_, i) =>
+          createEmptyMatch(i + 1, playersPerTeam)
+        );
+        // Save the initialized matches
+        await gamesApi.update(gameId, gameData);
+      }
 
-        if (incompleteMatchIndex >= 0) {
-          setCurrentMatch(incompleteMatchIndex + 1);
+      // Recalculate player averages and handicaps based on current season performance
+      await recalculatePlayerAveragesAndHandicaps(gameData);
+
+      // Save updated player data back to game
+      await gamesApi.update(gameId, gameData);
+      if (cancelled) return;
+      setGame(gameData);
+
+      // Initialize pre-match players state when entering pre-match setup
+      if (gameData.team1 && gameData.team2) {
+        setTeam1Players(gameData.team1.players);
+        setTeam2Players(gameData.team2.players);
+      }
+
+      // Determine current match based on completion
+      if (gameData.status === 'completed') {
+        setShowSummary(true);
+      } else {
+        // Check if this is the first time entering the game (no scores entered yet)
+        // Any positive pins value means scores have been entered
+        const hasAnyScores = gameData.matches.some((m: GameMatch) =>
+          m.team1.players.some((p: MatchPlayer) => p.pins !== '') ||
+          m.team2.players.some((p: MatchPlayer) => p.pins !== '')
+        );
+
+        // Show pre-match setup if no scores entered yet
+        if (!hasAnyScores) {
+          setShowPreMatch(true);
         } else {
-          setShowSummary(true);
+          // Find first incomplete match
+          if (!gameData.team1 || !gameData.team2) return;
+          const incompleteMatchIndex = gameData.matches.findIndex((m: GameMatch) => {
+            const team1Complete = gameData.team1!.players.every((p: GamePlayer, idx: number) =>
+              p.absent || (m.team1.players[idx] && m.team1.players[idx].pins !== '')
+            );
+            const team2Complete = gameData.team2!.players.every((p: GamePlayer, idx: number) =>
+              p.absent || (m.team2.players[idx] && m.team2.players[idx].pins !== '')
+            );
+            return !team1Complete || !team2Complete;
+          });
+
+          if (incompleteMatchIndex >= 0) {
+            setCurrentMatch(incompleteMatchIndex + 1);
+          } else {
+            setShowSummary(true);
+          }
         }
       }
-    }
-  };
+    };
+
+    loadGame();
+    return () => { cancelled = true; };
+  }, [gameId]);
 
   const handlePreMatchContinue = async () => {
     if (!game || !game.team1 || !game.team2) return;
@@ -246,12 +250,19 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
     } else if (updated.status === 'pending') {
       updated.status = 'in-progress';
     }
+    const previous = game;
     setGame(updated);
-    await gamesApi.update(gameId, updated);
+    try {
+      await gamesApi.update(gameId, updated);
+    } catch (error) {
+      console.error('Failed to save score update:', error);
+      setGame(previous);
+    }
   };
 
   const togglePlayerAbsent = async (team: 'team1' | 'team2', playerIndex: number) => {
     if (!game || !game.team1 || !game.team2 || !game.team1.players || !game.team2.players) return;
+    const previous = game;
     const updated: Game = { ...game };
     if (team === 'team1' && updated.team1 && updated.team1.players && updated.team1.players[playerIndex]) {
       updated.team1.players[playerIndex].absent = !updated.team1.players[playerIndex].absent;
@@ -259,7 +270,12 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
       updated.team2.players[playerIndex].absent = !updated.team2.players[playerIndex].absent;
     }
     setGame(updated);
-    await gamesApi.update(gameId, updated);
+    try {
+      await gamesApi.update(gameId, updated);
+    } catch (error) {
+      console.error('Failed to save absent toggle:', error);
+      setGame(previous);
+    }
   };
 
   const goToNextMatch = () => {

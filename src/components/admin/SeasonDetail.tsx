@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { seasonsApi, teamsApi, gamesApi, leaguesApi } from '../../services/api';
 import { calculateTeamStandings, calculatePlayerSeasonStats } from '../../utils/standingsUtils';
 import { postponeMatchDay } from '../../utils/scheduleUtils';
@@ -35,10 +35,6 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [postponeWeeks, setPostponeWeeks] = useState(1);
 
-  useEffect(() => {
-    loadSeasonData();
-  }, [seasonId]);
-
   const loadSeasonData = async () => {
     const seasonData = await seasonsApi.getById(seasonId);
     setSeason(seasonData ?? null);
@@ -66,6 +62,16 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
       }
     }
   };
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      await loadSeasonData();
+      if (cancelled) return;
+    };
+    load();
+    return () => { cancelled = true; };
+  }, [seasonId]);
 
   const handleCompleteSeason = async () => {
     const incompleteGames = games.filter(g => g.status !== 'completed');
@@ -164,9 +170,9 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
 
   if (!season || !league) return <div>{t('seasons.loading')}</div>;
 
-  const teamStandings = calculateTeamStandings(teams, games);
-  const playerStats = calculatePlayerSeasonStats(teams, games);
-  const seasonRecords = calculateSeasonRecords(teams, games);
+  const teamStandings = useMemo(() => calculateTeamStandings(teams, games), [teams, games]);
+  const playerStats = useMemo(() => calculatePlayerSeasonStats(teams, games), [teams, games]);
+  const seasonRecords = useMemo(() => calculateSeasonRecords(teams, games), [teams, games]);
   
   const roundGames = games.filter(g => g.round === selectedRound);
   const matchDayGames = selectedMatchDay ? roundGames.filter(g => g.matchDay === selectedMatchDay) : [];

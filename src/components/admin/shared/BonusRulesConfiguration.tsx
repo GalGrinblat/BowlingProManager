@@ -123,7 +123,7 @@ export const BonusRulesConfiguration: React.FC<BonusRulesConfigurationProps> = (
           )}
         </div>
         {bonusRules.map((rule, idx) => (
-          <div key={idx} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+          <div key={`${rule.type}-${rule.condition}-${idx}`} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
             <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">{t('leagues.bonus.applyTo')}</label>

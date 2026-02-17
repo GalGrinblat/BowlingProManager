@@ -113,7 +113,7 @@ export const TeamPanel: React.FC<TeamPanelProps> = ({
     <div className="space-y-3">
       {players.map((player, idx) => (
         <PlayerRow
-          key={idx}
+          key={player.playerId}
           player={player}
           idx={idx}
           team={team}

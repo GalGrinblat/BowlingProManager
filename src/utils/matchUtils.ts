@@ -1,5 +1,9 @@
 import type { BonusRule, Game, PlayerMatchResult, GameMatch, MatchPlayer, GamePlayer } from '../types/index';
 import { compareTeamScores, applyMatchWinnerPoints } from './comparisonUtils';
+import { ABSENT_PLAYER_PENALTY, MIN_BOWLING_SCORE, MAX_BOWLING_SCORE } from '../constants/bowling';
+
+const clampScore = (score: number): number =>
+  Math.max(MIN_BOWLING_SCORE, Math.min(MAX_BOWLING_SCORE, score));
 
 export const createEmptyMatch = (matchNumber: number, playersPerTeam: number): GameMatch => {
   const createEmptyPlayers = (): MatchPlayer[] =>
@@ -86,7 +90,7 @@ const calculateTeamTotals = (
   
   gamePlayers.forEach((player, idx) => {
     if (!player || !matchPlayers[idx]) return;
-    const score = player.absent ? player.average - 10 : (Number(matchPlayers[idx].pins) || 0);
+    const score = player.absent ? player.average - ABSENT_PLAYER_PENALTY : clampScore(Number(matchPlayers[idx].pins) || 0);
     totalPins += score;
     totalWithHandicap += score + player.handicap;
   });
@@ -117,9 +121,9 @@ export const calculateMatchResults = (game: Game, matchIndex: number): void => {
       return;
     }
     
-    // If player is absent, use average - 10; otherwise use entered pins (or 0)
-    const team1PlayerScore = team1Player.absent ? team1Player.average - 10 : (Number(match.team1.players[idx]?.pins) || 0);
-    const team2PlayerScore = team2Player.absent ? team2Player.average - 10 : (Number(match.team2.players[idx]?.pins) || 0);
+    // If player is absent, use average minus penalty; otherwise use entered pins (or 0)
+    const team1PlayerScore = team1Player.absent ? team1Player.average - ABSENT_PLAYER_PENALTY : clampScore(Number(match.team1.players[idx]?.pins) || 0);
+    const team2PlayerScore = team2Player.absent ? team2Player.average - ABSENT_PLAYER_PENALTY : clampScore(Number(match.team2.players[idx]?.pins) || 0);
     
     const team1PlayerScoreWithHandicap = team1PlayerScore + team1Player.handicap;
     const team2PlayerScoreWithHandicap = team2PlayerScore + team2Player.handicap;

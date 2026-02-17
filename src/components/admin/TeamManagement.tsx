@@ -4,17 +4,17 @@ import { useTranslation } from '../../contexts/LanguageContext';
 import { useDateFormat } from '../../hooks/useDateFormat';
 import { getPlayerDisplayName } from '../../utils/playerUtils';
 
-import type { TeamManagementProps } from '../../types/index';
+import type { TeamManagementProps, Season, Team, Player, RosterChange } from '../../types/index';
 
 export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack }) => {
   const { t } = useTranslation();
   const { formatDate } = useDateFormat();
-  const [season, setSeason] = useState<any>(null);
-  const [teams, setTeams] = useState<any[]>([]);
-  const [allPlayers, setAllPlayers] = useState<any[]>([]);
-  const [selectedTeam, setSelectedTeam] = useState<any>(null);
+  const [season, setSeason] = useState<Season | null>(null);
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [allPlayers, setAllPlayers] = useState<Player[]>([]);
+  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
   const [editingRoster, setEditingRoster] = useState(false);
-  const [rosterChanges, setRosterChanges] = useState<any[]>([]);
+  const [rosterChanges, setRosterChanges] = useState<RosterChange[]>([]);
 
   useEffect(() => {
     loadData();
@@ -22,7 +22,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
 
   const loadData = async () => {
     const seasonData = await seasonsApi.getById(seasonId);
-    setSeason(seasonData);
+    setSeason(seasonData ?? null);
 
     const teamsData = await teamsApi.getBySeason(seasonId);
     setTeams(teamsData);
@@ -31,33 +31,27 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
     setAllPlayers(playersData.filter(p => p.active));
   };
 
-  const handleEditRoster = (team: any) => {
+  const handleEditRoster = (team: Team) => {
     setSelectedTeam(team);
     setEditingRoster(true);
   };
 
-  const handleSubstitutePlayer = async (team: any, oldPlayerIndex: any, newPlayerId: any) => {
+  const handleSubstitutePlayer = async (team: Team, oldPlayerIndex: number, newPlayerId: string) => {
     const oldPlayerId = team.playerIds[oldPlayerIndex];
+    if (!oldPlayerId) return;
     const oldPlayer = allPlayers.find(p => p.id === oldPlayerId);
     const newPlayer = allPlayers.find(p => p.id === newPlayerId);
 
     if (!newPlayer || !oldPlayer) return;
 
     // Create roster change record
-    const change = {
-      teamId: team.id,
-      teamName: team.name,
+    const change: RosterChange = {
       date: new Date().toISOString(),
-      type: 'substitution',
-      oldPlayer: {
-        id: oldPlayerId,
-        name: getPlayerDisplayName(oldPlayer)
-      },
-      newPlayer: {
-        id: newPlayerId,
-        name: getPlayerDisplayName(newPlayer)
-      },
-      position: oldPlayerIndex
+      position: oldPlayerIndex,
+      oldPlayerId,
+      newPlayerId,
+      oldPlayerName: getPlayerDisplayName(oldPlayer),
+      newPlayerName: getPlayerDisplayName(newPlayer)
     };
 
     // Update team roster
@@ -77,11 +71,11 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
     setSelectedTeam(null);
   };
 
-  const getPlayerInfo = (playerId: any) => {
+  const getPlayerInfo = (playerId: string) => {
     return allPlayers.find(p => p.id === playerId);
   };
 
-  const getAvailablePlayers = (team: any) => {
+  const getAvailablePlayers = (team: Team) => {
     // Filter out players already on this team
     return allPlayers.filter(p => !team.playerIds.includes(p.id));
   };
@@ -123,7 +117,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
       {/* Teams List */}
       <div className="grid md:grid-cols-2 gap-6">
         {teams.map(team => {
-          const teamPlayers = team.playerIds.map((id: any) => getPlayerInfo(id)).filter(Boolean);
+          const teamPlayers = team.playerIds.map((id: string) => getPlayerInfo(id)).filter((p): p is Player => !!p);
           const recentChanges = (team.rosterChanges || []).slice(0, 3);
 
           return (
@@ -140,8 +134,8 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
 
               {/* Current Roster */}
               <div className="space-y-2 mb-4">
-                {teamPlayers.map((player: any, idx: any) => (
-                  <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                {teamPlayers.map((player, idx) => (
+                  <div key={player.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold">
                         {idx + 1}
@@ -159,11 +153,11 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
                 <div className="border-t pt-3">
                   <h3 className="text-sm font-semibold text-gray-600 mb-2">Recent Changes</h3>
                   <div className="space-y-1">
-                    {recentChanges.map((change: any, idx: any) => (
+                    {recentChanges.map((change: RosterChange, idx: number) => (
                       <div key={idx} className="text-xs text-gray-600 bg-yellow-50 p-2 rounded">
-                        <span className="font-semibold">{change.oldPlayer.name}</span>
+                        <span className="font-semibold">{change.oldPlayerName}</span>
                         {' '}{t('common.rightArrow')}{' '}
-                        <span className="font-semibold">{change.newPlayer.name}</span>
+                        <span className="font-semibold">{change.newPlayerName}</span>
                         <span className="text-gray-500 ml-2">
                           ({formatDate(change.date)})
                         </span>
@@ -187,12 +181,12 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
               </h2>
               
               <div className="space-y-4">
-                {selectedTeam.playerIds.map((playerId: any, idx: any) => {
+                {selectedTeam.playerIds.map((playerId: string, idx: number) => {
                   const currentPlayer = getPlayerInfo(playerId);
                   const availablePlayers = getAvailablePlayers(selectedTeam);
 
                   return (
-                    <div key={idx} className="border border-gray-200 rounded-lg p-4">
+                    <div key={playerId} className="border border-gray-200 rounded-lg p-4">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold">
@@ -252,8 +246,8 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
           <h2 className="text-xl font-bold text-gray-800 mb-4">Season Roster Change History</h2>
           <div className="space-y-2">
             {teams
-              .flatMap((t: any) => (t.rosterChanges || []).map((c: any) => ({ ...c, teamName: t.name })))
-              .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
+              .flatMap((t: Team) => (t.rosterChanges || []).map((c: RosterChange) => ({ ...c, teamName: t.name })))
+              .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
               .map((change, idx) => (
                 <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center gap-4">
@@ -263,9 +257,9 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
                         {change.teamName}
                       </div>
                       <div className="text-sm text-gray-600">
-                        <span className="font-medium">{change.oldPlayer.name}</span>
+                        <span className="font-medium">{change.oldPlayerName}</span>
                         {' '}{t('common.rightArrow')}{' '}
-                        <span className="font-medium">{change.newPlayer.name}</span>
+                        <span className="font-medium">{change.newPlayerName}</span>
                         <span className="text-gray-400 ml-2">
                           (Position {change.position + 1})
                         </span>

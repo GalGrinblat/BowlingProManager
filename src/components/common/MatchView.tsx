@@ -44,7 +44,7 @@ export const MatchView: React.FC<MatchViewProps> = ({ matchNumber, game, onUpdat
             const team2MatchPlayer = match.team2.players[idx];
             if (!team1MatchPlayer ||!team2Player || !team2MatchPlayer) return null;
             return (
-              <div key={idx} className="player-row bg-gray-700 rounded-lg p-3">
+              <div key={player.playerId} className="player-row bg-gray-700 rounded-lg p-3">
                 <div className="grid grid-cols-3 gap-4 items-center">
                   {/* Team 1 Player */}
                   <PlayerScoreInput

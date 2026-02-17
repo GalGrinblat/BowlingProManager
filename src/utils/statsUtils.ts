@@ -1,4 +1,5 @@
 import type { Game, GameMatch, GamePlayer } from '../types/index';
+import { ABSENT_PLAYER_PENALTY } from '../constants/bowling';
 
 interface PlayerGameStats {
   totalPins: number;
@@ -33,7 +34,7 @@ export const calculatePlayerStats = (game: Game): GameStats => {
       return { totalPins: 0, gameAverage: 0, pointsScored: 0, isAbsent: false };
     }
     if (player.absent) {
-      const absenceScore = player.average - 10;
+      const absenceScore = player.average - ABSENT_PLAYER_PENALTY;
       const totalPins = absenceScore * 3;
       const gameAverage = absenceScore;
       const pointsScored = game.matches?.reduce((sum: number, m: GameMatch) => {
@@ -60,7 +61,7 @@ export const calculatePlayerStats = (game: Game): GameStats => {
       return { totalPins: 0, gameAverage: 0, pointsScored: 0, isAbsent: false };
     }
     if (player.absent) {
-      const absenceScore = player.average - 10;
+      const absenceScore = player.average - ABSENT_PLAYER_PENALTY;
       const totalPins = absenceScore * 3;
       const gameAverage = absenceScore;
       const pointsScored = game.matches?.reduce((sum: number, m: GameMatch) => {
