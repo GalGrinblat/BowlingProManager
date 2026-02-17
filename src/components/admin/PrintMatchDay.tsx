@@ -6,7 +6,7 @@ import { formatMatchDate } from '../../utils/scheduleUtils';
 import { useTranslation } from '../../contexts/LanguageContext';
 import { getPlayerDisplayName } from '../../utils/playerUtils';
 
-import type { PrintMatchDayProps } from '../../types/index';
+import type { Game, League, PrintMatchDayProps, ScheduleMatchDay, Season, Team, TeamStanding, CurrentPlayerAverages } from '../../types/index';
 
 export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
   seasonId,
@@ -15,13 +15,13 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
 }) => {
   const { t, language } = useTranslation();
   const isRTL = language === 'he';
-  const [season, setSeason] = useState<any>(null);
-  const [league, setLeague] = useState<any>(null);
-  const [teams, setTeams] = useState<any[]>([]);
-  const [games, setGames] = useState<any[]>([]);
-  const [matchDayGames, setMatchDayGames] = useState<any[]>([]);
-  const [teamStandings, setTeamStandings] = useState<any[]>([]);
-  const [, setCurrentAverages] = useState<any>({});
+  const [season, setSeason] = useState<Season | null>(null);
+  const [league, setLeague] = useState<League | null>(null);
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [games, setGames] = useState<Game[]>([]);
+  const [matchDayGames, setMatchDayGames] = useState<Game[]>([]);
+  const [teamStandings, setTeamStandings] = useState<TeamStanding[]>([]);
+  const [currentAverages, setCurrentAverages] = useState<CurrentPlayerAverages>({});
   const [teamPlayersMap, setTeamPlayersMap] = useState<Record<string, any[]>>({});
 
   useEffect(() => {
@@ -30,11 +30,11 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
 
   const loadData = async () => {
     const seasonData = await seasonsApi.getById(seasonId);
-    setSeason(seasonData);
-
     if (!seasonData) return;
-
+    setSeason(seasonData);
+  
     const leagueData = await leaguesApi.getById(seasonData.leagueId);
+    if (!leagueData) return;
     setLeague(leagueData);
 
     const teamsData = await teamsApi.getBySeason(seasonId);
@@ -53,13 +53,19 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
     const previousGames = gamesData.filter(g =>
       g.status === 'completed' && g.matchDay < matchDay
     );
-    const averages = calculateCurrentPlayerAverages(teamsData, previousGames);
-    setCurrentAverages(averages);
+
+    if (previousGames.length === 0) {
+      setCurrentAverages(seasonData.initialPlayerAverages || {});
+    }
+    else {
+      const averages = calculateCurrentPlayerAverages(previousGames);
+      setCurrentAverages(averages);
+    }
 
     // Preload team players for all teams
     const playersMap: Record<string, any[]> = {};
     for (const team of teamsData) {
-      playersMap[team.id] = await getTeamPlayers(team, seasonData, averages);
+      playersMap[team.id] = await getTeamPlayers(team, seasonData, currentAverages);
     }
     setTeamPlayersMap(playersMap);
   };
@@ -68,7 +74,7 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
     window.print();
   };
 
-  const getTeamPlayers = async (team: any, seasonData: any, averages: any) => {
+  const getTeamPlayers = async (team: Team, seasonData: Season, averages: CurrentPlayerAverages) => {
     const playerPromises = team.playerIds.map(async (playerId: string) => {
       const player = await playersApi.getById(playerId);
       const playerName = player ? getPlayerDisplayName(player) : 'Unknown';
@@ -77,9 +83,9 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
 
       // Calculate handicap for this match
       let handicap = 0;
-      if (seasonData.useHandicap && currentAvg > 0 && currentAvg < seasonData.handicapBasis) {
-        const diff = seasonData.handicapBasis - currentAvg;
-        handicap = Math.round(diff * (seasonData.handicapPercentage / 100));
+      if (seasonData.seasonConfigurations.useHandicap && currentAvg > 0 && currentAvg < seasonData.seasonConfigurations.handicapBasis) {
+        const diff = seasonData.seasonConfigurations.handicapBasis - currentAvg;
+        handicap = Math.round(diff * (seasonData.seasonConfigurations.handicapPercentage / 100));
       }
 
       return {
@@ -100,8 +106,8 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
   };
 
   const getScheduleInfo = () => {
-    if (!season.schedule) return null;
-    return season.schedule.find((s: any) => s.matchDay === matchDay);
+    if (!season || !season.schedule) return null;
+    return season.schedule.find((s: ScheduleMatchDay) => s.matchDay === matchDay);
   };
 
   if (!season || !league) {
@@ -200,7 +206,7 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
                         <h4 className="text-3xl font-bold text-gray-900 mb-2">{team1.name}</h4>
                         {team1Standing && (
                           <div className="text-sm text-gray-600">
-                            <div>#{team1Standing.rank} • {team1Standing.wins}-{team1Standing.losses}-{team1Standing.draws} ({team1Standing.points} {t('common.pts')})</div>
+                            <div>{team1Standing.wins}-{team1Standing.losses}-{team1Standing.draws} ({team1Standing.points} {t('common.pts')})</div>
                           </div>
                         )}
                       </div>
@@ -220,7 +226,7 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
                         <h4 className="text-3xl font-bold text-gray-900 mb-2">{team2.name}</h4>
                         {team2Standing && (
                           <div className="text-sm text-gray-600">
-                            <div>#{team2Standing.rank} • {team2Standing.wins}-{team2Standing.losses}-{team2Standing.draws} ({team2Standing.points} {t('common.pts')})</div>
+                            <div>{team2Standing.wins}-{team2Standing.losses}-{team2Standing.draws} ({team2Standing.points} {t('common.pts')})</div>
                           </div>
                         )}
                       </div>

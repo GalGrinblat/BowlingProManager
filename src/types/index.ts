@@ -83,7 +83,7 @@ export interface Season {
   status: SeasonStatus;
   schedule?: ScheduleMatchDay[];
   /** Initial player averages for this season, keyed by playerId */
-  playerAverages?: { [playerId: string]: number };
+  initialPlayerAverages?: CurrentPlayerAverages;
   updatedAt?: DateString;
   createdAt: DateString;
 }

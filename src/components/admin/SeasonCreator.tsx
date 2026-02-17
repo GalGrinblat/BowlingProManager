@@ -6,7 +6,7 @@ import { BonusRulesConfiguration } from './shared/BonusRulesConfiguration';
 import { playersApi, leaguesApi } from '../../services/api';
 import { useTranslation } from '../../contexts/LanguageContext';
 import { getPlayerDisplayName } from '../../utils/playerUtils';
-import type { SeasonCreatorProps, BonusRule, LineupStrategy, LineupRule, League } from '../../types/index';
+import type { SeasonCreatorProps, BonusRule, LineupStrategy, LineupRule, League, CurrentPlayerAverages } from '../../types/index';
 import { DEFAULT_HANDICAP_BASIS, DEFAULT_HANDICAP_PERCENTAGE, DEFAULT_NUMBER_OF_TEAMS, DEFAULT_NUMBER_OF_ROUNDS, DEFAULT_PLAYERS_PER_TEAM, DEFAULT_MATCHES_PER_GAME, DEFAULT_PLAYER_MATCH_POINTS, DEFAULT_TEAM_MATCH_POINTS, DEFAULT_TEAM_GAME_POINTS, DEFAULT_USE_HANDICAP, DEFAULT_LINEUP_STRATEGY, DEFAULT_LINEUP_RULE, DEFAULT_TEAM_ALL_PRESENT_BONUS_ENABLED, DEFAULT_TEAM_ALL_PRESENT_BONUS_POINTS } from '../../constants/bowling';
 import { PlayerMatchupConfiguration } from './shared/PlayerMatchupConfiguration';
 
@@ -72,7 +72,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
   const [teams, setTeams] = useState<Team[]>([]);
   const [inheritLeagueConfig, setInheritLeagueConfig] = useState(true);
   const [availablePlayers, setAvailablePlayers] = useState<Player[]>([]);
-  const [playerAverages, setPlayerAverages] = useState<{ [playerId: string]: number }>({});
+  const [playerAverages, setPlayerAverages] = useState<CurrentPlayerAverages>({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -495,11 +495,13 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
   const allPlayersWithTeams = teams.flatMap(team =>
     team.playerIds.map((playerId: string) => {
       const player = availablePlayers.find((p: Player) => p.id === playerId);
+      const avgObj = playerAverages[playerId] || { average: 0, gamesPlayed: 0, totalPins: 0 };
       return {
         playerId,
         playerName: player ? getPlayerDisplayName(player) : 'Unknown',
         teamName: team.name,
-        average: playerAverages[playerId] || 0
+        average: avgObj.average,
+        gamesPlayed: avgObj.gamesPlayed
       };
     })
   );
@@ -540,7 +542,16 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
                       value={player.average}
                       onChange={e => {
                         const newAvg = parseFloat(e.target.value) || 0;
-                        setPlayerAverages(prev => ({ ...prev, [player.playerId]: newAvg }));
+                        setPlayerAverages(prev => {
+                          return {
+                            ...prev,
+                            [player.playerId]: {
+                              average: newAvg,
+                              totalPins: 0,
+                              gamesPlayed: 0
+                            }
+                          };
+                        });
                       }}
                       className="w-24 px-3 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />

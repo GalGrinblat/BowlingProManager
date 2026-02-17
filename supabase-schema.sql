@@ -100,7 +100,7 @@ CREATE TABLE public.seasons (
   bonus_rules JSONB NOT NULL DEFAULT '[]'::jsonb,
   status season_status NOT NULL DEFAULT 'setup',
   schedule JSONB,
-  player_averages JSONB,
+  initial_player_averages JSONB,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

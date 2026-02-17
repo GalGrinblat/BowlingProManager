@@ -309,8 +309,7 @@ export const calculatePlayerSeasonStats = (teams: Team[], games: Game[]): Player
  * Returns a map of playerName -> { average, gamesPlayed }
  * Uses completed games only to determine current performance
  */
-export const calculateCurrentPlayerAverages = (_teams: Team[], games: Game[]): CurrentPlayerAverages => {
-  // Note: _teams parameter kept for API consistency but not used internally
+export const calculateCurrentPlayerAverages = (games: Game[]): CurrentPlayerAverages => {
   const playerAverages: CurrentPlayerAverages = {};
   
   // Process completed games only

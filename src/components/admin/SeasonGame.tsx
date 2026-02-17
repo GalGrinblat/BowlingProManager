@@ -426,7 +426,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
     );
 
     // Calculate current player averages from completed games
-    const currentAverages = calculateCurrentPlayerAverages(teams, completedGames);
+    const currentAverages = calculateCurrentPlayerAverages(completedGames);
 
     // Helper to update player averages and handicaps for a team
     function updatePlayerAveragesAndHandicaps(players: GamePlayer[] | undefined) {
@@ -438,8 +438,8 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
           playerAvg = currentAvg.average;
         } else {
           // Use season.playerAverages if available, fallback to player.average
-          playerAvg = (season && season.playerAverages && season.playerAverages[player.playerId] != null)
-            ? (season.playerAverages[player.playerId] ?? 0)
+          playerAvg = (season && season.initialPlayerAverages && season.initialPlayerAverages[player.playerId] !== undefined)
+            ? (season.initialPlayerAverages[player.playerId]?.average ?? 0)
             : (player.average || 0);
         }
         let handicap = 0;

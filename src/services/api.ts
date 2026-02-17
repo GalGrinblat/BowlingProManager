@@ -528,7 +528,7 @@ const mapSeasonFromDb = (data: any): Season => ({
   },
   status: data.status,
   schedule: data.schedule,
-  playerAverages: data.player_averages,
+  initialPlayerAverages: data.initial_player_averages,
   updatedAt: data.updated_at,
   createdAt: data.created_at
 });
@@ -559,7 +559,7 @@ const mapSeasonToDb = (data: Partial<Season>): any => {
   }
   if (data.status !== undefined) dbData.status = data.status;
   if (data.schedule !== undefined) dbData.schedule = data.schedule;
-  if (data.playerAverages !== undefined) dbData.player_averages = data.playerAverages;
+  if (data.initialPlayerAverages !== undefined) dbData.initial_player_averages = data.initialPlayerAverages;
   return dbData;
 };
 
