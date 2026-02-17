@@ -60,6 +60,7 @@ const he: TranslationDictionary = {
     completed: 'הושלם',
     matchDay: 'מחזור',
     round: 'סיבוב',
+    na: 'לא זמין',
   },
 
   // אימות
@@ -509,6 +510,7 @@ const he: TranslationDictionary = {
   gameHistory: {
     title: 'היסטוריית משחק',
     finalScore: 'תוצאה סופית',
+    winner: 'מנצח',
     wins: 'ניצחונות',
     pinsWithHandicap: 'פינים (עם הנדיקאפ)',
     match: 'משחק',
@@ -521,8 +523,11 @@ const he: TranslationDictionary = {
     withHandicap: 'עם הנדיקאפ',
     bonusPoints: 'נקודות בונוס',
     matchScore: 'ניקוד משחק',
+    teamTotal: 'סה"כ קבוצה',
     grandTotalPoints: 'נקודות סה"כ כלליות',
     grandTotalDesc: '2 נקודות מוענקות לקבוצה עם הפינים המשולבים הגבוהים ביותר בכל {{count}} המשחקים',
+    championBanner: 'מנצחת המשחק',
+    gameSummary: 'סיכום משחק',
   },
 
   // לוח משחקים
@@ -547,6 +552,18 @@ const he: TranslationDictionary = {
     thursdayPlural: 'ימי חמישי',
     fridayPlural: 'ימי שישי',
     saturdayPlural: 'שבתות',
+  },
+
+  // סיכום משחק
+  summary: {
+    gameSummary: 'סיכום משחק',
+    gameWinner: 'מנצח המשחק',
+    tieGame: 'תיקו',
+    matchBreakdown: 'פירוט משחקים',
+    match: 'משחק',
+    gameStatistics: 'סטטיסטיקות משחק',
+    backToMatch: 'חזרה למשחק {{matchNumber}}',
+    saveGame: 'שמור משחק',
   },
 
   // ניהול משתמשים

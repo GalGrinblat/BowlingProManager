@@ -60,6 +60,7 @@ const en: TranslationDictionary = {
     completed: 'Completed',
     matchDay: 'Match Day',
     round: 'Round',
+    na: 'N/A',
   },
 
   // Authentication
@@ -509,6 +510,7 @@ const en: TranslationDictionary = {
   gameHistory: {
     title: 'Game History',
     finalScore: 'Final Score',
+    winner: 'Winner',
     wins: 'Wins',
     pinsWithHandicap: 'pins (with Handicap)',
     match: 'Match',
@@ -521,8 +523,11 @@ const en: TranslationDictionary = {
     withHandicap: 'With Handicap',
     bonusPoints: 'Bonus Points',
     matchScore: 'Match Score',
+    teamTotal: 'Team Total',
     grandTotalPoints: 'Grand Total Points',
     grandTotalDesc: '2 points awarded to team with highest combined pins across all {{count}} matches',
+    championBanner: 'Game Winner',
+    gameSummary: 'Game Summary',
   },
 
   // Schedule
@@ -547,6 +552,18 @@ const en: TranslationDictionary = {
     thursdayPlural: 'Thursdays',
     fridayPlural: 'Fridays',
     saturdayPlural: 'Saturdays',
+  },
+
+  // Game Summary
+  summary: {
+    gameSummary: 'GAME SUMMARY',
+    gameWinner: 'Game Winner',
+    tieGame: 'TIE GAME',
+    matchBreakdown: 'MATCH BREAKDOWN',
+    match: 'Match',
+    gameStatistics: 'GAME STATISTICS',
+    backToMatch: 'Back to Match {{matchNumber}}',
+    saveGame: 'Save Game',
   },
 
   // User Management
