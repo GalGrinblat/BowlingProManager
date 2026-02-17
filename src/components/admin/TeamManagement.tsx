@@ -6,7 +6,7 @@ import { getPlayerDisplayName } from '../../utils/playerUtils';
 import type { TeamManagementProps } from '../../types/index';
 
 export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack }) => {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [season, setSeason] = useState<any>(null);
   const [teams, setTeams] = useState<any[]>([]);
   const [allPlayers, setAllPlayers] = useState<any[]>([]);
@@ -163,7 +163,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
                         {' '}{t('common.rightArrow')}{' '}
                         <span className="font-semibold">{change.newPlayer.name}</span>
                         <span className="text-gray-500 ml-2">
-                          ({new Date(change.date).toLocaleDateString()})
+                          ({new Date(change.date).toLocaleDateString(locale)})
                         </span>
                       </div>
                     ))}
@@ -271,7 +271,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
                     </div>
                   </div>
                   <div className="text-sm text-gray-500">
-                    {new Date(change.date).toLocaleDateString()}
+                    {new Date(change.date).toLocaleDateString(locale)}
                   </div>
                 </div>
               ))}

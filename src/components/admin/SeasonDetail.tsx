@@ -12,7 +12,7 @@ import type { GameMatch, ScheduleMatchDay, SeasonDetailProps } from '../../types
 import type { Season, League, Team, Game } from '../../types/index';
 
 export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, onPlayGame, onViewGame, onManageTeams }) => {
-  const { t, direction, isRTL } = useTranslation();
+  const { t, direction, isRTL, locale } = useTranslation();
   const [season, setSeason] = useState<Season | null>(null);
   const [league, setLeague] = useState<League | null>(null);
   const [teams, setTeams] = useState<Team[]>([]);
@@ -258,7 +258,7 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
                 <div className="text-sm opacity-90">{t('seasons.wld')}</div>
               </div>
               <div>
-                <div className="text-2xl font-bold">{champion.totalPinsWithHandicap.toLocaleString()}</div>
+                <div className="text-2xl font-bold">{champion.totalPinsWithHandicap.toLocaleString(locale)}</div>
                 <div className="text-sm opacity-90">{t('seasons.totalPins')}</div>
               </div>
             </div>
@@ -416,7 +416,7 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
                   const matchDayGamesForDay = roundGames.filter(g => g.matchDay === matchDay);
                   const completedInMatchDay = matchDayGamesForDay.filter(g => g.status === 'completed').length;
                   const scheduleEntry = season.schedule?.find((s: ScheduleMatchDay) => s.matchDay === matchDay);
-                  const dateDisplay = scheduleEntry?.date ? formatMatchDate(scheduleEntry.date) : null;
+                  const dateDisplay = scheduleEntry?.date ? formatMatchDate(scheduleEntry.date, locale) : null;
                   const isPostponed = scheduleEntry?.postponed;
                   
                   return (
@@ -797,7 +797,7 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
             <div className="mb-4">
               <p className="text-sm text-gray-600 mb-2">
                 {t('seasons.currentDate')}: {season.schedule?.find((s: ScheduleMatchDay) => s.matchDay === selectedMatchDay)?.date
-                  ? formatMatchDate(season.schedule.find((s: ScheduleMatchDay) => s.matchDay === selectedMatchDay)?.date ?? null)
+                  ? formatMatchDate(season.schedule.find((s: ScheduleMatchDay) => s.matchDay === selectedMatchDay)?.date ?? null, locale)
                   : t('seasons.notScheduled')}
               </p>
               <p className="text-sm text-gray-600 mb-4">
@@ -822,7 +822,7 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
                     const dateStr = season.schedule.find((s: ScheduleMatchDay) => s.matchDay === selectedMatchDay)?.date;
                     if (!dateStr) return t('seasons.notScheduled');
                     const newDate = new Date(new Date(dateStr).getTime() + postponeWeeks * 7 * 24 * 60 * 60 * 1000);
-                    return formatMatchDate(newDate.toISOString());
+                    return formatMatchDate(newDate.toISOString(), locale);
                   })()}
                 </p>
               )}

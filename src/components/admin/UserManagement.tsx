@@ -9,7 +9,7 @@ interface UserManagementProps {
 }
 
 export const UserManagement: React.FC<UserManagementProps> = ({ onBack }) => {
-  const { t: _t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [users, setUsers] = useState<DatabaseUser[]>([]);
   const [players, setPlayers] = useState<Player[]>([]);
   const [allowedEmails, setAllowedEmails] = useState<AllowedEmail[]>([]);
@@ -64,12 +64,12 @@ export const UserManagement: React.FC<UserManagementProps> = ({ onBack }) => {
         await usersApi.linkPlayer(userId, newPlayerId);
       }
 
-      alert('✅ User updated successfully');
+      alert(t('userManagement.userUpdatedSuccess'));
       setEditingUser(null);
       await loadData();
     } catch (error) {
       console.error('Error updating user:', error);
-      alert('❌ Failed to update user');
+      alert(t('userManagement.userUpdateFailed'));
     }
   };
 
@@ -80,52 +80,52 @@ export const UserManagement: React.FC<UserManagementProps> = ({ onBack }) => {
   };
 
   const getPlayerName = (playerId: string | null): string => {
-    if (!playerId) return 'Not linked';
+    if (!playerId) return t('userManagement.notLinked');
     const player = players.find(p => p.id === playerId);
-    return player ? getPlayerDisplayName(player) : 'Unknown Player';
+    return player ? getPlayerDisplayName(player) : t('userManagement.unknownPlayer');
   };
 
   const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleDateString();
+    return new Date(dateString).toLocaleDateString(locale);
   };
 
   const handleAddEmail = async () => {
     if (!newEmail.trim()) {
-      alert('❌ Please enter an email address');
+      alert(t('userManagement.emailRequired'));
       return;
     }
 
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(newEmail.trim())) {
-      alert('❌ Please enter a valid email address');
+      alert(t('userManagement.emailInvalid'));
       return;
     }
 
     try {
       await allowedEmailsApi.add(newEmail.trim(), newEmailNotes.trim() || undefined);
-      alert('✅ Email added to whitelist');
+      alert(t('userManagement.emailAddedSuccess'));
       setNewEmail('');
       setNewEmailNotes('');
       await loadData();
     } catch (error) {
       console.error('Error adding email:', error);
-      alert('❌ Failed to add email. It may already exist.');
+      alert(t('userManagement.emailAddFailed'));
     }
   };
 
   const handleRemoveEmail = async (email: string) => {
-    if (!confirm(`Remove ${email} from whitelist?\n\nUsers with this email will no longer be able to sign in.`)) {
+    if (!confirm(t('userManagement.confirmRemoveEmail').replace('{{email}}', email))) {
       return;
     }
 
     try {
       await allowedEmailsApi.remove(email);
-      alert('✅ Email removed from whitelist');
+      alert(t('userManagement.emailRemovedSuccess'));
       await loadData();
     } catch (error) {
       console.error('Error removing email:', error);
-      alert('❌ Failed to remove email');
+      alert(t('userManagement.emailRemoveFailed'));
     }
   };
 
@@ -143,27 +143,27 @@ export const UserManagement: React.FC<UserManagementProps> = ({ onBack }) => {
       <div className="bg-white rounded-xl shadow-lg p-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">User Management</h1>
-            <p className="text-gray-600">Manage user roles and player account links</p>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('userManagement.title')}</h1>
+            <p className="text-gray-600">{t('userManagement.subtitle')}</p>
           </div>
           <button
             onClick={onBack}
             className="text-gray-600 hover:text-gray-800"
           >
-            ← Back to Dashboard
+            ← {t('userManagement.backToDashboard')}
           </button>
         </div>
       </div>
 
       {/* Info Card */}
       <div className="bg-blue-50 rounded-xl p-6">
-        <h3 className="font-bold text-blue-900 mb-2">📌 User Management Guide</h3>
+        <h3 className="font-bold text-blue-900 mb-2">{t('userManagement.guideTitle')}</h3>
         <ul className="text-sm text-blue-800 space-y-1">
-          <li>• <strong>Email Whitelist</strong> - Only emails in the whitelist can sign in with Google</li>
-          <li>• <strong>Admin</strong> - Can manage all data, players, leagues, seasons, and users</li>
-          <li>• <strong>Player</strong> - Can view data and enter scores (must be linked to a player account)</li>
-          <li>• New users who sign in with Google will appear here with the "player" role by default</li>
-          <li>• Link player role users to their bowling player accounts</li>
+          <li>• {t('userManagement.guideEmailWhitelist')}</li>
+          <li>• {t('userManagement.guideAdminRole')}</li>
+          <li>• {t('userManagement.guidePlayerRole')}</li>
+          <li>• {t('userManagement.guideNewUsers')}</li>
+          <li>• {t('userManagement.guideLinkPlayers')}</li>
         </ul>
       </div>
 
@@ -171,38 +171,38 @@ export const UserManagement: React.FC<UserManagementProps> = ({ onBack }) => {
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="p-6 border-b border-gray-200">
           <h2 className="text-2xl font-bold text-gray-800 mb-2">
-            🔒 Email Whitelist ({allowedEmails.length})
+            {t('userManagement.emailWhitelistCount').replace('{{count}}', allowedEmails.length.toString())}
           </h2>
           <p className="text-sm text-gray-600">
-            Only emails in this list can sign in with Google
+            {t('userManagement.emailWhitelistDesc')}
           </p>
         </div>
 
         {/* Add Email Form */}
         <div className="p-6 bg-gray-50 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Add Email to Whitelist</h3>
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">{t('userManagement.addEmailTitle')}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Email Address *
+                {t('userManagement.emailAddressLabel')}
               </label>
               <input
                 type="email"
                 value={newEmail}
                 onChange={(e) => setNewEmail(e.target.value)}
-                placeholder="user@example.com"
+                placeholder={t('userManagement.emailAddressPlaceholder')}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Notes (Optional)
+                {t('userManagement.notesLabel')}
               </label>
               <input
                 type="text"
                 value={newEmailNotes}
                 onChange={(e) => setNewEmailNotes(e.target.value)}
-                placeholder="e.g., John Smith - Team Captain"
+                placeholder={t('userManagement.notesPlaceholder')}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
@@ -211,7 +211,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({ onBack }) => {
             onClick={handleAddEmail}
             className="mt-4 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold"
           >
-            Add to Whitelist
+            {t('userManagement.addToWhitelist')}
           </button>
         </div>
 
@@ -219,8 +219,8 @@ export const UserManagement: React.FC<UserManagementProps> = ({ onBack }) => {
         <div className="divide-y divide-gray-200">
           {allowedEmails.length === 0 ? (
             <div className="p-6 text-center text-gray-500">
-              <p className="mb-2">No emails in whitelist</p>
-              <p className="text-sm">⚠️ Warning: No one can sign in until you add emails to the whitelist</p>
+              <p className="mb-2">{t('userManagement.noEmailsInWhitelist')}</p>
+              <p className="text-sm">{t('userManagement.noEmailsWarning')}</p>
             </div>
           ) : (
             allowedEmails.map((email) => (
@@ -231,7 +231,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({ onBack }) => {
                       <h3 className="text-lg font-semibold text-gray-900">{email.email}</h3>
                       {users.some(u => u.email === email.email) && (
                         <span className="px-2 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-                          Registered
+                          {t('userManagement.registered')}
                         </span>
                       )}
                     </div>
@@ -239,14 +239,14 @@ export const UserManagement: React.FC<UserManagementProps> = ({ onBack }) => {
                       <p className="text-sm text-gray-600">{email.notes}</p>
                     )}
                     <p className="text-xs text-gray-500 mt-1">
-                      Added {formatDate(email.addedAt)}
+                      {t('userManagement.addedOn').replace('{{date}}', formatDate(email.addedAt))}
                     </p>
                   </div>
                   <button
                     onClick={() => handleRemoveEmail(email.email)}
                     className="ml-4 px-4 py-2 text-sm bg-red-100 text-red-700 rounded-lg hover:bg-red-200 font-semibold"
                   >
-                    Remove
+                    {t('common.remove')}
                   </button>
                 </div>
               </div>
@@ -259,12 +259,12 @@ export const UserManagement: React.FC<UserManagementProps> = ({ onBack }) => {
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="p-6 border-b border-gray-200">
           <h2 className="text-2xl font-bold text-gray-800">
-            All Users ({users.length})
+            {t('userManagement.allUsersTitle').replace('{{count}}', users.length.toString())}
           </h2>
         </div>
 
         {users.length === 0 ? (
-          <p className="text-gray-500 text-center py-12">No users found</p>
+          <p className="text-gray-500 text-center py-12">{t('userManagement.noUsersFound')}</p>
         ) : (
           <div className="divide-y divide-gray-200">
             {users.map((user) => (
@@ -273,35 +273,35 @@ export const UserManagement: React.FC<UserManagementProps> = ({ onBack }) => {
                   // Edit Mode
                   <div className="space-y-4">
                     <div>
-                      <p className="text-sm font-semibold text-gray-700 mb-1">Email</p>
+                      <p className="text-sm font-semibold text-gray-700 mb-1">{t('userManagement.email')}</p>
                       <p className="text-gray-900">{user.email}</p>
                     </div>
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Role *
+                        {t('userManagement.roleLabel')}
                       </label>
                       <select
                         value={selectedRole}
                         onChange={(e) => setSelectedRole(e.target.value as 'admin' | 'player')}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       >
-                        <option value="player">Player</option>
-                        <option value="admin">Admin</option>
+                        <option value="player">{t('userManagement.rolePlayer')}</option>
+                        <option value="admin">{t('userManagement.roleAdmin')}</option>
                       </select>
                     </div>
 
                     {selectedRole === 'player' && (
                       <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          Link to Player Account (Optional)
+                          {t('userManagement.linkPlayerLabel')}
                         </label>
                         <select
                           value={selectedPlayer}
                           onChange={(e) => setSelectedPlayer(e.target.value)}
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         >
-                          <option value="">Not linked</option>
+                          <option value="">{t('userManagement.notLinked')}</option>
                           {players.map((player) => (
                             <option key={player.id} value={player.id}>
                               {getPlayerDisplayName(player)}
@@ -309,7 +309,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({ onBack }) => {
                           ))}
                         </select>
                         <p className="text-xs text-gray-500 mt-1">
-                          Link this user to their bowling player account
+                          {t('userManagement.linkPlayerHelp')}
                         </p>
                       </div>
                     )}
@@ -319,13 +319,13 @@ export const UserManagement: React.FC<UserManagementProps> = ({ onBack }) => {
                         onClick={() => handleSaveUser(user.id)}
                         className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
                       >
-                        Save Changes
+                        {t('common.save')}
                       </button>
                       <button
                         onClick={handleCancelEdit}
                         className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-semibold"
                       >
-                        Cancel
+                        {t('common.cancel')}
                       </button>
                     </div>
                   </div>
@@ -342,19 +342,19 @@ export const UserManagement: React.FC<UserManagementProps> = ({ onBack }) => {
                               : 'bg-blue-100 text-blue-700'
                           }`}
                         >
-                          {user.role.toUpperCase()}
+                          {user.role === 'admin' ? t('userManagement.roleAdmin').toUpperCase() : t('userManagement.rolePlayer').toUpperCase()}
                         </span>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-600">
                         <div>
-                          <span className="font-medium">Player Account:</span>{' '}
+                          <span className="font-medium">{t('userManagement.playerAccountLabel')}</span>{' '}
                           <span className={user.playerId ? 'text-green-600' : 'text-gray-400'}>
                             {getPlayerName(user.playerId)}
                           </span>
                         </div>
                         <div>
-                          <span className="font-medium">Joined:</span>{' '}
+                          <span className="font-medium">{t('userManagement.joinedLabel')}</span>{' '}
                           {formatDate(user.createdAt)}
                         </div>
                       </div>
@@ -364,7 +364,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({ onBack }) => {
                       onClick={() => handleEditUser(user)}
                       className="ml-4 px-4 py-2 text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 font-semibold"
                     >
-                      Edit
+                      {t('common.edit')}
                     </button>
                   </div>
                 )}

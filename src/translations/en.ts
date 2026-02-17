@@ -432,6 +432,8 @@ const en: TranslationDictionary = {
     managePlayersDesc: 'Add, edit, or remove players',
     manageLeagues: 'Manage Leagues',
     manageLeaguesDesc: 'Create and configure leagues',
+    manageUsers: 'Manage Users',
+    manageUsersDesc: 'User roles & permissions',
     organizationSettings: 'Organization settings',
     activeLeagues: 'Active Leagues',
     noActiveLeagues: 'No active leagues yet',
@@ -442,6 +444,8 @@ const en: TranslationDictionary = {
     season: 'season',
     seasons: 'seasons',
     playersPerTeam: 'players/team',
+    loadingDashboard: 'Loading dashboard data...',
+    defaultOrgName: 'My Bowling Organization',
   },
 
   // Player Dashboard
@@ -524,6 +528,59 @@ const en: TranslationDictionary = {
     thursdayPlural: 'Thursdays',
     fridayPlural: 'Fridays',
     saturdayPlural: 'Saturdays',
+  },
+
+  // User Management
+  userManagement: {
+    title: 'User Management',
+    subtitle: 'Manage user roles and player account links',
+    backToDashboard: 'Back to Dashboard',
+    guideTitle: '📌 User Management Guide',
+    guideEmailWhitelist: 'Email Whitelist - Only emails in the whitelist can sign in with Google',
+    guideAdminRole: 'Admin - Can manage all data, players, leagues, seasons, and users',
+    guidePlayerRole: 'Player - Can view data and enter scores (must be linked to a player account)',
+    guideNewUsers: 'New users who sign in with Google will appear here with the "player" role by default',
+    guideLinkPlayers: 'Link player role users to their bowling player accounts',
+
+    // Email Whitelist
+    emailWhitelistTitle: '🔒 Email Whitelist',
+    emailWhitelistCount: '🔒 Email Whitelist ({{count}})',
+    emailWhitelistDesc: 'Only emails in this list can sign in with Google',
+    addEmailTitle: 'Add Email to Whitelist',
+    emailAddressLabel: 'Email Address *',
+    emailAddressPlaceholder: 'user@example.com',
+    notesLabel: 'Notes (Optional)',
+    notesPlaceholder: 'e.g., John Smith - Team Captain',
+    addToWhitelist: 'Add to Whitelist',
+    noEmailsInWhitelist: 'No emails in whitelist',
+    noEmailsWarning: '⚠️ Warning: No one can sign in until you add emails to the whitelist',
+    registered: 'Registered',
+    addedOn: 'Added {{date}}',
+
+    // Users List
+    allUsersTitle: 'All Users ({{count}})',
+    noUsersFound: 'No users found',
+    email: 'Email',
+    roleLabel: 'Role *',
+    rolePlayer: 'Player',
+    roleAdmin: 'Admin',
+    linkPlayerLabel: 'Link to Player Account (Optional)',
+    linkPlayerHelp: 'Link this user to their bowling player account',
+    notLinked: 'Not linked',
+    unknownPlayer: 'Unknown Player',
+    playerAccountLabel: 'Player Account:',
+    joinedLabel: 'Joined:',
+
+    // Messages
+    userUpdatedSuccess: '✅ User updated successfully',
+    userUpdateFailed: '❌ Failed to update user',
+    emailRequired: '❌ Please enter an email address',
+    emailInvalid: '❌ Please enter a valid email address',
+    emailAddedSuccess: '✅ Email added to whitelist',
+    emailAddFailed: '❌ Failed to add email. It may already exist.',
+    emailRemovedSuccess: '✅ Email removed from whitelist',
+    emailRemoveFailed: '❌ Failed to remove email',
+    confirmRemoveEmail: 'Remove {{email}} from whitelist?\n\nUsers with this email will no longer be able to sign in.',
   },
 };
 

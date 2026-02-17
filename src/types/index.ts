@@ -215,6 +215,7 @@ export interface LanguageContextType {
   t: (key: string) => string;
   direction: 'ltr' | 'rtl';
   isRTL: boolean;
+  locale: string;
 }
 
 /** NavigationState - Current view and entity IDs for app navigation */

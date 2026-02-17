@@ -85,6 +85,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
   };
 
   const direction: 'ltr' | 'rtl' = language === 'he' ? 'rtl' : 'ltr';
+  const locale = language === 'he' ? 'he-IL' : 'en-US';
 
   // Custom setLanguage that also updates localStorage
   const updateLanguage = (newLang: 'en' | 'he'): void => {
@@ -109,7 +110,8 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
     setLanguage: updateLanguage,
     t,
     direction,
-    isRTL: language === 'he'
+    isRTL: language === 'he',
+    locale
   };
 
   return (

@@ -5,7 +5,7 @@ import { useTranslation } from '../../contexts/LanguageContext';
 import type { SettingsProps } from '../../types/index';
 
 export const Settings: React.FC<SettingsProps> = ({ onBack, onRefreshData }) => {
-  const { t, setLanguage } = useTranslation();
+  const { t, setLanguage, locale } = useTranslation();
   const [organization, setOrganization] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<{
@@ -143,14 +143,14 @@ export const Settings: React.FC<SettingsProps> = ({ onBack, onRefreshData }) => 
             <div className="p-4 bg-gray-50 rounded-lg">
               <p className="text-sm text-gray-600 mb-1">{t('settings.created')}</p>
               <p className="text-lg font-semibold text-gray-800">
-                {new Date(organization.createdAt).toLocaleDateString()}
+                {new Date(organization.createdAt).toLocaleDateString(locale)}
               </p>
             </div>
             {organization.updatedAt && (
               <div className="p-4 bg-gray-50 rounded-lg">
                 <p className="text-sm text-gray-600 mb-1">{t('settings.lastUpdated')}</p>
                 <p className="text-lg font-semibold text-gray-800">
-                  {new Date(organization.updatedAt).toLocaleDateString()}
+                  {new Date(organization.updatedAt).toLocaleDateString(locale)}
                 </p>
               </div>
             )}

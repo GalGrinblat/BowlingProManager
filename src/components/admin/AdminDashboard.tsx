@@ -12,7 +12,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   gamesMap,
   isLoadingData,
 }) => {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const activeLeagues = leagues.filter(l => l.active);
 
   if (isLoadingData) {
@@ -20,11 +20,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       <div className="space-y-6">
         <div className="bg-white rounded-xl shadow-lg p-6">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('dashboard.adminTitle')}</h1>
-          <p className="text-gray-600">{org?.name || 'My Bowling Organization'}</p>
+          <p className="text-gray-600">{org?.name || t('dashboard.defaultOrgName')}</p>
         </div>
         <div className="bg-white rounded-xl shadow-lg p-12 text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 text-lg">Loading dashboard data...</p>
+          <p className="text-gray-600 text-lg">{t('dashboard.loadingDashboard')}</p>
         </div>
       </div>
     );
@@ -35,7 +35,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* Header */}
       <div className="bg-white rounded-xl shadow-lg p-6">
         <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('dashboard.adminTitle')}</h1>
-        <p className="text-gray-600">{org?.name || 'My Bowling Organization'}</p>
+        <p className="text-gray-600">{org?.name || t('dashboard.defaultOrgName')}</p>
       </div>
 
       {/* Quick Actions */}
@@ -63,8 +63,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           className="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all touch-manipulation"
         >
           <div className="text-4xl mb-2">🔐</div>
-          <h3 className="text-xl font-bold mb-1">Manage Users</h3>
-          <p className="text-sm text-orange-100">User roles & permissions</p>
+          <h3 className="text-xl font-bold mb-1">{t('dashboard.manageUsers')}</h3>
+          <p className="text-sm text-orange-100">{t('dashboard.manageUsersDesc')}</p>
         </button>
 
         <button
@@ -135,7 +135,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           </p>
                           {nextMatchDay && (
                             <p className="text-sm text-blue-600 font-medium">
-                              📅 {t('dashboard.next')}: {formatMatchDate(nextMatchDay.date || null)}
+                              📅 {t('dashboard.next')}: {formatMatchDate(nextMatchDay.date || null, locale)}
                               {nextMatchDay.postponed && <span className="text-orange-600 ml-1">({t('dashboard.postponed')})</span>}
                             </p>
                           )}

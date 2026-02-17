@@ -6,7 +6,7 @@ import { getPlayerDisplayName } from '../../utils/playerUtils';
 import type { Game, GameMatch, League, Player, PlayerDashboardProps, PlayerStats, Season } from '../../types/index';
 
 export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNavigate }) => {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [player, setPlayer] = useState<Player | null>(null);
   const [playerLeagues, setPlayerLeagues] = useState<League[]>([]);
   const [recentCompletedGames, setRecentCompletedGames] = useState<Game[]>([]);
@@ -246,7 +246,7 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
                             {t('common.round')} {game.round} • {t('common.matchDay')} {game.matchDay}
                           </span>
                           <span className="text-xs text-gray-400">
-                            {new Date(game.completedAt || '').toLocaleDateString()}
+                            {new Date(game.completedAt || '').toLocaleDateString(locale)}
                           </span>
                         </div>
                         <div className="flex items-center gap-4">

@@ -13,7 +13,7 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
   matchDay,
   onClose
 }) => {
-  const { t, language } = useTranslation();
+  const { t, language, locale } = useTranslation();
   const isRTL = language === 'he';
   const [season, setSeason] = useState<Season | null>(null);
   const [league, setLeague] = useState<League | null>(null);
@@ -171,7 +171,7 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
                       <span>📅 {t('common.round')} {round}</span>
                       <span>🎳 {t('common.matchDay')} {matchDay}</span>
                       {scheduleInfo?.date && (
-                        <span>📆 {formatMatchDate(scheduleInfo.date)}</span>
+                        <span>📆 {formatMatchDate(scheduleInfo.date, locale)}</span>
                       )}
                     </div>
                     {season.seasonConfigurations.useHandicap && (
@@ -336,7 +336,7 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
 
         {/* Footer */}
         <div className="mt-12 pt-6 border-t-2 border-gray-300 text-center text-sm text-gray-600">
-          <p>{t('common.printedOn')}: {new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}</p>
+          <p>{t('common.printedOn')}: {new Date().toLocaleDateString(locale)} {new Date().toLocaleTimeString(locale)}</p>
           <p className="mt-1">{league.name} • {season.name}</p>
         </div>
       </div>

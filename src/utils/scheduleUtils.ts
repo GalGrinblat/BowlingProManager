@@ -274,15 +274,16 @@ export const postponeMatchDay = (
 /**
  * Format date for display
  * @param {String} isoDate - ISO date string
+ * @param {String} locale - Optional locale for date formatting (defaults to 'en-US')
  * @returns {String} Formatted date string
  */
-export const formatMatchDate = (isoDate: string | null): string => {
+export const formatMatchDate = (isoDate: string | null, locale: string = 'en-US'): string => {
   if (!isoDate) return 'TBD';
   const date = new Date(isoDate);
-  return date.toLocaleDateString('en-US', { 
-    weekday: 'short', 
-    year: 'numeric', 
-    month: 'short', 
-    day: 'numeric' 
+  return date.toLocaleDateString(locale, {
+    weekday: 'short',
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
   });
 };

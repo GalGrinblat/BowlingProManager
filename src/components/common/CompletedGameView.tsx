@@ -2,7 +2,7 @@ import { useTranslation } from '../../contexts/LanguageContext';
 import type { CompletedGameViewProps, GameMatch, GamePlayer } from '../../types/index';
 
 export const CompletedGameView: React.FC<CompletedGameViewProps> = ({ game, onBack }) => {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   if (!game) return <div>Loading...</div>;
 
   const matches = game.matches ?? [];
@@ -32,7 +32,7 @@ export const CompletedGameView: React.FC<CompletedGameViewProps> = ({ game, onBa
           <div>
             <h1 className="text-3xl font-bold text-gray-800">{t('gameHistory.title')}</h1>
             <p className="text-sm text-gray-500 mt-1">
-              {t('common.round')} {game.round} • {t('common.matchDay')} {game.matchDay} • {t('playerDashboard.completedOn')} {new Date(game.completedAt ?? '').toLocaleDateString()}
+              {t('common.round')} {game.round} • {t('common.matchDay')} {game.matchDay} • {t('playerDashboard.completedOn')} {new Date(game.completedAt ?? '').toLocaleDateString(locale)}
             </p>
           </div>
           {winner !== 'tie' && (

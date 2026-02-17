@@ -241,9 +241,12 @@ export function calculateSeasonRecords(teams: Team[], games: Game[]): SeasonReco
 
 /**
  * Format date for display
+ * @param {String} date - Date string
+ * @param {String} locale - Optional locale for date formatting (defaults to 'en-US')
+ * @returns {String} Formatted date string
  */
-export function formatRecordDate(date: string): string {
+export function formatRecordDate(date: string, locale: string = 'en-US'): string {
   if (!date) return 'N/A';
   const d = new Date(date);
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  return d.toLocaleDateString(locale, { month: 'short', day: 'numeric', year: 'numeric' });
 }
