@@ -30,7 +30,7 @@ export const BonusRulesConfiguration: React.FC<BonusRulesConfigurationProps> = (
 }) => {
   const { t } = useTranslation();
 
-  const handleRuleChange = (idx: number, field: keyof BonusRule, value: any) => {
+  const handleRuleChange = (idx: number, field: keyof BonusRule, value: string) => {
     const updated = [...bonusRules];
     if (updated[idx]) {
       switch (field) {
@@ -52,18 +52,20 @@ export const BonusRulesConfiguration: React.FC<BonusRulesConfigurationProps> = (
           }
           break;
         case 'threshold':
-          if (typeof value === 'number') {
+          {
+            const valueNum = parseInt(value) || 0;
             updated[idx] = {
               ...updated[idx],
-              threshold: value,
+              threshold: valueNum,
             };
           }
           break;
         case 'points':
-          if (typeof value === 'number') {
+          {
+            const valueNum = parseInt(value) || 1;
             updated[idx] = {
               ...updated[idx],
-              points: value,
+              points: valueNum,
             };
           }
           break;
@@ -160,7 +162,7 @@ export const BonusRulesConfiguration: React.FC<BonusRulesConfigurationProps> = (
                   min="0"
                   max={MAX_BOWLING_SCORE}
                   value={rule.threshold}
-                  onChange={e => handleRuleChange(idx, 'threshold', parseInt(e.target.value) || 0)}
+                  onChange={e => handleRuleChange(idx, 'threshold', e.target.value)}
                   className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
                   disabled={disabled}
                 />
@@ -172,7 +174,7 @@ export const BonusRulesConfiguration: React.FC<BonusRulesConfigurationProps> = (
                   min="1"
                   max="10"
                   value={rule.points}
-                  onChange={e => handleRuleChange(idx, 'points', parseInt(e.target.value) || 1)}
+                  onChange={e => handleRuleChange(idx, 'points', e.target.value)}
                   className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm"
                   disabled={disabled}
                 />

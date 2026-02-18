@@ -146,7 +146,7 @@ export const Pagination: React.FC<PaginationProps> = ({ currentPage, totalItems,
 export const usePagination = (itemsPerPage = 10) => {
   const [currentPage, setCurrentPage] = React.useState(1);
 
-  const paginate = (items: any[]) => {
+  const paginate = <T,>(items: T[]): T[] => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     return items.slice(startIndex, endIndex);

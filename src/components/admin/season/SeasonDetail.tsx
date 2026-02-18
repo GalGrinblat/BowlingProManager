@@ -105,10 +105,10 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
         const gamesToUpdate = games.filter(g => g.matchDay === daySchedule.matchDay);
         for (const game of gamesToUpdate) {
           await gamesApi.update(game.id, {
-            date: daySchedule.date,
-            postponed: daySchedule.postponed as boolean | undefined,
-            originalDate: daySchedule.originalDate as string | undefined
-          } as any);
+            scheduledDate: daySchedule.date,
+            postponed: daySchedule.postponed,
+            originalDate: daySchedule.originalDate
+          });
         }
       }
       setShowPostponeModal(false);

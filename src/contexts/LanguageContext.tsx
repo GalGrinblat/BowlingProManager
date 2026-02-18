@@ -44,7 +44,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
     };
 
     // Listen for storage changes (when language is updated in Settings)
-    const handleStorageChange = (e: any) => {
+    const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'bowling_organization' || e.key === null) {
         loadLanguage();
       }
@@ -69,11 +69,11 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
   // Translation function with nested key support
   const t = (key: string): string => {
     const keys = key.split('.');
-    let value: any = translations[language];
-    
+    let value: unknown = translations[language];
+
     for (const k of keys) {
       if (value && typeof value === 'object') {
-        value = value[k];
+        value = (value as Record<string, unknown>)[k];
       } else {
         // Key not found, return the key itself as fallback
         console.warn(`Translation key not found: ${key}`);

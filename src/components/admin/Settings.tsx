@@ -3,12 +3,12 @@ import { organizationApi, utilApi } from '../../services/api';
 import { useTranslation } from '../../contexts/LanguageContext';
 import { useDateFormat } from '../../hooks/useDateFormat';
 
-import type { SettingsProps } from '../../types/index';
+import type { SettingsProps, Organization } from '../../types/index';
 
 export const Settings: React.FC<SettingsProps> = ({ onBack, onRefreshData }) => {
   const { t, setLanguage } = useTranslation();
   const { formatDate } = useDateFormat();
-  const [organization, setOrganization] = useState<any>(null);
+  const [organization, setOrganization] = useState<Organization | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<{
     name: string;

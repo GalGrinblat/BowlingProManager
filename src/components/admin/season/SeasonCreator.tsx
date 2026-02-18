@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { playersApi, leaguesApi } from '../../../services/api';
 import { useTranslation } from '../../../contexts/LanguageContext';
-import type { SeasonCreatorProps, LineupStrategy, LineupRule, League, CurrentPlayerAverages } from '../../../types/index';
+import type { SeasonCreatorProps, LineupStrategy, LineupRule, League, CurrentPlayerAverages, Player } from '../../../types/index';
 import {
   DEFAULT_HANDICAP_BASIS, DEFAULT_HANDICAP_PERCENTAGE, DEFAULT_NUMBER_OF_TEAMS,
   DEFAULT_NUMBER_OF_ROUNDS, DEFAULT_PLAYERS_PER_TEAM, DEFAULT_MATCHES_PER_GAME,
@@ -18,13 +18,7 @@ type SimpleTeam = {
   playerIds: string[];
 };
 
-type SimplePlayer = {
-  id: string;
-  firstName: string;
-  middleName?: string;
-  lastName: string;
-  [key: string]: any;
-};
+type SimplePlayer = Pick<Player, 'id' | 'firstName' | 'middleName' | 'lastName'>;
 
 export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, onSuccess, onRefreshData }) => {
   const { t } = useTranslation();

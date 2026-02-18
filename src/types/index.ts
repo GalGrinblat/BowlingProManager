@@ -16,6 +16,7 @@ export interface Organization {
   name: string;
   language: 'en' | 'he';
   createdAt: DateString;
+  updatedAt?: DateString;
 }
 
 /** Player - Individual bowler in the organization's player registry (can participate in multiple leagues) */
@@ -192,15 +193,15 @@ export interface User {
 /** AuthContextType - Authentication context providing user state and actions */
 export interface AuthContextType {
   currentUser: User | null;
-  playerData?: Player;
+  playerData: Player | null;
   isLoading?: boolean;
   user?: User | null;
-  login: (userId: string, role: 'admin' | 'player') => any;
+  login: (userId: string, role: 'admin' | 'player') => void;
   loginWithGoogle?: () => Promise<void>;
   logout: () => void;
   isAdmin: () => boolean;
   isPlayer: () => boolean;
-  session?: any;
+  session?: { user: { id: string } } | null;
 }
 
 /** TranslationDictionary - Nested translation key-value structure */
@@ -352,10 +353,10 @@ export interface PlayerMatchResult {
 /** Props for AdminDashboard - Main admin hub for league management */
 export interface AdminDashboardProps {
   onNavigate: (view: string, params?: Record<string, string>) => void;
-  org: any;
-  leagues: any[];
-  seasonsMap: Record<string, any[]>;
-  gamesMap: Record<string, any[]>;
+  org: Organization | null;
+  leagues: League[];
+  seasonsMap: Record<string, Season[]>;
+  gamesMap: Record<string, Game[]>;
   isLoadingData: boolean;
   onRefreshData: () => Promise<void>;
 }
@@ -433,7 +434,7 @@ export interface PlayerDashboardProps {
   playerId: string;
   onViewGame: (gameId: string) => void;
   onViewSeasonComparison: () => void;
-  onNavigate: (view: string, params?: Record<string, any>) => void;
+  onNavigate: (view: string, params?: Record<string, string>) => void;
 }
 
 /** Props for PlayerSeasonComparison - Compare player performance across seasons */
@@ -455,11 +456,31 @@ export interface MatchViewProps {
   isReadOnly?: boolean;
 }
 
+/** GameTotals - Aggregated point and pin totals across all matches in a game */
+export interface GameTotals {
+  team1Points: number;
+  team2Points: number;
+  team1TotalPinsWithHandicap: number;
+  team1TotalPinsNoHandicap: number;
+  team2TotalPinsWithHandicap: number;
+  team2TotalPinsNoHandicap: number;
+}
+
+/** GamePlayerStats - Aggregated player statistics for an entire game */
+export interface GamePlayerStats {
+  team1Stats: (GamePlayer & { totalPins: number; gameAverage: number; pointsScored: number; isAbsent: boolean })[];
+  team2Stats: (GamePlayer & { totalPins: number; gameAverage: number; pointsScored: number; isAbsent: boolean })[];
+  team1TotalPins: number;
+  team2TotalPins: number;
+  team1Average: number;
+  team2Average: number;
+}
+
 /** Props for SummaryView - Final game results and statistics */
 export interface SummaryViewProps {
   game: Game;
-  totals: any;
-  playerStats: any;
+  totals: GameTotals;
+  playerStats: GamePlayerStats;
   onBack: () => void;
   onFinish: () => void;
 }

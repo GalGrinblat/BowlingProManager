@@ -1,12 +1,11 @@
 import type { Game, GameMatch, GamePlayer } from '../types/index';
 import { ABSENT_PLAYER_PENALTY } from '../constants/bowling';
 
-interface PlayerGameStats {
+interface PlayerGameStats extends GamePlayer {
   totalPins: number;
   gameAverage: number;
   pointsScored: number;
   isAbsent: boolean;
-  [key: string]: any;
 }
 
 interface GameStats {
@@ -29,9 +28,9 @@ export const calculatePlayerStats = (game: Game): GameStats => {
       team2Average: 0
     };
   }
-  const team1Stats = game.team1.players.map((player: GamePlayer, idx: number) => {
+  const team1Stats = game.team1.players.map((player: GamePlayer, idx: number): PlayerGameStats => {
     if (!player) {
-      return { totalPins: 0, gameAverage: 0, pointsScored: 0, isAbsent: false };
+      return { totalPins: 0, gameAverage: 0, pointsScored: 0, isAbsent: false } as PlayerGameStats;
     }
     if (player.absent) {
       const absenceScore = player.average - ABSENT_PLAYER_PENALTY;
@@ -55,10 +54,10 @@ export const calculatePlayerStats = (game: Game): GameStats => {
     }, 0) || 0;
     return { ...player, totalPins, gameAverage, pointsScored, isAbsent: false };
   });
-  
-  const team2Stats = game.team2.players.map((player: GamePlayer, idx: number) => {
+
+  const team2Stats = game.team2.players.map((player: GamePlayer, idx: number): PlayerGameStats => {
     if (!player) {
-      return { totalPins: 0, gameAverage: 0, pointsScored: 0, isAbsent: false };
+      return { totalPins: 0, gameAverage: 0, pointsScored: 0, isAbsent: false } as PlayerGameStats;
     }
     if (player.absent) {
       const absenceScore = player.average - ABSENT_PLAYER_PENALTY;
@@ -82,20 +81,20 @@ export const calculatePlayerStats = (game: Game): GameStats => {
     }, 0) || 0;
     return { ...player, totalPins, gameAverage, pointsScored, isAbsent: false };
   });
-  
+
   // Calculate totals excluding absent players
-  const team1NonAbsentStats = team1Stats.filter((p: any) => !p.isAbsent);
-  const team2NonAbsentStats = team2Stats.filter((p: any) => !p.isAbsent);
-  
-  const team1TotalPins = team1NonAbsentStats.reduce((sum: number, p: any) => sum + p.totalPins, 0);
-  const team2TotalPins = team2NonAbsentStats.reduce((sum: number, p: any) => sum + p.totalPins, 0);
-  
+  const team1NonAbsentStats = team1Stats.filter((p: PlayerGameStats) => !p.isAbsent);
+  const team2NonAbsentStats = team2Stats.filter((p: PlayerGameStats) => !p.isAbsent);
+
+  const team1TotalPins = team1NonAbsentStats.reduce((sum: number, p: PlayerGameStats) => sum + p.totalPins, 0);
+  const team2TotalPins = team2NonAbsentStats.reduce((sum: number, p: PlayerGameStats) => sum + p.totalPins, 0);
+
   // Calculate average only from non-absent players
   const team1NonAbsentCount = team1NonAbsentStats.length;
   const team2NonAbsentCount = team2NonAbsentStats.length;
   const team1Average = team1NonAbsentCount > 0 ? team1TotalPins / (team1NonAbsentCount * 3) : 0;
   const team2Average = team2NonAbsentCount > 0 ? team2TotalPins / (team2NonAbsentCount * 3) : 0;
-  
+
   return {
     team1Stats,
     team2Stats,
@@ -106,22 +105,22 @@ export const calculatePlayerStats = (game: Game): GameStats => {
   };
 };
 
-export const calculateGameTotals = (game: Game): { 
-  team1Points: number; 
+export const calculateGameTotals = (game: Game): {
+  team1Points: number;
   team2Points: number;
   team1TotalPinsWithHandicap: number;
   team1TotalPinsNoHandicap: number;
   team2TotalPinsWithHandicap: number;
   team2TotalPinsNoHandicap: number;
 } => {
-  const team1Points = (game.matches?.reduce((sum: number, m: any) => sum + m.team1.points, 0) || 0) + (game.grandTotalPoints?.team1 || 0);
-  const team2Points = (game.matches?.reduce((sum: number, m: any) => sum + m.team2.points, 0) || 0) + (game.grandTotalPoints?.team2 || 0);
-  
-  const team1TotalPinsWithHandicap = game.matches?.reduce((sum: number, m: any) => sum + m.team1.totalWithHandicap, 0) || 0;
-  const team2TotalPinsWithHandicap = game.matches?.reduce((sum: number, m: any) => sum + m.team2.totalWithHandicap, 0) || 0;
-  const team1TotalPinsNoHandicap = game.matches?.reduce((sum: number, m: any) => sum + m.team1.totalPins, 0) || 0;
-  const team2TotalPinsNoHandicap = game.matches?.reduce((sum: number, m: any) => sum + m.team2.totalPins, 0) || 0;
-  
+  const team1Points = (game.matches?.reduce((sum: number, m: GameMatch) => sum + m.team1.points, 0) || 0) + (game.grandTotalPoints?.team1 || 0);
+  const team2Points = (game.matches?.reduce((sum: number, m: GameMatch) => sum + m.team2.points, 0) || 0) + (game.grandTotalPoints?.team2 || 0);
+
+  const team1TotalPinsWithHandicap = game.matches?.reduce((sum: number, m: GameMatch) => sum + m.team1.totalWithHandicap, 0) || 0;
+  const team2TotalPinsWithHandicap = game.matches?.reduce((sum: number, m: GameMatch) => sum + m.team2.totalWithHandicap, 0) || 0;
+  const team1TotalPinsNoHandicap = game.matches?.reduce((sum: number, m: GameMatch) => sum + m.team1.totalPins, 0) || 0;
+  const team2TotalPinsNoHandicap = game.matches?.reduce((sum: number, m: GameMatch) => sum + m.team2.totalPins, 0) || 0;
+
   return {
     team1Points: team1Points,
     team2Points: team2Points,
@@ -135,20 +134,20 @@ export const calculateGameTotals = (game: Game): {
 export const calculateGrandTotalPoints = (game: Game): { team1: number; team2: number } => {
   // Get configurable grand total points (defaults to 2 if not set)
   const teamGamePointsPerWin = game.teamGamePointsPerWin || 2;
-  
+
   // Check if all matches are complete (accounting for absent players)
   if (!game.team1 || !game.team2) return { team1: 0, team2: 0 };
-  const allMatchesComplete = game.matches?.every((m: any) => {
-    const team1Complete = game.team1!.players.every((p: any, idx: number) => !p || (p.absent || m.team1.players[idx]?.pins !== ''));
-    const team2Complete = game.team2!.players.every((p: any, idx: number) => !p || (p.absent || m.team2.players[idx]?.pins !== ''));
+  const allMatchesComplete = game.matches?.every((m: GameMatch) => {
+    const team1Complete = game.team1!.players.every((p: GamePlayer, idx: number) => !p || (p.absent || m.team1.players[idx]?.pins !== ''));
+    const team2Complete = game.team2!.players.every((p: GamePlayer, idx: number) => !p || (p.absent || m.team2.players[idx]?.pins !== ''));
     return team1Complete && team2Complete;
   }) || false;
-  
+
   if (allMatchesComplete) {
     // Calculate total pins with handicap across all matches
-    const team1GrandTotal = game.matches?.reduce((sum: number, m: any) => sum + m.team1.totalWithHandicap, 0) || 0;
-    const team2GrandTotal = game.matches?.reduce((sum: number, m: any) => sum + m.team2.totalWithHandicap, 0) || 0;
-    
+    const team1GrandTotal = game.matches?.reduce((sum: number, m: GameMatch) => sum + m.team1.totalWithHandicap, 0) || 0;
+    const team2GrandTotal = game.matches?.reduce((sum: number, m: GameMatch) => sum + m.team2.totalWithHandicap, 0) || 0;
+
     if (team1GrandTotal > team2GrandTotal) {
       return { team1: teamGamePointsPerWin, team2: 0 };
     } else if (team2GrandTotal > team1GrandTotal) {

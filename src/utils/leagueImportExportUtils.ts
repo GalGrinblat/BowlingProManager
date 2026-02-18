@@ -217,16 +217,22 @@ async function importLeagueData(
     // Map player IDs in matches if they exist
     const newMatches = (game.matches ? game.matches.map(match => ({
       ...match,
-      team1: Array.isArray(match.team1) ? match.team1.map((player: any) => ({
-        ...player,
-        playerId: playerIdMap.get(player.playerId) || player.playerId,
-      })) : match.team1,
-      team2: Array.isArray(match.team2) ? match.team2.map((player: any) => ({
-        ...player,
-        playerId: playerIdMap.get(player.playerId) || player.playerId,
-      })) : match.team2,
+      team1: Array.isArray(match.team1) ? match.team1.map((player: Record<string, string>) => {
+        if (!player.playerId) throw new Error('Missing playerId in match.team1');
+        return {
+          ...player,
+          playerId: playerIdMap.get(player.playerId) || player.playerId,
+        };
+      }) : match.team1,
+      team2: Array.isArray(match.team2) ? match.team2.map((player: Record<string, string>) => {
+        if (!player.playerId) throw new Error('Missing playerId in match.team2');
+        return {
+          ...player,
+          playerId: playerIdMap.get(player.playerId) || player.playerId,
+        };
+      }) : match.team2,
     })) : []) as GameMatch[];
-
+    
     // Find the season config for this game to get required fields
     const seasonConfig = data.seasons.find(s => s.id === game.seasonId);
     if (!seasonConfig) continue;
@@ -318,14 +324,20 @@ async function importSeasonData(
     // Map player IDs in matches if they exist
     const newMatches = (game.matches ? game.matches.map(match => ({
       ...match,
-      team1: Array.isArray(match.team1) ? match.team1.map((player: any) => ({
-        ...player,
-        playerId: playerIdMap.get(player.playerId) || player.playerId,
-      })) : match.team1,
-      team2: Array.isArray(match.team2) ? match.team2.map((player: any) => ({
-        ...player,
-        playerId: playerIdMap.get(player.playerId) || player.playerId,
-      })) : match.team2,
+      team1: Array.isArray(match.team1) ? match.team1.map((player: Record<string, string>) => {
+        if (!player.playerId) throw new Error('Missing playerId in match.team1');
+        return {
+          ...player,
+          playerId: playerIdMap.get(player.playerId) || player.playerId,
+        };
+      }) : match.team1,
+      team2: Array.isArray(match.team2) ? match.team2.map((player: Record<string, string>) => {
+        if (!player.playerId) throw new Error('Missing playerId in match.team2');
+        return {
+          ...player,
+          playerId: playerIdMap.get(player.playerId) || player.playerId,
+        };
+      }) : match.team2,
     })) : []) as GameMatch[];
 
     // Find the season config for this game to get required fields

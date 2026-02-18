@@ -65,7 +65,7 @@ export const TeamStandingsTable: React.FC<TeamStandingsTableProps> = ({
                   <span className="font-bold text-gray-800">#{index + 1}</span>
                 </td>
                 <td className={`${cellPadding} font-semibold text-gray-800 text-sm`}>
-                  {(standing as any).teamName || (getTeamName ? getTeamName(standing.teamId) : standing.teamId)}
+                  {standing.teamName || (getTeamName ? getTeamName(standing.teamId) : standing.teamId)}
                 </td>
                 <td className={`${cellPadding} text-center text-gray-600 text-sm`}>
                   {standing.gamesPlayed}

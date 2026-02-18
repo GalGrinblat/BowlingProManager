@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { supabase } from '../lib/supabase';
 import { playersApi } from '../services/api';
-import type { AuthContextType, User } from '../types/index';
+import type { AuthContextType, User, Player } from '../types/index';
 import type { Session } from '@supabase/supabase-js';
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -20,7 +20,7 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [playerData, setPlayerData] = useState<any>(null);
+  const [playerData, setPlayerData] = useState<Player | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [session, setSession] = useState<Session | null>(null);
 
@@ -115,7 +115,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         // Load player data if user is a player and has a linked player
         if (userData.role === 'player' && userData.player_id) {
           const player = await playersApi.getById(userData.player_id);
-          setPlayerData(player);
+          setPlayerData(player ?? null);
         }
       }
     } catch (error) {

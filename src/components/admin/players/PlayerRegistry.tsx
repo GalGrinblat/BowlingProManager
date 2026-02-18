@@ -146,7 +146,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({
     e.target.value = '';
   };
 
-  const playerValidator = (item: any) => {
+  const playerValidator = (item: Record<string, unknown>) => {
     if (!item.firstName) return { valid: false, error: 'Missing required field \'firstName\'' };
     if (!item.lastName) return { valid: false, error: 'Missing required field \'lastName\'' };
     if (item.active === undefined) item.active = true;

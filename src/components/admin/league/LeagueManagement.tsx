@@ -57,7 +57,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
     ...getDefaultFormData()
   });
 
-  const updateConfig = (field: keyof SeasonConfigurations, value: any) =>
+  const updateConfig = (field: keyof SeasonConfigurations, value: SeasonConfigurations[keyof SeasonConfigurations]) =>
     setFormData(prev => ({
       ...prev,
       defaultSeasonConfigurations: {

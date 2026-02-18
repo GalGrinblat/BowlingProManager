@@ -1,19 +1,14 @@
 import React from 'react';
 import { useTranslation } from '../../../contexts/LanguageContext';
 import { getPlayerDisplayName } from '../../../utils/playerUtils';
+import type { Player } from '../../../types/index';
 
 type SimpleTeam = {
   name: string;
   playerIds: string[];
 };
 
-type SimplePlayer = {
-  id: string;
-  firstName: string;
-  middleName?: string;
-  lastName: string;
-  [key: string]: any;
-};
+type SimplePlayer = Pick<Player, 'id' | 'firstName' | 'middleName' | 'lastName'>;
 
 interface TeamAssignmentStepProps {
   teams: SimpleTeam[];

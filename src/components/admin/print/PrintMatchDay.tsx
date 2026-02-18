@@ -8,6 +8,14 @@ import { getPlayerDisplayName } from '../../../utils/playerUtils';
 
 import type { Game, League, PrintMatchDayProps, ScheduleMatchDay, Season, Team, TeamStanding, CurrentPlayerAverages } from '../../../types/index';
 
+interface PrintPlayerInfo {
+  id: string;
+  name: string;
+  average: number;
+  gamesPlayed: number;
+  handicap: number;
+}
+
 export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
   seasonId,
   matchDay,
@@ -22,7 +30,7 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
   const [games, setGames] = useState<Game[]>([]);
   const [matchDayGames, setMatchDayGames] = useState<Game[]>([]);
   const [teamStandings, setTeamStandings] = useState<TeamStanding[]>([]);
-  const [teamPlayersMap, setTeamPlayersMap] = useState<Record<string, any[]>>({});
+  const [teamPlayersMap, setTeamPlayersMap] = useState<Record<string, PrintPlayerInfo[]>>({});
 
   useEffect(() => {
     loadData();
@@ -63,7 +71,7 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
     }
 
     // Preload team players for all teams
-    const playersMap: Record<string, any[]> = {};
+    const playersMap: Record<string, PrintPlayerInfo[]> = {};
     for (const team of teamsData) {
       playersMap[team.id] = await getTeamPlayers(team, seasonData, averagesToUse);
     }
@@ -98,7 +106,7 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
     });
 
     const players = await Promise.all(playerPromises);
-    return players.sort((a: any, b: any) => (b.average || 0) - (a.average || 0)); // Sort by average descending
+    return players.sort((a: PrintPlayerInfo, b: PrintPlayerInfo) => (b.average || 0) - (a.average || 0)); // Sort by average descending
   };
 
   const getTeamStanding = (teamId: string) => {
@@ -249,7 +257,7 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
                             </tr>
                           </thead>
                           <tbody>
-                            {team1Players.map((player: any, idx: number) => (
+                            {team1Players.map((player: PrintPlayerInfo, idx: number) => (
                               <tr key={player.id} className="border-b border-gray-200">
                                 <td className="px-2 py-2">
                                   <div className={`font-semibold ${isRTL ? 'text-right' : 'text-left'}`}>{idx + 1}. {player.name}</div>
@@ -271,10 +279,10 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
                               <td className={`px-2 py-2 font-semibold ${isRTL ? 'text-right' : 'text-left'}`}>{t('common.total')}</td>
                               <td></td>
                               <td className="text-center px-2 py-2 font-bold">
-                                {(team1Players.reduce((sum: number, p: any) => sum + p.average, 0) / team1Players.length || 0).toFixed(2)}
+                                {(team1Players.reduce((sum: number, p: PrintPlayerInfo) => sum + p.average, 0) / team1Players.length || 0).toFixed(2)}
                               </td>
                               <td className="text-center px-2 py-2 font-bold text-blue-600">
-                                {team1Players.reduce((sum: number, p: any) => sum + p.handicap, 0)}
+                                {team1Players.reduce((sum: number, p: PrintPlayerInfo) => sum + p.handicap, 0)}
                               </td>
                             </tr>
                           </tfoot>
@@ -296,7 +304,7 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
                             </tr>
                           </thead>
                           <tbody>
-                            {team2Players.map((player: any, idx: number) => (
+                            {team2Players.map((player: PrintPlayerInfo, idx: number) => (
                               <tr key={player.id} className="border-b border-gray-200">
                                 <td className="px-2 py-2">
                                   <div className={`font-semibold ${isRTL ? 'text-right' : 'text-left'}`}>{idx + 1}. {player.name}</div>
@@ -318,10 +326,10 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
                               <td className={`px-2 py-2 font-semibold ${isRTL ? 'text-right' : 'text-left'}`}>{t('common.total')}</td>
                               <td></td>
                               <td className="text-center px-2 py-2 font-bold">
-                                {(team2Players.reduce((sum: number, p: any) => sum + p.average, 0) / team2Players.length || 0).toFixed(2)}
+                                {(team2Players.reduce((sum: number, p: PrintPlayerInfo) => sum + p.average, 0) / team2Players.length || 0).toFixed(2)}
                               </td>
                               <td className="text-center px-2 py-2 font-bold text-purple-600">
-                                {team2Players.reduce((sum: number, p: any) => sum + p.handicap, 0)}
+                                {team2Players.reduce((sum: number, p: PrintPlayerInfo) => sum + p.handicap, 0)}
                               </td>
                             </tr>
                           </tfoot>
@@ -351,7 +359,7 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
                               </tr>
                             </thead>
                             <tbody>
-                              {team1Players.map((player: any, idx: number) => (
+                              {team1Players.map((player: PrintPlayerInfo, idx: number) => (
                                 <tr key={player.id}>
                                   <td className="border border-gray-800 px-2 py-2 text-xs font-semibold">
                                     {idx + 1}. {player.name.split(' ')[0]}
@@ -391,7 +399,7 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
                               </tr>
                             </thead>
                             <tbody>
-                              {team2Players.map((player: any, idx: number) => (
+                              {team2Players.map((player: PrintPlayerInfo, idx: number) => (
                                 <tr key={player.id}>
                                   <td className="border border-gray-800 px-2 py-2 text-xs font-semibold">
                                     {idx + 1}. {player.name.split(' ')[0]}
