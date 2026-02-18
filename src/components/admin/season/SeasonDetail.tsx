@@ -144,8 +144,6 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
     if (event.target) event.target.value = '';
   };
 
-  if (!season || !league) return <div>{t('seasons.loading')}</div>;
-
   const teamStandings = useMemo(() => calculateTeamStandings(teams, games), [teams, games]);
   const playerStats = useMemo(() => calculatePlayerSeasonStats(teams, games), [teams, games]);
   const seasonRecords = useMemo(() => calculateSeasonRecords(teams, games), [teams, games]);
@@ -153,8 +151,10 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
   const totalGames = games.length;
   const completedGames = games.filter(g => g.status === 'completed').length;
   const progressPercent = totalGames > 0 ? (completedGames / totalGames) * 100 : 0;
-  const isCompleted = season.status === 'completed';
+  const isCompleted = season?.status === 'completed';
   const champion = isCompleted && teamStandings.length > 0 ? teamStandings[0] : null;
+
+  if (!season || !league) return <div>{t('seasons.loading')}</div>;
 
   return (
     <div className="space-y-6">
