@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { seasonsApi, teamsApi, gamesApi, leaguesApi, playersApi } from '../../services/api';
-import { calculateTeamStandings, calculateCurrentPlayerAverages } from '../../utils/standingsUtils';
-import { calculateHeadToHead } from '../../utils/headToHeadUtils';
-import { useTranslation } from '../../contexts/LanguageContext';
-import { useDateFormat } from '../../hooks/useDateFormat';
-import { getPlayerDisplayName } from '../../utils/playerUtils';
+import { seasonsApi, teamsApi, gamesApi, leaguesApi, playersApi } from '../../../services/api';
+import { calculateTeamStandings, calculateCurrentPlayerAverages } from '../../../utils/standingsUtils';
+import { calculateHeadToHead } from '../../../utils/headToHeadUtils';
+import { useTranslation } from '../../../contexts/LanguageContext';
+import { useDateFormat } from '../../../hooks/useDateFormat';
+import { getPlayerDisplayName } from '../../../utils/playerUtils';
 
-import type { Game, League, PrintMatchDayProps, ScheduleMatchDay, Season, Team, TeamStanding, CurrentPlayerAverages } from '../../types/index';
+import type { Game, League, PrintMatchDayProps, ScheduleMatchDay, Season, Team, TeamStanding, CurrentPlayerAverages } from '../../../types/index';
 
 export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
   seasonId,

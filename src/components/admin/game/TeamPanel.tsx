@@ -1,5 +1,5 @@
 import React from 'react';
-import type { GamePlayer } from '../../types/index';
+import type { GamePlayer } from '../../../types/index';
 
 interface PlayerRowProps {
   player: GamePlayer;

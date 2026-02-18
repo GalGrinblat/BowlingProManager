@@ -1,8 +1,8 @@
-import { ArrowLeft, CheckCircle } from './Icons';
+import { ArrowLeft, CheckCircle } from '../../common/Icons';
 import { TeamStatsCard } from './TeamStatsCard';
-import { useTranslation } from '../../contexts/LanguageContext';
+import { useTranslation } from '../../../contexts/LanguageContext';
 
-import type { GameMatch, SummaryViewProps } from '../../types/index';
+import type { GameMatch, SummaryViewProps } from '../../../types/index';
 
 export const SummaryView: React.FC<SummaryViewProps> = ({ game, totals, playerStats, onBack, onFinish }) => {
   const { t, direction, isRTL } = useTranslation();

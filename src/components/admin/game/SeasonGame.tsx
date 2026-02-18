@@ -1,14 +1,14 @@
 import React from 'react';
-import { gamesApi } from '../../services/api';
-import { MatchView } from '../common/MatchView';
-import { SummaryView } from '../common/SummaryView';
-import { calculateMatchResults, calculateBonusPoints } from '../../utils/matchUtils';
-import { calculatePlayerStats, calculateGameTotals, calculateGrandTotalPoints } from '../../utils/statsUtils';
-import { applyLineupRule } from '../../utils/lineupUtils';
-import { PreMatchSetup } from './game/PreMatchSetup';
-import { useGameInitializer } from '../../hooks/useGameInitializer';
+import { gamesApi } from '../../../services/api';
+import { MatchView } from './MatchView';
+import { SummaryView } from './SummaryView';
+import { calculateMatchResults, calculateBonusPoints } from '../../../utils/matchUtils';
+import { calculatePlayerStats, calculateGameTotals, calculateGrandTotalPoints } from '../../../utils/statsUtils';
+import { applyLineupRule } from '../../../utils/lineupUtils';
+import { PreMatchSetup } from './PreMatchSetup';
+import { useGameInitializer } from '../../../hooks/useGameInitializer';
 
-import type { SeasonGameProps, Game, GamePlayer, GameMatch } from '../../types/index';
+import type { SeasonGameProps, Game, GamePlayer, GameMatch } from '../../../types/index';
 
 export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
   const {

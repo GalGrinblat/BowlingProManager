@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { teamsApi, playersApi, seasonsApi } from '../../services/api';
-import { useTranslation } from '../../contexts/LanguageContext';
-import { useDateFormat } from '../../hooks/useDateFormat';
-import { getPlayerDisplayName } from '../../utils/playerUtils';
+import { teamsApi, playersApi, seasonsApi } from '../../../services/api';
+import { useTranslation } from '../../../contexts/LanguageContext';
+import { useDateFormat } from '../../../hooks/useDateFormat';
+import { getPlayerDisplayName } from '../../../utils/playerUtils';
 
-import type { TeamManagementProps, Season, Team, Player, RosterChange } from '../../types/index';
+import type { TeamManagementProps, Season, Team, Player, RosterChange } from '../../../types/index';
 
 export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack }) => {
   const { t } = useTranslation();

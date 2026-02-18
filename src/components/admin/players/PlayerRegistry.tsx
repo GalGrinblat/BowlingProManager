@@ -1,21 +1,21 @@
 import React, { useState } from 'react';
-import { playersApi, teamsApi, seasonsApi } from '../../services/api';
-import { createPlayer, validatePlayer } from '../../models';
-import { Pagination, usePagination } from '../common/Pagination';
-import { useTranslation } from '../../contexts/LanguageContext';
+import { playersApi, teamsApi, seasonsApi } from '../../../services/api';
+import { createPlayer, validatePlayer } from '../../../models';
+import { Pagination, usePagination } from '../../common/Pagination';
+import { useTranslation } from '../../../contexts/LanguageContext';
 import {
   exportToCSV,
   exportToJSON,
   parseJSONImport,
   parseCSVImport,
   booleanConverter
-} from '../../utils/importExportUtils';
-import { getPlayerDisplayName } from '../../utils/playerUtils';
-import type { Player, PlayerRegistryProps } from '../../types/index';
-import { PLAYER_SORT_OPTIONS } from '../../constants/sortOptions';
-import { sortByOption, SortOption } from '../../utils/sortUtils';
-import { PlayerForm } from './players/PlayerForm';
-import { ImportPreviewModal } from './players/ImportPreviewModal';
+} from '../../../utils/importExportUtils';
+import { getPlayerDisplayName } from '../../../utils/playerUtils';
+import type { Player, PlayerRegistryProps } from '../../../types/index';
+import { PLAYER_SORT_OPTIONS } from '../../../constants/sortOptions';
+import { sortByOption, SortOption } from '../../../utils/sortUtils';
+import { PlayerForm } from './PlayerForm';
+import { ImportPreviewModal } from './ImportPreviewModal';
 
 export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({
   onBack,

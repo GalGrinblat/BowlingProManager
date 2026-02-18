@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from '../../../contexts/LanguageContext';
-import { TeamPanel } from '../TeamPanel';
+import { TeamPanel } from './TeamPanel';
 import type { Game, GamePlayer } from '../../../types/index';
 
 interface PreMatchSetupProps {

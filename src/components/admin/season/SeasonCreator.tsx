@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { playersApi, leaguesApi } from '../../services/api';
-import { useTranslation } from '../../contexts/LanguageContext';
-import type { SeasonCreatorProps, LineupStrategy, LineupRule, League, CurrentPlayerAverages } from '../../types/index';
+import { playersApi, leaguesApi } from '../../../services/api';
+import { useTranslation } from '../../../contexts/LanguageContext';
+import type { SeasonCreatorProps, LineupStrategy, LineupRule, League, CurrentPlayerAverages } from '../../../types/index';
 import {
   DEFAULT_HANDICAP_BASIS, DEFAULT_HANDICAP_PERCENTAGE, DEFAULT_NUMBER_OF_TEAMS,
   DEFAULT_NUMBER_OF_ROUNDS, DEFAULT_PLAYERS_PER_TEAM, DEFAULT_MATCHES_PER_GAME,
   DEFAULT_PLAYER_MATCH_POINTS, DEFAULT_TEAM_MATCH_POINTS, DEFAULT_TEAM_GAME_POINTS,
   DEFAULT_USE_HANDICAP, DEFAULT_LINEUP_STRATEGY, DEFAULT_LINEUP_RULE,
   DEFAULT_TEAM_ALL_PRESENT_BONUS_ENABLED, DEFAULT_TEAM_ALL_PRESENT_BONUS_POINTS
-} from '../../constants/bowling';
-import { SeasonConfigStep, SeasonFormData } from './season/SeasonConfigStep';
-import { TeamAssignmentStep } from './season/TeamAssignmentStep';
-import { PlayerAveragesStep } from './season/PlayerAveragesStep';
+} from '../../../constants/bowling';
+import { SeasonConfigStep, SeasonFormData } from './SeasonConfigStep';
+import { TeamAssignmentStep } from './TeamAssignmentStep';
+import { PlayerAveragesStep } from './PlayerAveragesStep';
 
 type SimpleTeam = {
   name: string;
@@ -150,8 +150,8 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
     };
 
     try {
-      const { seasonsApi, gamesApi, teamsApi } = await import('../../services/api');
-      const { generateRoundRobinSchedule } = await import('../../utils/scheduleUtils');
+      const { seasonsApi, gamesApi, teamsApi } = await import('../../../services/api');
+      const { generateRoundRobinSchedule } = await import('../../../utils/scheduleUtils');
 
       const created = await seasonsApi.create(seasonData);
 

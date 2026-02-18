@@ -1,6 +1,6 @@
 import React from 'react';
-import { Star } from './Icons';
-import { GamePlayer, MatchPlayer } from '@/types';
+import { Star } from '../../common/Icons';
+import { GamePlayer, MatchPlayer } from '../../../types';
 
 export interface PlayerScoreInputProps {
   player: GamePlayer;

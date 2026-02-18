@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { leaguesApi, seasonsApi, teamsApi, gamesApi } from '../../services/api';
-import { calculateTeamStandings } from '../../utils/standingsUtils';
-import { useTranslation } from '../../contexts/LanguageContext';
-import { useDateFormat } from '../../hooks/useDateFormat';
-import { exportLeague, downloadExportFile, readImportFile, importLeagueOrSeason } from '../../utils/leagueImportExportUtils';
+import { leaguesApi, seasonsApi, teamsApi, gamesApi } from '../../../services/api';
+import { calculateTeamStandings } from '../../../utils/standingsUtils';
+import { useTranslation } from '../../../contexts/LanguageContext';
+import { useDateFormat } from '../../../hooks/useDateFormat';
+import { exportLeague, downloadExportFile, readImportFile, importLeagueOrSeason } from '../../../utils/leagueImportExportUtils';
 
-import type { LeagueDetailProps, League, Season, Team } from '../../types/index';
+import type { LeagueDetailProps, League, Season, Team } from '../../../types/index';
 
 export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, onViewSeason, onCreateSeason, onRefreshData }) => {
   const { t } = useTranslation();
