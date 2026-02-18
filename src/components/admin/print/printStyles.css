@@ -1,0 +1,65 @@
+@media print {
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  body * {
+    visibility: hidden;
+    position: static !important;
+  }
+
+  .print-modal-root,
+  .print-modal-root * {
+    visibility: visible;
+  }
+
+  .print-modal-root {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-content {
+    padding: 0 !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+
+  .print-section {
+    page-break-after: always;
+    page-break-inside: avoid;
+  }
+
+  .print-section:last-child {
+    page-break-after: auto;
+  }
+
+  .match-section {
+    page-break-after: always;
+    page-break-inside: avoid;
+  }
+
+  .match-section:last-child {
+    page-break-after: auto;
+  }
+
+  @page {
+    margin: 1cm;
+    size: A4 portrait;
+  }
+}
+
+.break-inside-avoid {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
