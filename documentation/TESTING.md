@@ -113,26 +113,32 @@ The Bowling League Management System includes a comprehensive test suite coverin
 
 ---
 
-### 6. test-i18n.js
-**Purpose**: Validates internationalization and translation system
 
-**Coverage**:
-- Translation key completeness (English and Hebrew)
-- Missing key detection across languages
-- RTL layout support verification
-- Translation pattern guidelines
+# Test Suite Documentation
 
-**Key Tests**:
-- ✅ All English keys have Hebrew counterparts
-- ✅ All Hebrew keys have English counterparts
-- ✅ Translation functions return correct values
-- ✅ RTL/LTR direction handling
+## Overview
+The Bowling League Management System now uses a modern, comprehensive test suite covering business logic, calculations, data validation, and UI components. All new and future tests use Jest and React Testing Library (RTL) for unit, component, and integration testing.
 
-**Run**: `node tests/test-i18n.js`
+## Test Structure
 
-**Expected**: 21 tests passing
+Tests are organized as follows:
 
----
+```
+tests/
+  unit/
+    utils/
+    models/
+    services/
+  component/
+    admin/
+    player/
+    common/
+  integration/
+```
+
+- **Unit tests**: Pure logic, utilities, models, and API mocks
+- **Component tests**: React component rendering, props, state, and UI logic
+- **Integration tests**: Multi-module flows (e.g., full game scoring, season lifecycle)
 
 ## Running All Tests
 
@@ -141,149 +147,58 @@ The Bowling League Management System includes a comprehensive test suite coverin
 npm test
 ```
 
-### Individual Test Execution
+### Using Jest Directly
 ```bash
-# Run specific test suite
-node tests/test-handicap.js
-node tests/test-scoring.js
-node tests/test-schedule.js
-node tests/test-validation.js
-node tests/test-dynamic-handicap.js
-node tests/test-i18n.js
+npx jest
 ```
-
-## Test Statistics
-
-| Test Suite | Tests | Coverage Area |
-|------------|-------|---------------|
-| test-handicap.js | 8 | Handicap calculation |
-| test-scoring.js | 21 | Scoring & bonus points |
-| test-schedule.js | 10 | Round-robin scheduling |
-| test-validation.js | 14 | Data validation |
-| test-dynamic-handicap.js | — | Dynamic handicap (needs fix) |
-| test-i18n.js | 21 | Internationalization |
-| **Total** | **74+** | **Core business logic & i18n** |
-
-## Test Design Principles
-
-### Standalone Tests
-All tests are self-contained and don't require:
-- External dependencies
-- Database connections
-- Running application
-- Build processes
-
-### Pure Functions
-Tests validate pure functions with:
-- Known inputs
-- Expected outputs
-- No side effects
-- Deterministic results
-
-### Clear Output
-Each test provides:
-- ✅/❌ Visual pass/fail indicators
-- Descriptive test names
-- Expected vs actual results
-- Exit codes (0 = pass, 1 = fail)
 
 ## Adding New Tests
 
-### Test File Template
-```javascript
-// Test function implementations here
+- Place new unit tests in `tests/unit/`
+- Place new component tests in `tests/component/`
+- Place new integration tests in `tests/integration/`
+- Use `.test.ts` or `.test.tsx` extensions for Jest to pick up files automatically
 
-const tests = [
-  {
-    name: 'Test name',
-    test: () => {
-      // Test logic
-      return true; // or false
-    },
-    expected: 'expected result',
-    description: 'What this test validates'
-  }
-];
+## Coverage Goals
 
-// Run tests (copy from existing test files)
-```
+- 100% coverage for all business logic, scoring, handicap, and scheduling utilities
+- High coverage for all critical React components (admin/player/game views)
+- Integration tests for season/game/standings flows
 
-### Best Practices
-1. **One concept per test**: Focus on single behavior
-2. **Descriptive names**: Clear test intent
-3. **Expected values**: Document what should happen
-4. **Edge cases**: Test boundaries and errors
-5. **Independent tests**: No test dependencies
+## Best Practices
 
-## Integration with Development Workflow
+1. **Check for errors after every change and fix them**
+2. Use descriptive test names and groupings
+3. Prefer data-driven tests for business rules
+4. Mock external dependencies (e.g., localStorage, supabase)
+5. Use code coverage tools (Jest coverage)
+6. Add pre-commit/test hooks to enforce test runs before pushes
 
-### Start of Day Routine
-The start-of-day health check (see [START_OF_DAY.md](START_OF_DAY.md)) includes a test verification step that ensures:
-- All test files are present
-- Tests can be executed
-- No critical test failures
+## CI Integration
 
-### Manual Testing Workflow
-```bash
-# 1. Make code changes
-# 2. Run relevant test suite
-node tests/test-handicap.js
+All tests and coverage are run automatically in CI (see `.github/workflows/ci.yml`).
 
-# 3. Verify all tests pass
-# 4. Commit changes
-```
+## Legacy Test Files
 
-## Future Enhancements
+The following legacy Node.js test files remain for reference and business logic validation:
 
-### Planned Additions
-- [ ] Grand total points calculation tests
-- [ ] Standings calculation tests
-- [ ] Player statistics aggregation tests
-- [ ] Match winner determination tests
-- [ ] Absent player edge case tests
-- [ ] Fix test-dynamic-handicap.js module resolution issue
-- [ ] Supabase API integration tests
+- `tests/test-handicap.js`
+- `tests/test-scoring.js`
+- `tests/test-schedule.js`
+- `tests/test-validation.js`
+- `tests/test-dynamic-handicap.js`
+- `tests/test-i18n.js`
 
-### Test Framework Migration
-Consider migrating to a test framework (Jest, Mocha) when:
-- Test count exceeds 100
-- Need for advanced features (mocking, coverage)
-- CI/CD integration requirements
-- Team collaboration increases
+These will be incrementally migrated to Jest/RTL as coverage expands.
 
 ## Troubleshooting
 
-### Test Failures
+If you encounter errors:
 1. Check test output for specific failure
 2. Verify expected vs actual values
 3. Review recent code changes in tested area
 4. Run individual test in isolation
 5. Check for environment issues (Node.js version)
 
-### Common Issues
-- **"process is not defined"**: Test file missing Node.js context
-- **"module not found"**: Test file moved or renamed
-- **Exit code 1**: At least one test failed
-- **Syntax errors**: Check for typos in test logic
-
-## Test Coverage Summary
-
-### Business Logic Coverage
-✅ **Handicap Calculation**: 100% (all formulas and edge cases)
-✅ **Bonus Points**: 100% (all rules and thresholds)
-✅ **Individual Games**: 100% (wins, losses, draws)
-✅ **Schedule Generation**: 100% (all team counts and scenarios)
-✅ **Data Validation**: 100% (all models and constraints)
-✅ **Internationalization**: 100% (translation completeness and RTL)
-
-### Not Yet Covered
-⚠️ UI Components (requires different testing approach)
-⚠️ API/Supabase layer (covered by integration tests later)
-⚠️ State management (React-specific testing)
-⚠️ User interactions (requires E2E testing)
-
----
-
-**Last Updated**: February 17, 2026
-**Total Tests**: 74+
-**All Tests Status**: ✅ Passing (except test-dynamic-handicap which needs module fix)
+**Last Updated**: February 18, 2026
+    description: 'What this test validates'

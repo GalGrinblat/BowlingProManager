@@ -1,5 +1,34 @@
 # Bowling League App - Tester Guide
 
+## 🧪 Automated Testing Overview
+
+The Bowling League App now uses a modern test suite with Jest and React Testing Library (RTL) for all new and future tests. Tests are organized in:
+
+```
+tests/
+  unit/         # Business logic, utilities, models
+  component/    # React component tests (admin/player/common)
+  integration/  # Multi-module and flow tests
+```
+
+**How to run all tests:**
+
+```
+npm test
+```
+
+**How to run a specific test file:**
+
+```
+npx jest tests/unit/utils/matchUtils.test.ts
+```
+
+**Legacy Node.js test files** remain for business logic reference (see TESTING.md for details). All new tests should use Jest/RTL.
+
+**After every code or test change, always check for errors and fix them before continuing.**
+
+See TESTING.md for full details on test structure, coverage, and workflow.
+
 Welcome testers! This guide will help you get started and explore the features of the Bowling League Management System.
 
 ## 🚀 Quick Start (5 minutes)
