@@ -8,7 +8,7 @@
     "build": "vite build",
     "vercel-build": "npm ci && npm run build",
     "preview": "vite preview",
-    "test": "node tests/test-validation.js && node tests/test-scoring.js && node tests/test-schedule.js && node tests/test-handicap.js && node tests/test-dynamic-handicap.js && node tests/test-i18n.js",
+    "test": "jest",
     "check": "node scripts/start-of-day.js"
   },
   "dependencies": {
@@ -17,6 +17,7 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/react-hooks": "^8.0.1",
@@ -26,8 +27,10 @@
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.0.0",
     "autoprefixer": "^10.4.14",
+    "jest-environment-jsdom": "^30.2.0",
     "postcss": "^8.4.24",
     "tailwindcss": "^3.3.0",
+    "ts-jest": "^29.4.6",
     "typescript": "^5.9.3",
     "vite": "^4.3.9"
   }

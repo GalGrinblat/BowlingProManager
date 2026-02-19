@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import * as React from 'react';
 import { playersApi, teamsApi, seasonsApi } from '../../../services/api';
 import { createPlayer, validatePlayer } from '../../../models';
 import { Pagination, usePagination } from '../../common/Pagination';
@@ -24,19 +24,19 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({
   onRefreshPlayers
 }) => {
   const { t } = useTranslation();
-  const [isAdding, setIsAdding] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
+  const [isAdding, setIsAdding] = React.useState(false);
+  const [editingId, setEditingId] = React.useState<string | null>(null);
+  const [formData, setFormData] = React.useState({
     firstName: '',
     middleName: '',
     lastName: '',
     active: true
   });
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showImportModal, setShowImportModal] = useState(false);
-  const [importData, setImportData] = useState<Player[]>([]);
-  const [importErrors, setImportErrors] = useState<string[]>([]);
-  const [sortOption, setSortOption] = useState(PLAYER_SORT_OPTIONS[0]);
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const [showImportModal, setShowImportModal] = React.useState(false);
+  const [importData, setImportData] = React.useState<Player[]>([]);
+  const [importErrors, setImportErrors] = React.useState<string[]>([]);
+  const [sortOption, setSortOption] = React.useState(PLAYER_SORT_OPTIONS[0]);
 
   const activePagination = usePagination(20);
   const inactivePagination = usePagination(20);
