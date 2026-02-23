@@ -32,8 +32,8 @@ export const TeamStatsCard: React.FC<TeamStatsCardProps> = ({
         {teamName}
       </div>
       <div className="space-y-2">
-        {playerStats.map((player, idx) => (
-          <div key={idx} className={`bg-gray-700 rounded p-3 ${player.isAbsent ? 'opacity-60 bg-red-900' : ''}`}>
+        {playerStats.map((player) => (
+          <div key={player.name} className={`bg-gray-700 rounded p-3 ${player.isAbsent ? 'opacity-60 bg-red-900' : ''}`}>
             <div className="grid grid-cols-4 gap-3 items-center h-14">
               <div className="col-span-2">
                 <div className="text-white font-semibold text-lg">{player.name}</div>

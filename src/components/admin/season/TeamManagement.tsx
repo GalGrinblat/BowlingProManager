@@ -153,8 +153,8 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
                 <div className="border-t pt-3">
                   <h3 className="text-sm font-semibold text-gray-600 mb-2">Recent Changes</h3>
                   <div className="space-y-1">
-                    {recentChanges.map((change: RosterChange, idx: number) => (
-                      <div key={idx} className="text-xs text-gray-600 bg-yellow-50 p-2 rounded">
+                    {recentChanges.map((change: RosterChange) => (
+                      <div key={`${change.date}-${change.oldPlayerName}`} className="text-xs text-gray-600 bg-yellow-50 p-2 rounded">
                         <span className="font-semibold">{change.oldPlayerName}</span>
                         {' '}{t('common.rightArrow')}{' '}
                         <span className="font-semibold">{change.newPlayerName}</span>

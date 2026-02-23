@@ -46,7 +46,7 @@ const RecordCard: React.FC<{
       {records.length > 0 ? (
         <div className="space-y-2">
           {records.map((record, index) => (
-            <div key={index} className={`flex items-center justify-between bg-white rounded-lg p-2 shadow-sm border ${c.itemBorder}`}>
+            <div key={`${record.playerRecordEntry?.playerId ?? record.teamRecordEntry?.teamId}-${record.round}-${record.matchDay}`} className={`flex items-center justify-between bg-white rounded-lg p-2 shadow-sm border ${c.itemBorder}`}>
               <div className="flex items-center gap-2 flex-1 min-w-0">
                 <span className={`text-xl font-bold ${c.value}`}>{medals[index]}</span>
                 <div className="min-w-0 flex-1">

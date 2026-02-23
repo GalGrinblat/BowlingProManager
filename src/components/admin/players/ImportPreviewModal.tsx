@@ -30,7 +30,7 @@ export const ImportPreviewModal: React.FC<ImportPreviewModalProps> = ({
               <h3 className="font-bold text-red-800 mb-2">⚠️ {t('players.errorsFound')} (<span className="ltr-content">{importErrors.length}</span>)</h3>
               <div className="text-sm text-red-700 space-y-1 max-h-40 overflow-y-auto">
                 {importErrors.map((error, idx) => (
-                  <div key={idx}>• {error}</div>
+                  <div key={`${idx}-${error}`}>• {error}</div>
                 ))}
               </div>
             </div>
@@ -42,7 +42,7 @@ export const ImportPreviewModal: React.FC<ImportPreviewModalProps> = ({
                 ✅ {t('players.validPlayers')} (<span className="ltr-content">{importData.length}</span>)
               </h3>
               <div className="space-y-2 max-h-96 overflow-y-auto">
-                {importData.map((player, idx) => {
+                {importData.map((player) => {
                   const isDuplicate = existingPlayers.some(p =>
                     p.firstName.toLowerCase() === player.firstName.toLowerCase() &&
                     p.lastName.toLowerCase() === player.lastName.toLowerCase()
@@ -50,7 +50,7 @@ export const ImportPreviewModal: React.FC<ImportPreviewModalProps> = ({
 
                   return (
                     <div
-                      key={idx}
+                      key={`${player.firstName}-${player.lastName}`}
                       className={`p-3 border rounded-lg ${
                         isDuplicate ? 'bg-yellow-50 border-yellow-300' : 'bg-gray-50 border-gray-200'
                       }`}

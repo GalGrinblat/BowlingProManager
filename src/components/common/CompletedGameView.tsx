@@ -109,7 +109,7 @@ export const CompletedGameView: React.FC<CompletedGameViewProps> = ({ game, onBa
                     }, 0);
 
                     return (
-                      <tr key={playerIdx} className="border-b border-gray-100 hover:bg-orange-50">
+                      <tr key={player.playerId} className="border-b border-gray-100 hover:bg-orange-50">
                         <td className={`px-2 py-1.5 text-xs font-semibold text-gray-800 ${isRTL ? 'text-right' : 'text-left'}`}>
                           {playerIdx + 1}. {player.name}
                         </td>
@@ -223,7 +223,7 @@ export const CompletedGameView: React.FC<CompletedGameViewProps> = ({ game, onBa
                     }, 0);
 
                     return (
-                      <tr key={playerIdx} className="border-b border-gray-100 hover:bg-blue-50">
+                      <tr key={player.playerId} className="border-b border-gray-100 hover:bg-blue-50">
                         <td className={`px-2 py-1.5 text-xs font-semibold text-gray-800 ${isRTL ? 'text-right' : 'text-left'}`}>
                           {playerIdx + 1}. {player.name}
                         </td>
