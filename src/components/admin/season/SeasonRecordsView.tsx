@@ -2,9 +2,10 @@ import React from 'react';
 import { useTranslation } from '../../../contexts/LanguageContext';
 
 interface RecordEntry {
-  playerRecordEntry?: { playerId: string; value: number };
-  teamRecordEntry?: { teamId: string; value: number };
+  playerRecordEntry?: { playerId: string; playerName: string; value: number };
+  teamRecordEntry?: { teamId: string; teamName: string; value: number };
   teamId?: string;
+  teamName?: string;
   round: number;
   matchDay: number;
 }
@@ -51,9 +52,9 @@ const RecordCard: React.FC<{
                 <span className={`text-xl font-bold ${c.value}`}>{medals[index]}</span>
                 <div className="min-w-0 flex-1">
                   <p className="font-bold text-gray-800 text-sm truncate">
-                    {type === 'player' ? record.playerRecordEntry?.playerId : record.teamRecordEntry?.teamId}
+                    {type === 'player' ? record.playerRecordEntry?.playerName : record.teamRecordEntry?.teamName}
                   </p>
-                  {type === 'player' && <p className="text-xs text-gray-600 truncate">{record.teamId}</p>}
+                  {type === 'player' && <p className="text-xs text-gray-600 truncate">{record.teamName}</p>}
                 </div>
               </div>
               <div className="text-right ml-2">

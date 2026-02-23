@@ -79,7 +79,7 @@ const he: TranslationDictionary = {
     selectRole: 'בחר תפקיד',
     loginAs: 'התחבר בתור',
     welcome: 'ברוך הבא',
-    subtitle: 'התחבר כדי לגשת לליגת הבולינג שלך',
+    subtitle: 'התחבר כדי לגשת לליגת הבאולינג שלך',
     signIn: 'התחבר עם Google',
     signingIn: 'מתחבר...',
     loginFailed: 'ההתחברות נכשלה. אנא נסה שוב.',
@@ -497,7 +497,7 @@ const he: TranslationDictionary = {
     seasons: 'עונות',
     playersPerTeam: 'שחקנים/קבוצה',
     loadingDashboard: 'טוען נתוני לוח בקרה...',
-    defaultOrgName: 'ארגון הבולינג שלי',
+    defaultOrgName: 'ארגון הבאולינג שלי',
   },
 
   // לוח בקרה - שחקן

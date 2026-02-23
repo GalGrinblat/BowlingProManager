@@ -7,6 +7,7 @@ import { Game, GameMatch, GamePlayer, MatchPlayer, PlayerRecordEntry, TeamRecord
 interface PlayerSeasonRecordEntry {
   playerRecordEntry: PlayerRecordEntry;
   teamId: string;
+  teamName: string;
   matchDay: number;
   round: number;
 }
@@ -60,6 +61,7 @@ export function calculateSeasonRecords(teams: Team[], games: Game[]): SeasonReco
       // Track highest match score
       const playerRecordEntry: PlayerRecordEntry = {
         playerId: player.playerId,
+        playerName: player.name,
         recordType: 'singleMatch',
         value: pins,
         numberOfGames: 1,
@@ -68,6 +70,7 @@ export function calculateSeasonRecords(teams: Team[], games: Game[]): SeasonReco
       highestPlayerMatchScores.push({
         playerRecordEntry: playerRecordEntry,
         teamId: team.id,
+        teamName: team.name,
         matchDay: game.matchDay,
         round: game.round
       });
@@ -87,6 +90,7 @@ export function calculateSeasonRecords(teams: Team[], games: Game[]): SeasonReco
         if (playerSeries > 0) {
           const playerRecordEntry: PlayerRecordEntry = {
             playerId: player.playerId,
+            playerName: player.name,
             recordType: 'series',
             value: playerSeries,
             numberOfGames: numberOfGames,
@@ -95,6 +99,7 @@ export function calculateSeasonRecords(teams: Team[], games: Game[]): SeasonReco
           highestPlayerSeries.push({
             playerRecordEntry: playerRecordEntry,
             teamId: team.id,
+            teamName: team.name,
             matchDay: game.matchDay,
             round: game.round
           });
@@ -164,6 +169,7 @@ export function calculateSeasonRecords(teams: Team[], games: Game[]): SeasonReco
           value: team1MatchTotal,
           date: game.scheduledDate || '',
           teamId: team1.id,
+          teamName: team1.name,
           numberOfGames: 1,
           playerIds: team1.playerIds
         };
@@ -179,6 +185,7 @@ export function calculateSeasonRecords(teams: Team[], games: Game[]): SeasonReco
           value: team2MatchTotal,
           date: game.scheduledDate || '',
           teamId: team2.id,
+          teamName: team2.name,
           numberOfGames: 1,
           playerIds: team2.playerIds
         };
@@ -196,6 +203,7 @@ export function calculateSeasonRecords(teams: Team[], games: Game[]): SeasonReco
         value: team1GameTotalRef.value,
         date: game.scheduledDate || '',
         teamId: team1.id,
+        teamName: team1.name,
         numberOfGames: team1MatchCountRef.value,
         playerIds: team1.playerIds
       };
@@ -211,6 +219,7 @@ export function calculateSeasonRecords(teams: Team[], games: Game[]): SeasonReco
         value: team2GameTotalRef.value,
         date: game.scheduledDate || '',
         teamId: team2.id,
+        teamName: team2.name,
         numberOfGames: team2MatchCountRef.value,
         playerIds: team2.playerIds
       };

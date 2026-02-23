@@ -274,17 +274,19 @@ export interface CurrentPlayerAverages {
 
 export interface PlayerRecordEntry {
   playerId: string;
+  playerName: string;
   recordType: 'singleMatch' | 'series';
   value: number;
-  numberOfGames: number;  
+  numberOfGames: number;
   date: string;
 }
 
 export interface TeamRecordEntry {
   teamId: string;
+  teamName: string;
   recordType: 'singleMatch' | 'series';
   value: number;
-  numberOfGames: number;  
+  numberOfGames: number;
   date: string;
   playerIds: string[]; // For team records, we can also track which players were involved
 }
