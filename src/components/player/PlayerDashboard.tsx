@@ -4,7 +4,7 @@ import { useTranslation } from '../../contexts/LanguageContext';
 import { useDateFormat } from '../../hooks/useDateFormat';
 import { getPlayerDisplayName } from '../../utils/playerUtils';
 
-import type { Game, GameMatch, League, Player, PlayerDashboardProps, PlayerStats, Season } from '../../types/index';
+import type { Game, GameMatch, League, Player, PlayerDashboardProps, PlayerStats, Season, Team } from '../../types/index';
 
 export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNavigate }) => {
   const { t } = useTranslation();
@@ -14,85 +14,106 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
   const [recentCompletedGames, setRecentCompletedGames] = useState<Game[]>([]);
   const [view, setView] = useState('dashboard'); // dashboard, stats, leagues, history
   const [playerStats, setPlayerStats] = useState<PlayerStats | null>(null);
-  const [gameDetailsMap, setGameDetailsMap] = useState<Record<string, { season: Season | null, league: League | null, team1: any, team2: any }>>({});
+  const [gameDetailsMap, setGameDetailsMap] = useState<Record<string, { season: Season | null, league: League | null, team1: Team | undefined, team2: Team | undefined }>>({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
-    loadPlayerData();
+    let cancelled = false;
+
+    const load = async () => {
+      setIsLoading(true);
+      setLoadError(null);
+      try {
+        const playerData = await playersApi.getById(playerId);
+        if (cancelled) return;
+        setPlayer(playerData ?? null);
+
+        // Find all teams this player is on
+        const allTeams = await teamsApi.getAll();
+        if (cancelled) return;
+        const playerTeams = allTeams.filter(team => team.playerIds.includes(playerId));
+
+        // Get unique seasons the player is in
+        const seasonIds = [...new Set(playerTeams.map(t => t.seasonId))];
+        const seasons = await Promise.all(seasonIds.map(id => seasonsApi.getById(id)));
+        if (cancelled) return;
+        const validSeasons = seasons.filter(Boolean);
+
+        // Get leagues for those seasons
+        const leagueIds = [...new Set(validSeasons.filter((s): s is Season => s !== undefined).map(s => s.leagueId))];
+        const leaguesData = await Promise.all(leagueIds.map(id => leaguesApi.getById(id)));
+        if (cancelled) return;
+        const leagues = leaguesData
+          .filter((league): league is League => !!league && typeof league.id === 'string')
+          .map(league => {
+            const leagueSeasons = validSeasons.filter((s): s is Season => s !== undefined && s.leagueId === league.id);
+            const activeSeasons = leagueSeasons.filter((s: Season) => s.status === 'active');
+            return {
+              ...league,
+              seasons: leagueSeasons,
+              activeSeasons,
+              playerTeams: playerTeams.filter(t =>
+                leagueSeasons.some((s: Season) => s.id === t.seasonId)
+              )
+            };
+          });
+        setPlayerLeagues(leagues);
+
+        // Get recent completed games
+        const allGames = await gamesApi.getAll();
+        if (cancelled) return;
+        const completedPlayerGamesPromises = allGames.map(async game => {
+          const team1 = await teamsApi.getById(game.team1Id);
+          const team2 = await teamsApi.getById(game.team2Id);
+          const isPlayerGame = (team1?.playerIds.includes(playerId) || team2?.playerIds.includes(playerId)) &&
+                 game.status === 'completed';
+          return isPlayerGame ? game : null;
+        });
+        const completedPlayerGamesResults = await Promise.all(completedPlayerGamesPromises);
+        if (cancelled) return;
+        const completedPlayerGames = completedPlayerGamesResults.filter((game): game is Game => game !== null);
+
+        // Sort by completion date (most recent first)
+        const sortedCompletedGames = completedPlayerGames.sort((a, b) => {
+          const dateA = new Date(a.completedAt || a.updatedAt || 0);
+          const dateB = new Date(b.completedAt || b.updatedAt || 0);
+          return dateB.getTime() - dateA.getTime();
+        });
+        const topGames = sortedCompletedGames.slice(0, 5);
+        setRecentCompletedGames(topGames);
+
+        // Preload game details for rendering
+        const detailsMap: Record<string, { season: Season | null, league: League | null, team1: Team | undefined, team2: Team | undefined }> = {};
+        for (const game of topGames) {
+          const season = await seasonsApi.getById(game.seasonId);
+          const league = season ? await leaguesApi.getById(season.leagueId) : null;
+          const team1 = await teamsApi.getById(game.team1Id);
+          const team2 = await teamsApi.getById(game.team2Id);
+          if (cancelled) return;
+          detailsMap[game.id] = { season: season ?? null, league: league ?? null, team1, team2 };
+        }
+        setGameDetailsMap(detailsMap);
+
+        // Calculate player statistics across all games
+        const stats = await computePlayerStats(allGames);
+        if (cancelled) return;
+        setPlayerStats(stats);
+      } catch (error) {
+        if (!cancelled) {
+          console.error('Failed to load player data:', error);
+          setLoadError('Failed to load player data');
+        }
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    };
+
+    load();
+    return () => { cancelled = true; };
   }, [playerId]);
 
-  const loadPlayerData = async () => {
-    const playerData = await playersApi.getById(playerId);
-    setPlayer(playerData ?? null);
-
-    // Find all teams this player is on
-    const allTeams = await teamsApi.getAll();
-    const playerTeams = allTeams.filter(team => team.playerIds.includes(playerId));
-
-    // Get unique seasons the player is in
-    const seasonIds = [...new Set(playerTeams.map(t => t.seasonId))];
-    const seasons = await Promise.all(seasonIds.map(id => seasonsApi.getById(id)));
-    const validSeasons = seasons.filter(Boolean);
-
-    // Get leagues for those seasons
-    const leagueIds = [...new Set(validSeasons.filter((s): s is Season => s !== undefined).map(s => s.leagueId))];
-    const leaguesData = await Promise.all(leagueIds.map(id => leaguesApi.getById(id)));
-    const leagues = leaguesData
-      .filter((league): league is League => !!league && typeof league.id === 'string')
-      .map(league => {
-        const leagueSeasons = validSeasons.filter((s): s is Season => s !== undefined && s.leagueId === league.id);
-        const activeSeasons = leagueSeasons.filter((s: Season) => s.status === 'active');
-
-        return {
-          ...league,
-          seasons: leagueSeasons,
-          activeSeasons: activeSeasons,
-          playerTeams: playerTeams.filter(t =>
-            leagueSeasons.some((s: Season) => s.id === t.seasonId)
-          )
-        };
-      });
-
-    setPlayerLeagues(leagues);
-
-    // Get recent completed games
-    const allGames = await gamesApi.getAll();
-    const completedPlayerGamesPromises = allGames.map(async game => {
-      const team1 = await teamsApi.getById(game.team1Id);
-      const team2 = await teamsApi.getById(game.team2Id);
-      const isPlayerGame = (team1?.playerIds.includes(playerId) || team2?.playerIds.includes(playerId)) &&
-             game.status === 'completed';
-      return isPlayerGame ? game : null;
-    });
-
-    const completedPlayerGamesResults = await Promise.all(completedPlayerGamesPromises);
-    const completedPlayerGames = completedPlayerGamesResults.filter((game): game is Game => game !== null);
-
-    // Sort by completion date (most recent first)
-    const sortedCompletedGames = completedPlayerGames.sort((a, b) => {
-      const dateA = new Date(a.completedAt || a.updatedAt || 0);
-      const dateB = new Date(b.completedAt || b.updatedAt || 0);
-      return dateB.getTime() - dateA.getTime();
-    });
-
-    const topGames = sortedCompletedGames.slice(0, 5);
-    setRecentCompletedGames(topGames); // Show last 5 completed games
-
-    // Preload game details for rendering
-    const detailsMap: Record<string, { season: Season | null, league: League | null, team1: any, team2: any }> = {};
-    for (const game of topGames) {
-      const season = await seasonsApi.getById(game.seasonId);
-      const league = season ? await leaguesApi.getById(season.leagueId) : null;
-      const team1 = await teamsApi.getById(game.team1Id);
-      const team2 = await teamsApi.getById(game.team2Id);
-      detailsMap[game.id] = { season: season ?? null, league: league ?? null, team1, team2 };
-    }
-    setGameDetailsMap(detailsMap);
-
-    // Calculate player statistics across all games
-    await calculatePlayerStats(allGames);
-  };
-
-  const calculatePlayerStats = async (allGames: Game[]) => {
+  const computePlayerStats = async (allGames: Game[]): Promise<PlayerStats> => {
     const playerData = await playersApi.getById(playerId);
     const stats: PlayerStats = {
       playerId: playerId,
@@ -106,7 +127,6 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
       pointsScored: 0,
     };
 
-    // Process all completed games
     const completedGames = allGames.filter((g: Game) => g.status === 'completed');
 
     for (const game of completedGames) {
@@ -133,11 +153,8 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
               stats.totalPins += pins;
               seriesPins += pins;
               playedMatch = true;
-              if (pins > stats.highGame) {
-                stats.highGame = pins;
-              }
+              if (pins > stats.highGame) stats.highGame = pins;
             }
-            // Calculate points scored
             if (match.playerMatches && match.playerMatches[playerIndex]) {
               const points = isOnTeam1
                 ? match.playerMatches[playerIndex].team1Points
@@ -148,22 +165,18 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
           }
         });
       }
-      // Update high series and series count
       if (playedMatch) {
-        if (seriesPins > stats.highSeries) {
-          stats.highSeries = seriesPins;
-        }
+        if (seriesPins > stats.highSeries) stats.highSeries = seriesPins;
         stats.seriesCount++;
       }
     }
 
-    // Calculate averages
-    if (stats.gamesPlayed > 0) {
-      stats.average = stats.totalPins / stats.gamesPlayed;
-    }
-    setPlayerStats(stats);
+    if (stats.gamesPlayed > 0) stats.average = stats.totalPins / stats.gamesPlayed;
+    return stats;
   };
 
+  if (isLoading) return <div>Loading...</div>;
+  if (loadError) return <div>{loadError}</div>;
   if (!player) return <div>Loading...</div>;
 
   return (
