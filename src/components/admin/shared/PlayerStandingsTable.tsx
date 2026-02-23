@@ -9,7 +9,7 @@ interface PlayerStandingsTableProps {
   compact?: boolean;
   className?: string;
   previousRanks?: Map<string, number>;
-  lastMatchdayPins?: Map<string, number>;
+  lastMatchdayPins?: Map<string, number[]>;
   teamCompletedGameCount?: Map<string, number>;
 }
 
@@ -83,7 +83,7 @@ export const PlayerStandingsTable: React.FC<PlayerStandingsTableProps> = ({
           <tbody>
             {playerStats.map((stat, index) => {
               const playerKey = `${stat.teamId}-${stat.playerName}`;
-              const lastPins = lastMatchdayPins?.get(playerKey);
+              const lastScores = lastMatchdayPins?.get(playerKey);
               const possibleGames = stat.teamId ? teamCompletedGameCount?.get(stat.teamId) : undefined;
               const participationPct = possibleGames && possibleGames > 0
                 ? Math.round((stat.gamesPlayed / possibleGames) * 100)
@@ -120,8 +120,8 @@ export const PlayerStandingsTable: React.FC<PlayerStandingsTableProps> = ({
                     {stat.highSeries}
                   </td>
                   {!compact && (
-                    <td className={`${cellPadding} text-center text-gray-600 text-sm hidden sm:table-cell`}>
-                      {lastPins !== undefined ? lastPins : '-'}
+                    <td className={`${cellPadding} text-center text-gray-600 text-sm hidden sm:table-cell whitespace-nowrap`}>
+                      {lastScores ? lastScores.join(' / ') : '-'}
                     </td>
                   )}
                   {!compact && (

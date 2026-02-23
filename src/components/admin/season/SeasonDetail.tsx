@@ -176,17 +176,22 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
     return map;
   }, [teams, games, lastMatchdayGames]);
 
-  const lastMatchdayTeamResults = useMemo((): Map<string, 'W' | 'L' | 'D'> => {
-    const map = new Map<string, 'W' | 'L' | 'D'>();
+  const lastMatchdayTeamResults = useMemo((): Map<string, { result: 'W' | 'L' | 'D'; ownPoints: number; opponentPoints: number; opponentName: string }> => {
+    const map = new Map<string, { result: 'W' | 'L' | 'D'; ownPoints: number; opponentPoints: number; opponentName: string }>();
     lastMatchdayGames.forEach(game => {
       const t1Points = (game.matches?.reduce((sum, m: GameMatch) => sum + (m.team1?.points || 0), 0) || 0) + (game.grandTotalPoints?.team1 || 0);
       const t2Points = (game.matches?.reduce((sum, m: GameMatch) => sum + (m.team2?.points || 0), 0) || 0) + (game.grandTotalPoints?.team2 || 0);
-      if (t1Points > t2Points) { map.set(game.team1Id, 'W'); map.set(game.team2Id, 'L'); }
-      else if (t2Points > t1Points) { map.set(game.team2Id, 'W'); map.set(game.team1Id, 'L'); }
-      else { map.set(game.team1Id, 'D'); map.set(game.team2Id, 'D'); }
+      const team1Name = teams.find(t => t.id === game.team1Id)?.name || game.team1Id;
+      const team2Name = teams.find(t => t.id === game.team2Id)?.name || game.team2Id;
+      let r1: 'W' | 'L' | 'D', r2: 'W' | 'L' | 'D';
+      if (t1Points > t2Points) { r1 = 'W'; r2 = 'L'; }
+      else if (t2Points > t1Points) { r1 = 'L'; r2 = 'W'; }
+      else { r1 = 'D'; r2 = 'D'; }
+      map.set(game.team1Id, { result: r1, ownPoints: t1Points, opponentPoints: t2Points, opponentName: team2Name });
+      map.set(game.team2Id, { result: r2, ownPoints: t2Points, opponentPoints: t1Points, opponentName: team1Name });
     });
     return map;
-  }, [lastMatchdayGames]);
+  }, [lastMatchdayGames, teams]);
 
   const previousPlayerRanks = useMemo((): Map<string, number> => {
     const lastIds = new Set(lastMatchdayGames.map(g => g.id));
@@ -198,8 +203,8 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
     return map;
   }, [teams, games, lastMatchdayGames]);
 
-  const lastMatchdayPlayerPins = useMemo((): Map<string, number> => {
-    const map = new Map<string, number>();
+  const lastMatchdayPlayerPins = useMemo((): Map<string, number[]> => {
+    const map = new Map<string, number[]>();
     lastMatchdayGames.forEach(game => {
       (['team1', 'team2'] as const).forEach(teamKey => {
         const gameTeam = game[teamKey];
@@ -207,10 +212,10 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
         const teamId = teamKey === 'team1' ? game.team1Id : game.team2Id;
         gameTeam.players.forEach((player, idx) => {
           if (player.absent) return;
-          const pins = game.matches?.reduce((sum, m: GameMatch) => {
-            return sum + (parseInt(m[teamKey]?.players[idx]?.pins || '') || 0);
-          }, 0) || 0;
-          if (pins > 0) map.set(`${teamId}-${player.name}`, pins);
+          const matchScores: number[] = (game.matches ?? []).map((m: GameMatch) =>
+            parseInt(m[teamKey]?.players[idx]?.pins || '') || 0
+          );
+          if (matchScores.some(p => p > 0)) map.set(`${teamId}-${player.name}`, matchScores);
         });
       });
     });

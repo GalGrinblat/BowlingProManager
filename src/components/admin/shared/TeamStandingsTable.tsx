@@ -1,6 +1,8 @@
 import React from 'react';
 import type { TeamStanding } from '../../../types/index';
 
+type TeamLastResult = { result: 'W' | 'L' | 'D'; ownPoints: number; opponentPoints: number; opponentName: string };
+
 interface TeamStandingsTableProps {
   standings: TeamStanding[];
   direction?: 'ltr' | 'rtl';
@@ -10,7 +12,7 @@ interface TeamStandingsTableProps {
   compact?: boolean;
   className?: string;
   previousRanks?: Map<string, number>;
-  lastResults?: Map<string, 'W' | 'L' | 'D'>;
+  lastResults?: Map<string, TeamLastResult>;
 }
 
 export const TeamStandingsTable: React.FC<TeamStandingsTableProps> = ({
@@ -38,19 +40,30 @@ export const TeamStandingsTable: React.FC<TeamStandingsTableProps> = ({
     return <span className="text-gray-400 text-xs">—</span>;
   };
 
-  const getResultBadge = (teamId: string) => {
+  const getResultCell = (teamId: string) => {
     if (!lastResults) return <span className="text-gray-300 text-sm">-</span>;
-    const result = lastResults.get(teamId);
-    if (!result) return <span className="text-gray-300 text-sm">-</span>;
-    const cls = result === 'W'
+    const r = lastResults.get(teamId);
+    if (!r) return <span className="text-gray-300 text-sm">-</span>;
+    const badgeCls = r.result === 'W'
       ? 'bg-green-100 text-green-700'
-      : result === 'L'
+      : r.result === 'L'
       ? 'bg-red-100 text-red-700'
       : 'bg-gray-100 text-gray-600';
+    const resultWord = r.result === 'W' ? 'Won' : r.result === 'L' ? 'Lost' : 'Drew';
     return (
-      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${cls}`}>
-        {result}
-      </span>
+      <div className="text-center">
+        <div className="flex items-center justify-center gap-1.5">
+          <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs font-bold ${badgeCls}`}>
+            {r.result}
+          </span>
+          <span className="text-xs font-semibold text-gray-700">
+            {r.ownPoints}-{r.opponentPoints}
+          </span>
+        </div>
+        <div className="text-xs text-gray-500 mt-0.5 truncate max-w-[8rem]">
+          {resultWord} vs {r.opponentName}
+        </div>
+      </div>
     );
   };
 
@@ -122,8 +135,8 @@ export const TeamStandingsTable: React.FC<TeamStandingsTableProps> = ({
                   {standing.totalPinsWithHandicap}
                 </td>
                 {!compact && (
-                  <td className={`${cellPadding} text-center hidden sm:table-cell`}>
-                    {getResultBadge(standing.teamId)}
+                  <td className={`${cellPadding} hidden sm:table-cell`}>
+                    {getResultCell(standing.teamId)}
                   </td>
                 )}
               </tr>
