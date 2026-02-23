@@ -17,6 +17,8 @@ import { sortByOption, SortOption } from '../../../utils/sortUtils';
 import { PlayerForm } from './PlayerForm';
 import { ImportPreviewModal } from './ImportPreviewModal';
 
+const DEFAULT_SORT_OPTION: SortOption<Player> = { key: 'lastName', labelKey: 'sort.lastNameAsc', direction: 'asc' };
+
 export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({
   onBack,
   players,
@@ -230,24 +232,27 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({
     );
   }
 
-  // Filtered and sorted players
-  const filteredPlayers = players.filter(p => {
+  const filteredPlayers = React.useMemo(() => {
     const term = searchTerm.toLowerCase();
-    return p.firstName.toLowerCase().includes(term) ||
+    return players.filter(p =>
+      p.firstName.toLowerCase().includes(term) ||
       p.lastName.toLowerCase().includes(term) ||
-      getPlayerDisplayName(p).toLowerCase().includes(term);
-  });
+      getPlayerDisplayName(p).toLowerCase().includes(term)
+    );
+  }, [players, searchTerm]);
 
-  const DEFAULT_SORT_OPTION: SortOption<Player> = { key: 'lastName', labelKey: 'sort.lastNameAsc', direction: 'asc' };
-  const sortedPlayers = sortByOption(filteredPlayers, sortOption ?? DEFAULT_SORT_OPTION);
+  const sortedPlayers = React.useMemo(
+    () => sortByOption(filteredPlayers, sortOption ?? DEFAULT_SORT_OPTION),
+    [filteredPlayers, sortOption]
+  );
 
   React.useEffect(() => {
     activePagination.resetPage();
     inactivePagination.resetPage();
   }, [searchTerm]);
 
-  const activePlayers = sortedPlayers.filter(p => p.active);
-  const inactivePlayers = sortedPlayers.filter(p => !p.active);
+  const activePlayers = React.useMemo(() => sortedPlayers.filter(p => p.active), [sortedPlayers]);
+  const inactivePlayers = React.useMemo(() => sortedPlayers.filter(p => !p.active), [sortedPlayers]);
 
   const paginatedActivePlayers = activePagination.paginate(activePlayers);
   const paginatedInactivePlayers = inactivePagination.paginate(inactivePlayers);
