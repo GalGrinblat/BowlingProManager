@@ -12,7 +12,7 @@ interface PlayerRowProps {
   totalPlayers: number;
 }
 
-export const PlayerRow: React.FC<PlayerRowProps> = ({
+const PlayerRow: React.FC<PlayerRowProps> = ({
   player,
   idx,
   team,
@@ -87,7 +87,7 @@ export const PlayerRow: React.FC<PlayerRowProps> = ({
   </div>
 );
 
-interface TeamPanelProps {
+interface GameTeamPanelProps {
   teamName: string;
   teamColor: string;
   players: GamePlayer[];
@@ -98,7 +98,7 @@ interface TeamPanelProps {
   t: (key: string) => string;
 }
 
-export const TeamPanel: React.FC<TeamPanelProps> = ({
+export const GameTeamPanel: React.FC<GameTeamPanelProps> = ({
   teamName,
   teamColor,
   players,

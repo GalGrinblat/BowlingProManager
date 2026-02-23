@@ -2,7 +2,7 @@ import React from 'react';
 import { gamesApi } from '../../../services/api';
 import { logger } from '../../../utils/logger';
 import { MatchView } from './MatchView';
-import { SummaryView } from './SummaryView';
+import { GameSummaryView } from './GameSummaryView';
 import { calculateMatchResults, calculateBonusPoints } from '../../../utils/matchUtils';
 import { calculatePlayerStats, calculateGameTotals, calculateGrandTotalPoints } from '../../../utils/statsUtils';
 import { applyLineupRule } from '../../../utils/lineupUtils';
@@ -226,7 +226,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
     const totals = calculateGameTotals(game);
     const playerStats = calculatePlayerStats(game);
     return (
-      <SummaryView
+      <GameSummaryView
         game={game}
         totals={totals}
         playerStats={playerStats}

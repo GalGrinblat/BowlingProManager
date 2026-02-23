@@ -478,8 +478,8 @@ export interface GamePlayerStats {
   team2Average: number;
 }
 
-/** Props for SummaryView - Final game results and statistics */
-export interface SummaryViewProps {
+/** Props for GameSummaryView - Final game results and statistics */
+export interface GameSummaryViewProps {
   game: Game;
   totals: GameTotals;
   playerStats: GamePlayerStats;

@@ -1,10 +1,10 @@
 import { ArrowLeft, CheckCircle } from '../../common/Icons';
-import { TeamStatsCard } from './TeamStatsCard';
+import { GameTeamStatsCard } from './GameTeamStatsCard';
 import { useTranslation } from '../../../contexts/LanguageContext';
 
-import type { GameMatch, SummaryViewProps } from '../../../types/index';
+import type { GameMatch, GameSummaryViewProps } from '../../../types/index';
 
-export const SummaryView: React.FC<SummaryViewProps> = ({ game, totals, playerStats, onBack, onFinish }) => {
+export const GameSummaryView: React.FC<GameSummaryViewProps> = ({ game, totals, playerStats, onBack, onFinish }) => {
   const { t, direction, isRTL } = useTranslation();
 
   if (!game || !game.team1 || !game.team2) return null;
@@ -98,7 +98,7 @@ export const SummaryView: React.FC<SummaryViewProps> = ({ game, totals, playerSt
 
       {/* Player Statistics */}
       <div className="grid md:grid-cols-2 gap-6 mb-6">
-        <TeamStatsCard
+        <GameTeamStatsCard
           teamName={game.team1.name}
           teamColor="orange"
           playerStats={playerStats.team1Stats}
@@ -106,7 +106,7 @@ export const SummaryView: React.FC<SummaryViewProps> = ({ game, totals, playerSt
           matchCount={lastMatchNumber}
         />
 
-        <TeamStatsCard
+        <GameTeamStatsCard
           teamName={game.team2.name}
           teamColor="blue"
           playerStats={playerStats.team2Stats}

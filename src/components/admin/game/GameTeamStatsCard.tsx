@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from '../../../contexts/LanguageContext';
 
-export interface TeamStatsCardProps {
+export interface GameTeamStatsCardProps {
   teamName: string;
   teamColor: 'orange' | 'blue';
   playerStats: Array<{
@@ -15,7 +15,7 @@ export interface TeamStatsCardProps {
   matchCount?: number;
 }
 
-export const TeamStatsCard: React.FC<TeamStatsCardProps> = ({
+export const GameTeamStatsCard: React.FC<GameTeamStatsCardProps> = ({
   teamName,
   teamColor,
   playerStats,

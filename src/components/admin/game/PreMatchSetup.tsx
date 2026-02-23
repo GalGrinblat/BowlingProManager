@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from '../../../contexts/LanguageContext';
-import { TeamPanel } from './TeamPanel';
+import { GameTeamPanel } from './GameTeamPanel';
 import type { Game, GamePlayer } from '../../../types/index';
 
 interface PreMatchSetupProps {
@@ -63,7 +63,7 @@ export const PreMatchSetup: React.FC<PreMatchSetupProps> = ({
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <TeamPanel
+          <GameTeamPanel
             teamName={game.team1?.name || t('games.team1')}
             teamColor="text-blue-400"
             players={team1Players}
@@ -73,7 +73,7 @@ export const PreMatchSetup: React.FC<PreMatchSetupProps> = ({
             movePlayer={onMovePlayer}
             t={t}
           />
-          <TeamPanel
+          <GameTeamPanel
             teamName={game.team2?.name || t('games.team2')}
             teamColor="text-green-400"
             players={team2Players}
