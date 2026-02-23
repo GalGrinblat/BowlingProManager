@@ -434,7 +434,7 @@ export interface PlayerDashboardProps {
   playerId: string;
   onViewGame: (gameId: string) => void;
   onViewSeasonComparison: () => void;
-  onNavigate: (view: string, params?: Record<string, string>) => void;
+  onNavigate: (view: string, params?: Record<string, unknown>) => void;
 }
 
 /** Props for PlayerSeasonComparison - Compare player performance across seasons */

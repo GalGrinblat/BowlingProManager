@@ -5,7 +5,7 @@ import { useTranslation } from '../../../contexts/LanguageContext';
 import { useDateFormat } from '../../../hooks/useDateFormat';
 import { PlayerStandingsTable } from '../shared/PlayerStandingsTable';
 
-import type { Game, League, PlayerStats, Season, Team } from '../../../types/index';
+import type { Game, League, PlayerStats, Season } from '../../../types/index';
 
 interface PrintPlayerStandingsProps {
   seasonId: string;
@@ -20,7 +20,6 @@ export const PrintPlayerStandings: React.FC<PrintPlayerStandingsProps> = ({
   const { formatDate, formatTime } = useDateFormat();
   const [season, setSeason] = useState<Season | null>(null);
   const [league, setLeague] = useState<League | null>(null);
-  const [teams, setTeams] = useState<Team[]>([]);
   const [games, setGames] = useState<Game[]>([]);
   const [playerStats, setPlayerStats] = useState<PlayerStats[]>([]);
 
@@ -38,7 +37,6 @@ export const PrintPlayerStandings: React.FC<PrintPlayerStandingsProps> = ({
     setLeague(leagueData);
 
     const teamsData = await teamsApi.getBySeason(seasonId);
-    setTeams(teamsData);
 
     const gamesData = await gamesApi.getBySeason(seasonId);
     setGames(gamesData);

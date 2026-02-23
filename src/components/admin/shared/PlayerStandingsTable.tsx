@@ -14,7 +14,7 @@ export const PlayerStandingsTable: React.FC<PlayerStandingsTableProps> = ({
   playerStats,
   direction = 'ltr',
   t,
-  showHeader = true,
+  showHeader: _showHeader = true,
   compact = false,
   className = ''
 }) => {

@@ -16,7 +16,7 @@ export const TeamStandingsTable: React.FC<TeamStandingsTableProps> = ({
   direction = 'ltr',
   t,
   getTeamName,
-  showHeader = true,
+  showHeader: _showHeader = true,
   compact = false,
   className = ''
 }) => {

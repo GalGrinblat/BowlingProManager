@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from '../../../contexts/LanguageContext';
 import { useDateFormat } from '../../../hooks/useDateFormat';
-import { calculateHeadToHead, formatHeadToHead } from '../../../utils/headToHeadUtils';
+import { calculateHeadToHead } from '../../../utils/headToHeadUtils';
 import { GameCard } from './GameCard';
 import type { Season, Team, Game, ScheduleMatchDay } from '../../../types/index';
 
