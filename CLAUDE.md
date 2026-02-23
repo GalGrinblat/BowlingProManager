@@ -1,6 +1,6 @@
-# Bowling League App — AI Coding Agent Instructions
+# CLAUDE.md — Bowling League Management System
 
-> **Sync note**: This file is mirrored in [CLAUDE.md](../CLAUDE.md) for Claude Code. When updating either file, update the other to keep them in sync.
+> **Sync note**: This file is mirrored in [.github/copilot-instructions.md](.github/copilot-instructions.md) for GitHub Copilot. When updating either file, update the other to keep them in sync.
 
 ## Tech Stack
 
@@ -73,7 +73,7 @@ Organization
 - Formula: `Math.round((basis - average) * (percentage / 100))`
 - Dynamic: recalculates before each game using completed season averages
 - Config per league: `useHandicap`, `handicapBasis` (default 160), `handicapPercentage` (default 100%)
-- Key files: `src/components/admin/game/SeasonGame.tsx`, `src/utils/standingsUtils.ts`
+- Key files: [SeasonGame](src/components/admin/game/SeasonGame.tsx), [standingsUtils](src/utils/standingsUtils.ts)
 
 ### Scoring (multi-layer, all values configurable per league/season)
 1. **Individual match points** — player vs player comparison with handicap (`playerMatchPointsPerWin`, default 1)
@@ -81,14 +81,14 @@ Organization
 3. **Match winner points** — team with higher total wins (`teamMatchPointsPerWin`, default 1)
 4. **Grand total points** — team with highest combined pins across all matches (`teamGamePointsPerWin`, default 2)
 - Draws always award 50% of the respective win points
-- Key file: `src/utils/matchUtils.ts`
+- Key file: [matchUtils](src/utils/matchUtils.ts)
 
 ### Scheduling
 - Round-robin: each round = every team plays every other team once
 - Split into match days (no team plays twice same day)
 - Match days numbered continuously across rounds
 - Odd team count: bye system
-- Key file: `src/utils/scheduleUtils.ts`
+- Key file: [scheduleUtils](src/utils/scheduleUtils.ts)
 
 ### Absent Players
 - Score = average − 10

@@ -6,7 +6,11 @@
       "Bash(npm outdated:*)",
       "Bash(find:*)",
       "Bash(wc:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(grep:*)",
+      "Bash(cd:*)",
+      "Bash(cat:*)",
+      "Bash(python3:*)"
     ]
   }
 }
