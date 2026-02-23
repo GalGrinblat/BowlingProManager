@@ -1,5 +1,14 @@
 import { createClient } from '@supabase/supabase-js';
-import type { GameStatus, SeasonStatus } from '../types/index';
+import type {
+  GameStatus,
+  SeasonStatus,
+  BonusRule,
+  RosterChange,
+  GameMatch,
+  GameTeam,
+  ScheduleMatchDay,
+  CurrentPlayerAverages,
+} from '../types/index';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -78,7 +87,7 @@ export type Database = {
           handicap_percentage: number;
           team_all_present_bonus_enabled: boolean;
           team_all_present_bonus_points: number;
-          bonus_rules: any;
+          bonus_rules: BonusRule[];
           active: boolean;
           created_at: string;
           updated_at: string;
@@ -107,10 +116,10 @@ export type Database = {
           handicap_percentage: number;
           team_all_present_bonus_enabled: boolean;
           team_all_present_bonus_points: number;
-          bonus_rules: any;
+          bonus_rules: BonusRule[];
           status: SeasonStatus;
-          schedule: any;
-          initial_player_averages: any;
+          schedule: ScheduleMatchDay[] | null;
+          initial_player_averages: CurrentPlayerAverages | null;
           created_at: string;
           updated_at: string;
         };
@@ -122,8 +131,8 @@ export type Database = {
           id: string;
           season_id: string;
           name: string;
-          player_ids: any;
-          roster_changes: any;
+          player_ids: string[];
+          roster_changes: RosterChange[];
           created_at: string;
           updated_at: string;
         };
@@ -139,20 +148,20 @@ export type Database = {
           team1_id: string;
           team2_id: string;
           status: GameStatus;
-          matches: any;
-          team1_data: any;
-          team2_data: any;
+          matches: GameMatch[] | null;
+          team1_data: GameTeam | null;
+          team2_data: GameTeam | null;
           matches_per_game: number;
           use_handicap: boolean;
           lineup_strategy: 'flexible' | 'fixed' | 'rule-based';
           lineup_rule: 'standard' | 'balanced';
           team_all_present_bonus_enabled: boolean;
           team_all_present_bonus_points: number;
-          bonus_rules: any;
+          bonus_rules: BonusRule[];
           player_match_points_per_win: number;
           team_match_points_per_win: number;
           team_game_points_per_win: number;
-          grand_total_points: any;
+          grand_total_points: { team1: number; team2: number } | null;
           scheduled_date: string | null;
           postponed: boolean;
           original_date: string | null;
@@ -166,3 +175,9 @@ export type Database = {
     };
   };
 };
+
+// Convenience Row type aliases for use in API mapper functions
+export type GameRow   = Database['public']['Tables']['games']['Row'];
+export type SeasonRow = Database['public']['Tables']['seasons']['Row'];
+export type LeagueRow = Database['public']['Tables']['leagues']['Row'];
+export type TeamRow   = Database['public']['Tables']['teams']['Row'];

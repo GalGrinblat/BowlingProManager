@@ -1,9 +1,10 @@
 import { supabase } from '../../lib/supabase';
+import type { LeagueRow } from '../../lib/supabase';
 import { handleError } from './helpers';
 import { seasonsApi } from './seasons';
 import type { League, Season } from '../../types/index';
 
-const mapLeagueFromDb = (data: any): League => ({
+const mapLeagueFromDb = (data: LeagueRow): League => ({
   id: data.id,
   name: data.name,
   description: data.description || '',
@@ -29,8 +30,8 @@ const mapLeagueFromDb = (data: any): League => ({
   createdAt: data.created_at
 });
 
-const mapLeagueToDb = (data: Partial<League>): any => {
-  const dbData: any = {};
+const mapLeagueToDb = (data: Partial<League>): Record<string, unknown> => {
+  const dbData: Record<string, unknown> = {};
   if (data.name !== undefined) dbData.name = data.name;
   if (data.description !== undefined) dbData.description = data.description;
   if (data.dayOfWeek !== undefined) dbData.day_of_week = data.dayOfWeek;

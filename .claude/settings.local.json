@@ -10,7 +10,8 @@
       "Bash(grep:*)",
       "Bash(cd:*)",
       "Bash(cat:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(npm test)"
     ]
   }
 }

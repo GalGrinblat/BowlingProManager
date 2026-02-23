@@ -1,8 +1,9 @@
 import { supabase } from '../../lib/supabase';
+import type { GameRow } from '../../lib/supabase';
 import { handleError } from './helpers';
 import type { Game } from '../../types/index';
 
-const mapGameFromDb = (data: any): Game => ({
+const mapGameFromDb = (data: GameRow): Game => ({
   id: data.id,
   seasonId: data.season_id,
   round: data.round,
@@ -10,11 +11,11 @@ const mapGameFromDb = (data: any): Game => ({
   team1Id: data.team1_id,
   team2Id: data.team2_id,
   status: data.status,
-  completedAt: data.completed_at,
+  completedAt: data.completed_at ?? undefined,
   createdAt: data.created_at,
-  matches: data.matches,
-  team1: data.team1_data,
-  team2: data.team2_data,
+  matches: data.matches ?? undefined,
+  team1: data.team1_data ?? undefined,
+  team2: data.team2_data ?? undefined,
   matchesPerGame: data.matches_per_game,
   useHandicap: data.use_handicap,
   lineupStrategy: data.lineup_strategy,
@@ -25,15 +26,15 @@ const mapGameFromDb = (data: any): Game => ({
   playerMatchPointsPerWin: data.player_match_points_per_win,
   teamMatchPointsPerWin: data.team_match_points_per_win,
   teamGamePointsPerWin: data.team_game_points_per_win,
-  grandTotalPoints: data.grand_total_points,
-  scheduledDate: data.scheduled_date,
+  grandTotalPoints: data.grand_total_points ?? undefined,
+  scheduledDate: data.scheduled_date ?? undefined,
   postponed: data.postponed,
-  originalDate: data.original_date,
-  updatedAt: data.updated_at
+  originalDate: data.original_date ?? undefined,
+  updatedAt: data.updated_at ?? undefined
 });
 
-const mapGameToDb = (data: Partial<Game>): any => {
-  const dbData: any = {};
+const mapGameToDb = (data: Partial<Game>): Record<string, unknown> => {
+  const dbData: Record<string, unknown> = {};
   if (data.seasonId !== undefined) dbData.season_id = data.seasonId;
   if (data.round !== undefined) dbData.round = data.round;
   if (data.matchDay !== undefined) dbData.match_day = data.matchDay;

@@ -1,8 +1,9 @@
 import { supabase } from '../../lib/supabase';
+import type { TeamRow } from '../../lib/supabase';
 import { handleError } from './helpers';
 import type { Team } from '../../types/index';
 
-const mapTeamFromDb = (data: any): Team => ({
+const mapTeamFromDb = (data: TeamRow): Team => ({
   id: data.id,
   seasonId: data.season_id,
   name: data.name,
@@ -11,8 +12,8 @@ const mapTeamFromDb = (data: any): Team => ({
   createdAt: data.created_at
 });
 
-const mapTeamToDb = (data: Partial<Team>): any => {
-  const dbData: any = {};
+const mapTeamToDb = (data: Partial<Team>): Record<string, unknown> => {
+  const dbData: Record<string, unknown> = {};
   if (data.seasonId !== undefined) dbData.season_id = data.seasonId;
   if (data.name !== undefined) dbData.name = data.name;
   if (data.playerIds !== undefined) dbData.player_ids = data.playerIds;

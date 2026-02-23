@@ -1,8 +1,9 @@
 import { supabase } from '../../lib/supabase';
+import type { SeasonRow } from '../../lib/supabase';
 import { handleError } from './helpers';
 import type { Season } from '../../types/index';
 
-const mapSeasonFromDb = (data: any): Season => ({
+const mapSeasonFromDb = (data: SeasonRow): Season => ({
   id: data.id,
   leagueId: data.league_id,
   name: data.name,
@@ -26,14 +27,14 @@ const mapSeasonFromDb = (data: any): Season => ({
     bonusRules: data.bonus_rules || [],
   },
   status: data.status,
-  schedule: data.schedule,
-  initialPlayerAverages: data.initial_player_averages,
-  updatedAt: data.updated_at,
+  schedule: data.schedule ?? undefined,
+  initialPlayerAverages: data.initial_player_averages ?? undefined,
+  updatedAt: data.updated_at ?? undefined,
   createdAt: data.created_at
 });
 
-const mapSeasonToDb = (data: Partial<Season>): any => {
-  const dbData: any = {};
+const mapSeasonToDb = (data: Partial<Season>): Record<string, unknown> => {
+  const dbData: Record<string, unknown> = {};
   if (data.leagueId !== undefined) dbData.league_id = data.leagueId;
   if (data.name !== undefined) dbData.name = data.name;
   if (data.startDate !== undefined) dbData.start_date = data.startDate;
