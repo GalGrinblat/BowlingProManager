@@ -25,3 +25,6 @@ dist-ssr
 
 # gh-pages cache
 .cache
+
+# Test coverage (generated artifact)
+coverage/
