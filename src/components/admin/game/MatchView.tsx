@@ -1,21 +1,28 @@
+import React from 'react';
 import { ArrowLeft, ArrowRight } from '../../common/Icons';
 import { PlayerScoreInput } from './PlayerScoreInput';
+import { useTranslation } from '../../../contexts/LanguageContext';
 import type { MatchViewProps, GamePlayer } from '../../../types/index';
 
 export const MatchView: React.FC<MatchViewProps> = ({ matchNumber, game, onUpdateScore, onNavigate, onCancel, isReadOnly = false }) => {
+  const { t } = useTranslation();
   const matchIndex = matchNumber - 1;
   if (!game || !game.matches || !game.matches[matchIndex]) return null;
   const match = game.matches[matchIndex];
   const totalMatches = game.matches.length;
   if (!game.team1 || !game.team2) return null;
   if (!match.team1 || !match.team2) return null;
-  
+
+  const matchTitle = t('games.matchOf')
+    .replace('{{current}}', String(matchNumber))
+    .replace('{{total}}', String(totalMatches));
+
   return (
     <div className="scorecard rounded-xl p-6 md:p-8 mb-8 animate-slide-in">
       <div className="flex items-center justify-between mb-6">
         <div className="bowling-title text-white text-3xl">
-          MATCH {matchNumber} OF {totalMatches}
-          {isReadOnly && <span className="text-sm ml-3 text-yellow-400">(Read Only)</span>}
+          {matchTitle}
+          {isReadOnly && <span className="text-sm ml-3 text-yellow-400">({t('common.readOnly')})</span>}
         </div>
         <div className="flex gap-2">
           {Array.from({ length: totalMatches }, (_, i) => i + 1).map(num => (
@@ -29,7 +36,7 @@ export const MatchView: React.FC<MatchViewProps> = ({ matchNumber, game, onUpdat
         <div className="bg-gradient-to-br from-orange-600 to-red-600 text-white p-4 rounded-lg text-center">
           <div className="bowling-title text-3xl truncate">{game.team1.name}</div>
         </div>
-        
+
         <div className="bg-gradient-to-br from-blue-600 to-indigo-700 text-white p-4 rounded-lg text-center">
           <div className="bowling-title text-3xl truncate">{game.team2.name}</div>
         </div>
@@ -63,7 +70,7 @@ export const MatchView: React.FC<MatchViewProps> = ({ matchNumber, game, onUpdat
                   {/* Points in Middle */}
                   <div className="text-center">
                     <div className="bg-gray-900 rounded-lg p-2 border border-gray-600">
-                      <div className="text-xs text-gray-400 mb-1">POINTS</div>
+                      <div className="text-xs text-gray-400 mb-1">{t('common.points').toUpperCase()}</div>
                       <div className="flex items-center justify-center gap-2">
                         <span className={`font-bold text-lg ${match.playerMatches?.[idx]?.result === 'team1' ? 'text-green-400' : 'text-gray-500'}`}>
                           {match.playerMatches?.[idx]?.team1Points ?? 0}
@@ -100,20 +107,20 @@ export const MatchView: React.FC<MatchViewProps> = ({ matchNumber, game, onUpdat
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="bg-orange-600 text-white p-4 rounded-lg">
           <div className="text-center">
-            <div className="text-sm font-bold uppercase tracking-wider opacity-90 mb-1">Total Pins</div>
+            <div className="text-sm font-bold uppercase tracking-wider opacity-90 mb-1">{t('games.totalPins')}</div>
             <div className="text-3xl font-bold mb-2">{match.team1.totalPins}</div>
-            <div className="text-xs font-bold uppercase tracking-wider opacity-90 mb-1">Total Pins w/ HC</div>
+            <div className="text-xs font-bold uppercase tracking-wider opacity-90 mb-1">{t('games.totalPinsHC')}</div>
             <div className="text-2xl font-bold mb-3">{match.team1.totalWithHandicap}</div>
             <div className="pt-3 border-t border-orange-400">
-              <div className="text-sm font-bold uppercase tracking-wider opacity-90 mb-1">Match Points</div>
+              <div className="text-sm font-bold uppercase tracking-wider opacity-90 mb-1">{t('games.matchPoints')}</div>
               <div className="text-4xl font-bold">{match.team1.points}</div>
             </div>
           </div>
         </div>
-        
+
         <div className="flex items-center justify-center">
           <div className="bg-gray-900 rounded-lg p-3 border border-gray-600">
-            <div className="text-xs text-gray-400 mb-1 text-center">POINTS</div>
+            <div className="text-xs text-gray-400 mb-1 text-center">{t('common.points').toUpperCase()}</div>
             <div className="flex items-center justify-center gap-2">
               <span className="text-orange-400 font-bold text-2xl">{match.team1.points}</span>
               <span className="text-gray-600">-</span>
@@ -121,15 +128,15 @@ export const MatchView: React.FC<MatchViewProps> = ({ matchNumber, game, onUpdat
             </div>
           </div>
         </div>
-        
+
         <div className="bg-blue-600 text-white p-4 rounded-lg">
           <div className="text-center">
-            <div className="text-sm font-bold uppercase tracking-wider opacity-90 mb-1">Total Pins</div>
+            <div className="text-sm font-bold uppercase tracking-wider opacity-90 mb-1">{t('games.totalPins')}</div>
             <div className="text-3xl font-bold mb-2">{match.team2.totalPins}</div>
-            <div className="text-xs font-bold uppercase tracking-wider opacity-90 mb-1">Total Pins w/ HC</div>
+            <div className="text-xs font-bold uppercase tracking-wider opacity-90 mb-1">{t('games.totalPinsHC')}</div>
             <div className="text-2xl font-bold mb-3">{match.team2.totalWithHandicap}</div>
             <div className="pt-3 border-t border-blue-400">
-              <div className="text-sm font-bold uppercase tracking-wider opacity-90 mb-1">Match Points</div>
+              <div className="text-sm font-bold uppercase tracking-wider opacity-90 mb-1">{t('games.matchPoints')}</div>
               <div className="text-4xl font-bold">{match.team2.points}</div>
             </div>
           </div>
@@ -143,21 +150,21 @@ export const MatchView: React.FC<MatchViewProps> = ({ matchNumber, game, onUpdat
           className="flex items-center justify-center gap-1 sm:gap-2 bg-gray-700 text-white py-3 sm:py-4 rounded-lg font-bold uppercase text-xs sm:text-sm hover:bg-gray-600 transition-colors touch-manipulation"
         >
           <ArrowLeft size={18} />
-          <span className="hidden sm:inline">Back</span>
+          <span className="hidden sm:inline">{t('common.back')}</span>
         </button>
-        
+
         <button
           onClick={onCancel}
           className="bg-red-600 text-white py-3 sm:py-4 rounded-lg font-bold uppercase text-xs sm:text-sm hover:bg-red-700 transition-colors touch-manipulation"
         >
-          Cancel
+          {t('common.cancel')}
         </button>
-        
+
         <button
           onClick={() => onNavigate('next')}
           className="flex items-center justify-center gap-1 sm:gap-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 sm:py-4 rounded-lg font-bold uppercase text-xs sm:text-sm hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg touch-manipulation"
         >
-          {matchNumber === 3 ? 'Summary' : 'Next'}
+          {matchNumber === totalMatches ? t('games.summary') : t('common.next')}
           <ArrowRight size={18} />
         </button>
       </div>

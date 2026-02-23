@@ -61,6 +61,14 @@ const en: TranslationDictionary = {
     matchDay: 'Match Day',
     round: 'Round',
     na: 'N/A',
+    loading: 'Loading...',
+    previous: 'Previous',
+    readOnly: 'Read Only',
+    showing: 'Showing',
+    to: 'to',
+    of: 'of',
+    results: 'results',
+    score: 'Score',
   },
 
   // Authentication
@@ -71,6 +79,10 @@ const en: TranslationDictionary = {
     selectRole: 'Select Role',
     loginAs: 'Login as',
     welcome: 'Welcome',
+    subtitle: 'Sign in to access your bowling league',
+    signIn: 'Sign in with Google',
+    signingIn: 'Signing in...',
+    loginFailed: 'Failed to sign in. Please try again.',
   },
 
   // Player Registry
@@ -365,6 +377,17 @@ const en: TranslationDictionary = {
   teams: {
     name: 'Team Name',
     backToSeason: 'Back to Season',
+    title: 'Team Management',
+    rosterInfoTitle: 'Player Substitutions & Roster Changes',
+    rosterInfoDesc: 'You can substitute players on team rosters during the season. Changes are tracked and logged. For absent players in individual games, use the "Absent" option when entering scores.',
+    editRoster: 'Edit Roster',
+    editRosterFor: 'Edit Roster - {{team}}',
+    recentChanges: 'Recent Changes',
+    substituteWith: 'Substitute with:',
+    selectPlayer: 'Select player...',
+    replaceConfirm: 'Replace {{player}} with this player?',
+    rosterChangeHistory: 'Season Roster Change History',
+    position: 'Position {{num}}',
   },
 
   // Game Scoring
@@ -394,6 +417,15 @@ const en: TranslationDictionary = {
     willUse: 'Will use:',
     pinsPerGame: 'pins/game',
     continueToMatch: 'Continue to Match',
+    matchOf: 'MATCH {{current}} OF {{total}}',
+    totalPins: 'Total Pins',
+    totalPinsHC: 'Total Pins w/ HC',
+    matchPoints: 'Match Points',
+    withHdc: 'W/Hdc',
+    avg: 'Avg',
+    hc: 'HC',
+    summary: 'Summary',
+    enterAllScores: 'Please enter all scores before proceeding',
   },
 
   // Records

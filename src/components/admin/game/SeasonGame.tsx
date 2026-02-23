@@ -7,10 +7,12 @@ import { calculatePlayerStats, calculateGameTotals, calculateGrandTotalPoints } 
 import { applyLineupRule } from '../../../utils/lineupUtils';
 import { PreMatchSetup } from './PreMatchSetup';
 import { useGameInitializer } from '../../../hooks/useGameInitializer';
+import { useTranslation } from '../../../contexts/LanguageContext';
 
 import type { SeasonGameProps, Game, GamePlayer, GameMatch } from '../../../types/index';
 
 export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
+  const { t } = useTranslation();
   const {
     game, setGame,
     currentMatch, setCurrentMatch,
@@ -171,7 +173,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
       p.absent || (match.team2.players[idx] && match.team2.players[idx].pins !== '')
     );
     if (!team1Complete || !team2Complete) {
-      alert('Please enter all scores before proceeding');
+      alert(t('games.enterAllScores'));
       return;
     }
     if (currentMatch < game.matches.length) {
@@ -217,7 +219,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
     onBack();
   };
 
-  if (!game) return <div>Loading...</div>;
+  if (!game) return <div>{t('common.loading')}</div>;
 
   if (showSummary) {
     const totals = calculateGameTotals(game);

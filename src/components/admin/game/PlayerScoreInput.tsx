@@ -1,5 +1,6 @@
 import React from 'react';
 import { Star } from '../../common/Icons';
+import { useTranslation } from '../../../contexts/LanguageContext';
 import { GamePlayer, MatchPlayer } from '../../../types';
 
 export interface PlayerScoreInputProps {
@@ -27,6 +28,7 @@ export const PlayerScoreInput: React.FC<PlayerScoreInputProps> = ({
   isReadOnly = false,
   alignment = 'left',
 }) => {
+  const { t } = useTranslation();
   const isRightAligned = alignment === 'right';
   
   // Color configurations
@@ -50,8 +52,8 @@ export const PlayerScoreInput: React.FC<PlayerScoreInputProps> = ({
         {player.name}
       </div>
       <div className={`text-xs text-gray-400 ${isRightAligned ? 'text-right' : ''}`}>
-        Avg: {typeof player.average === 'number' ? player.average.toFixed(1) : player.average} | HC: {useHandicap === false ? 'N/A' : player.handicap}
-        {player.absent && <span className="text-red-400 font-bold ml-1">(ABSENT)</span>}
+        {t('games.avg')}: {typeof player.average === 'number' ? player.average.toFixed(1) : player.average} | {t('games.hc')}: {useHandicap === false ? t('common.na') : player.handicap}
+        {player.absent && <span className="text-red-400 font-bold ml-1">({t('games.absent').toUpperCase()})</span>}
       </div>
     </div>
   );
@@ -79,13 +81,13 @@ export const PlayerScoreInput: React.FC<PlayerScoreInputProps> = ({
             </div>
           )}
           <div className="text-center">
-            <label className="text-gray-400 text-sm block">W/Hdc</label>
+            <label className="text-gray-400 text-sm block">{t('games.withHdc')}</label>
             <div className={`w-16 px-2 py-1 ${textColor} font-bold text-sm text-center`}>
               {scoreWithHandicap}
             </div>
           </div>
           <div className="text-center">
-            <label className="text-gray-400 text-sm block">Score</label>
+            <label className="text-gray-400 text-sm block">{t('common.score')}</label>
             <div className="w-16 px-2 py-1 bg-red-700 text-yellow-300 rounded border border-red-600 font-bold text-center text-sm">
               {absentScore}
             </div>
@@ -114,13 +116,13 @@ export const PlayerScoreInput: React.FC<PlayerScoreInputProps> = ({
             </div>
           )}
           <div className="text-center">
-            <label className="text-gray-400 text-sm block">W/Hdc</label>
+            <label className="text-gray-400 text-sm block">{t('games.withHdc')}</label>
             <div className={`w-16 px-2 py-1 ${textColor} font-bold text-sm text-center`}>
               {scoreWithHandicap}
             </div>
           </div>
           <div className="text-center">
-            <label className="text-gray-400 text-sm block">Score</label>
+            <label className="text-gray-400 text-sm block">{t('common.score')}</label>
             <input
               type="number"
               inputMode='numeric'

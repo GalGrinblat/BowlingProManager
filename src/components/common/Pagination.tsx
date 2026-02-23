@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useTranslation } from '../../contexts/LanguageContext';
 
 /**
  * Reusable Pagination Component
@@ -12,6 +13,7 @@ import type { PaginationProps } from '../../types/index';
 // ... previous code ...
 
 export const Pagination: React.FC<PaginationProps> = ({ currentPage, totalItems, itemsPerPage, onPageChange }) => {
+  const { t } = useTranslation();
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   
   if (totalPages <= 1) return null; // Don't show pagination if only 1 page
@@ -56,7 +58,7 @@ export const Pagination: React.FC<PaginationProps> = ({ currentPage, totalItems,
               : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
           }`}
         >
-          Previous
+          {t('common.previous')}
         </button>
         <button
           onClick={() => onPageChange(currentPage + 1)}
@@ -67,17 +69,17 @@ export const Pagination: React.FC<PaginationProps> = ({ currentPage, totalItems,
               : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
           }`}
         >
-          Next
+          {t('common.next')}
         </button>
       </div>
       <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
         <div>
           <p className="text-sm text-gray-700">
-            Showing <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> to{' '}
+            {t('common.showing')} <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> {t('common.to')}{' '}
             <span className="font-medium">
               {Math.min(currentPage * itemsPerPage, totalItems)}
             </span>{' '}
-            of <span className="font-medium">{totalItems}</span> results
+            {t('common.of')} <span className="font-medium">{totalItems}</span> {t('common.results')}
           </p>
         </div>
         <div>
@@ -89,7 +91,7 @@ export const Pagination: React.FC<PaginationProps> = ({ currentPage, totalItems,
                 currentPage === 1 ? 'cursor-not-allowed opacity-50' : ''
               }`}
             >
-              <span className="sr-only">Previous</span>
+              <span className="sr-only">{t('common.previous')}</span>
               <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clipRule="evenodd" />
               </svg>
@@ -126,7 +128,7 @@ export const Pagination: React.FC<PaginationProps> = ({ currentPage, totalItems,
                 currentPage === totalPages ? 'cursor-not-allowed opacity-50' : ''
               }`}
             >
-              <span className="sr-only">Next</span>
+              <span className="sr-only">{t('common.next')}</span>
               <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
               </svg>

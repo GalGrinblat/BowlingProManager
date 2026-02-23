@@ -61,6 +61,14 @@ const he: TranslationDictionary = {
     matchDay: 'מחזור',
     round: 'סיבוב',
     na: 'לא זמין',
+    loading: 'טוען...',
+    previous: 'הקודם',
+    readOnly: 'לקריאה בלבד',
+    showing: 'מציג',
+    to: 'עד',
+    of: 'מתוך',
+    results: 'תוצאות',
+    score: 'ניקוד',
   },
 
   // אימות
@@ -71,6 +79,10 @@ const he: TranslationDictionary = {
     selectRole: 'בחר תפקיד',
     loginAs: 'התחבר בתור',
     welcome: 'ברוך הבא',
+    subtitle: 'התחבר כדי לגשת לליגת הבולינג שלך',
+    signIn: 'התחבר עם Google',
+    signingIn: 'מתחבר...',
+    loginFailed: 'ההתחברות נכשלה. אנא נסה שוב.',
   },
 
   // רישום שחקנים
@@ -365,6 +377,17 @@ const he: TranslationDictionary = {
   teams: {
     name: 'שם קבוצה',
     backToSeason: 'חזרה לעונה',
+    title: 'ניהול קבוצות',
+    rosterInfoTitle: 'החלפות שחקנים ושינויי סגל',
+    rosterInfoDesc: 'ניתן להחליף שחקנים בסגלי הקבוצות במהלך העונה. השינויים נרשמים ומתועדים. לשחקנים נעדרים במשחקים בודדים, השתמש באפשרות "נעדר" בעת הזנת הניקוד.',
+    editRoster: 'ערוך סגל',
+    editRosterFor: 'ערוך סגל - {{team}}',
+    recentChanges: 'שינויים אחרונים',
+    substituteWith: 'החלף ב:',
+    selectPlayer: 'בחר שחקן...',
+    replaceConfirm: 'להחליף את {{player}} בשחקן זה?',
+    rosterChangeHistory: 'היסטוריית שינויי סגל בעונה',
+    position: 'עמדה {{num}}',
   },
 
   // ניקוד משחק
@@ -394,6 +417,15 @@ const he: TranslationDictionary = {
     willUse: 'ישתמש ב:',
     pinsPerGame: 'פינים/משחק',
     continueToMatch: 'המשך למשחק',
+    matchOf: 'מקצה {{current}} מתוך {{total}}',
+    totalPins: 'סה"כ פינים',
+    totalPinsHC: 'סה"כ פינים עם הנד\'',
+    matchPoints: 'נקודות מקצה',
+    withHdc: 'עם הנד\'',
+    avg: 'ממ\'',
+    hc: 'הנד\'',
+    summary: 'סיכום',
+    enterAllScores: 'אנא הזן את כל הניקודים לפני המשך',
   },
 
   // שיאים

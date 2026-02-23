@@ -80,7 +80,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
     return allPlayers.filter(p => !team.playerIds.includes(p.id));
   };
 
-  if (!season) return <div>Loading...</div>;
+  if (!season) return <div>{t('common.loading')}</div>;
 
   return (
     <div className="space-y-6">
@@ -88,7 +88,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
       <div className="bg-white rounded-xl shadow-lg p-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Team Management</h1>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('teams.title')}</h1>
             <p className="text-gray-600">{season.name}</p>
           </div>
           <button
@@ -105,10 +105,9 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
         <div className="flex items-start gap-3">
           <span className="text-2xl">ℹ️</span>
           <div>
-            <p className="font-semibold text-blue-800 mb-1">Player Substitutions & Roster Changes</p>
+            <p className="font-semibold text-blue-800 mb-1">{t('teams.rosterInfoTitle')}</p>
             <p className="text-sm text-blue-600">
-              You can substitute players on team rosters during the season. Changes are tracked and logged. 
-              For absent players in individual games, use the "Absent" checkbox when entering scores.
+              {t('teams.rosterInfoDesc')}
             </p>
           </div>
         </div>
@@ -128,7 +127,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
                   onClick={() => handleEditRoster(team)}
                   className="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 font-semibold text-sm"
                 >
-                  ✏️ Edit Roster
+                  ✏️ {t('teams.editRoster')}
                 </button>
               </div>
 
@@ -151,7 +150,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
               {/* Recent Changes */}
               {recentChanges.length > 0 && (
                 <div className="border-t pt-3">
-                  <h3 className="text-sm font-semibold text-gray-600 mb-2">Recent Changes</h3>
+                  <h3 className="text-sm font-semibold text-gray-600 mb-2">{t('teams.recentChanges')}</h3>
                   <div className="space-y-1">
                     {recentChanges.map((change: RosterChange) => (
                       <div key={`${change.date}-${change.oldPlayerName}`} className="text-xs text-gray-600 bg-yellow-50 p-2 rounded">
@@ -177,7 +176,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
           <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                Edit Roster - {selectedTeam.name}
+                {t('teams.editRosterFor').replace('{{team}}', selectedTeam.name)}
               </h2>
               
               <div className="space-y-4">
@@ -200,18 +199,18 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
 
                       <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          Substitute with:
+                          {t('teams.substituteWith')}
                         </label>
                         <select
                           onChange={(e) => {
-                            if (e.target.value && confirm(`Replace ${currentPlayer ? getPlayerDisplayName(currentPlayer) : ''} with this player?`)) {
+                            if (e.target.value && confirm(t('teams.replaceConfirm').replace('{{player}}', currentPlayer ? getPlayerDisplayName(currentPlayer) : ''))) {
                               handleSubstitutePlayer(selectedTeam, idx, e.target.value);
                             }
                           }}
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                           defaultValue=""
                         >
-                          <option value="">Select player...</option>
+                          <option value="">{t('teams.selectPlayer')}</option>
                           {availablePlayers.map(player => (
                             <option key={player.id} value={player.id}>
                               {getPlayerDisplayName(player)}
@@ -232,7 +231,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
                   }}
                   className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 font-semibold"
                 >
-                  Close
+                  {t('common.close')}
                 </button>
               </div>
             </div>
@@ -243,7 +242,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
       {/* All Roster Changes History */}
       {teams.some(t => t.rosterChanges && t.rosterChanges.length > 0) && (
         <div className="bg-white rounded-xl shadow-lg p-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">Season Roster Change History</h2>
+          <h2 className="text-xl font-bold text-gray-800 mb-4">{t('teams.rosterChangeHistory')}</h2>
           <div className="space-y-2">
             {teams
               .flatMap((t: Team) => (t.rosterChanges || []).map((c: RosterChange) => ({ ...c, teamName: t.name })))
@@ -261,7 +260,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
                         {' '}{t('common.rightArrow')}{' '}
                         <span className="font-medium">{change.newPlayerName}</span>
                         <span className="text-gray-400 ml-2">
-                          (Position {change.position + 1})
+                          ({t('teams.position').replace('{{num}}', String(change.position + 1))})
                         </span>
                       </div>
                     </div>
