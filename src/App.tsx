@@ -66,20 +66,20 @@ function AppContent() {
       setOrg(orgData);
       setLeagues(leaguesData);
 
-      // Load seasons for each league
+      // Load seasons for all leagues in parallel
+      const seasonsResults = await Promise.all(
+        leaguesData.map(league => seasonsApi.getByLeague(league.id))
+      );
       const seasonsData: Record<string, Season[]> = {};
+      leaguesData.forEach((league, i) => { seasonsData[league.id] = seasonsResults[i] ?? []; });
+
+      // Load games for all seasons in parallel
+      const allSeasons = seasonsResults.flat();
+      const gamesResults = await Promise.all(
+        allSeasons.map(season => gamesApi.getBySeason(season.id))
+      );
       const allGamesData: Record<string, Game[]> = {};
-
-      for (const league of leaguesData) {
-        const seasons = await seasonsApi.getByLeague(league.id);
-        seasonsData[league.id] = seasons;
-
-        // Load games for each season
-        for (const season of seasons) {
-          const games = await gamesApi.getBySeason(season.id);
-          allGamesData[season.id] = games;
-        }
-      }
+      allSeasons.forEach((season, i) => { allGamesData[season.id] = gamesResults[i] ?? []; });
 
       setSeasonsMap(seasonsData);
       setGamesMap(allGamesData);
