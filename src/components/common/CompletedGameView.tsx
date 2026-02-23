@@ -156,8 +156,29 @@ export const CompletedGameView: React.FC<CompletedGameViewProps> = ({ game, onBa
                     </td>
                   </tr>
 
-                  {/* Team 1 With Handicap */}
+                  {/* Team 1 Handicap */}
                   <tr className="bg-orange-50 font-semibold text-xs">
+                    <td className={`px-2 py-1.5 text-gray-600 ${isRTL ? 'text-right' : 'text-left'}`}>
+                      {t('gameHistory.hdc')}
+                    </td>
+                    {matches.map((match, idx) => {
+                      const hdc = (match.team1?.totalWithHandicap || 0) - (match.team1?.totalPins || 0);
+                      return (
+                        <td key={idx} className="px-1 py-1.5 text-center text-orange-500">
+                          {hdc > 0 ? `+${hdc}` : hdc}
+                        </td>
+                      );
+                    })}
+                    <td className="px-1 py-1.5 text-center bg-orange-50 text-orange-600">
+                      {totals.team1TotalWithHandicap - totals.team1TotalPins > 0
+                        ? `+${totals.team1TotalWithHandicap - totals.team1TotalPins}`
+                        : totals.team1TotalWithHandicap - totals.team1TotalPins}
+                    </td>
+                    <td className="px-1 py-1.5 bg-orange-50"></td>
+                  </tr>
+
+                  {/* Team 1 With Handicap (Team Totals) */}
+                  <tr className="bg-orange-100 border-t border-orange-200 font-semibold text-xs">
                     <td className={`px-2 py-1.5 text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
                       🎯 {t('gameHistory.withHandicap')}
                     </td>
@@ -270,8 +291,29 @@ export const CompletedGameView: React.FC<CompletedGameViewProps> = ({ game, onBa
                     </td>
                   </tr>
 
-                  {/* Team 2 With Handicap */}
+                  {/* Team 2 Handicap */}
                   <tr className="bg-blue-50 font-semibold text-xs">
+                    <td className={`px-2 py-1.5 text-gray-600 ${isRTL ? 'text-right' : 'text-left'}`}>
+                      {t('gameHistory.hdc')}
+                    </td>
+                    {matches.map((match, idx) => {
+                      const hdc = (match.team2?.totalWithHandicap || 0) - (match.team2?.totalPins || 0);
+                      return (
+                        <td key={idx} className="px-1 py-1.5 text-center text-blue-500">
+                          {hdc > 0 ? `+${hdc}` : hdc}
+                        </td>
+                      );
+                    })}
+                    <td className="px-1 py-1.5 text-center bg-blue-50 text-blue-600">
+                      {totals.team2TotalWithHandicap - totals.team2TotalPins > 0
+                        ? `+${totals.team2TotalWithHandicap - totals.team2TotalPins}`
+                        : totals.team2TotalWithHandicap - totals.team2TotalPins}
+                    </td>
+                    <td className="px-1 py-1.5 bg-blue-50"></td>
+                  </tr>
+
+                  {/* Team 2 With Handicap (Team Totals) */}
+                  <tr className="bg-blue-100 border-t border-blue-200 font-semibold text-xs">
                     <td className={`px-2 py-1.5 text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
                       🎯 {t('gameHistory.withHandicap')}
                     </td>
