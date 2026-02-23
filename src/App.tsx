@@ -16,6 +16,7 @@ import { organizationApi, leaguesApi, seasonsApi, gamesApi, playersApi } from '.
 import './styles/globals.css';
 import type { Game, Organization, League, Season, Player } from './types';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
+import { ToastProvider, useToast } from './contexts/ToastContext';
 
 interface NavigationState {
   leagueId: string | null;
@@ -26,6 +27,7 @@ interface NavigationState {
 
 function AppContent() {
   const { currentUser, logout, isAdmin, isPlayer, isLoading } = useAuth();
+  const { showToast } = useToast();
   const [currentView, setCurrentView] = useState<string>(
     currentUser ? (isAdmin() ? 'dashboard' : 'player-dashboard') : 'login'
   );
@@ -85,6 +87,7 @@ function AppContent() {
       setGamesMap(allGamesData);
     } catch (error) {
       console.error('Error loading dashboard data:', error);
+      showToast('Failed to load dashboard data. Please refresh the page.');
     } finally {
       setIsLoadingData(false);
     }
@@ -97,6 +100,7 @@ function AppContent() {
       setPlayers(playersData);
     } catch (error) {
       console.error('Error loading players:', error);
+      showToast('Failed to load players. Please refresh the page.');
     } finally {
       setIsLoadingPlayers(false);
     }
@@ -291,7 +295,9 @@ export default function App() {
     <ErrorBoundary>
       <AuthProvider>
         <LanguageProvider>
-          <AppContent />
+          <ToastProvider>
+            <AppContent />
+          </ToastProvider>
         </LanguageProvider>
       </AuthProvider>
     </ErrorBoundary>
