@@ -86,7 +86,7 @@ export const PrintCombined: React.FC<PrintCombinedProps> = ({
       let handicap = 0;
       if (seasonData.seasonConfigurations.useHandicap && currentAvg > 0 && currentAvg < seasonData.seasonConfigurations.handicapBasis) {
         const diff = seasonData.seasonConfigurations.handicapBasis - currentAvg;
-        handicap = Math.round(diff * (seasonData.seasonConfigurations.handicapPercentage / 100));
+        handicap = Math.ceil(diff * (seasonData.seasonConfigurations.handicapPercentage / 100));
       }
 
       return { id: playerId, name: playerName, average: currentAvg, gamesPlayed: currentGamesPlayed, handicap };
