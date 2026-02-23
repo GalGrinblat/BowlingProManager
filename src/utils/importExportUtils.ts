@@ -139,7 +139,7 @@ export const parseCSVImport = <T>(
         // Skip fields to remove
         if (fieldsToRemove.includes(header)) return;
         
-        let value: any = values[index];
+        const value: any = values[index];
         
         // Apply custom converter if available
         if (fieldConverters[header]) {

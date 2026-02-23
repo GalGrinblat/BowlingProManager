@@ -123,10 +123,10 @@ export function calculateSeasonRecords(teams: Team[], games: Game[]): SeasonReco
     const team1 = teams.find(t => t.id === game.team1Id);
     const team2 = teams.find(t => t.id === game.team2Id);
     if (!team1 || !team2 || !game.matches) return;
-    let team1GameTotalRef = { value: 0 };
-    let team1MatchCountRef = { value: 0 };
-    let team2GameTotalRef = { value: 0 };
-    let team2MatchCountRef = { value: 0 };
+    const team1GameTotalRef = { value: 0 };
+    const team1MatchCountRef = { value: 0 };
+    const team2GameTotalRef = { value: 0 };
+    const team2MatchCountRef = { value: 0 };
     game.matches.forEach((match: GameMatch, matchIndex: number) => {
       if (!match.team1 || !match.team2) return;
       
