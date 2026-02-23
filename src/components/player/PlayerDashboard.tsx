@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { playersApi, leaguesApi, seasonsApi, teamsApi, gamesApi } from '../../services/api';
+import { logger } from '../../utils/logger';
 import { useTranslation } from '../../contexts/LanguageContext';
 import { useDateFormat } from '../../hooks/useDateFormat';
 import { getPlayerDisplayName } from '../../utils/playerUtils';
@@ -101,7 +102,7 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
         setPlayerStats(stats);
       } catch (error) {
         if (!cancelled) {
-          console.error('Failed to load player data:', error);
+          logger.error('Failed to load player data:', error);
           setLoadError('Failed to load player data');
         }
       } finally {

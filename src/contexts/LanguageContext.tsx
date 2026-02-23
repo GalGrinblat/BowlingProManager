@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import translations from '../translations';
 import type { LanguageContextType } from '../types/index';
+import { logger } from '../utils/logger';
 
 const LanguageContext = createContext<LanguageContextType | null>(null);
 
@@ -31,7 +32,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
           }
         }
       } catch (error) {
-        console.error('Error loading language preference:', error);
+        logger.error('Error loading language preference:', error);
       }
     };
 
@@ -76,7 +77,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
         value = (value as Record<string, unknown>)[k];
       } else {
         // Key not found, return the key itself as fallback
-        console.warn(`Translation key not found: ${key}`);
+        logger.warn(`Translation key not found: ${key}`);
         return key;
       }
     }
@@ -100,7 +101,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
           localStorage.setItem('bowling_organization', JSON.stringify(org));
         }
       } catch (error) {
-        console.error('Error updating language in localStorage:', error);
+        logger.error('Error updating language in localStorage:', error);
       }
     }
   };

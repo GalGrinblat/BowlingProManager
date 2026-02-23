@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase';
 import { playersApi } from '../services/api';
 import type { AuthContextType, User, Player } from '../types/index';
 import type { Session } from '@supabase/supabase-js';
+import { logger } from '../utils/logger';
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -94,7 +95,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             .single();
 
           if (insertError) {
-            console.error('Error creating user:', insertError);
+            logger.error('Error creating user:', insertError);
             setIsLoading(false);
             return;
           }
@@ -119,7 +120,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
       }
     } catch (error) {
-      console.error('Error loading user profile:', error);
+      logger.error('Error loading user profile:', error);
     } finally {
       setIsLoading(false);
     }
@@ -135,7 +136,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
       if (error) throw error;
     } catch (error) {
-      console.error('Error signing in with Google:', error);
+      logger.error('Error signing in with Google:', error);
       throw error;
     }
   };
@@ -147,7 +148,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setCurrentUser(null);
       setPlayerData(null);
     } catch (error) {
-      console.error('Error signing out:', error);
+      logger.error('Error signing out:', error);
     }
   };
 
@@ -161,7 +162,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Legacy login function for backward compatibility (deprecated)
   const login = async (_userId: string, _role: 'admin' | 'player' = 'player') => {
-    console.warn('Legacy login function called - OAuth should be used instead');
+    logger.warn('Legacy login function called - OAuth should be used instead');
     return null;
   };
 

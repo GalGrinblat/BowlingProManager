@@ -1,5 +1,6 @@
 import React from 'react';
 import { gamesApi } from '../../../services/api';
+import { logger } from '../../../utils/logger';
 import { MatchView } from './MatchView';
 import { SummaryView } from './SummaryView';
 import { calculateMatchResults, calculateBonusPoints } from '../../../utils/matchUtils';
@@ -138,7 +139,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
     try {
       await gamesApi.update(gameId, updated);
     } catch (error) {
-      console.error('Failed to save score update:', error);
+      logger.error('Failed to save score update:', error);
       setGame(previous);
     }
   };
@@ -156,7 +157,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
     try {
       await gamesApi.update(gameId, updated);
     } catch (error) {
-      console.error('Failed to save absent toggle:', error);
+      logger.error('Failed to save absent toggle:', error);
       setGame(previous);
     }
   };

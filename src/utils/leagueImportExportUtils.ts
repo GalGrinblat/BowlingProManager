@@ -1,4 +1,5 @@
 import { leaguesApi, seasonsApi, teamsApi, gamesApi, playersApi } from '../services/api';
+import { logger } from './logger';
 import { getPlayerDisplayName } from './playerUtils';
 import type { League, Season, Team, Game, Player, GameMatch } from '../types/index';
 
@@ -149,7 +150,7 @@ export async function importLeagueOrSeason(
       return await importSeasonData(data, playerIdMap);
     }
   } catch (error) {
-    console.error('Import error:', error);
+    logger.error('Import error:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error during import'

@@ -1,3 +1,5 @@
+import { logger } from '../../utils/logger';
+
 export const handleError = (error: any, context: string): void => {
-  console.error(`Error in ${context}:`, error);
+  logger.error(`Error in ${context}:`, error);
 };

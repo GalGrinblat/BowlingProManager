@@ -3,6 +3,7 @@ import { usersApi, playersApi, allowedEmailsApi, type DatabaseUser, type Allowed
 import type { Player } from '../../types/index';
 import { useTranslation } from '../../contexts/LanguageContext';
 import { useDateFormat } from '../../hooks/useDateFormat';
+import { logger } from '../../utils/logger';
 import { getPlayerDisplayName } from '../../utils/playerUtils';
 
 interface UserManagementProps {
@@ -38,7 +39,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({ onBack }) => {
       setPlayers(playersData.filter(p => p.active));
       setAllowedEmails(allowedEmailsData);
     } catch (error) {
-      console.error('Error loading data:', error);
+      logger.error('Error loading data:', error);
     } finally {
       setLoading(false);
     }
@@ -70,7 +71,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({ onBack }) => {
       setEditingUser(null);
       await loadData();
     } catch (error) {
-      console.error('Error updating user:', error);
+      logger.error('Error updating user:', error);
       alert(t('userManagement.userUpdateFailed'));
     }
   };
@@ -107,7 +108,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({ onBack }) => {
       setNewEmailNotes('');
       await loadData();
     } catch (error) {
-      console.error('Error adding email:', error);
+      logger.error('Error adding email:', error);
       alert(t('userManagement.emailAddFailed'));
     }
   };
@@ -122,7 +123,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({ onBack }) => {
       alert(t('userManagement.emailRemovedSuccess'));
       await loadData();
     } catch (error) {
-      console.error('Error removing email:', error);
+      logger.error('Error removing email:', error);
       alert(t('userManagement.emailRemoveFailed'));
     }
   };

@@ -13,6 +13,7 @@ import { UserManagement } from './components/admin/UserManagement';
 import { PlayerDashboard } from './components/player/PlayerDashboard';
 import { CompletedGameView } from './components/common/CompletedGameView';
 import { organizationApi, leaguesApi, seasonsApi, gamesApi, playersApi } from './services/api';
+import { logger } from './utils/logger';
 import './styles/globals.css';
 import type { Game, Organization, League, Season, Player } from './types';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
@@ -86,7 +87,7 @@ function AppContent() {
       setSeasonsMap(seasonsData);
       setGamesMap(allGamesData);
     } catch (error) {
-      console.error('Error loading dashboard data:', error);
+      logger.error('Error loading dashboard data:', error);
       showToast('Failed to load dashboard data. Please refresh the page.');
     } finally {
       setIsLoadingData(false);
@@ -99,7 +100,7 @@ function AppContent() {
       const playersData = await playersApi.getAll();
       setPlayers(playersData);
     } catch (error) {
-      console.error('Error loading players:', error);
+      logger.error('Error loading players:', error);
       showToast('Failed to load players. Please refresh the page.');
     } finally {
       setIsLoadingPlayers(false);

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from '../../contexts/LanguageContext';
+import { logger } from '../../utils/logger';
 
 export const LoginView: React.FC = () => {
   const { loginWithGoogle } = useAuth();
@@ -14,7 +15,7 @@ export const LoginView: React.FC = () => {
     try {
       await loginWithGoogle();
     } catch (error) {
-      console.error('Login error:', error);
+      logger.error('Login error:', error);
       alert(t('auth.loginFailed'));
       setIsLoading(false);
     }

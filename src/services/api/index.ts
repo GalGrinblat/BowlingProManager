@@ -5,6 +5,7 @@
 
 import { supabase } from '../../lib/supabase';
 import { handleError } from './helpers';
+import { logger } from '../../utils/logger';
 import type { Organization } from '../../types/index';
 
 // Re-export entity APIs from their modules
@@ -257,7 +258,7 @@ export const authApi = {
 
   login: async (userId: string, role: 'admin' | 'player' = 'player'): Promise<AuthUser> => {
     // OAuth-based, this method is deprecated
-    console.warn('authApi.login is deprecated - use OAuth instead');
+    logger.warn('authApi.login is deprecated - use OAuth instead');
     return { userId, role };
   },
 
@@ -277,6 +278,6 @@ export const utilApi = {
   clearAll: async (): Promise<void> => {
     // This would require admin privileges to delete all data
     // Not implementing for safety reasons
-    console.warn('utilApi.clearAll is not implemented for Supabase');
+    logger.warn('utilApi.clearAll is not implemented for Supabase');
   }
 };
