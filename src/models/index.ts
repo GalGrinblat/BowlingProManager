@@ -17,6 +17,16 @@ import type {
 } from '../types/index';
 import { MAX_BOWLING_SCORE, DEFAULT_USE_HANDICAP, DEFAULT_HANDICAP_BASIS, DEFAULT_HANDICAP_PERCENTAGE, DEFAULT_NUMBER_OF_TEAMS, DEFAULT_PLAYER_MATCH_POINTS, DEFAULT_PLAYERS_PER_TEAM, DEFAULT_NUMBER_OF_ROUNDS, DEFAULT_MATCHES_PER_GAME, DEFAULT_TEAM_GAME_POINTS, DEFAULT_TEAM_MATCH_POINTS } from '../constants/bowling';
 
+const parseIntOrDefault = (val: number | string, fallback: number): number => {
+  const parsed = parseInt(String(val), 10);
+  return isNaN(parsed) ? fallback : parsed;
+};
+
+const parseFloatOrDefault = (val: number | string, fallback: number): number => {
+  const parsed = parseFloat(String(val));
+  return isNaN(parsed) ? fallback : parsed;
+};
+
 // ===== ORGANIZATION MODEL =====
 export const createOrganization = ({
   name = 'My Organization',
@@ -90,20 +100,20 @@ export const createLeague = ({
   description,
   dayOfWeek,
   defaultSeasonConfigurations: {
-    numberOfTeams: parseInt(String(numberOfTeams)) || DEFAULT_NUMBER_OF_TEAMS,
-    playersPerTeam: parseInt(String(playersPerTeam)) || DEFAULT_PLAYERS_PER_TEAM,
-    numberOfRounds: parseInt(String(numberOfRounds)) || DEFAULT_NUMBER_OF_ROUNDS,
-    matchesPerGame: parseInt(String(matchesPerGame)) || DEFAULT_MATCHES_PER_GAME,
+    numberOfTeams: parseIntOrDefault(numberOfTeams, DEFAULT_NUMBER_OF_TEAMS),
+    playersPerTeam: parseIntOrDefault(playersPerTeam, DEFAULT_PLAYERS_PER_TEAM),
+    numberOfRounds: parseIntOrDefault(numberOfRounds, DEFAULT_NUMBER_OF_ROUNDS),
+    matchesPerGame: parseIntOrDefault(matchesPerGame, DEFAULT_MATCHES_PER_GAME),
     lineupStrategy: lineupStrategyParam,
     lineupRule: lineupRuleParam,
-    playerMatchPointsPerWin: parseFloat(String(playerMatchPointsPerWin)) || DEFAULT_PLAYER_MATCH_POINTS,
-    teamMatchPointsPerWin: parseFloat(String(teamMatchPointsPerWin)) || DEFAULT_TEAM_MATCH_POINTS,
-    teamGamePointsPerWin: parseFloat(String(teamGamePointsPerWin)) || DEFAULT_TEAM_GAME_POINTS,
+    playerMatchPointsPerWin: parseFloatOrDefault(playerMatchPointsPerWin, DEFAULT_PLAYER_MATCH_POINTS),
+    teamMatchPointsPerWin: parseFloatOrDefault(teamMatchPointsPerWin, DEFAULT_TEAM_MATCH_POINTS),
+    teamGamePointsPerWin: parseFloatOrDefault(teamGamePointsPerWin, DEFAULT_TEAM_GAME_POINTS),
     useHandicap: useHandicap,
-    handicapBasis: parseInt(String(handicapBasis)) || DEFAULT_HANDICAP_BASIS,
-    handicapPercentage: parseInt(String(handicapPercentage)) || DEFAULT_HANDICAP_PERCENTAGE,
+    handicapBasis: parseIntOrDefault(handicapBasis, DEFAULT_HANDICAP_BASIS),
+    handicapPercentage: parseIntOrDefault(handicapPercentage, DEFAULT_HANDICAP_PERCENTAGE),
     teamAllPresentBonusEnabled: teamAllPresentBonusEnabled,
-    teamAllPresentBonusPoints: parseInt(String(teamAllPresentBonusPoints)) || 1,
+    teamAllPresentBonusPoints: parseIntOrDefault(teamAllPresentBonusPoints, 1),
     bonusRules,
   },
   active
@@ -156,20 +166,20 @@ export const createSeason = ({
   startDate: startDate || new Date().toISOString(),
   endDate,
   seasonConfigurations: {
-    numberOfTeams: parseInt(String(numberOfTeams)) || DEFAULT_NUMBER_OF_TEAMS,
-    playersPerTeam: parseInt(String(playersPerTeam)) || DEFAULT_PLAYERS_PER_TEAM,
-    numberOfRounds: parseInt(String(numberOfRounds)) || DEFAULT_NUMBER_OF_ROUNDS,
-    matchesPerGame: parseInt(String(matchesPerGame)) || DEFAULT_MATCHES_PER_GAME,
+    numberOfTeams: parseIntOrDefault(numberOfTeams, DEFAULT_NUMBER_OF_TEAMS),
+    playersPerTeam: parseIntOrDefault(playersPerTeam, DEFAULT_PLAYERS_PER_TEAM),
+    numberOfRounds: parseIntOrDefault(numberOfRounds, DEFAULT_NUMBER_OF_ROUNDS),
+    matchesPerGame: parseIntOrDefault(matchesPerGame, DEFAULT_MATCHES_PER_GAME),
     lineupStrategy: lineupStrategyParam,
     lineupRule: lineupRuleParam,
-    playerMatchPointsPerWin: parseFloat(String(playerMatchPointsPerWin)) || DEFAULT_PLAYER_MATCH_POINTS,
-    teamMatchPointsPerWin: parseFloat(String(teamMatchPointsPerWin)) || DEFAULT_TEAM_MATCH_POINTS,
-    teamGamePointsPerWin: parseFloat(String(teamGamePointsPerWin)) || DEFAULT_TEAM_GAME_POINTS,
+    playerMatchPointsPerWin: parseFloatOrDefault(playerMatchPointsPerWin, DEFAULT_PLAYER_MATCH_POINTS),
+    teamMatchPointsPerWin: parseFloatOrDefault(teamMatchPointsPerWin, DEFAULT_TEAM_MATCH_POINTS),
+    teamGamePointsPerWin: parseFloatOrDefault(teamGamePointsPerWin, DEFAULT_TEAM_GAME_POINTS),
     useHandicap: useHandicap,
-    handicapBasis: parseInt(String(handicapBasis)) || DEFAULT_HANDICAP_BASIS,
-    handicapPercentage: parseInt(String(handicapPercentage)) || DEFAULT_HANDICAP_PERCENTAGE,
+    handicapBasis: parseIntOrDefault(handicapBasis, DEFAULT_HANDICAP_BASIS),
+    handicapPercentage: parseIntOrDefault(handicapPercentage, DEFAULT_HANDICAP_PERCENTAGE),
     teamAllPresentBonusEnabled: teamAllPresentBonusEnabled,
-    teamAllPresentBonusPoints: parseInt(String(teamAllPresentBonusPoints)) || 1,
+    teamAllPresentBonusPoints: parseIntOrDefault(teamAllPresentBonusPoints, 1),
     bonusRules,
   },
   status: 'setup'
