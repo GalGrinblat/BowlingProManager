@@ -49,7 +49,7 @@ export const TeamStandingsTable: React.FC<TeamStandingsTableProps> = ({
       : r.result === 'L'
       ? 'bg-red-100 text-red-700'
       : 'bg-gray-100 text-gray-600';
-    const resultWord = r.result === 'W' ? 'Won' : r.result === 'L' ? 'Lost' : 'Drew';
+    const resultWord = r.result === 'W' ? t('seasons.resultWon') : r.result === 'L' ? t('seasons.resultLost') : t('seasons.resultDrew');
     return (
       <div className="text-center">
         <div className="flex items-center justify-center gap-1.5">
@@ -61,7 +61,7 @@ export const TeamStandingsTable: React.FC<TeamStandingsTableProps> = ({
           </span>
         </div>
         <div className="text-xs text-gray-500 mt-0.5 truncate max-w-[8rem]">
-          {resultWord} vs {r.opponentName}
+          {resultWord} {t('seasons.resultVs')} {r.opponentName}
         </div>
       </div>
     );
