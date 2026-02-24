@@ -88,7 +88,6 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({
       active: player.active
     });
     setEditingId(player.id);
-    setIsAdding(true);
   };
 
   const handleDelete = async (id: string) => {
@@ -283,6 +282,41 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({
         />
       ) : (
         <>
+          {/* Import/Export Section */}
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <h3 className="text-lg font-bold text-gray-800 mb-4">{t('players.importExport')}</h3>
+            <div className="flex flex-wrap gap-3">
+              <div className="flex gap-2">
+                <button
+                  onClick={() => exportToCSV(players, 'players')}
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold flex items-center gap-2"
+                >
+                  📥 {t('players.exportCSV')}
+                </button>
+                <button
+                  onClick={() => exportToJSON(players, 'players')}
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold flex items-center gap-2"
+                >
+                  📥 {t('players.exportJSON')}
+                </button>
+              </div>
+              <div>
+                <label className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-semibold cursor-pointer flex items-center gap-2 inline-block">
+                  📤 {t('players.importFile')}
+                  <input
+                    type="file"
+                    accept=".csv,.json"
+                    onChange={handleImportFile}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+            </div>
+            <p className="text-sm text-gray-600 mt-3">
+              💡 {t('players.importExportHelp')}
+            </p>
+          </div>
+
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <input
               type="text"
@@ -318,41 +352,6 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({
               ))}
             </select>
           </div>
-
-          {/* Import/Export Section */}
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <h3 className="text-lg font-bold text-gray-800 mb-4">{t('players.importExport')}</h3>
-            <div className="flex flex-wrap gap-3">
-              <div className="flex gap-2">
-                <button
-                  onClick={() => exportToCSV(players, 'players')}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold flex items-center gap-2"
-                >
-                  📥 {t('players.exportCSV')}
-                </button>
-                <button
-                  onClick={() => exportToJSON(players, 'players')}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold flex items-center gap-2"
-                >
-                  📥 {t('players.exportJSON')}
-                </button>
-              </div>
-              <div>
-                <label className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-semibold cursor-pointer flex items-center gap-2 inline-block">
-                  📤 {t('players.importFile')}
-                  <input
-                    type="file"
-                    accept=".csv,.json"
-                    onChange={handleImportFile}
-                    className="hidden"
-                  />
-                </label>
-              </div>
-            </div>
-            <p className="text-sm text-gray-600 mt-3">
-              💡 {t('players.importExportHelp')}
-            </p>
-          </div>
         </>
       )}
 
@@ -367,23 +366,35 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({
           <p className="text-gray-500 text-center py-8">{t('players.noActivePlayers')}</p>
         ) : (
           <div className="p-6 space-y-2">
-            {paginatedActivePlayers.map((player: Player) => (
-              <div key={player.id} className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-semibold text-gray-800">{getPlayerDisplayName(player)}</h3>
-                  </div>
-                  <div className="flex gap-2">
-                    <button onClick={() => handleEdit(player)} className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200">
-                      {t('common.edit')}
-                    </button>
-                    <button onClick={() => handleDelete(player.id)} className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200">
-                      {t('common.delete')}
-                    </button>
+            {paginatedActivePlayers.map((player: Player) =>
+              editingId === player.id ? (
+                <div key={player.id} className="border-2 border-blue-400 rounded-xl">
+                  <PlayerForm
+                    formData={formData}
+                    isEditing={true}
+                    onFormDataChange={setFormData}
+                    onSubmit={handleSubmit}
+                    onCancel={handleCancel}
+                  />
+                </div>
+              ) : (
+                <div key={player.id} className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-semibold text-gray-800">{getPlayerDisplayName(player)}</h3>
+                    </div>
+                    <div className="flex gap-2">
+                      <button onClick={() => handleEdit(player)} className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200">
+                        {t('common.edit')}
+                      </button>
+                      <button onClick={() => handleDelete(player.id)} className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200">
+                        {t('common.delete')}
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              )
+            )}
             <Pagination
               currentPage={activePagination.currentPage}
               totalItems={activePlayers.length}
@@ -403,20 +414,32 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({
             </h2>
           </div>
           <div className="p-6 space-y-2">
-            {paginatedInactivePlayers.map((player: Player) => (
-              <div key={player.id} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-semibold text-gray-600">{getPlayerDisplayName(player)}</h3>
-                  </div>
-                  <div className="flex gap-2">
-                    <button onClick={() => handleEdit(player)} className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200">
-                      {t('common.edit')}
-                    </button>
+            {paginatedInactivePlayers.map((player: Player) =>
+              editingId === player.id ? (
+                <div key={player.id} className="border-2 border-blue-400 rounded-xl">
+                  <PlayerForm
+                    formData={formData}
+                    isEditing={true}
+                    onFormDataChange={setFormData}
+                    onSubmit={handleSubmit}
+                    onCancel={handleCancel}
+                  />
+                </div>
+              ) : (
+                <div key={player.id} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-semibold text-gray-600">{getPlayerDisplayName(player)}</h3>
+                    </div>
+                    <div className="flex gap-2">
+                      <button onClick={() => handleEdit(player)} className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200">
+                        {t('common.edit')}
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              )
+            )}
           </div>
           <Pagination
             currentPage={inactivePagination.currentPage}
