@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from '../../../contexts/LanguageContext';
 import { GameTeamPanel } from './GameTeamPanel';
+import { sortPlayersByAverage } from '../../../utils/lineupUtils';
 import type { Game, GamePlayer } from '../../../types/index';
 
 interface PreMatchSetupProps {
@@ -20,6 +21,15 @@ export const PreMatchSetup: React.FC<PreMatchSetupProps> = ({
   const { t } = useTranslation();
   const lineupStrategy = game.lineupStrategy;
   const lineupRule = game.lineupRule;
+
+  const displayTeam1Players = useMemo(() =>
+    lineupStrategy === 'rule-based' ? sortPlayersByAverage(team1Players) : team1Players,
+    [lineupStrategy, team1Players]
+  );
+  const displayTeam2Players = useMemo(() =>
+    lineupStrategy === 'rule-based' ? sortPlayersByAverage(team2Players) : team2Players,
+    [lineupStrategy, team2Players]
+  );
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6">
@@ -66,7 +76,7 @@ export const PreMatchSetup: React.FC<PreMatchSetupProps> = ({
           <GameTeamPanel
             teamName={game.team1?.name || t('games.team1')}
             teamColor="text-blue-400"
-            players={team1Players}
+            players={displayTeam1Players}
             team="team1"
             lineupStrategy={lineupStrategy}
             toggleAbsent={onToggleAbsent}
@@ -76,7 +86,7 @@ export const PreMatchSetup: React.FC<PreMatchSetupProps> = ({
           <GameTeamPanel
             teamName={game.team2?.name || t('games.team2')}
             teamColor="text-green-400"
-            players={team2Players}
+            players={displayTeam2Players}
             team="team2"
             lineupStrategy={lineupStrategy}
             toggleAbsent={onToggleAbsent}

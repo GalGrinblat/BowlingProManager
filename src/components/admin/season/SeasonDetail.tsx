@@ -342,8 +342,8 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
                     if (!e.target.value) {
                       setStandingsFilter(null);
                     } else {
-                      const [round, matchDay] = e.target.value.split('-').map(Number);
-                      setStandingsFilter({round, matchDay});
+                      const [roundStr, matchDayStr] = e.target.value.split('-');
+                      setStandingsFilter({round: Number(roundStr), matchDay: Number(matchDayStr)});
                     }
                   }}
                   className="px-3 py-1 border border-gray-300 rounded-lg text-sm"
@@ -398,8 +398,8 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
                       if (!e.target.value) {
                         setStandingsFilter(null);
                       } else {
-                        const [round, matchDay] = e.target.value.split('-').map(Number);
-                        setStandingsFilter({round, matchDay});
+                        const [roundStr, matchDayStr] = e.target.value.split('-');
+                        setStandingsFilter({round: Number(roundStr), matchDay: Number(matchDayStr)});
                       }
                     }}
                     className="px-3 py-1 border border-gray-300 rounded-lg text-sm"

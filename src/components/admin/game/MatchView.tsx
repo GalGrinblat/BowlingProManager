@@ -5,7 +5,7 @@ import { useTranslation } from '../../../contexts/LanguageContext';
 import type { MatchViewProps, GamePlayer } from '../../../types/index';
 
 export const MatchView: React.FC<MatchViewProps> = ({ matchNumber, game, onUpdateScore, onNavigate, onCancel, isReadOnly = false }) => {
-  const { t } = useTranslation();
+  const { t, isRTL } = useTranslation();
   const matchIndex = matchNumber - 1;
   if (!game || !game.matches || !game.matches[matchIndex]) return null;
   const match = game.matches[matchIndex];
@@ -149,7 +149,7 @@ export const MatchView: React.FC<MatchViewProps> = ({ matchNumber, game, onUpdat
           onClick={() => onNavigate('back')}
           className="flex items-center justify-center gap-1 sm:gap-2 bg-gray-700 text-white py-3 sm:py-4 rounded-lg font-bold uppercase text-xs sm:text-sm hover:bg-gray-600 transition-colors touch-manipulation"
         >
-          <ArrowLeft size={18} />
+          {isRTL ? <ArrowRight size={18} /> : <ArrowLeft size={18} />}
           <span className="hidden sm:inline">{t('common.back')}</span>
         </button>
 
@@ -165,7 +165,7 @@ export const MatchView: React.FC<MatchViewProps> = ({ matchNumber, game, onUpdat
           className="flex items-center justify-center gap-1 sm:gap-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 sm:py-4 rounded-lg font-bold uppercase text-xs sm:text-sm hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg touch-manipulation"
         >
           {matchNumber === totalMatches ? t('games.summary') : t('common.next')}
-          <ArrowRight size={18} />
+          {isRTL ? <ArrowLeft size={18} /> : <ArrowRight size={18} />}
         </button>
       </div>
     </div>

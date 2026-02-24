@@ -10,7 +10,7 @@ import { PreMatchSetup } from './PreMatchSetup';
 import { useGameInitializer } from '../../../hooks/useGameInitializer';
 import { useTranslation } from '../../../contexts/LanguageContext';
 
-import type { SeasonGameProps, Game, GamePlayer, GameMatch } from '../../../types/index';
+import type { SeasonGameProps, Game, GamePlayer, GameMatch, MatchPlayer } from '../../../types/index';
 
 export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
   const { t } = useTranslation();
@@ -191,7 +191,28 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
       setCurrentMatch(game.matches.length);
     } else if (currentMatch > 1) {
       setCurrentMatch(currentMatch - 1);
+    } else {
+      setShowPreMatch(true);
     }
+  };
+
+  const handleCancel = async () => {
+    if (game?.matches) {
+      const hasAnyScores = game.matches.some((m: GameMatch) =>
+        m.team1.players.some((p: MatchPlayer) => p.pins !== '') ||
+        m.team2.players.some((p: MatchPlayer) => p.pins !== '')
+      );
+      if (!hasAnyScores && game.status !== 'pending') {
+        try {
+          const updated: Game = { ...game, status: 'pending' };
+          await gamesApi.update(gameId, updated);
+          setGame(updated);
+        } catch (error) {
+          logger.error('Failed to reset game status to pending:', error);
+        }
+      }
+    }
+    onBack();
   };
 
   const finishGame = async () => {
@@ -260,7 +281,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
         if (direction === 'next') goToNextMatch();
         else goToPreviousMatch();
       }}
-      onCancel={onBack}
+      onCancel={handleCancel}
     />
   );
 };
