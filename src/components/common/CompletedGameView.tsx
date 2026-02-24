@@ -19,17 +19,19 @@ export const CompletedGameView: React.FC<CompletedGameViewProps> = ({ game, onBa
     <div className="space-y-6" dir={direction}>
       {/* Header */}
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <button
-          onClick={onBack}
-          className={`flex items-center gap-2 text-gray-600 hover:text-gray-800 mb-4 text-lg font-semibold ${isRTL ? 'flex-row-reverse' : ''}`}
-        >
-          <span>{isRTL ? t('common.rightArrow') : t('common.leftArrow')}</span> {t('common.back')}
-        </button>
-        <div className={isRTL ? 'text-right' : 'text-left'}>
-          <h1 className="text-3xl font-bold text-gray-800">{t('gameHistory.title')}</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            {t('common.round')} {game.round} • {t('common.matchDay')} {game.matchDay} • {t('playerDashboard.completedOn')} {formatDate(game.completedAt ?? '')}
-          </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800">{t('gameHistory.title')}</h1>
+            <p className="text-sm text-gray-500 mt-1">
+              {t('common.round')} {game.round} • {t('common.matchDay')} {game.matchDay} • {t('playerDashboard.completedOn')} {formatDate(game.completedAt ?? '')}
+            </p>
+          </div>
+          <button
+            onClick={onBack}
+            className={`flex items-center gap-2 text-gray-600 hover:text-gray-800 text-lg font-semibold ${isRTL ? 'flex-row-reverse' : ''}`}
+          >
+            <span>{isRTL ? t('common.rightArrow') : t('common.leftArrow')}</span> {t('common.back')}
+          </button>
         </div>
       </div>
 
