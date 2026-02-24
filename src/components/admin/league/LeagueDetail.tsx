@@ -113,58 +113,56 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-start mb-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-800 mb-2">{league.name}</h1>
             {league.description && (
               <p className="text-gray-600">{league.description}</p>
             )}
           </div>
-          <button
-            onClick={onBack}
-            className="text-gray-600 hover:text-gray-800"
-          >
-            {t('common.leftArrow')} {t('leagues.backToLeagues')}
-          </button>
+          <div className="flex flex-col items-end gap-2">
+            <button
+              onClick={onBack}
+              className="text-gray-600 hover:text-gray-800"
+            >
+              {t('common.leftArrow')} {t('leagues.backToLeagues')}
+            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => onCreateSeason(leagueId)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
+              >
+                + {t('seasons.createSeason')}
+              </button>
+              <button
+                onClick={handleExportLeague}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold"
+                title={t('leagues.exportLeagueDesc')}
+              >
+                📥 {t('leagues.exportLeague')}
+              </button>
+              <button
+                onClick={handleImportClick}
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-semibold"
+                title={t('leagues.importLeagueDesc')}
+              >
+                📤 {t('leagues.importLeague')}
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".json"
+                onChange={handleImportFile}
+                className="hidden"
+              />
+            </div>
+          </div>
         </div>
         <div className="flex gap-4 text-sm text-gray-600">
           {league.dayOfWeek && <span>📅 {t(`days.${league.dayOfWeek.toLowerCase()}Plural`)}</span>}
           <span>👥 <span className="ltr-content">{league.defaultSeasonConfigurations.playersPerTeam}</span> {t('leagues.playersPerTeam')}</span>
           <span>🎳 <span className="ltr-content">{league.defaultSeasonConfigurations.matchesPerGame || 3}</span> {t('leagues.matchesPerGame')}</span>
           {league.defaultSeasonConfigurations.useHandicap && <span>⚖️ {t('leagues.handicapDisplay').replace('{{percentage}}', String(league.defaultSeasonConfigurations.handicapPercentage || 100)).replace('{{basis}}', String(league.defaultSeasonConfigurations.handicapBasis))}</span>}
-        </div>
-      </div>
-
-      {/* Action Bar */}
-      <div className="bg-white rounded-xl shadow-lg p-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <button
-            onClick={() => onCreateSeason(leagueId)}
-            className="bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 px-6 rounded-lg hover:from-blue-600 hover:to-blue-700 font-semibold shadow-md hover:shadow-lg transition-all"
-          >
-            + {t('seasons.createSeason')}
-          </button>
-          <button
-            onClick={handleExportLeague}
-            className="bg-gradient-to-r from-green-500 to-green-600 text-white py-3 px-6 rounded-lg hover:from-green-600 hover:to-green-700 font-semibold shadow-md hover:shadow-lg transition-all"
-            title={t('leagues.exportLeagueDesc')}
-          >
-            📥 {t('leagues.exportLeague')}
-          </button>
-          <button
-            onClick={handleImportClick}
-            className="bg-gradient-to-r from-purple-500 to-purple-600 text-white py-3 px-6 rounded-lg hover:from-purple-600 hover:to-purple-700 font-semibold shadow-md hover:shadow-lg transition-all"
-            title={t('leagues.importLeagueDesc')}
-          >
-            📤 {t('leagues.importLeague')}
-          </button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".json"
-            onChange={handleImportFile}
-            className="hidden"
-          />
         </div>
       </div>
 

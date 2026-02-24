@@ -55,21 +55,21 @@ export const SeasonHeader: React.FC<SeasonHeaderProps> = ({
               {onManageTeams && (
                 <button
                   onClick={onManageTeams}
-                  className="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 font-semibold"
+                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-semibold"
                 >
                   👥 {t('seasons.manageTeams')}
                 </button>
               )}
               <button
                 onClick={onExportSeason}
-                className="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 font-semibold"
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold"
                 title={t('seasons.exportSeasonDesc')}
               >
                 📥 {t('seasons.exportSeason')}
               </button>
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 font-semibold"
+                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-semibold"
                 title={t('seasons.importSeasonDesc')}
               >
                 📤 {t('seasons.importSeason')}
@@ -84,7 +84,7 @@ export const SeasonHeader: React.FC<SeasonHeaderProps> = ({
               {completedGames === totalGames && (
                 <button
                   onClick={onCompleteSeason}
-                  className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold"
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold"
                 >
                   {t('seasons.completeSeason')}
                 </button>

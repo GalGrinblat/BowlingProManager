@@ -28,9 +28,9 @@ export const CompletedGameView: React.FC<CompletedGameViewProps> = ({ game, onBa
           </div>
           <button
             onClick={onBack}
-            className={`flex items-center gap-2 text-gray-600 hover:text-gray-800 text-lg font-semibold ${isRTL ? 'flex-row-reverse' : ''}`}
+            className="text-gray-600 hover:text-gray-800"
           >
-            <span>{isRTL ? t('common.rightArrow') : t('common.leftArrow')}</span> {t('common.back')}
+            {isRTL ? t('common.rightArrow') : t('common.leftArrow')} {t('common.back')}
           </button>
         </div>
       </div>

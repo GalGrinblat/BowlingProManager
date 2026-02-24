@@ -149,7 +149,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({ onBack }) => {
             onClick={onBack}
             className="text-gray-600 hover:text-gray-800"
           >
-            ← {t('userManagement.backToDashboard')}
+            {t('common.leftArrow')} {t('userManagement.backToDashboard')}
           </button>
         </div>
       </div>
@@ -169,7 +169,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({ onBack }) => {
       {/* Email Whitelist */}
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+          <h2 className="text-xl font-bold text-gray-800 mb-2">
             {t('userManagement.emailWhitelistCount').replace('{{count}}', allowedEmails.length.toString())}
           </h2>
           <p className="text-sm text-gray-600">
@@ -257,7 +257,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({ onBack }) => {
       {/* Users List */}
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-800">
+          <h2 className="text-xl font-bold text-gray-800">
             {t('userManagement.allUsersTitle').replace('{{count}}', users.length.toString())}
           </h2>
         </div>

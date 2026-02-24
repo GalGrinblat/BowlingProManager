@@ -292,7 +292,7 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
       {view === 'teamStandings' && (
         <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold text-gray-800">{t('seasons.teamStandings')}</h2>
+            <h2 className="text-xl font-bold text-gray-800">{t('seasons.teamStandings')}</h2>
             <button
               onClick={() => setShowPrintTeamStandings(true)}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold text-sm"
@@ -319,7 +319,7 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="p-4 sm:p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-bold text-gray-800">{t('seasons.playerStandings')} ({playerStats.length} {t('common.players').toLowerCase()})</h2>
+              <h2 className="text-xl font-bold text-gray-800">{t('seasons.playerStandings')} ({playerStats.length} {t('common.players').toLowerCase()})</h2>
               <button
                 onClick={() => setShowPrintPlayerStandings(true)}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold text-sm"

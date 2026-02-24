@@ -339,7 +339,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
         <div className="flex justify-end">
           <button
             onClick={() => setIsAdding(true)}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
           >
             + {t('leagues.createLeague')}
           </button>
@@ -349,7 +349,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
       {/* Active Leagues */}
       <div className="bg-white rounded-xl shadow-lg p-6">
         <div className="mb-4">
-          <h2 className="text-2xl font-bold text-gray-800">
+          <h2 className="text-xl font-bold text-gray-800">
             {t('leagues.activeLeagues')} (<span className="ltr-content">{activeLeagues.length}</span>)
           </h2>
           <p className="text-sm text-gray-600 mt-1">
