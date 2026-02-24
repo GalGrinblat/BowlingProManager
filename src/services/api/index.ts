@@ -59,7 +59,7 @@ export const organizationApi = {
         .limit(1)
         .single();
 
-      const updateData: any = {};
+      const updateData: { name?: string; language?: string } = {};
       if (updates.name !== undefined) updateData.name = updates.name;
       if (updates.language !== undefined) updateData.language = updates.language;
 

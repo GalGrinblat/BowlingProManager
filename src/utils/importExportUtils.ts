@@ -69,7 +69,7 @@ export const exportToJSON = <T>(data: T[], filename: string): void => {
  */
 export const parseJSONImport = <T>(
   content: string,
-  validateFn: (item: any) => { valid: boolean; error?: string },
+  validateFn: (item: Record<string, unknown>) => { valid: boolean; error?: string },
   fieldsToRemove: string[] = ['id', 'createdAt']
 ): ParseResult<T> => {
   try {
@@ -109,9 +109,9 @@ export const parseJSONImport = <T>(
  */
 export const parseCSVImport = <T>(
   content: string,
-  validateFn: (item: any) => { valid: boolean; error?: string },
+  validateFn: (item: Record<string, unknown>) => { valid: boolean; error?: string },
   fieldsToRemove: string[] = ['id', 'createdAt'],
-  fieldConverters: Record<string, (value: string) => any> = {}
+  fieldConverters: Record<string, (value: string) => unknown> = {}
 ): ParseResult<T> => {
   try {
     const lines = content.split('\n').filter(line => line.trim());
@@ -126,20 +126,20 @@ export const parseCSVImport = <T>(
     for (let i = 1; i < lines.length; i++) {
       const line = lines[i];
       if (!line) continue;
-      
+
       const values = parseCSVLine(line);
-      
+
       if (values.length !== headers.length) {
         errors.push(`Row ${i + 1}: Column count mismatch (expected ${headers.length}, got ${values.length})`);
         continue;
       }
 
-      const itemData: any = {};
+      const itemData: Record<string, unknown> = {};
       headers.forEach((header, index) => {
         // Skip fields to remove
         if (fieldsToRemove.includes(header)) return;
-        
-        const value: any = values[index];
+
+        const value = values[index];
         
         // Apply custom converter if available
         if (fieldConverters[header]) {

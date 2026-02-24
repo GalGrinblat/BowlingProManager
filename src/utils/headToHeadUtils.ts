@@ -5,7 +5,7 @@ import type { Game, GameMatch, Team } from '../types/index';
  * Calculate matchup records between teams
  */
 
-interface HeadToHeadStats {
+export interface HeadToHeadStats {
   gamesPlayed: number;
   team1Wins: number;
   team2Wins: number;

@@ -82,7 +82,7 @@ export const playersApi = {
 
   update: async (id: string, updates: Partial<Player>): Promise<Player | null> => {
     try {
-      const updateData: any = {};
+      const updateData: { first_name?: string; middle_name?: string | null; last_name?: string; active?: boolean } = {};
       if (updates.firstName !== undefined) updateData.first_name = updates.firstName;
       if (updates.middleName !== undefined) updateData.middle_name = updates.middleName || null;
       if (updates.lastName !== undefined) updateData.last_name = updates.lastName;

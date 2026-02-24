@@ -1,13 +1,14 @@
 import React from 'react';
 import { useTranslation } from '../../../contexts/LanguageContext';
 import { formatHeadToHead } from '../../../utils/headToHeadUtils';
+import type { HeadToHeadStats } from '../../../utils/headToHeadUtils';
 import type { Game, GameMatch, Team } from '../../../types/index';
 
 interface GameCardProps {
   game: Game;
   team1: Team | undefined;
   team2: Team | undefined;
-  h2h: any;
+  h2h: HeadToHeadStats;
   onPlayGame: () => void;
   onViewGame: () => void;
 }
@@ -26,8 +27,8 @@ export const GameCard: React.FC<GameCardProps> = ({ game, team1, team2, h2h, onP
     }
   };
 
-  const team1TotalPoints = game.matches?.reduce((sum: any, m: GameMatch) => sum + (m.team1?.points || 0), 0) + (game.grandTotalPoints?.team1 || 0);
-  const team2TotalPoints = game.matches?.reduce((sum: any, m: GameMatch) => sum + (m.team2?.points || 0), 0) + (game.grandTotalPoints?.team2 || 0);
+  const team1TotalPoints = game.matches?.reduce((sum: number, m: GameMatch) => sum + (m.team1?.points || 0), 0) + (game.grandTotalPoints?.team1 || 0);
+  const team2TotalPoints = game.matches?.reduce((sum: number, m: GameMatch) => sum + (m.team2?.points || 0), 0) + (game.grandTotalPoints?.team2 || 0);
 
   return (
     <div className={`border rounded-lg p-4 transition-colors ${

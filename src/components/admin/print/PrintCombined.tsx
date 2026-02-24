@@ -51,7 +51,7 @@ export const PrintCombined: React.FC<PrintCombinedProps> = ({
     });
 
     const players = await Promise.all(playerPromises);
-    return players.sort((a: any, b: any) => (b.average || 0) - (a.average || 0));
+    return players.sort((a, b) => (b.average || 0) - (a.average || 0));
   };
 
   const loadData = async () => {
