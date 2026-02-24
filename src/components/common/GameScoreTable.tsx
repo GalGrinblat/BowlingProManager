@@ -1,3 +1,4 @@
+import React, { useMemo } from 'react';
 import { useTranslation } from '../../contexts/LanguageContext';
 import type { Game, GameMatch, GamePlayer } from '../../types/index';
 
@@ -8,18 +9,21 @@ interface GameScoreTableProps {
 export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
   const { t, direction, isRTL } = useTranslation();
 
-  const matches = game.matches ?? [];
-  const totals = {
+  const matches = useMemo(() => game.matches ?? [], [game.matches]);
+
+  const totals = useMemo(() => ({
     team1TotalPoints: matches.reduce((sum: number, m: GameMatch) => sum + (m.team1?.points || 0), 0) + (game.grandTotalPoints?.team1 || 0),
     team2TotalPoints: matches.reduce((sum: number, m: GameMatch) => sum + (m.team2?.points || 0), 0) + (game.grandTotalPoints?.team2 || 0),
     team1TotalPins: matches.reduce((sum: number, m: GameMatch) => sum + (m.team1?.totalPins || 0), 0),
     team2TotalPins: matches.reduce((sum: number, m: GameMatch) => sum + (m.team2?.totalPins || 0), 0),
     team1TotalWithHandicap: matches.reduce((sum: number, m: GameMatch) => sum + (m.team1?.totalWithHandicap || 0), 0),
     team2TotalWithHandicap: matches.reduce((sum: number, m: GameMatch) => sum + (m.team2?.totalWithHandicap || 0), 0),
-  };
+  }), [matches, game.grandTotalPoints]);
 
-  const winner = totals.team1TotalPoints > totals.team2TotalPoints ? 'team1' :
-                 totals.team2TotalPoints > totals.team1TotalPoints ? 'team2' : 'tie';
+  const winner = useMemo(() =>
+    totals.team1TotalPoints > totals.team2TotalPoints ? 'team1' :
+    totals.team2TotalPoints > totals.team1TotalPoints ? 'team2' : 'tie'
+  , [totals.team1TotalPoints, totals.team2TotalPoints]);
 
   return (
     <div className="p-4">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { playersApi, leaguesApi, seasonsApi, teamsApi, gamesApi } from '../../services/api';
 import { logger } from '../../utils/logger';
 import { useTranslation } from '../../contexts/LanguageContext';
@@ -175,6 +175,17 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
     return stats;
   };
 
+  const enrichedGames = useMemo(() => recentCompletedGames.map(game => {
+    const details = gameDetailsMap[game.id];
+    if (!details) return null;
+    const { league, team1, team2 } = details;
+    const isTeam1 = team1?.playerIds.includes(playerId);
+    const team1TotalPoints = game.matches?.reduce((sum: number, m: GameMatch) => sum + (m.team1?.points || 0), 0) + (game.grandTotalPoints?.team1 || 0);
+    const team2TotalPoints = game.matches?.reduce((sum: number, m: GameMatch) => sum + (m.team2?.points || 0), 0) + (game.grandTotalPoints?.team2 || 0);
+    const playerWon = (isTeam1 && team1TotalPoints > team2TotalPoints) || (!isTeam1 && team2TotalPoints > team1TotalPoints);
+    return { game, league, team1, team2, isTeam1, team1TotalPoints, team2TotalPoints, playerWon };
+  }), [recentCompletedGames, gameDetailsMap, playerId]);
+
   if (isLoading) return <div>Loading...</div>;
   if (loadError) return <div>{loadError}</div>;
   if (!player) return <div>Loading...</div>;
@@ -238,14 +249,9 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
             <div className="bg-white rounded-xl shadow-lg p-6">
               <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('playerDashboard.recentCompletedGames')}</h2>
               <div className="space-y-3">
-                {recentCompletedGames.map(game => {
-                  const details = gameDetailsMap[game.id];
-                  if (!details) return null;
-                  const { league, team1, team2 } = details;
-                  const isTeam1 = team1?.playerIds.includes(playerId);
-                  const team1TotalPoints = game.matches?.reduce((sum: number, m: GameMatch) => sum + (m.team1?.points || 0), 0) + (game.grandTotalPoints?.team1 || 0);
-                  const team2TotalPoints = game.matches?.reduce((sum: number, m: GameMatch) => sum + (m.team2?.points || 0), 0) + (game.grandTotalPoints?.team2 || 0);
-                  const playerWon = (isTeam1 && team1TotalPoints > team2TotalPoints) || (!isTeam1 && team2TotalPoints > team1TotalPoints);
+                {enrichedGames.map(data => {
+                  if (!data) return null;
+                  const { game, league, team1, team2, isTeam1, team1TotalPoints, team2TotalPoints, playerWon } = data;
                   return (
                     <div
                       key={game.id}
