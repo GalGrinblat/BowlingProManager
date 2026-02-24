@@ -29,7 +29,6 @@ export const Settings: React.FC<SettingsProps> = ({ onBack, onRefreshData }) => 
 
   useEffect(() => {
     loadOrganization();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSave = async () => {

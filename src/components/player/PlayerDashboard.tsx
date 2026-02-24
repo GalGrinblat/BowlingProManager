@@ -112,6 +112,7 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
 
     load();
     return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playerId]);
 
   const computePlayerStats = async (allGames: Game[]): Promise<PlayerStats> => {

@@ -81,7 +81,6 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
 
   useEffect(() => {
     loadLeagues();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {

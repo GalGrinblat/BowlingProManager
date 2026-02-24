@@ -57,6 +57,7 @@ function AppContent() {
       loadDashboardData();
       loadPlayers();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAdminUser]);
 
   const loadDashboardData = async () => {
