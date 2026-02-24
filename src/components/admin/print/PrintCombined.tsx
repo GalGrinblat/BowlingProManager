@@ -34,9 +34,25 @@ export const PrintCombined: React.FC<PrintCombinedProps> = ({
   const [playerStats, setPlayerStats] = useState<PlayerStats[]>([]);
   const [teamPlayersMap, setTeamPlayersMap] = useState<Record<string, any[]>>({});
 
-  useEffect(() => {
-    loadData();
-  }, [seasonId, matchDay]);
+  const getTeamPlayers = async (team: Team, seasonData: Season, averages: CurrentPlayerAverages) => {
+    const playerPromises = team.playerIds.map(async (playerId: string) => {
+      const player = await playersApi.getById(playerId);
+      const playerName = player ? getPlayerDisplayName(player) : 'Unknown';
+      const currentAvg = averages[playerId]?.average || 0;
+      const currentGamesPlayed = averages[playerId]?.gamesPlayed || 0;
+
+      let handicap = 0;
+      if (seasonData.seasonConfigurations.useHandicap && currentAvg > 0 && currentAvg < seasonData.seasonConfigurations.handicapBasis) {
+        const diff = seasonData.seasonConfigurations.handicapBasis - currentAvg;
+        handicap = Math.ceil(diff * (seasonData.seasonConfigurations.handicapPercentage / 100));
+      }
+
+      return { id: playerId, name: playerName, average: currentAvg, gamesPlayed: currentGamesPlayed, handicap };
+    });
+
+    const players = await Promise.all(playerPromises);
+    return players.sort((a: any, b: any) => (b.average || 0) - (a.average || 0));
+  };
 
   const loadData = async () => {
     const seasonData = await seasonsApi.getById(seasonId);
@@ -76,25 +92,10 @@ export const PrintCombined: React.FC<PrintCombinedProps> = ({
     }
   };
 
-  const getTeamPlayers = async (team: Team, seasonData: Season, averages: CurrentPlayerAverages) => {
-    const playerPromises = team.playerIds.map(async (playerId: string) => {
-      const player = await playersApi.getById(playerId);
-      const playerName = player ? getPlayerDisplayName(player) : 'Unknown';
-      const currentAvg = averages[playerId]?.average || 0;
-      const currentGamesPlayed = averages[playerId]?.gamesPlayed || 0;
-
-      let handicap = 0;
-      if (seasonData.seasonConfigurations.useHandicap && currentAvg > 0 && currentAvg < seasonData.seasonConfigurations.handicapBasis) {
-        const diff = seasonData.seasonConfigurations.handicapBasis - currentAvg;
-        handicap = Math.ceil(diff * (seasonData.seasonConfigurations.handicapPercentage / 100));
-      }
-
-      return { id: playerId, name: playerName, average: currentAvg, gamesPlayed: currentGamesPlayed, handicap };
-    });
-
-    const players = await Promise.all(playerPromises);
-    return players.sort((a: any, b: any) => (b.average || 0) - (a.average || 0));
-  };
+  useEffect(() => {
+    loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [seasonId, matchDay]);
 
   if (!season || !league) return <div>{t('seasons.loading')}</div>;
 

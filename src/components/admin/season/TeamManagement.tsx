@@ -16,10 +16,6 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
   const [editingRoster, setEditingRoster] = useState(false);
   const [rosterChanges, setRosterChanges] = useState<RosterChange[]>([]);
 
-  useEffect(() => {
-    loadData();
-  }, [seasonId]);
-
   const loadData = async () => {
     const seasonData = await seasonsApi.getById(seasonId);
     setSeason(seasonData ?? null);
@@ -30,6 +26,11 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
     const playersData = await playersApi.getAll();
     setAllPlayers(playersData.filter(p => p.active));
   };
+
+  useEffect(() => {
+    loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [seasonId]);
 
   const handleEditRoster = (team: Team) => {
     setSelectedTeam(team);

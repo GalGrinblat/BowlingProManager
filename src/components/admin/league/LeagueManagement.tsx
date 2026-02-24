@@ -66,10 +66,6 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
       }
     }));
 
-  useEffect(() => {
-    loadLeagues();
-  }, []);
-
   const loadLeagues = async () => {
     const data = await leaguesApi.getAll();
     setLeagues(data);
@@ -82,6 +78,11 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
     }
     setSeasonsMap(seasonsData);
   };
+
+  useEffect(() => {
+    loadLeagues();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

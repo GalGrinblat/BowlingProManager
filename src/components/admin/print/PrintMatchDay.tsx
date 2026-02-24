@@ -32,15 +32,38 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
   const [teamStandings, setTeamStandings] = useState<TeamStanding[]>([]);
   const [teamPlayersMap, setTeamPlayersMap] = useState<Record<string, PrintPlayerInfo[]>>({});
 
-  useEffect(() => {
-    loadData();
-  }, [seasonId, matchDay]);
+  const getTeamPlayers = async (team: Team, seasonData: Season, averages: CurrentPlayerAverages) => {
+    const playerPromises = team.playerIds.map(async (playerId: string) => {
+      const player = await playersApi.getById(playerId);
+      const playerName = player ? getPlayerDisplayName(player) : 'Unknown';
+      const currentAvg = averages[playerId]?.average || 0;
+      const currentGamesPlayed = averages[playerId]?.gamesPlayed || 0;
+
+      // Calculate handicap for this match
+      let handicap = 0;
+      if (seasonData.seasonConfigurations.useHandicap && currentAvg > 0 && currentAvg < seasonData.seasonConfigurations.handicapBasis) {
+        const diff = seasonData.seasonConfigurations.handicapBasis - currentAvg;
+        handicap = Math.ceil(diff * (seasonData.seasonConfigurations.handicapPercentage / 100));
+      }
+
+      return {
+        id: playerId,
+        name: playerName,
+        average: currentAvg,
+        gamesPlayed: currentGamesPlayed,
+        handicap
+      };
+    });
+
+    const players = await Promise.all(playerPromises);
+    return players.sort((a: PrintPlayerInfo, b: PrintPlayerInfo) => (b.average || 0) - (a.average || 0)); // Sort by average descending
+  };
 
   const loadData = async () => {
     const seasonData = await seasonsApi.getById(seasonId);
     if (!seasonData) return;
     setSeason(seasonData);
-  
+
     const leagueData = await leaguesApi.getById(seasonData.leagueId);
     if (!leagueData) return;
     setLeague(leagueData);
@@ -78,35 +101,13 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
     setTeamPlayersMap(playersMap);
   };
 
+  useEffect(() => {
+    loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [seasonId, matchDay]);
+
   const handlePrint = () => {
     window.print();
-  };
-
-  const getTeamPlayers = async (team: Team, seasonData: Season, averages: CurrentPlayerAverages) => {
-    const playerPromises = team.playerIds.map(async (playerId: string) => {
-      const player = await playersApi.getById(playerId);
-      const playerName = player ? getPlayerDisplayName(player) : 'Unknown';
-      const currentAvg = averages[playerId]?.average || 0;
-      const currentGamesPlayed = averages[playerId]?.gamesPlayed || 0;
-
-      // Calculate handicap for this match
-      let handicap = 0;
-      if (seasonData.seasonConfigurations.useHandicap && currentAvg > 0 && currentAvg < seasonData.seasonConfigurations.handicapBasis) {
-        const diff = seasonData.seasonConfigurations.handicapBasis - currentAvg;
-        handicap = Math.ceil(diff * (seasonData.seasonConfigurations.handicapPercentage / 100));
-      }
-
-      return {
-        id: playerId,
-        name: playerName,
-        average: currentAvg,
-        gamesPlayed: currentGamesPlayed,
-        handicap
-      };
-    });
-
-    const players = await Promise.all(playerPromises);
-    return players.sort((a: PrintPlayerInfo, b: PrintPlayerInfo) => (b.average || 0) - (a.average || 0)); // Sort by average descending
   };
 
   const getTeamStanding = (teamId: string) => {

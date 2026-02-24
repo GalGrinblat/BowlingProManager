@@ -23,10 +23,6 @@ export const PrintPlayerStandings: React.FC<PrintPlayerStandingsProps> = ({
   const [games, setGames] = useState<Game[]>([]);
   const [playerStats, setPlayerStats] = useState<PlayerStats[]>([]);
 
-  useEffect(() => {
-    loadData();
-  }, [seasonId]);
-
   const loadData = async () => {
     const seasonData = await seasonsApi.getById(seasonId);
     if (!seasonData) return;
@@ -44,6 +40,11 @@ export const PrintPlayerStandings: React.FC<PrintPlayerStandingsProps> = ({
     const stats = calculatePlayerSeasonStats(teamsData, gamesData);
     setPlayerStats(stats);
   };
+
+  useEffect(() => {
+    loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [seasonId]);
 
   const handlePrint = () => {
     window.print();

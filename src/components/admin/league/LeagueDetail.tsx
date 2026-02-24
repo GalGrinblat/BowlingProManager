@@ -17,10 +17,6 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
   const [seasonGames, setSeasonGames] = useState<Record<string, any[]>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    loadLeagueData();
-  }, [leagueId]);
-
   const loadLeagueData = async () => {
     const leagueData = await leaguesApi.getById(leagueId);
     if (!leagueData) {
@@ -49,6 +45,11 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
     setSeasonTeams(teamsData);
     setSeasonGames(gamesData);
   };
+
+  useEffect(() => {
+    loadLeagueData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [leagueId]);
 
   const activeSeason = seasons.find(s => s.status === 'active');
   const completedSeasons = seasons.filter(s => s.status === 'completed');

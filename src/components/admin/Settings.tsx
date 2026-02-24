@@ -18,10 +18,6 @@ export const Settings: React.FC<SettingsProps> = ({ onBack, onRefreshData }) => 
     language: 'en'
   });
 
-  useEffect(() => {
-    loadOrganization();
-  }, []);
-
   const loadOrganization = async () => {
     const org = await organizationApi.get();
     setOrganization(org);
@@ -30,6 +26,11 @@ export const Settings: React.FC<SettingsProps> = ({ onBack, onRefreshData }) => 
       language: org.language || 'en'
     });
   };
+
+  useEffect(() => {
+    loadOrganization();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSave = async () => {
     await organizationApi.update({
