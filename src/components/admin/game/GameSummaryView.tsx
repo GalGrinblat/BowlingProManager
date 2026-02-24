@@ -1,8 +1,9 @@
 import { ArrowLeft, CheckCircle } from '../../common/Icons';
 import { GameTeamStatsCard } from './GameTeamStatsCard';
+import { GameScoreTable } from '../../common/GameScoreTable';
 import { useTranslation } from '../../../contexts/LanguageContext';
 
-import type { GameMatch, GameSummaryViewProps } from '../../../types/index';
+import type { GameSummaryViewProps } from '../../../types/index';
 
 export const GameSummaryView: React.FC<GameSummaryViewProps> = ({ game, totals, playerStats, onBack, onFinish }) => {
   const { t, direction, isRTL } = useTranslation();
@@ -11,10 +12,6 @@ export const GameSummaryView: React.FC<GameSummaryViewProps> = ({ game, totals, 
 
   // Calculate last match number for back button
   const lastMatchNumber = Array.isArray(game.matches) ? game.matches.length : 0;
-
-  // Use default team colors (GameTeam doesn't have color property)
-  const team1ColorClass = 'text-orange-400';
-  const team2ColorClass = 'text-blue-400';
 
   return (
     <div className="scorecard rounded-xl p-6 md:p-8 mb-8 animate-slide-in" dir={direction}>
@@ -38,57 +35,9 @@ export const GameSummaryView: React.FC<GameSummaryViewProps> = ({ game, totals, 
         </div>
       </div>
 
-      {/* Match-by-Match Breakdown */}
-      <div className="bg-gray-800 rounded-lg p-4 mb-6">
-        <div className={`bowling-title text-white text-xl mb-4 ${isRTL ? 'text-right' : 'text-left'}`}>
-          {t('summary.matchBreakdown')}
-        </div>
-        <div className="space-y-2">
-          {Array.isArray(game.matches) && game.matches.map((match: GameMatch, idx: number) => (
-            <div key={idx} className="bg-gray-700 rounded p-3">
-              <div className="grid grid-cols-3 items-center">
-                <div className="text-center">
-                  <div className={`${team1ColorClass} font-bold text-2xl`}>{match.team1.totalWithHandicap}</div>
-                  <div className="text-gray-400 text-xs">({match.team1.totalPins})</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-white font-bold text-sm mb-1">
-                    {t('summary.match')} {idx + 1}
-                  </div>
-                  <div className="text-yellow-400 font-bold text-xl">
-                    {match.team1.points} - {match.team2.points}
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className={`${team2ColorClass} font-bold text-2xl`}>{match.team2.totalWithHandicap}</div>
-                  <div className="text-gray-400 text-xs">({match.team2.totalPins})</div>
-                </div>
-              </div>
-            </div>
-          ))}
-
-          {/* Total Line */}
-          <div className="bg-gray-900 rounded p-3 border-2 border-yellow-500">
-            <div className="grid grid-cols-3 items-center">
-              <div className="text-center">
-                <div className={`${team1ColorClass} font-bold text-2xl`}>{totals.team1TotalPinsWithHandicap}</div>
-                <div className="text-gray-400 text-xs">({totals.team1TotalPinsNoHandicap})</div>
-              </div>
-              <div className="text-center">
-                <div className="text-white font-bold text-sm mb-1">{t('common.total')}</div>
-                <div className="text-yellow-400 font-bold text-2xl">
-                  {game.grandTotalPoints
-                    ? `${game.grandTotalPoints.team1} - ${game.grandTotalPoints.team2}`
-                    : t('common.na')}
-                </div>
-              </div>
-              <div className="text-center">
-                <div className={`${team2ColorClass} font-bold text-2xl`}>{totals.team2TotalPinsWithHandicap}</div>
-                <div className="text-gray-400 text-xs">({totals.team2TotalPinsNoHandicap})</div>
-              </div>
-            </div>
-          </div>
-        </div>
+      {/* Full Score Table */}
+      <div className="bg-white rounded-lg mb-6 overflow-hidden">
+        <GameScoreTable game={game} />
       </div>
 
       {/* Game Statistics */}
