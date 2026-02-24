@@ -251,7 +251,7 @@ export const authApi = {
         userId: user.id,
         role: data.role as 'admin' | 'player'
       };
-    } catch (error) {
+    } catch {
       return null;
     }
   },

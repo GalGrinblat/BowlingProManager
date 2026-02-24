@@ -193,7 +193,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
       await seasonsApi.update(created.id, { schedule });
       await onRefreshData?.();
       if (typeof onSuccess === 'function') onSuccess(created.id);
-    } catch (err) {
+    } catch {
       alert(t('validation.saveError'));
     }
   };

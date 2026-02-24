@@ -141,7 +141,6 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
       if (playerIndex === undefined || playerIndex === -1) continue;
 
       let seriesPins = 0;
-      let seriesPoints = 0;
       let playedMatch = false;
 
       if (game.matches) {
@@ -162,7 +161,6 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
                 ? match.playerMatches[playerIndex].team1Points
                 : match.playerMatches[playerIndex].team2Points;
               stats.pointsScored += points;
-              seriesPoints += points;
             }
           }
         });

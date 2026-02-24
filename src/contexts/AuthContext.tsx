@@ -75,11 +75,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const loadUserProfile = async (userId: string) => {
     try {
       // First, check if user exists in users table
-      let { data: userData, error: userError } = await supabase
+      const userResult = await supabase
         .from('users')
         .select('*')
         .eq('id', userId)
         .single();
+      const userError = userResult.error;
+      let userData = userResult.data;
 
       // If user doesn't exist, create them
       if (userError && userError.code === 'PGRST116') {
