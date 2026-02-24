@@ -1,346 +1,315 @@
 # BowlingAppAi - Project Issues Analysis
-**Date:** February 23, 2026
-**Previous Review:** February 17, 2026
+**Date:** February 24, 2026
+**Previous Review:** February 23, 2026
 **Status:** Comprehensive codebase review completed (updated)
 
 ---
 
-## Changes Since Last Review (Feb 17)
+## Changes Since Last Review (Feb 23)
 
 | Commit | Date | Change |
 |--------|------|--------|
-| `43fefca` | Feb 17 | Applied fixes from Claude analysis (error boundaries, constants, race conditions) |
-| `f348320` | Feb 18 | Monolithic component decomposition — major refactoring |
-| `6ba09ed` | Feb 18 | File structure reorganized into feature-based directories |
-| `80bffa9` | Feb 18 | Replaced `any` type usage throughout codebase |
-| `b0b08dd` | Feb 18 | Fixed season loading bug |
-| `d6dde3f` | Feb 19 | Improved test structure and coverage (unit/integration/component) |
-| `60074a8` | Feb 19 | Refactored project testing setup |
-| `4c82cfd` | Feb 19 | Fixed test issues |
-| `575e379` | Feb 19 | Added CI pipeline (GitHub Actions runs tests on push/PR) |
-| `26ac0b4–a84c39c` | Feb 19 | Fixed dependency issues to restore build |
+| `fbbce56` | Feb 23 | Fix parseInt with Falsy Zero in models |
+| `169a2e6` | Feb 23 | Fix inadequate error handling (try/catch in UI layer) |
+| `1353149` | Feb 23 | Replace index-based React keys (partial) |
+| `3d3ddf9` | Feb 23 | Add useMemo to PlayerRegistry filter/sort |
+| `71f3f97` | Feb 23 | Parallelize N+1 data loading in App.tsx via Promise.all |
+| `8855085` | Feb 23 | Add toast/notification system for silent API errors |
+| `ba7e1af` | Feb 23 | Upgrade Vite 4.3.9 → 7.3.1 |
+| `a67054a` | Feb 23 | Add ESLint + Prettier |
+| `6a312c2` | Feb 23 | Complete i18n coverage |
+| `1772235` | Feb 23 | Fix console logging in production (structured logger) |
+| `035623d` | Feb 23 | Round up handicap and absent scores |
+| `073e6ad` | Feb 23 | Fix season records showing player ID |
+| `496107a` | Feb 23 | Fix season records showing player ID |
+| `25be89b` | Feb 23 | Update team and player standings views |
+| `c173768` | Feb 23 | Add last matchday scores and results |
+| `3d7b47b` | Feb 23 | Use translation keys |
+| `1b400d9` | Feb 23 | Rename game components |
+| `9381e22` | Feb 23 | Update CompletedGameView tables |
+| `52e976c` | Feb 24 | Extract game score tables |
+| `ef9f66a` | Feb 24 | Remove duplicated winner line |
+| `30b6ff2` | Feb 24 | Fix Hebrew score row |
+| `34e0ae0` | Feb 24 | Update completed game design |
+| `cb0f908` | Feb 24 | Render edit player in player location |
+| `fd3ac86` | Feb 24 | Fix pagination format |
+| `b592b64` | Feb 24 | Enforce view standards |
+| `02a5ddb` | Feb 24 | Add option to view specific matchday table in a season |
+| `e2e582b` | Feb 24 | Fix minor bugs in game flow |
 
-**Previous issue count:** 23 issues (0 critical, 5 high, 11 medium, 7 low)
-**Current issue count:** 15 issues (0 critical, 0 high, 9 medium, 6 low)
+**Previous issue count:** 15 issues (0 critical, 0 high, 9 medium, 6 low)
+**Current issue count:** 14 issues (0 critical, 2 high, 7 medium, 5 low)
 
 ---
 
 ## Executive Summary
 
-Significant progress since the Feb 17 review. All 5 high-priority issues have been resolved or fully addressed, and several medium-priority issues were fixed. The codebase has been restructured from a handful of monolithic files into a proper feature-based directory hierarchy. A real test framework (Jest + React Testing Library) replaced the old vanilla Node.js scripts, and a CI pipeline now runs tests on every push.
+Active development continued since the Feb 23 review with 27 commits across both days, resolving nearly all medium-priority items from the previous analysis. Vite was upgraded three major versions (4→7), ESLint+Prettier is now enforced, a toast notification system surfaces API errors, a structured logger replaces raw `console.*` calls, and i18n coverage was completed. Pagination and N+1 loading were fixed.
 
-**Codebase size:** ~15,000 lines of TypeScript/TSX across 94 files (was ~12,800 across 50+ files — grew due to component decomposition)
+However, adding ESLint revealed 20 real errors and 40 warnings previously invisible in the codebase. Most critically, `PlayerRegistry.tsx` calls React hooks conditionally (after an early `return`) — a violation of the Rules of Hooks that can cause subtle, hard-to-reproduce rendering bugs. A second category of errors — referencing `const` arrow functions before their declaration inside component bodies — appears in 8+ files.
 
-**Critical Issues:** 0 (unchanged)
-**High-Priority Issues:** 0 (down from 5)
-**Medium-Priority Issues:** 9 (down from 11)
-**Low-Priority Issues:** 6 (down from 7)
+**Codebase size:** ~15,617 lines of TypeScript/TSX across 97 files (was ~15,000 across 94 — grew with new components `GameScoreTable`, `MatchDayReport`, etc.)
+
+**Critical Issues:** 0
+**High-Priority Issues:** 2 (up from 0 — newly surfaced by ESLint)
+**Medium-Priority Issues:** 7 (down from 9)
+**Low-Priority Issues:** 5 (down from 6)
 
 ---
 
-## Resolved Issues (Since Feb 17)
+## Resolved Issues (Since Feb 23)
 
-### Previously High: Monolithic Components
-**Status:** RESOLVED (`f348320`, `6ba09ed`)
+### Previously Medium: N+1 Query Pattern
+**Status:** RESOLVED (`71f3f97`)
+**Location:** `src/App.tsx:73-81`
 
-| File | Feb 17 Lines | Feb 23 Lines | Notes |
-|------|-------------|-------------|-------|
-| `services/api.ts` | 1,029 | 282 (index) | Split into `games.ts`, `leagues.ts`, `seasons.ts`, `teams.ts`, `players.ts`, `helpers.ts` |
-| `admin/SeasonDetail.tsx` | 918 | 279 | Extracted to 9 sub-components in `season/` folder |
-| `admin/PlayerRegistry.tsx` | 657 | 437 | Split out `PlayerForm.tsx`, `ImportPreviewModal.tsx` |
-| `admin/PrintCombined.tsx` | 634 | (removed) | Split into `PrintMatchDay.tsx`, `ScoreSheet.tsx` |
-| `admin/SeasonCreator.tsx` | 603 | 254 | Extracted `SeasonConfigStep`, `TeamAssignmentStep`, `PlayerAveragesStep` |
-| `admin/SeasonGame.tsx` | 585 | 263 | Logic extracted to `useGameInitializer.ts` hook |
+Sequential nested loops replaced with `Promise.all()`. Seasons for all leagues and games for all seasons now load in parallel rather than serially.
 
-New custom hooks created: `useGameInitializer.ts`, `usePlayerAverages.ts`, `useDateFormat.ts`.
-New shared components: `BonusRulesConfiguration`, `GeneralConfiguration`, `HandicapConfigurationForm`, `PlayerMatchupConfiguration`, `PointsConfiguration`, `TeamStandingsTable`, `PlayerStandingsTable`.
+### Previously Medium: No Toast / Silent Error Handling
+**Status:** RESOLVED (`8855085`)
+**Location:** `src/contexts/ToastContext.tsx`, `src/App.tsx:91,104`
 
-Only one file now exceeds 500 lines: `PrintMatchDay.tsx` at 537 lines.
+`ToastContext` + `useToast` hook implemented. `ToastProvider` wraps the app in `App.tsx:299`. API failures in `loadDashboardData` and `loadPlayers` now surface `showToast()` calls. The context supports `error`, `success`, and `info` types with auto-dismiss.
 
-### Previously High: Race Conditions in Game State Updates
-**Status:** RESOLVED (`43fefca`)
-**Location:** `src/components/admin/game/SeasonGame.tsx`
+### Previously Medium: Outdated Dependencies (Vite)
+**Status:** RESOLVED (`ba7e1af`)
 
-Optimistic update with rollback pattern is now implemented:
+Vite upgraded from 4.3.9 → **7.3.1**. Three major versions closed. React and Tailwind remain on 18.x and 3.x respectively (both one major version behind their latest).
+
+### Previously Low: No ESLint / Prettier
+**Status:** RESOLVED (`a67054a`)
+**Location:** `eslint.config.js`
+
+ESLint configured with `@typescript-eslint`, `react-hooks`, `react-refresh`, and `eslint-config-prettier`. The `no-explicit-any` rule emits warnings; `no-unused-vars` emits errors. Prettier integrated via `eslint-config-prettier`. Running ESLint now surfaces 20 errors / 40 warnings across the codebase (see High issues below).
+
+### Previously Low: Console Logging in Production
+**Status:** RESOLVED (`1772235`)
+**Location:** `src/utils/logger.ts`
+
+`logger.error` / `logger.warn` / `logger.log` utility added. `warn` and `log` are suppressed in production (`NODE_ENV !== 'production'`). Only 3 remaining `console.*` calls exist — all inside `logger.ts` itself (intentional). All other production code uses the logger.
+
+### Previously Medium: RTL/i18n Incomplete
+**Status:** RESOLVED (`6a312c2`, `3d7b47b`)
+
+Translation key coverage completed. "Sign in with Google" and other previously hardcoded English strings now routed through `t()`. Translation files (`en.ts`, `he.ts`) both hit 100% line coverage in the test suite.
+
+### Previously Medium: Memoization Sparse (PlayerRegistry)
+**Status:** RESOLVED (`3d3ddf9`)
+**Location:** `src/components/admin/players/PlayerRegistry.tsx:234-254`
+
+`filteredPlayers`, `sortedPlayers`, `activePlayers`, and `inactivePlayers` are now `React.useMemo`-derived. Filter/sort no longer reruns on every keystroke.
+
+### Previously Medium: parseInt Falsy-Zero (Config Layer)
+**Status:** RESOLVED (`fbbce56`)
+**Location:** `src/models/index.ts`
+
+Model creator functions now use `isNaN(parsed) ? DEFAULT : parsed` instead of `parsed || DEFAULT`. The `0` value is now correctly preserved for `handicapPercentage`, `numberOfTeams`, etc.
+
+*Note: `parseInt(x) || 0` still appears in 16 locations across utils and components (`standingsUtils.ts`, `recordsUtils.ts`, `GameScoreTable.tsx`, `PlayerDashboard.tsx`). These are pin-parsing contexts where 0 is the correct fallback for an empty/invalid string, so the pattern is intentionally correct there.*
+
+---
+
+## High-Priority Issues
+
+### 1. React Hooks Called Conditionally — Rules of Hooks Violation
+**Severity:** HIGH (new — surfaced by ESLint)
+**Location:** `src/components/admin/players/PlayerRegistry.tsx:234,243,248,253,254`
+
+Five React hooks are called **after** an early `return` statement inside `PlayerRegistry`. The React Rules of Hooks require hooks to be called unconditionally and in the same order on every render:
+
 ```typescript
-setGame(updated);                         // Update UI immediately
-try {
-  await gamesApi.update(gameId, updated); // Persist
-} catch {
-  setGame(previous);                      // Rollback on failure
+// Line ~220: early return for loading state
+if (isLoading) {
+  return <LoadingSpinner />;   // ← hooks below this are SKIPPED on loading renders
 }
+
+// Lines 234–254: hooks called after the conditional return
+const filteredPlayers = React.useMemo(...);   // violation
+const sortedPlayers   = React.useMemo(...);   // violation
+React.useEffect(() => { ... }, [searchTerm]); // violation
+const activePlayers   = React.useMemo(...);   // violation
+const inactivePlayers = React.useMemo(...);   // violation
 ```
 
-### Previously High: No Error Boundaries
-**Status:** RESOLVED (`43fefca`)
+This violates the [Rules of Hooks](https://react.dev/reference/rules/rules-of-hooks). While React may not crash immediately, it will produce incorrect behavior (wrong state, stale memos) whenever the component transitions between loading and loaded states, because the hook call order changes between renders.
 
-`src/components/common/ErrorBoundary.tsx` created and applied in `App.tsx:291`. The entire application is now wrapped in an `<ErrorBoundary>`, preventing a single component crash from white-screening the app.
+**Fix:** Move all `useMemo`/`useEffect` calls to the top of the component, before any conditional returns. Compute derived values unconditionally; let them return empty/null values when data isn't available yet.
 
-### Previously High: Hardcoded Business Constants
-**Status:** RESOLVED (`43fefca`)
+### 2. "Cannot Access Variable Before Declaration" — TDZ Errors in 8+ Files
+**Severity:** HIGH (new — surfaced by ESLint)
+**Affected files:**
+- `src/components/admin/Settings.tsx:22`
+- `src/components/admin/league/LeagueDetail.tsx:21`
+- `src/components/admin/league/LeagueManagement.tsx:70`
+- `src/components/admin/print/PrintCombined.tsx:38`
+- `src/components/admin/print/PrintMatchDay.tsx:36`
+- `src/components/admin/print/PrintPlayerStandings.tsx:27`
+- `src/components/admin/print/PrintTeamStandings.tsx:28`
+- `src/components/admin/season/TeamManagement.tsx:20`
 
-All 5 hardcoded `average - 10` instances replaced with the `ABSENT_PLAYER_PENALTY` constant from `src/constants/bowling.ts`. Both `matchUtils.ts` and `statsUtils.ts` now import and use the constant.
+A widespread pattern across the codebase: `useEffect` callbacks reference `const` arrow functions that are declared **later** in the component body:
 
-### Previously Medium: Memory Leaks — Missing Async Cleanup
-**Status:** RESOLVED (`f348320`)
-**Location:** `src/hooks/useGameInitializer.ts:61`
-
-The game loading effect now uses a `cancelled` flag and returns a cleanup function:
 ```typescript
+// useEffect is called HERE (top of component)
 useEffect(() => {
-  let cancelled = false;
-  const loadGame = async () => {
-    ...
-    if (cancelled) return;
-    setGame(gameData);
-  };
-  loadGame();
-  return () => { cancelled = true; };
-}, [gameId]);
+  loadData();   // references `loadData` before its const declaration
+}, []);
+
+// `loadData` is declared HERE (below)
+const loadData = async () => { ... };
 ```
 
-### Previously Medium: useEffect Dependency Issues
-**Status:** RESOLVED (`43fefca`)
-**Location:** `src/App.tsx:51-57`
+In JavaScript, `const`/`let` are subject to the Temporal Dead Zone (TDZ). Accessing them before their declaration line throws `ReferenceError`. While React effects fire asynchronously after mount (by which time `loadData` is defined), ESLint flags this as a static error — and the pattern is genuinely fragile in non-effect contexts.
 
-`isAdmin` (a function reference) is no longer in the dependency array. Replaced with a stable derived boolean:
+**Fix:** Declare `loadData`/`loadOrganization`/etc. **before** the `useEffect` that references them, or convert them to `useCallback` hooks (which also resolves the `react-hooks/exhaustive-deps` warnings):
 ```typescript
-const isAdminUser = !isLoading && currentUser && isAdmin();
-React.useEffect(() => {
-  if (isAdminUser) { loadDashboardData(); loadPlayers(); }
-}, [isAdminUser]);
+const loadData = useCallback(async () => { ... }, [dep1, dep2]);
+useEffect(() => { loadData(); }, [loadData]);
 ```
-
-### Previously Medium: Zero Memoization
-**Status:** PARTIALLY RESOLVED (`f348320`)
-**Location:** `src/components/admin/season/SeasonDetail.tsx:147-149`
-
-Three expensive calculations are now memoized in SeasonDetail:
-```typescript
-const teamStandings = useMemo(() => calculateTeamStandings(teams, games), [teams, games]);
-const playerStats   = useMemo(() => calculatePlayerSeasonStats(teams, games), [teams, games]);
-const seasonRecords = useMemo(() => calculateSeasonRecords(teams, games), [teams, games]);
-```
-No other `useMemo`, `useCallback`, or `React.memo` exists in the codebase.
-
-### Previously Low: Limited Test Coverage
-**Status:** SIGNIFICANTLY IMPROVED (`d6dde3f`, `60074a8`, `575e379`)
-
-Old approach: 6 vanilla Node.js scripts with no framework.
-Current approach: 12 structured test files using Jest + React Testing Library + jsdom:
-
-```
-tests/
-  unit/
-    models/modelsValidation.test.ts
-    services/api.test.ts
-    utils/matchUtils.test.ts
-    utils/scheduleUtils.test.ts
-    utils/standingsUtils.test.ts
-  integration/
-    scoringFlow.test.ts
-    seasonFlow.test.ts
-  component/
-    admin/AdminDashboard.test.tsx
-    admin/LeagueManagement.test.tsx
-    admin/PlayerRegistry.test.tsx
-    common/Pagination.test.tsx
-    player/PlayerDashboard.test.tsx
-```
-
-CI/CD pipeline added (`.github/workflows/ci.yml`) — tests run on every push and pull request to `main`.
-
-### Previously Medium: No Pagination
-**Status:** PARTIALLY RESOLVED (`d6dde3f`)
-**Location:** `src/components/common/Pagination.tsx`, `src/components/admin/players/PlayerRegistry.tsx`
-
-A reusable `Pagination` component with a `usePagination` hook was added. `PlayerRegistry` now paginates player lists at 20 items per page. The N+1 sequential data fetch in `App.tsx` (leagues → seasons → games) remains unaddressed.
 
 ---
 
 ## Medium-Priority Issues
 
-### 1. Residual `any` Types (~38 occurrences)
-**Severity:** MEDIUM (downgraded from HIGH — 61% reduction achieved)
+### 3. Residual `any` Types (~13 occurrences)
+**Severity:** MEDIUM (down from ~38)
 
-`any` count reduced from ~98 to ~38. Remaining occurrences are concentrated in two areas:
+Remaining `any` usages after multiple cleanup rounds:
 
-**Database interface layer** (`src/lib/supabase.ts:81–155`) — JSON columns typed as `any`:
-```typescript
-bonus_rules: any;
-schedule: any;
-matches: any;
-team1_data: any;
-```
-These represent PostgreSQL JSONB columns and require proper TypeScript interfaces.
+| File | Location | Description |
+|------|----------|-------------|
+| `src/services/api/helpers.ts:3` | `error: any` param | Error handler catch param |
+| `src/services/api/index.ts:62` | `updateData: any` | Dynamic update object |
+| `src/services/api/players.ts:85` | `updateData: any` | Dynamic update object |
+| `src/components/admin/print/PrintCombined.tsx:96` | `(a: any, b: any)` sort | Comparator params |
+| `src/components/admin/season/GameCard.tsx:10,29,30` | `h2h: any`, reducer `sum: any` | Prop and accumulator |
+| `src/components/player/PlayerDashboard.tsx:247,248` | reducer `sum: any` | Accumulator |
+| `src/utils/importExportUtils.ts:72,112,137,142` | Various | Generic import/export handlers |
 
-**API mapping layer** (`src/services/api/games.ts`, `leagues.ts`, `seasons.ts`):
-```typescript
-const mapGameFromDb = (data: any): Game => ({ ... })
-const mapGameToDb = (data: Partial<Game>): any => { ... }
-```
+**Fix:** The `sum: any` accumulator pattern in `GameCard` and `PlayerDashboard` is trivially fixable (`sum: number`). The `updateData: any` in the API layer needs a typed partial update interface. The `importExportUtils.ts` generics need proper type parameters.
 
-**Component layer:**
-- `src/components/admin/season/GameCard.tsx:10` — `h2h: any` prop (new component needs typing)
-- `src/components/player/PlayerDashboard.tsx:17,81` — team data typed as `{ team1: any, team2: any }`
-- `src/components/admin/print/PrintCombined.tsx:96` — `(a: any, b: any)` sort comparator
+### 4. Index-Based React Keys (18 occurrences)
+**Severity:** MEDIUM (down from 22)
 
-**Fix:** Define TypeScript interfaces for Supabase JSONB columns in `src/lib/supabase.ts`; type the DB mapper functions properly
+18 `key={i}` / `key={idx}` instances remain across 3 files. The new `GameScoreTable.tsx` component (extracted Feb 24) introduced the most new instances:
 
-### 2. Index-Based React Keys (~22 occurrences)
-**Severity:** MEDIUM (reduced from 35+)
+- `src/components/admin/print/PrintMatchDay.tsx:354,368,376,394,408,416` (6 — score sheet column headers, inherently positional)
+- `src/components/admin/print/ScoreSheet.tsx:33,45,53` (3 — frame number columns, inherently positional)
+- `src/components/common/GameScoreTable.tsx:41,99,117,140,170,228,246,269` (8 — new component, match columns)
+- `src/components/admin/season/TeamManagement.tsx:251` (1 — roster change history)
 
-22 instances of `key={idx}`, `key={i}`, or `key={index}` across 8 files:
-- `src/components/admin/print/PrintMatchDay.tsx:354,368,376,394,408,416`
-- `src/components/admin/print/ScoreSheet.tsx:33,45,53`
-- `src/components/common/CompletedGameView.tsx:87,147,171,201`
-- `src/components/admin/season/TeamManagement.tsx:157,252`
-- `src/components/admin/season/SeasonRecordsView.tsx:49`
-- `src/components/admin/game/SummaryView.tsx:48`
-- `src/components/admin/game/TeamStatsCard.tsx:36`
-- `src/components/admin/players/ImportPreviewModal.tsx:33,53`
+The print components use index keys for frame-number column headers — these are inherently positional and stable, making index keys acceptable there. The `TeamManagement` roster history and `GameScoreTable` match columns should use stable IDs.
 
-**Fix:** Use unique IDs (player IDs, match IDs) instead of array indices where data has stable identity
+**Fix:** For `GameScoreTable`, use match index + player ID as composite key. For `TeamManagement` roster changes, use the change's timestamp or player ID.
 
-### 3. Inadequate Error Handling (UI Layer)
+### 5. ESLint Warnings — useEffect Missing Dependencies (9 occurrences)
+**Severity:** MEDIUM (new — surfaced by ESLint)
+
+`react-hooks/exhaustive-deps` warnings across `App.tsx`, `SeasonDetail.tsx`, `PlayerDashboard.tsx`, and 6 print/season components. All follow the same pattern: a data-loading function is called in `useEffect` but not listed in the dependency array.
+
+This is the symptom of the same root cause as Issue #2 (TDZ). Both are resolved together by converting loaders to `useCallback`.
+
+**Fix:** Part of the same fix as Issue #2 — `useCallback` + include in `useEffect` deps.
+
+### 6. Unused Variable Errors (4 occurrences)
+**Severity:** MEDIUM (new — surfaced by ESLint)
+
+| File | Variable | Issue |
+|------|----------|-------|
+| `src/components/player/PlayerDashboard.tsx:196` | `err` | Caught error never used |
+| `src/contexts/ToastContext.tsx:254` | `error` | Caught error never used |
+| `src/utils/leagueImportExportUtils.ts:143` | `seriesPoints` | Assigned but never read |
+| `src/utils/leagueImportExportUtils.ts:419` | `error` | Caught error never used |
+
+**Fix:** Either use the variable (log it via `logger`, pass to toast) or replace with `_` prefix. The `seriesPoints` assignment may represent incomplete logic.
+
+### 7. Test Coverage — Still Low
 **Severity:** MEDIUM
 
-67 try/catch blocks exist (API layer is well-covered), but critical user-facing paths still lack error feedback:
-- `src/components/player/PlayerDashboard.tsx:23` — `loadPlayerData()` has no try/catch; silent failure
-- `src/App.tsx:87,98` — Errors only logged to `console.error`, no user notification
-- `src/components/admin/season/SeasonDetail.tsx:42` — `loadSeasonData()` has no try/catch
+12 test files, 17 test cases for 97 source files. Coverage report shows critical gaps:
 
-No toast/notification system exists. All errors are invisible to the user.
+| Module | Statement Coverage |
+|--------|--------------------|
+| `services/api/seasons.ts` | 5% |
+| `services/api/leagues.ts` | 9% |
+| `services/api/teams.ts` | 16% |
+| `services/api/players.ts` | 19% |
+| `utils/importExportUtils.ts` | 12% |
+| `utils/leagueImportExportUtils.ts` | not measured |
 
-**Fix:** Add error state to components; implement a lightweight toast or alert system
+Business logic utilities (`matchUtils`, `standingsUtils`, `scheduleUtils`) are the best-tested modules. The API layer is essentially untested outside of mocks. New components (`GameScoreTable`, `MatchDayReport`) have no tests.
 
-### 4. Outdated Dependencies
-**Severity:** MEDIUM
+**Fix:** Prioritize tests for the API layer (mock Supabase client) and new utility files (`recordsUtils`, `importExportUtils`). Add interaction tests for `SeasonGame` score entry flow.
+
+### 8. Memoization Still Sparse (Outside PlayerRegistry)
+**Severity:** MEDIUM (partially resolved)
+
+`useMemo` was added to `PlayerRegistry` and `SeasonDetail`. Other components with expensive derived state remain unoptimized:
+
+- `src/components/player/PlayerDashboard.tsx` — Game history filtering and stats calculation recalculated on every render
+- `src/components/common/GameScoreTable.tsx` — New component with no memoization; recalculates totals on every render
+- `src/components/admin/print/PrintCombined.tsx` — Player sort recalculated on every render
+
+**Fix:** Add `useMemo` for derived collections in `PlayerDashboard` and `GameScoreTable`.
+
+### 9. Outdated Dependencies (React, Tailwind)
+**Severity:** MEDIUM (partially resolved — Vite fixed)
 
 | Package | Current | Latest | Gap |
 |---------|---------|--------|-----|
-| `vite` | 4.3.9 | 7.x | 3 major versions behind |
 | `react` | 18.3.1 | 19.x | 1 major version behind |
+| `react-dom` | 18.3.1 | 19.x | 1 major version behind |
 | `tailwindcss` | 3.3.0 | 4.x | 1 major version behind |
 | `@vitejs/plugin-react` | 4.0.0 | 5.x | 1 major version behind |
 
-**Fix:** Upgrade Vite first (likely requires config changes), then React 19 (requires testing for breaking changes)
+Vite was resolved. React 19 brings improved Suspense, Actions API, and `use()` hook — migration is non-trivial. Tailwind 4 uses a new CSS-first config with breaking changes.
 
-### 5. RTL/i18n Incomplete
-**Severity:** MEDIUM
-
-Translation coverage has improved in newer components, but gaps remain:
-- `src/components/common/LoginView.tsx:59` — "Sign in with Google" not translated
-- Several admin component strings still hardcoded in English
-- No pluralization support in the translation system
-- RTL layout not tested across new sub-components added during decomposition
-
-**Fix:** Audit all components for hardcoded strings; add pluralization helper
-
-### 6. Minimal Vite Configuration
-**Severity:** MEDIUM
-**Location:** `vite.config.ts`
-
-Config is 9 lines with only basic plugin and dev server settings. Missing:
-- No source map configuration for production debugging
-- No chunk splitting strategy (all code in one bundle)
-- No CSP headers
-- No build size analysis
-
-**Fix:** Add `build.rollupOptions.output.manualChunks` for vendor splitting; configure source maps
-
-### 7. N+1 Query Pattern / Excessive Initial Data Load
-**Severity:** MEDIUM
-**Location:** `src/App.tsx:73-81`, `src/components/player/PlayerDashboard.tsx:23-55`
-
-**App.tsx** — Sequential nested loops on login:
-```typescript
-for (const league of leaguesData) {
-  const seasons = await seasonsApi.getByLeague(league.id);   // 1 per league
-  for (const season of seasons) {
-    const games = await gamesApi.getBySeason(season.id);     // 1 per season
-  }
-}
-```
-With 3 leagues × 5 seasons each = 18 sequential API calls on every login.
-
-**PlayerDashboard** — Fetches ALL teams to find player's teams, then resolves seasons and leagues individually. No AbortController despite an async useEffect.
-
-**Fix:** Add server-side filtering; use `Promise.all()` for parallel calls; add AbortController to PlayerDashboard's useEffect
-
-### 8. parseInt with Falsy Zero
-**Severity:** MEDIUM
-**Location:** `src/models/index.ts:93-106`, `src/components/player/PlayerDashboard.tsx:130`
-
-```typescript
-numberOfTeams: parseInt(String(numberOfTeams)) || DEFAULT_NUMBER_OF_TEAMS,
-handicapPercentage: parseInt(String(handicapPercentage)) || DEFAULT_HANDICAP_PERCENTAGE,
-```
-
-If a valid value of `0` is passed (e.g., `handicapPercentage = 0`), it falls back to the default. This is a latent bug for any configuration where 0 is a meaningful value.
-
-**Fix:** Use `isNaN(parsed) ? DEFAULT : parsed` pattern instead of `|| DEFAULT`
-
-### 9. Memoization Still Sparse
-**Severity:** MEDIUM
-
-Memoization was added to `SeasonDetail`, but other components with expensive operations remain unoptimized:
-- `src/components/admin/players/PlayerRegistry.tsx` — Filter/sort of player list runs on every keystroke with no debounce or `useMemo`
-- `src/components/player/PlayerDashboard.tsx` — Game history calculations recalculated on every render
-- `src/components/admin/print/PrintCombined.tsx` — Player sort recalculated on every render
-
-**Fix:** Add `useMemo` for filtered/sorted lists in PlayerRegistry; memoize stats in PlayerDashboard
+**Fix:** Upgrade Tailwind 3 → 4 (config migration required). React 19 upgrade should follow after Tailwind to isolate breaking changes.
 
 ---
 
 ## Low-Priority Issues
 
-### 10. Accessibility Issues
+### 10. Accessibility — Minimal ARIA Coverage
 **Severity:** LOW
 
-Only 1 `aria-label` found across the entire codebase. Specific problems:
-- No ARIA labels on interactive elements (buttons, inputs, nav)
-- Score input fields lack `<label>` elements
-- No visible focus indicators on custom-styled elements
-- No keyboard navigation support for custom controls
+Only 2 `aria-` attributes found across the entire codebase. Score input fields lack `<label>` elements. No keyboard navigation support for custom controls. No visible focus indicators on styled elements.
 
-**Fix:** Add ARIA labels systematically; ensure form inputs have associated `<label>` elements
+**Fix:** Add ARIA labels systematically to interactive elements; associate form labels with inputs.
 
 ### 11. No URL-Based Routing
 **Severity:** LOW
 **Location:** `src/App.tsx:29-120`
 
-Navigation still uses `currentView` state + `navigationState`. Page refresh loses all context. Browser Back/Forward buttons do not work as expected.
+Navigation still uses `currentView` state + `navigationState`. Page refresh loses all context. Browser Back/Forward buttons do not work. Link sharing is impossible.
 
-**Fix:** Implement React Router with URL params for leagueId, seasonId, gameId
+**Fix:** Implement React Router with URL params for `leagueId`, `seasonId`, `gameId`.
 
-### 12. No ESLint / Prettier
+### 12. No Code Splitting / Lazy Loading
 **Severity:** LOW
 
-No linting or formatting tooling configured. Code style is inconsistent across the 94 files.
+No `React.lazy()` or dynamic imports. All 97 source files load upfront, including admin-only views players never access. Now that Vite 7 is in place, this is straightforward to implement.
 
-**Fix:** Add ESLint with `@typescript-eslint` plugin and Prettier; integrate with CI
+**Fix:** Add route-based code splitting with `React.lazy` and `<Suspense>` for admin-only views.
 
-### 13. Console Logging in Production
+### 13. Minimal Vite Build Configuration
+**Severity:** LOW
+**Location:** `vite.config.ts`
+
+Config is 9 lines. Now on Vite 7, advanced features are available but unconfigured:
+- No chunk splitting (all code in one bundle)
+- No source maps for production debugging
+- No CSP headers
+- No bundle size analysis
+
+**Fix:** Add `build.rollupOptions.output.manualChunks` for vendor splitting; configure source maps.
+
+### 14. Validation Not Enforced Consistently
 **Severity:** LOW
 
-22 `console.error`/`console.log`/`console.warn` calls in production code. Error information is only visible to developers with DevTools open.
+Score bounds checking (0–300) exists only as HTML `min`/`max` attributes on inputs. `matchUtils.ts` and `standingsUtils.ts` accept any numeric value without validation.
 
-**Fix:** Implement structured logging with environment-based filtering; add error reporting service
-
-### 14. No Code Splitting / Lazy Loading
-**Severity:** LOW
-
-No `React.lazy()` or dynamic imports. All components load upfront, including admin-only views that players never access.
-
-**Fix:** Add route-based code splitting with `React.lazy` and `<Suspense>`
-
-### 15. Validation Not Enforced Consistently
-**Severity:** LOW
-
-Validation functions exist in `src/models/index.ts` but are not always called before API operations. Score bounds checking (0-300) exists only as HTML `min`/`max` attributes; `matchUtils.ts` and `statsUtils.ts` accept any numeric value.
-
-**Fix:** Call validation at all data entry points; add bounds checking in business logic layer
+**Fix:** Add bounds checking in the business logic layer; enforce validation at all data entry points, not just the HTML layer.
 
 ---
 
@@ -349,87 +318,87 @@ Validation functions exist in `src/models/index.ts` but are not always called be
 | Severity | Count | Primary Categories |
 |----------|-------|-------------------|
 | **Critical** | 0 | *(none)* |
-| **High** | 0 | *(all resolved since Feb 17)* |
-| **Medium** | 9 | Type Safety, Error Handling, Performance, Dependencies, i18n |
-| **Low** | 6 | Accessibility, Routing, DX, Logging |
+| **High** | 2 | React Hooks violations (surfaced by ESLint) |
+| **Medium** | 7 | Type Safety, Hook Patterns, Test Coverage, Dependencies |
+| **Low** | 5 | Accessibility, Routing, Build Config, Lazy Loading |
 
 ---
 
-## Comparison: Feb 17 vs Feb 23
+## Comparison: Feb 23 vs Feb 24
 
-| Metric | Feb 17 | Feb 23 | Trend |
+| Metric | Feb 23 | Feb 24 | Trend |
 |--------|--------|--------|-------|
 | Critical issues | 0 | 0 | Same |
-| High issues | 5 | 0 | **All resolved** |
-| Medium issues | 11 | 9 | Improved |
-| Low issues | 7 | 6 | Slightly improved |
-| Total issues | 23 | 15 | **35% reduction** |
-| `any` type count | ~98 | ~38 | **61% reduction** |
-| `try/catch` blocks | 65 | 67 | Same |
-| Test files | 6 (vanilla Node) | 12 (Jest/RTL) | **Significantly improved** |
-| CI/CD pipeline | None | GitHub Actions | **Added** |
-| Monolithic files (>500 lines) | 6 | 1 | **Resolved** |
-| `useMemo` usage | 0 | 3 | Improved |
-| Error boundaries | 0 | 1 | **Added** |
-| Async cleanup (cancelled flag) | 0 | 1 | Improved |
-| Pagination | None | PlayerRegistry paginated | Improved |
-| Accessibility (ARIA) | ~0 | 1 | Minimal |
+| High issues | 0 | 2 | ↑ Newly surfaced by ESLint |
+| Medium issues | 9 | 7 | Improved |
+| Low issues | 6 | 5 | Improved |
+| Total issues | 15 | 14 | Improved |
+| `any` type count | ~38 | ~13 | **66% reduction** |
+| Console logs in production | 22 | 0 | **Eliminated** (via logger) |
+| ESLint errors | N/A (no ESLint) | 20 | Now measurable |
+| ESLint warnings | N/A | 40 | Now measurable |
+| Test files | 12 | 12 | Same |
+| Tests passing | 17 | 17 | Same |
+| Vite version | 4.3.9 | 7.3.1 | **Upgraded** |
+| Toast system | None | Full | **Added** |
+| Structured logger | None | Full | **Added** |
+| i18n coverage | Partial | Complete | **Resolved** |
+| N+1 loading | Sequential | Promise.all | **Resolved** |
+| Source files | 94 | 97 | +3 new components |
 
 ---
 
 ## Technical Debt Assessment
 
-| Area | Feb 17 | Feb 23 | Notes |
+| Area | Feb 23 | Feb 24 | Notes |
 |------|--------|--------|-------|
 | **Security Posture** | Fair | Fair | RLS policies still not confirmed in Supabase |
-| **Type Safety** | Poor | Fair | `any` cut 61%; Supabase JSONB layer still needs proper types |
-| **Error Handling** | Fair | Fair | API layer solid; UI-layer still silent on errors |
-| **Maintainability** | Fair | Good | Feature-based structure, custom hooks, small components |
-| **Performance** | Fair | Fair | SeasonDetail memoized; N+1 and initial load still present |
-| **Testing** | Poor | Fair | Real framework + CI; coverage still limited |
-| **Overall** | Fair | Fair-Good | Strong structural improvements; remaining issues are lower risk |
+| **Type Safety** | Fair | Good | `any` down to ~13; remaining are isolated, all flagged by ESLint |
+| **Error Handling** | Fair | Good | Toast system + try/catch throughout; ESLint caught unused `err` variables |
+| **Maintainability** | Good | Good | ESLint + Prettier now enforced; TDZ/hooks patterns need cleanup |
+| **Performance** | Fair | Fair | PlayerRegistry memoized; `GameScoreTable` not yet memoized |
+| **Testing** | Fair | Fair | 12 suites pass; API layer near 0% coverage |
+| **Build Tooling** | Fair | Good | Vite 7, ESLint, Prettier all in place |
+| **Overall** | Fair-Good | Good | Two regressions (hooks violations) offset by strong quality tooling additions |
 
 ---
 
 ## Immediate Action Items
 
-### Should Fix Now:
-1. **Type the Supabase JSONB columns** — Define interfaces for `bonus_rules`, `schedule`, `matches` in `src/lib/supabase.ts`; eliminates ~15 of the remaining `any` usages
-2. **Add try/catch to `PlayerDashboard.loadPlayerData()`** — Silent failure on player data load is user-facing
-3. **Add AbortController to PlayerDashboard's useEffect** — Async effect with no cleanup is a memory/state leak risk
-4. **Fix parseInt falsy-zero pattern** — Use `isNaN` check in `src/models/index.ts`
+### Must Fix (High):
+1. **Fix hooks-after-return in `PlayerRegistry`** (`src/components/admin/players/PlayerRegistry.tsx`) — Move all `useMemo`/`useEffect` calls above the early loading `return`. This is a Rules of Hooks violation causing incorrect behavior during loading transitions.
+2. **Fix TDZ pattern across 8 files** — Move `const loadData` declarations above their `useEffect` callers, or convert to `useCallback`. This simultaneously resolves the 9 `react-hooks/exhaustive-deps` warnings.
 
-### Should Fix Soon:
-5. **Replace remaining index-based keys** — Start with components where lists can be reordered (TeamManagement, PlayerRegistry)
-6. **Add memoization to PlayerRegistry** — Filter/sort runs on every keystroke; add `useMemo`
-7. **Reduce N+1 load in App.tsx** — Use `Promise.all()` for parallel season/game fetches
-8. **Add a toast/notification system** — Surface API errors that currently only reach `console.error`
-9. **Upgrade Vite 4 → 7** — Three major versions behind; blocking modern build optimizations
+### Should Fix (Medium):
+3. **Fix unused variable errors** — Replace bare `catch (err)` with `catch (_err)` or log the error. Investigate `seriesPoints` in `leagueImportExportUtils.ts`.
+4. **Type the `sum: any` accumulators** — In `GameCard.tsx` and `PlayerDashboard.tsx`, trivially fixable as `sum: number`.
+5. **Add `useMemo` to `GameScoreTable`** (`src/components/common/GameScoreTable.tsx`) — New component calculates totals on every render.
+6. **Improve test coverage for API layer** — `leagues.ts` and `seasons.ts` are at 5–9%.
+7. **Upgrade React 18 → 19 and Tailwind 3 → 4** — Both one major version behind.
 
-### Nice to Have:
-10. **Add ESLint + Prettier** — Enforce consistency across 94 files
-11. **Implement React Router** — URL-based navigation with browser history support
-12. **Add code splitting** — `React.lazy` for admin-only routes
-13. **Complete i18n coverage** — Audit all components for untranslated strings
-14. **Improve accessibility** — ARIA labels, focus management, semantic HTML
-15. **Vite build config** — Chunk splitting, source maps for production
+### Nice to Have (Low):
+8. **Implement React Router** — URL-based navigation with browser history support
+9. **Add code splitting** — `React.lazy` for admin-only routes
+10. **Vite build config** — Chunk splitting, source maps for production
+11. **Accessibility** — ARIA labels, focus management, semantic HTML
+12. **Consistent validation** — Score bounds (0–300) enforced in business logic, not just HTML
 
 ---
 
 ## Recommendations
 
-The Feb 17–19 sprint resolved the most structurally significant issues in the codebase. The decomposition of monolithic components into a feature-based directory structure (94 files vs. 50+) is a lasting architectural improvement. The shift to a real test framework (Jest + React Testing Library) with CI is equally important for long-term maintainability.
+The Feb 23 sprint successfully resolved the majority of previously identified medium-priority issues and added critical quality infrastructure (ESLint, toast system, structured logger, Vite 7). The codebase is meaningfully better than it was two days ago.
 
-Remaining work is lower-risk and lower-urgency. The largest outstanding type safety gap is the Supabase JSONB column types in `src/lib/supabase.ts`, which should be the next type-safety focus. Error handling at the UI layer (silent failures) and the N+1 query pattern on login are the most user-visible concerns.
+The most important finding from this review is that **adding ESLint revealed pre-existing bugs** that were invisible before. The conditional hooks violation in `PlayerRegistry` is a real correctness bug. The TDZ pattern (loading functions declared after their useEffect callers) is technically risky and generates noise that obscures real issues. Both should be addressed before adding more features.
 
 **Priority Order:**
-1. Fix silent UI-layer error handling (users can't see API failures)
-2. Complete type safety for Supabase layer (eliminates remaining `any` hotspot)
-3. Fix async cleanup and data fetching patterns in PlayerDashboard
-4. Build tooling (ESLint, Vite upgrade, chunk splitting)
-5. UX improvements (routing, accessibility, i18n completion)
+1. Fix Rules of Hooks violation in `PlayerRegistry` (correctness bug)
+2. Fix TDZ / exhaustive-deps pattern across 8 files (cleanup + correctness)
+3. Fix unused variable errors (reach 0 ESLint errors)
+4. Improve API layer test coverage
+5. React 19 + Tailwind 4 upgrades
 
 ---
 
 **Generated by:** Claude Code - Comprehensive Project Analysis
-**Last Updated:** 2026-02-23
+**Last Updated:** 2026-02-24
