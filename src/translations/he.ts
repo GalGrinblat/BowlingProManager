@@ -378,6 +378,9 @@ const he: TranslationDictionary = {
     createMissingTeams: 'צור קבוצות חסרות',
     expectedTeamsCount: 'צפויות {{expected}} קבוצות, אך רק {{actual}} מוגדרות.',
     inheritFromLeagueConfig: 'ירש מהגדרות הליגה',
+    currentStandings: 'נוכחי',
+    afterMatchDay: 'אחרי מחזור {{matchDay}}',
+    afterRoundMatchDay: 'אחרי סיבוב {{round}} מחזור {{matchDay}}',
   },
 
   // ניהול קבוצות

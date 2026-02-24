@@ -33,6 +33,7 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
   const [view, setView] = useState('schedule');
   const [selectedRound, setSelectedRound] = useState(1);
   const [selectedMatchDay, setSelectedMatchDay] = useState<number | null>(null);
+  const [standingsFilter, setStandingsFilter] = useState<{round: number, matchDay: number} | null>(null);
   const [showPostponeModal, setShowPostponeModal] = useState(false);
   const [showPrintModal, setShowPrintModal] = useState(false);
   const [showPrintOptionsModal, setShowPrintOptionsModal] = useState(false);
@@ -231,6 +232,38 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
     return map;
   }, [games]);
 
+  const completedMatchDayEvents = useMemo(() => {
+    const seen = new Set<string>();
+    const result: {round: number, matchDay: number}[] = [];
+    games.filter(g => g.status === 'completed').forEach(g => {
+      const key = `${g.round}-${g.matchDay}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        result.push({round: g.round, matchDay: g.matchDay});
+      }
+    });
+    return result.sort((a, b) => a.round !== b.round ? a.round - b.round : a.matchDay - b.matchDay);
+  }, [games]);
+
+  const standingsGames = useMemo(() => {
+    if (!standingsFilter) return games;
+    const {round: r, matchDay: md} = standingsFilter;
+    return games.filter(g =>
+      g.status === 'completed' &&
+      (g.round < r || (g.round === r && g.matchDay <= md))
+    );
+  }, [games, standingsFilter]);
+
+  const filteredTeamStandings = useMemo(
+    () => standingsFilter ? calculateTeamStandings(teams, standingsGames) : teamStandings,
+    [standingsFilter, teamStandings, teams, standingsGames]
+  );
+
+  const filteredPlayerStats = useMemo(
+    () => standingsFilter ? calculatePlayerSeasonStats(teams, standingsGames) : playerStats,
+    [standingsFilter, playerStats, teams, standingsGames]
+  );
+
   const totalGames = games.length;
   const completedGames = games.filter(g => g.status === 'completed').length;
   const progressPercent = totalGames > 0 ? (completedGames / totalGames) * 100 : 0;
@@ -238,6 +271,14 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
   const champion = isCompleted && teamStandings.length > 0 ? teamStandings[0] : null;
 
   if (!season || !league) return <div>{t('seasons.loading')}</div>;
+
+  const hasMultipleRounds = season.seasonConfigurations.numberOfRounds > 1;
+  const getMatchDayLabel = (round: number, matchDay: number) =>
+    hasMultipleRounds
+      ? t('seasons.afterRoundMatchDay').replace('{{round}}', String(round)).replace('{{matchDay}}', String(matchDay))
+      : t('seasons.afterMatchDay').replace('{{matchDay}}', String(matchDay));
+  const getStandingsTitle = (base: string) =>
+    standingsFilter ? `${base} – ${getMatchDayLabel(standingsFilter.round, standingsFilter.matchDay)}` : base;
 
   return (
     <div className="space-y-6">
@@ -292,16 +333,45 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
       {view === 'teamStandings' && (
         <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold text-gray-800">{t('seasons.teamStandings')}</h2>
-            <button
-              onClick={() => setShowPrintTeamStandings(true)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold text-sm"
-            >
-              🖨️ {t('common.print')}
-            </button>
+            <h2 className="text-xl font-bold text-gray-800">{getStandingsTitle(t('seasons.teamStandings'))}</h2>
+            <div className="flex items-center gap-2">
+              {completedMatchDayEvents.length > 0 && (
+                <select
+                  value={standingsFilter ? `${standingsFilter.round}-${standingsFilter.matchDay}` : ''}
+                  onChange={(e) => {
+                    if (!e.target.value) {
+                      setStandingsFilter(null);
+                    } else {
+                      const [round, matchDay] = e.target.value.split('-').map(Number);
+                      setStandingsFilter({round, matchDay});
+                    }
+                  }}
+                  className="px-3 py-1 border border-gray-300 rounded-lg text-sm"
+                >
+                  <option value="">{t('seasons.currentStandings')}</option>
+                  {completedMatchDayEvents.map(({round, matchDay}) => (
+                    <option key={`${round}-${matchDay}`} value={`${round}-${matchDay}`}>
+                      {getMatchDayLabel(round, matchDay)}
+                    </option>
+                  ))}
+                </select>
+              )}
+              <button
+                onClick={() => setShowPrintTeamStandings(true)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold text-sm"
+              >
+                🖨️ {t('common.print')}
+              </button>
+            </div>
           </div>
           <div className="overflow-x-auto -mx-4 sm:mx-0">
-            <TeamStandingsTable standings={teamStandings} direction={direction} t={t} previousRanks={previousTeamRanks} lastResults={lastMatchdayTeamResults} />
+            <TeamStandingsTable
+              standings={filteredTeamStandings}
+              direction={direction}
+              t={t}
+              previousRanks={standingsFilter ? new Map() : previousTeamRanks}
+              lastResults={standingsFilter ? new Map() : lastMatchdayTeamResults}
+            />
           </div>
         </div>
       )}
@@ -319,16 +389,46 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="p-4 sm:p-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-gray-800">{t('seasons.playerStandings')} ({playerStats.length} {t('common.players').toLowerCase()})</h2>
-              <button
-                onClick={() => setShowPrintPlayerStandings(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold text-sm"
-              >
-                🖨️ {t('common.print')}
-              </button>
+              <h2 className="text-xl font-bold text-gray-800">{getStandingsTitle(t('seasons.playerStandings'))}</h2>
+              <div className="flex items-center gap-2">
+                {completedMatchDayEvents.length > 0 && (
+                  <select
+                    value={standingsFilter ? `${standingsFilter.round}-${standingsFilter.matchDay}` : ''}
+                    onChange={(e) => {
+                      if (!e.target.value) {
+                        setStandingsFilter(null);
+                      } else {
+                        const [round, matchDay] = e.target.value.split('-').map(Number);
+                        setStandingsFilter({round, matchDay});
+                      }
+                    }}
+                    className="px-3 py-1 border border-gray-300 rounded-lg text-sm"
+                  >
+                    <option value="">{t('seasons.currentStandings')}</option>
+                    {completedMatchDayEvents.map(({round, matchDay}) => (
+                      <option key={`${round}-${matchDay}`} value={`${round}-${matchDay}`}>
+                        {getMatchDayLabel(round, matchDay)}
+                      </option>
+                    ))}
+                  </select>
+                )}
+                <button
+                  onClick={() => setShowPrintPlayerStandings(true)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold text-sm"
+                >
+                  🖨️ {t('common.print')}
+                </button>
+              </div>
             </div>
             <div className="overflow-x-auto -mx-4 sm:mx-0">
-              <PlayerStandingsTable playerStats={playerStats} direction={direction} t={t} previousRanks={previousPlayerRanks} lastMatchdayPins={lastMatchdayPlayerPins} teamCompletedGameCount={teamCompletedGameCount} />
+              <PlayerStandingsTable
+                playerStats={filteredPlayerStats}
+                direction={direction}
+                t={t}
+                previousRanks={standingsFilter ? new Map() : previousPlayerRanks}
+                lastMatchdayPins={standingsFilter ? new Map() : lastMatchdayPlayerPins}
+                teamCompletedGameCount={teamCompletedGameCount}
+              />
             </div>
           </div>
         </div>

@@ -378,6 +378,9 @@ const en: TranslationDictionary = {
     createMissingTeams: 'Create Missing Teams',
     expectedTeamsCount: 'Expected {{expected}} teams, but only {{actual}} found.',
     inheritFromLeagueConfig: 'Inherit from league configurations',
+    currentStandings: 'Current',
+    afterMatchDay: 'After Match Day {{matchDay}}',
+    afterRoundMatchDay: 'After R{{round}} MD{{matchDay}}',
   },
 
   // Team Management
