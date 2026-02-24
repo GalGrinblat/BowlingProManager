@@ -209,6 +209,33 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({
     setImportErrors([]);
   };
 
+  const filteredPlayers = React.useMemo(() => {
+    const term = searchTerm.toLowerCase();
+    return players.filter(p =>
+      p.firstName.toLowerCase().includes(term) ||
+      p.lastName.toLowerCase().includes(term) ||
+      getPlayerDisplayName(p).toLowerCase().includes(term)
+    );
+  }, [players, searchTerm]);
+
+  const sortedPlayers = React.useMemo(
+    () => sortByOption(filteredPlayers, sortOption ?? DEFAULT_SORT_OPTION),
+    [filteredPlayers, sortOption]
+  );
+
+  const activePlayers = React.useMemo(() => sortedPlayers.filter(p => p.active), [sortedPlayers]);
+  const inactivePlayers = React.useMemo(() => sortedPlayers.filter(p => !p.active), [sortedPlayers]);
+
+  React.useEffect(() => {
+    activePagination.resetPage();
+    inactivePagination.resetPage();
+    // activePagination and inactivePagination are stable refs from usePagination
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchTerm]);
+
+  const paginatedActivePlayers = activePagination.paginate(activePlayers);
+  const paginatedInactivePlayers = inactivePagination.paginate(inactivePlayers);
+
   if (isLoadingPlayers) {
     return (
       <div className="space-y-6">
@@ -230,31 +257,6 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({
       </div>
     );
   }
-
-  const filteredPlayers = React.useMemo(() => {
-    const term = searchTerm.toLowerCase();
-    return players.filter(p =>
-      p.firstName.toLowerCase().includes(term) ||
-      p.lastName.toLowerCase().includes(term) ||
-      getPlayerDisplayName(p).toLowerCase().includes(term)
-    );
-  }, [players, searchTerm]);
-
-  const sortedPlayers = React.useMemo(
-    () => sortByOption(filteredPlayers, sortOption ?? DEFAULT_SORT_OPTION),
-    [filteredPlayers, sortOption]
-  );
-
-  React.useEffect(() => {
-    activePagination.resetPage();
-    inactivePagination.resetPage();
-  }, [searchTerm]);
-
-  const activePlayers = React.useMemo(() => sortedPlayers.filter(p => p.active), [sortedPlayers]);
-  const inactivePlayers = React.useMemo(() => sortedPlayers.filter(p => !p.active), [sortedPlayers]);
-
-  const paginatedActivePlayers = activePagination.paginate(activePlayers);
-  const paginatedInactivePlayers = inactivePagination.paginate(inactivePlayers);
 
   return (
     <div className="space-y-6">
