@@ -47,13 +47,11 @@ export const CompletedGameView: React.FC<CompletedGameViewProps> = ({ game, onBa
       {/* Game Summary Table */}
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-3">
-          <h2 className={`text-lg font-bold text-white text-center ${isRTL ? 'flex-row-reverse' : ''}`}>
-            {isRTL ? (
-              <>{game.team2?.name} {team2TotalPoints} 🆚 {team1TotalPoints} {game.team1?.name}</>
-            ) : (
-              <>{game.team1?.name} {team1TotalPoints} 🆚 {team2TotalPoints} {game.team2?.name}</>
-            )}
-          </h2>
+          <div className="flex items-center justify-center gap-3 text-white font-bold text-lg">
+            <span className="text-orange-300">{game.team1?.name}</span>
+            <span>{team1TotalPoints} 🆚 {team2TotalPoints}</span>
+            <span className="text-blue-300">{game.team2?.name}</span>
+          </div>
         </div>
 
         <GameScoreTable game={game} />
