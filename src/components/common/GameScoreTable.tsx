@@ -37,8 +37,8 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
                 <th className={`px-2 py-2 text-xs font-bold text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
                   {t('common.player')}
                 </th>
-                {matches.map((_, idx) => (
-                  <th key={idx} className="px-2 py-2 text-center text-xs font-bold text-gray-700">
+                {matches.map((match, idx) => (
+                  <th key={`match-${match.matchNumber}`} className="px-2 py-2 text-center text-xs font-bold text-gray-700">
                     {t('gameHistory.match')} {idx + 1}
                   </th>
                 ))}
@@ -67,7 +67,7 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
                     <td className={`px-2 py-1.5 text-xs font-semibold text-gray-800 ${isRTL ? 'text-right' : 'text-left'}`}>
                       {playerIdx + 1}. {player.name}
                     </td>
-                    {matches.map((match, matchIdx) => {
+                    {matches.map((match) => {
                       const matchPlayer = match.team1?.players[playerIdx];
                       const pins = matchPlayer?.pins !== '' ? parseInt(matchPlayer?.pins || '0') : 0;
                       const playerMatch = match.playerMatches?.[playerIdx];
@@ -76,7 +76,7 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
                       const hasBonus = (playerMatch?.team1Points || 0) > (result === 'team1' ? 1 : result === 'draw' ? 0.5 : 0);
 
                       return (
-                        <td key={matchIdx} className="px-1 py-1.5 text-center text-xs">
+                        <td key={`match-${match.matchNumber}`} className="px-1 py-1.5 text-center text-xs">
                           <div className="font-semibold">
                             {pins} {hasBonus && '⭐'}
                           </div>
@@ -95,8 +95,8 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
                 <td className={`px-2 py-1.5 text-gray-800 ${isRTL ? 'text-right' : 'text-left'}`}>
                   {t('gameHistory.teamTotal')}
                 </td>
-                {matches.map((match, idx) => (
-                  <td key={idx} className="px-1 py-1.5 text-center text-orange-700">
+                {matches.map((match) => (
+                  <td key={`match-${match.matchNumber}`} className="px-1 py-1.5 text-center text-orange-700">
                     {match.team1?.totalPins || 0}
                   </td>
                 ))}
@@ -111,10 +111,10 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
                 <td className={`px-2 py-1.5 text-gray-600 ${isRTL ? 'text-right' : 'text-left'}`}>
                   {t('gameHistory.hdc')}
                 </td>
-                {matches.map((match, idx) => {
+                {matches.map((match) => {
                   const hdc = (match.team1?.totalWithHandicap || 0) - (match.team1?.totalPins || 0);
                   return (
-                    <td key={idx} className="px-1 py-1.5 text-center text-orange-500">
+                    <td key={`match-${match.matchNumber}`} className="px-1 py-1.5 text-center text-orange-500">
                       {hdc > 0 ? `+${hdc}` : hdc}
                     </td>
                   );
@@ -132,12 +132,12 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
                 <td className={`px-2 py-1.5 text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
                   {t('gameHistory.withHandicap')}
                 </td>
-                {matches.map((match, idx) => {
+                {matches.map((match) => {
                   const team1Total = match.team1?.totalWithHandicap || 0;
                   const team2Total = match.team2?.totalWithHandicap || 0;
                   const resultIcon = team1Total > team2Total ? '✅' : team1Total === team2Total ? '⚖️' : '❌';
                   return (
-                    <td key={idx} className="px-1 py-1.5 text-center text-orange-600">
+                    <td key={`match-${match.matchNumber}`} className="px-1 py-1.5 text-center text-orange-600">
                       <div>{team1Total}</div>
                       <div className="text-[10px]">{resultIcon}</div>
                     </td>
@@ -166,8 +166,8 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
                 <th className={`px-2 py-2 text-xs font-bold text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
                   {t('common.player')}
                 </th>
-                {matches.map((_, idx) => (
-                  <th key={idx} className="px-2 py-2 text-center text-xs font-bold text-gray-700">
+                {matches.map((match, idx) => (
+                  <th key={`match-${match.matchNumber}`} className="px-2 py-2 text-center text-xs font-bold text-gray-700">
                     {t('gameHistory.match')} {idx + 1}
                   </th>
                 ))}
@@ -196,7 +196,7 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
                     <td className={`px-2 py-1.5 text-xs font-semibold text-gray-800 ${isRTL ? 'text-right' : 'text-left'}`}>
                       {playerIdx + 1}. {player.name}
                     </td>
-                    {matches.map((match, matchIdx) => {
+                    {matches.map((match) => {
                       const matchPlayer = match.team2?.players[playerIdx];
                       const pins = matchPlayer?.pins !== '' ? parseInt(matchPlayer?.pins || '0') : 0;
                       const playerMatch = match.playerMatches?.[playerIdx];
@@ -205,7 +205,7 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
                       const hasBonus = (playerMatch?.team2Points || 0) > (result === 'team2' ? 1 : result === 'draw' ? 0.5 : 0);
 
                       return (
-                        <td key={matchIdx} className="px-1 py-1.5 text-center text-xs">
+                        <td key={`match-${match.matchNumber}`} className="px-1 py-1.5 text-center text-xs">
                           <div className="font-semibold">
                             {pins} {hasBonus && '⭐'}
                           </div>
@@ -224,8 +224,8 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
                 <td className={`px-2 py-1.5 text-gray-800 ${isRTL ? 'text-right' : 'text-left'}`}>
                   {t('gameHistory.teamTotal')}
                 </td>
-                {matches.map((match, idx) => (
-                  <td key={idx} className="px-1 py-1.5 text-center text-blue-700">
+                {matches.map((match) => (
+                  <td key={`match-${match.matchNumber}`} className="px-1 py-1.5 text-center text-blue-700">
                     {match.team2?.totalPins || 0}
                   </td>
                 ))}
@@ -240,10 +240,10 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
                 <td className={`px-2 py-1.5 text-gray-600 ${isRTL ? 'text-right' : 'text-left'}`}>
                   {t('gameHistory.hdc')}
                 </td>
-                {matches.map((match, idx) => {
+                {matches.map((match) => {
                   const hdc = (match.team2?.totalWithHandicap || 0) - (match.team2?.totalPins || 0);
                   return (
-                    <td key={idx} className="px-1 py-1.5 text-center text-blue-500">
+                    <td key={`match-${match.matchNumber}`} className="px-1 py-1.5 text-center text-blue-500">
                       {hdc > 0 ? `+${hdc}` : hdc}
                     </td>
                   );
@@ -261,12 +261,12 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
                 <td className={`px-2 py-1.5 text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
                   {t('gameHistory.withHandicap')}
                 </td>
-                {matches.map((match, idx) => {
+                {matches.map((match) => {
                   const team1Total = match.team1?.totalWithHandicap || 0;
                   const team2Total = match.team2?.totalWithHandicap || 0;
                   const resultIcon = team2Total > team1Total ? '✅' : team2Total === team1Total ? '⚖️' : '❌';
                   return (
-                    <td key={idx} className="px-1 py-1.5 text-center text-blue-600">
+                    <td key={`match-${match.matchNumber}`} className="px-1 py-1.5 text-center text-blue-600">
                       <div>{team2Total}</div>
                       <div className="text-[10px]">{resultIcon}</div>
                     </td>

@@ -30,7 +30,7 @@ export const ScoreSheet: React.FC<ScoreSheetProps> = ({ teamName, players, match
           <tr className="bg-gray-200">
             <th className="border border-gray-800 px-2 py-2 text-sm font-bold">{t('print.match')}</th>
             {Array.from({ length: matchesPerGame }, (_, i) => (
-              <th key={i} className="border border-gray-800 px-2 py-2 text-sm font-bold">{i + 1}</th>
+              <th key={i + 1} className="border border-gray-800 px-2 py-2 text-sm font-bold">{i + 1}</th>
             ))}
             <th className="border border-gray-800 px-2 py-2 text-sm font-bold bg-gray-300">{t('common.total')}</th>
           </tr>
@@ -42,7 +42,7 @@ export const ScoreSheet: React.FC<ScoreSheetProps> = ({ teamName, players, match
                 {idx + 1}. {player.name.split(' ')[0]}
               </td>
               {Array.from({ length: matchesPerGame }, (_, i) => (
-                <td key={i} className="border border-gray-800 px-2 py-6"></td>
+                <td key={i + 1} className="border border-gray-800 px-2 py-6"></td>
               ))}
               <td className="border border-gray-800 px-2 py-6 bg-gray-100"></td>
             </tr>

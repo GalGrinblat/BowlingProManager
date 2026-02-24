@@ -248,8 +248,8 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
             {teams
               .flatMap((t: Team) => (t.rosterChanges || []).map((c: RosterChange) => ({ ...c, teamName: t.name })))
               .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-              .map((change, idx) => (
-                <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              .map((change) => (
+                <div key={`${change.date}-${change.oldPlayerId}-${change.position}`} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center gap-4">
                     <span className="text-2xl">🔄</span>
                     <div>
