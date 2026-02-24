@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { playersApi, leaguesApi } from '../../../services/api';
 import { useTranslation } from '../../../contexts/LanguageContext';
-import type { SeasonCreatorProps, LineupStrategy, LineupRule, League, CurrentPlayerAverages, Player } from '../../../types/index';
+import { useAdminData } from '../../../contexts/AdminDataContext';
+import type { LineupStrategy, LineupRule, League, CurrentPlayerAverages, Player } from '../../../types/index';
 import {
   DEFAULT_HANDICAP_BASIS, DEFAULT_HANDICAP_PERCENTAGE, DEFAULT_NUMBER_OF_TEAMS,
   DEFAULT_NUMBER_OF_ROUNDS, DEFAULT_PLAYERS_PER_TEAM, DEFAULT_MATCHES_PER_GAME,
@@ -20,7 +22,10 @@ type SimpleTeam = {
 
 type SimplePlayer = Pick<Player, 'id' | 'firstName' | 'middleName' | 'lastName'>;
 
-export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, onSuccess, onRefreshData }) => {
+export const SeasonCreator: React.FC = () => {
+  const navigate = useNavigate();
+  const { leagueId } = useParams<{ leagueId: string }>();
+  const { loadDashboardData } = useAdminData();
   const { t } = useTranslation();
   const [step, setStep] = useState(1);
   const [league, setLeague] = useState<League | null>(null);
@@ -51,7 +56,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
 
   useEffect(() => {
     const fetchData = async () => {
-      const leagueData = await leaguesApi.getById(leagueId);
+      const leagueData = await leaguesApi.getById(leagueId!);
       setLeague(leagueData ?? null);
       const cfg = leagueData?.defaultSeasonConfigurations;
       setFormData(prev => ({
@@ -76,7 +81,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
       setAvailablePlayers(players);
     };
     fetchData();
-  }, [leagueId]);
+  }, [leagueId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Team assignment handlers
   const handleTeamNameChange = (teamIndex: number, name: string) => {
@@ -117,7 +122,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
     const today = new Date().toISOString();
     const leagueCfg = league?.defaultSeasonConfigurations;
     const seasonData = {
-      leagueId,
+      leagueId: leagueId!,
       name: formData.name,
       startDate: today,
       endDate: today,
@@ -191,8 +196,8 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
       }
 
       await seasonsApi.update(created.id, { schedule });
-      await onRefreshData?.();
-      if (typeof onSuccess === 'function') onSuccess(created.id);
+      await loadDashboardData();
+      navigate(`/admin/seasons/${created.id}`);
     } catch {
       alert(t('validation.saveError'));
     }
@@ -219,7 +224,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
           setTeams(newTeams);
           setStep(2);
         }}
-        onBack={onBack}
+        onBack={() => navigate(`/admin/leagues/${leagueId}`)}
       />
     );
   }
@@ -248,7 +253,7 @@ export const SeasonCreator: React.FC<SeasonCreatorProps> = ({ leagueId, onBack, 
       onPlayerAveragesChange={setPlayerAverages}
       onSubmit={handleFinalSubmit}
       onBack={() => setStep(2)}
-      onCancel={onBack}
+      onCancel={() => navigate(`/admin/leagues/${leagueId}`)}
     />
   );
 };

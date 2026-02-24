@@ -1,13 +1,18 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { playersApi, leaguesApi, seasonsApi, teamsApi, gamesApi } from '../../services/api';
 import { logger } from '../../utils/logger';
 import { useTranslation } from '../../contexts/LanguageContext';
 import { useDateFormat } from '../../hooks/useDateFormat';
 import { getPlayerDisplayName } from '../../utils/playerUtils';
+import { useAuth } from '../../contexts/AuthContext';
 
-import type { Game, GameMatch, League, Player, PlayerDashboardProps, PlayerStats, Season, Team } from '../../types/index';
+import type { Game, GameMatch, League, Player, PlayerStats, Season, Team } from '../../types/index';
 
-export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNavigate }) => {
+export const PlayerDashboard: React.FC = () => {
+  const navigate = useNavigate();
+  const { playerData } = useAuth();
+  const playerId = playerData?.id ?? '';
   const { t } = useTranslation();
   const { formatDate } = useDateFormat();
   const [player, setPlayer] = useState<Player | null>(null);
@@ -256,7 +261,7 @@ export const PlayerDashboard: React.FC<PlayerDashboardProps> = ({ playerId, onNa
                     <div
                       key={game.id}
                       className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
-                      onClick={() => onNavigate('player-game-history', { gameId: game.id, gameData: game })}
+                      onClick={() => navigate(`/player/games/${game.id}`, { state: { game } })}
                     >
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">

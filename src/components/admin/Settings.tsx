@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { organizationApi, utilApi } from '../../services/api';
 import { useTranslation } from '../../contexts/LanguageContext';
 import { useDateFormat } from '../../hooks/useDateFormat';
+import { useAdminData } from '../../contexts/AdminDataContext';
 
-import type { SettingsProps, Organization } from '../../types/index';
+import type { Organization } from '../../types/index';
 
-export const Settings: React.FC<SettingsProps> = ({ onBack, onRefreshData }) => {
+export const Settings: React.FC = () => {
+  const navigate = useNavigate();
+  const { loadDashboardData } = useAdminData();
   const { t, setLanguage } = useTranslation();
   const { formatDate } = useDateFormat();
   const [organization, setOrganization] = useState<Organization | null>(null);
@@ -39,7 +43,7 @@ export const Settings: React.FC<SettingsProps> = ({ onBack, onRefreshData }) => 
     setLanguage(formData.language); // Update context
     setIsEditing(false);
     await loadOrganization();
-    await onRefreshData?.();
+    await loadDashboardData();
 
     // Dispatch custom event to notify other components
     window.dispatchEvent(new Event('languageChanged'));
@@ -57,7 +61,7 @@ export const Settings: React.FC<SettingsProps> = ({ onBack, onRefreshData }) => 
             <p className="text-gray-600">{t('settings.organizationSettings')}</p>
           </div>
           <button
-            onClick={onBack}
+            onClick={() => navigate('/admin')}
             className="text-gray-600 hover:text-gray-800"
           >
             {t('common.leftArrow')} {t('players.backToDashboard')}

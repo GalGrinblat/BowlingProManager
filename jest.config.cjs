@@ -7,6 +7,7 @@ module.exports = {
   transform: {
     '^.+\\.(ts|tsx)$': 'ts-jest',
   },
+  setupFiles: ['<rootDir>/tests/setup.ts'],
   setupFilesAfterEnv: ['@testing-library/jest-dom'],
   testMatch: [
     '**/?(*.)+(test).[jt]s?(x)'

@@ -1,3 +1,4 @@
+import React from 'react';
 
 // Deep mock for supabase and import.meta.env
 jest.mock('../../../src/lib/supabase', () => {
@@ -14,6 +15,24 @@ jest.mock('../../../src/lib/supabase', () => {
     },
   };
 });
+
+jest.mock('react-router-dom', () => ({
+  useNavigate: () => jest.fn(),
+}));
+
+jest.mock('../../../src/contexts/AdminDataContext', () => ({
+  useAdminData: () => ({
+    loadDashboardData: jest.fn(),
+    players: [],
+    isLoadingPlayers: false,
+    loadPlayers: jest.fn(),
+    org: null,
+    leagues: [],
+    seasonsMap: {},
+    gamesMap: {},
+    isLoadingData: false,
+  }),
+}));
 
 // Mock import.meta.env for VITE_SUPABASE_URL/ANON_KEY
 Object.defineProperty(global, 'import', {
@@ -47,7 +66,7 @@ describe('LeagueManagement', () => {
   it('renders league management form', () => {
     render(
       <LanguageProvider>
-        <LeagueManagement onBack={() => {}} onViewLeague={() => {}} />
+        <LeagueManagement />
       </LanguageProvider>
     );
     // TODO: Add assertions for league management form

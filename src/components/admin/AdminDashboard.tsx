@@ -1,19 +1,16 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../../contexts/LanguageContext';
 import { useDateFormat } from '../../hooks/useDateFormat';
+import { useAdminData } from '../../contexts/AdminDataContext';
 
-import type { AdminDashboardProps, ScheduleMatchDay } from '../../types/index';
+import type { ScheduleMatchDay } from '../../types/index';
 
-export const AdminDashboard: React.FC<AdminDashboardProps> = ({
-  onNavigate,
-  org,
-  leagues,
-  seasonsMap,
-  gamesMap,
-  isLoadingData,
-}) => {
+export const AdminDashboard: React.FC = () => {
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const { formatMatchDate } = useDateFormat();
+  const { org, leagues, seasonsMap, gamesMap, isLoadingData } = useAdminData();
   const activeLeagues = leagues.filter(l => l.active);
 
   if (isLoadingData) {
@@ -42,7 +39,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* Quick Actions */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <button
-          onClick={() => onNavigate('players')}
+          onClick={() => navigate('/admin/players')}
           className="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all touch-manipulation"
         >
           <div className="text-4xl mb-2">👥</div>
@@ -51,7 +48,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </button>
 
         <button
-          onClick={() => onNavigate('leagues')}
+          onClick={() => navigate('/admin/leagues')}
           className="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all touch-manipulation"
         >
           <div className="text-4xl mb-2">🏆</div>
@@ -60,7 +57,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </button>
 
         <button
-          onClick={() => onNavigate('users')}
+          onClick={() => navigate('/admin/users')}
           className="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all touch-manipulation"
         >
           <div className="text-4xl mb-2">🔐</div>
@@ -69,7 +66,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </button>
 
         <button
-          onClick={() => onNavigate('settings')}
+          onClick={() => navigate('/admin/settings')}
           className="bg-gradient-to-br from-green-500 to-green-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all touch-manipulation"
         >
           <div className="text-4xl mb-2">⚙️</div>
@@ -85,7 +82,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <div className="text-center py-8 text-gray-500">
             <p>{t('dashboard.noActiveLeagues')}</p>
             <button
-              onClick={() => onNavigate('leagues')}
+              onClick={() => navigate('/admin/leagues')}
               className="mt-4 text-blue-600 hover:text-blue-700 font-semibold"
             >
               {t('dashboard.createFirstLeague')}
@@ -97,31 +94,26 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               const seasons = seasonsMap[league.id] || [];
               const activeSeason = seasons.find(s => s.status === 'active');
 
-              // Find next matchday date
               let nextMatchDay = null;
               if (activeSeason && activeSeason.schedule) {
                 const games = gamesMap[activeSeason.id] || [];
-
-                // Find the next incomplete match day
                 const incompleteMatchDays = activeSeason.schedule.filter((day: ScheduleMatchDay) => {
                   const dayGames = games.filter(g => g.matchDay === day.matchDay);
                   const hasIncomplete = dayGames.some(g => g.status !== 'completed');
                   const dayDate = day.date ? new Date(day.date) : null;
                   return hasIncomplete && dayDate;
                 });
-
-                // Sort by date and get the next one
                 if (incompleteMatchDays.length > 0) {
                   incompleteMatchDays.sort((a: ScheduleMatchDay, b: ScheduleMatchDay) => new Date(a.date || '').getTime() - new Date(b.date || '').getTime());
                   nextMatchDay = incompleteMatchDays[0];
                 }
               }
-              
+
               return (
                 <div
                   key={league.id}
                   className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors cursor-pointer"
-                  onClick={() => onNavigate('league-detail', { leagueId: league.id })}
+                  onClick={() => navigate(`/admin/leagues/${league.id}`)}
                 >
                   <div className="flex justify-between items-start">
                     <div>

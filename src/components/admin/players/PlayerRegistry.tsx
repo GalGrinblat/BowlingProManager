@@ -11,20 +11,19 @@ import {
   booleanConverter
 } from '../../../utils/importExportUtils';
 import { getPlayerDisplayName } from '../../../utils/playerUtils';
-import type { Player, PlayerRegistryProps } from '../../../types/index';
+import type { Player } from '../../../types/index';
 import { PLAYER_SORT_OPTIONS } from '../../../constants/sortOptions';
 import { sortByOption, SortOption } from '../../../utils/sortUtils';
 import { PlayerForm } from './PlayerForm';
 import { ImportPreviewModal } from './ImportPreviewModal';
+import { useNavigate } from 'react-router-dom';
+import { useAdminData } from '../../../contexts/AdminDataContext';
 
 const DEFAULT_SORT_OPTION: SortOption<Player> = { key: 'lastName', labelKey: 'sort.lastNameAsc', direction: 'asc' };
 
-export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({
-  onBack,
-  players,
-  isLoadingPlayers,
-  onRefreshPlayers
-}) => {
+export const PlayerRegistry: React.FC = () => {
+  const navigate = useNavigate();
+  const { players, isLoadingPlayers, loadPlayers } = useAdminData();
   const { t } = useTranslation();
   const [isAdding, setIsAdding] = React.useState(false);
   const [editingId, setEditingId] = React.useState<string | null>(null);
@@ -77,7 +76,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({
 
     setFormData({ firstName: '', middleName: '', lastName: '', active: true });
     setIsAdding(false);
-    await onRefreshPlayers();
+    await loadPlayers();
   };
 
   const handleEdit = (player: Player) => {
@@ -113,7 +112,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({
     if (confirm(`⚠️ ${t('players.deleteConfirm')} "${playerDisplayName}"?\n\n${t('common.deleteWarning')}`)) {
       await playersApi.delete(id);
       alert(`✅ "${playerDisplayName}" ${t('players.deleted')}`);
-      await onRefreshPlayers();
+      await loadPlayers();
     }
   };
 
@@ -190,7 +189,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({
     setShowImportModal(false);
     setImportData([]);
     setImportErrors([]);
-    await onRefreshPlayers();
+    await loadPlayers();
 
     let message = `✅ ${t('players.importComplete')}\n\n`;
     message += `• ${successCount} ${t('players.playersImported')}\n`;
@@ -245,7 +244,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({
               <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('players.title')}</h1>
               <p className="text-gray-600">Loading players...</p>
             </div>
-            <button onClick={onBack} className="text-gray-600 hover:text-gray-800">
+            <button onClick={() => navigate('/admin')} className="text-gray-600 hover:text-gray-800">
               {t('common.leftArrow')} {t('players.backToDashboard')}
             </button>
           </div>
@@ -267,7 +266,7 @@ export const PlayerRegistry: React.FC<PlayerRegistryProps> = ({
             <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('players.title')}</h1>
             <p className="text-gray-600">{t('players.totalPlayers').replace('{{count}}', String(players.length))}</p>
           </div>
-          <button onClick={onBack} className="text-gray-600 hover:text-gray-800">
+          <button onClick={() => navigate('/admin')} className="text-gray-600 hover:text-gray-800">
             {t('common.leftArrow')} {t('players.backToDashboard')}
           </button>
         </div>

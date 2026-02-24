@@ -9,7 +9,9 @@ import { PointsConfiguration } from '../shared/PointsConfiguration';
 import { GeneralConfiguration } from '../shared/GeneralConfiguration';
 import { BonusRulesConfiguration } from '../shared/BonusRulesConfiguration';
 
-import type { League, LeagueManagementProps, SeasonConfigurations, LineupStrategy, LineupRule } from '../../../types/index';
+import { useNavigate } from 'react-router-dom';
+import { useAdminData } from '../../../contexts/AdminDataContext';
+import type { League, SeasonConfigurations, LineupStrategy, LineupRule } from '../../../types/index';
 
 function getDefaultSeasonConfigurations(): SeasonConfigurations {
   return {
@@ -41,7 +43,9 @@ function getDefaultFormData() {
   };
 }
 
-export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onViewLeague, onRefreshData }) => {
+export const LeagueManagement: React.FC = () => {
+  const navigate = useNavigate();
+  const { loadDashboardData } = useAdminData();
   const { t } = useTranslation();
   const [leagues, setLeagues] = useState<League[]>([]);
   const [seasonsMap, setSeasonsMap] = useState<Record<string, any[]>>({});
@@ -120,7 +124,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
     setFormData(getDefaultFormData());
     setIsAdding(false);
     await loadLeagues();
-    await onRefreshData?.();
+    await loadDashboardData();
   };
 
   const handleEdit = (league: League) => {
@@ -173,7 +177,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
     if (confirm(`${t('leagues.deleteConfirm')} "${league?.name}"?\n\n${t('common.deleteWarning')}`)) {
       await leaguesApi.delete(id);
       await loadLeagues();
-      await onRefreshData?.();
+      await loadDashboardData();
       alert(t('leagues.leagueDeleted'));
     }
   };
@@ -185,7 +189,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
         await leaguesApi.update(league.id, { active: false });
         alert(`✅ "${league.name}" ${t('leagues.archived')}`);
         await loadLeagues();
-        await onRefreshData?.();
+        await loadDashboardData();
       }
     } else {
       // Restoring an archived league
@@ -193,7 +197,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
         await leaguesApi.update(league.id, { active: true });
         alert(`✅ "${league.name}" ${t('leagues.restored')}`);
         await loadLeagues();
-        await onRefreshData?.();
+        await loadDashboardData();
       }
     }
   };
@@ -217,7 +221,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
             <p className="text-gray-600">{t('leagues.totalLeagues').replace('{{count}}', String(leagues.length))}</p>
           </div>
           <button
-            onClick={onBack}
+            onClick={() => navigate('/admin')}
             className="text-gray-600 hover:text-gray-800"
           >
             {t('common.leftArrow')} {t('players.backToDashboard')}
@@ -389,7 +393,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                     </div>
                     <div className="flex gap-2 ml-4">
                       <button
-                        onClick={() => onViewLeague(league.id)}
+                        onClick={() => navigate(`/admin/leagues/${league.id}`)}
                         className="px-3 py-1 text-sm bg-purple-100 text-purple-700 rounded hover:bg-purple-200"
                       >
                         {t('common.view')}
@@ -454,7 +458,7 @@ export const LeagueManagement: React.FC<LeagueManagementProps> = ({ onBack, onVi
                     </div>
                     <div className="flex gap-2">
                       <button
-                        onClick={() => onViewLeague(league.id)}
+                        onClick={() => navigate(`/admin/leagues/${league.id}`)}
                         className="px-3 py-1 text-sm bg-purple-100 text-purple-700 rounded hover:bg-purple-200"
                       >
                         {t('common.view')}

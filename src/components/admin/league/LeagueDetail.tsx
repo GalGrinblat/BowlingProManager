@@ -1,13 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { leaguesApi, seasonsApi, teamsApi, gamesApi } from '../../../services/api';
 import { calculateTeamStandings } from '../../../utils/standingsUtils';
 import { useTranslation } from '../../../contexts/LanguageContext';
 import { useDateFormat } from '../../../hooks/useDateFormat';
 import { exportLeague, downloadExportFile, readImportFile, importLeagueOrSeason } from '../../../utils/leagueImportExportUtils';
+import { useAdminData } from '../../../contexts/AdminDataContext';
 
-import type { LeagueDetailProps, League, Season, Team } from '../../../types/index';
+import type { League, Season, Team } from '../../../types/index';
 
-export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, onViewSeason, onCreateSeason, onRefreshData }) => {
+export const LeagueDetail: React.FC = () => {
+  const navigate = useNavigate();
+  const { leagueId } = useParams<{ leagueId: string }>();
+  const { loadDashboardData } = useAdminData();
   const { t } = useTranslation();
   const { formatDate } = useDateFormat();
   const [league, setLeague] = useState<League | null>(null);
@@ -18,12 +23,12 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const loadLeagueData = async () => {
-    const leagueData = await leaguesApi.getById(leagueId);
+    const leagueData = await leaguesApi.getById(leagueId!);
     if (!leagueData) {
       return;
     }
     setLeague(leagueData);
-    const seasonsData = await seasonsApi.getByLeague(leagueId);
+    const seasonsData = await seasonsApi.getByLeague(leagueId!);
     setSeasons(seasonsData.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
 
     // Preload data for completed seasons
@@ -55,7 +60,7 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
   const completedSeasons = seasons.filter(s => s.status === 'completed');
 
   const handleExportLeague = async () => {
-    const exportData = await exportLeague(leagueId);
+    const exportData = await exportLeague(leagueId!);
     if (exportData) {
       const filename = `${league?.name.replace(/[^a-z0-9]/gi, '_')}_${new Date().toISOString().split('T')[0]}.json`;
       downloadExportFile(exportData, filename);
@@ -77,7 +82,7 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
 
       if (result.success) {
         alert(t('leagues.importSuccess'));
-        await onRefreshData?.();
+        await loadDashboardData();
         await loadLeagueData();
       } else {
         alert(`${t('leagues.importError')}: ${result.error}`);
@@ -97,7 +102,7 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
       <div className="bg-white rounded-lg shadow-md p-6">
         <div className="flex items-center gap-4 mb-6">
           <button
-            onClick={onBack}
+            onClick={() => navigate('/admin/leagues')}
             className="text-gray-600 hover:text-gray-800"
           >
             {t('common.leftArrow')} {t('leagues.backToLeagues')}
@@ -123,14 +128,14 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
           </div>
           <div className="flex flex-col items-end gap-2">
             <button
-              onClick={onBack}
+              onClick={() => navigate('/admin/leagues')}
               className="text-gray-600 hover:text-gray-800"
             >
               {t('common.leftArrow')} {t('leagues.backToLeagues')}
             </button>
             <div className="flex gap-2">
               <button
-                onClick={() => onCreateSeason(leagueId)}
+                onClick={() => navigate(`/admin/leagues/${leagueId}/seasons/new`)}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
               >
                 + {t('seasons.createSeason')}
@@ -181,7 +186,7 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
               </div>
             </div>
             <button
-              onClick={() => onViewSeason(activeSeason.id)}
+              onClick={() => navigate(`/admin/seasons/${activeSeason.id}`)}
               className="px-4 py-2 bg-white text-green-600 rounded-lg hover:bg-green-50 font-semibold"
             >
               {t('seasons.viewSeason')} {t('common.rightArrow')}
@@ -206,7 +211,7 @@ export const LeagueDetail: React.FC<LeagueDetailProps> = ({ leagueId, onBack, on
                 <div
                   key={season.id}
                   className="border border-gray-200 rounded-lg p-4 hover:border-purple-300 transition-colors cursor-pointer"
-                  onClick={() => onViewSeason(season.id)}
+                  onClick={() => navigate(`/admin/seasons/${season.id}`)}
                 >
                   <div className="flex justify-between items-start">
                     <div className="flex-1">

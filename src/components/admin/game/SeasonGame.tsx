@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { gamesApi } from '../../../services/api';
 import { logger } from '../../../utils/logger';
 import { MatchView } from './MatchView';
@@ -10,9 +11,11 @@ import { PreMatchSetup } from './PreMatchSetup';
 import { useGameInitializer } from '../../../hooks/useGameInitializer';
 import { useTranslation } from '../../../contexts/LanguageContext';
 
-import type { SeasonGameProps, Game, GamePlayer, GameMatch, MatchPlayer } from '../../../types/index';
+import type { Game, GamePlayer, GameMatch, MatchPlayer } from '../../../types/index';
 
-export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
+export const SeasonGame: React.FC = () => {
+  const navigate = useNavigate();
+  const { gameId } = useParams<{ gameId: string }>();
   const { t } = useTranslation();
   const {
     game, setGame,
@@ -21,7 +24,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
     showPreMatch, setShowPreMatch,
     team1Players, setTeam1Players,
     team2Players, setTeam2Players,
-  } = useGameInitializer(gameId);
+  } = useGameInitializer(gameId!);
 
   const handlePreMatchContinue = async () => {
     if (!game || !game.team1 || !game.team2) return;
@@ -53,7 +56,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
       completedAt: game.completedAt,
       updatedAt: game.updatedAt,
     };
-    await gamesApi.update(gameId, updatedGame);
+    await gamesApi.update(gameId!, updatedGame);
     setGame(updatedGame);
     setShowPreMatch(false);
     setCurrentMatch(1);
@@ -137,7 +140,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
     const previous = game;
     setGame(updated);
     try {
-      await gamesApi.update(gameId, updated);
+      await gamesApi.update(gameId!, updated);
     } catch (error) {
       logger.error('Failed to save score update:', error);
       setGame(previous);
@@ -155,7 +158,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
     }
     setGame(updated);
     try {
-      await gamesApi.update(gameId, updated);
+      await gamesApi.update(gameId!, updated);
     } catch (error) {
       logger.error('Failed to save absent toggle:', error);
       setGame(previous);
@@ -205,14 +208,14 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
       if (!hasAnyScores && game.status !== 'pending') {
         try {
           const updated: Game = { ...game, status: 'pending' };
-          await gamesApi.update(gameId, updated);
+          await gamesApi.update(gameId!, updated);
           setGame(updated);
         } catch (error) {
           logger.error('Failed to reset game status to pending:', error);
         }
       }
     }
-    onBack();
+    navigate(-1);
   };
 
   const finishGame = async () => {
@@ -237,8 +240,8 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
       team1: game.team1,
       team2: game.team2,
     };
-    await gamesApi.update(gameId, updated);
-    onBack();
+    await gamesApi.update(gameId!, updated);
+    navigate(-1);
   };
 
   if (!game) return <div>{t('common.loading')}</div>;
@@ -266,7 +269,7 @@ export const SeasonGame: React.FC<SeasonGameProps> = ({ gameId, onBack }) => {
         onToggleAbsent={toggleAbsent}
         onMovePlayer={movePlayer}
         onContinue={handlePreMatchContinue}
-        onBack={onBack}
+        onBack={() => navigate(-1)}
       />
     );
   }

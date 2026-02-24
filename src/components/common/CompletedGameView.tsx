@@ -1,11 +1,27 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
+import { gamesApi } from '../../services/api';
 import { useTranslation } from '../../contexts/LanguageContext';
 import { useDateFormat } from '../../hooks/useDateFormat';
 import { GameScoreTable } from './GameScoreTable';
-import type { CompletedGameViewProps, GameMatch } from '../../types/index';
+import type { Game, GameMatch } from '../../types/index';
 
-export const CompletedGameView: React.FC<CompletedGameViewProps> = ({ game, onBack }) => {
+export const CompletedGameView: React.FC = () => {
+  const navigate = useNavigate();
+  const { gameId } = useParams<{ gameId: string }>();
+  const location = useLocation();
   const { t, direction, isRTL } = useTranslation();
   const { formatDate } = useDateFormat();
+  const [game, setGame] = useState<Game | undefined>(location.state?.game);
+
+  useEffect(() => {
+    if (!game && gameId) {
+      gamesApi.getById(gameId).then(data => {
+        if (data) setGame(data);
+      });
+    }
+  }, [gameId, game]);
+
   if (!game) return <div>{t('common.loading')}</div>;
 
   const matches = game.matches ?? [];
@@ -27,7 +43,7 @@ export const CompletedGameView: React.FC<CompletedGameViewProps> = ({ game, onBa
             </p>
           </div>
           <button
-            onClick={onBack}
+            onClick={() => navigate(-1)}
             className="text-gray-600 hover:text-gray-800"
           >
             {isRTL ? t('common.rightArrow') : t('common.leftArrow')} {t('common.back')}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { usersApi, playersApi, allowedEmailsApi, type DatabaseUser, type AllowedEmail } from '../../services/api';
 import type { Player } from '../../types/index';
 import { useTranslation } from '../../contexts/LanguageContext';
@@ -6,11 +7,8 @@ import { useDateFormat } from '../../hooks/useDateFormat';
 import { logger } from '../../utils/logger';
 import { getPlayerDisplayName } from '../../utils/playerUtils';
 
-interface UserManagementProps {
-  onBack: () => void;
-}
-
-export const UserManagement: React.FC<UserManagementProps> = ({ onBack }) => {
+export const UserManagement: React.FC = () => {
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const { formatDate } = useDateFormat();
   const [users, setUsers] = useState<DatabaseUser[]>([]);
@@ -146,7 +144,7 @@ export const UserManagement: React.FC<UserManagementProps> = ({ onBack }) => {
             <p className="text-gray-600">{t('userManagement.subtitle')}</p>
           </div>
           <button
-            onClick={onBack}
+            onClick={() => navigate('/admin')}
             className="text-gray-600 hover:text-gray-800"
           >
             {t('common.leftArrow')} {t('userManagement.backToDashboard')}

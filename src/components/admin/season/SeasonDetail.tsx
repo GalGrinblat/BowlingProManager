@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { seasonsApi, teamsApi, gamesApi, leaguesApi } from '../../../services/api';
 import { calculateTeamStandings, calculatePlayerSeasonStats } from '../../../utils/standingsUtils';
 import type { GameMatch } from '../../../types/index';
@@ -21,10 +22,11 @@ import { HeadToHeadView } from './HeadToHeadView';
 import { SeasonRecordsView } from './SeasonRecordsView';
 import { PostponeModal } from './PostponeModal';
 
-import type { SeasonDetailProps } from '../../../types/index';
 import type { Season, League, Team, Game } from '../../../types/index';
 
-export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, onPlayGame, onViewGame, onManageTeams }) => {
+export const SeasonDetail: React.FC = () => {
+  const navigate = useNavigate();
+  const { seasonId } = useParams<{ seasonId: string }>();
   const { t, direction } = useTranslation();
   const [season, setSeason] = useState<Season | null>(null);
   const [league, setLeague] = useState<League | null>(null);
@@ -42,16 +44,16 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
   const [postponeWeeks, setPostponeWeeks] = useState(1);
 
   const loadSeasonData = async () => {
-    const seasonData = await seasonsApi.getById(seasonId);
+    const seasonData = await seasonsApi.getById(seasonId!);
     setSeason(seasonData ?? null);
     if (!seasonData) return;
     const leagueData = await leaguesApi.getById(seasonData.leagueId);
     setLeague(leagueData ?? null);
 
-    const teamsData = await teamsApi.getBySeason(seasonId);
+    const teamsData = await teamsApi.getBySeason(seasonId!);
     setTeams(teamsData);
 
-    const gamesData = await gamesApi.getBySeason(seasonId);
+    const gamesData = await gamesApi.getBySeason(seasonId!);
     setGames(gamesData);
 
     if (gamesData.length > 0) {
@@ -86,7 +88,7 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
       return;
     }
     if (confirm(t('seasons.confirmComplete'))) {
-      await seasonsApi.update(seasonId, { status: 'completed' });
+      await seasonsApi.update(seasonId!, { status: 'completed' });
       await loadSeasonData();
     }
   };
@@ -103,7 +105,7 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
     }
     if (confirm(t('seasons.confirmPostpone').replace('{{matchDay}}', String(selectedMatchDay)).replace('{{weeks}}', String(postponeWeeks)))) {
       const updatedSchedule = postponeMatchDay(season?.schedule ?? [], selectedMatchDay ?? 1, postponeWeeks, league?.dayOfWeek ?? '');
-      await seasonsApi.update(seasonId, { schedule: updatedSchedule });
+      await seasonsApi.update(seasonId!, { schedule: updatedSchedule });
       for (const daySchedule of updatedSchedule) {
         const gamesToUpdate = games.filter(g => g.matchDay === daySchedule.matchDay);
         for (const game of gamesToUpdate) {
@@ -121,7 +123,7 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
   };
 
   const handleExportSeason = async () => {
-    const exportData = await exportSeason(seasonId);
+    const exportData = await exportSeason(seasonId!);
     if (exportData && season) {
       const filename = `${season.name.replace(/[^a-z0-9]/gi, '_')}_${new Date().toISOString().split('T')[0]}.json`;
       downloadExportFile(exportData, filename);
@@ -290,8 +292,8 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
         completedGames={completedGames}
         totalGames={totalGames}
         selectedRound={selectedRound}
-        onBack={onBack}
-        onManageTeams={onManageTeams}
+        onBack={() => navigate(`/admin/leagues/${season.leagueId}`)}
+        onManageTeams={() => navigate(`/admin/seasons/${seasonId}/teams`)}
         onExportSeason={handleExportSeason}
         onImportFile={handleImportFile}
         onCompleteSeason={handleCompleteSeason}
@@ -326,8 +328,8 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
           onMatchDayChange={setSelectedMatchDay}
           onShowPrintOptions={() => setShowPrintOptionsModal(true)}
           onShowPostpone={() => setShowPostponeModal(true)}
-          onPlayGame={onPlayGame}
-          onViewGame={onViewGame}
+          onPlayGame={(gameId) => navigate(`/admin/games/${gameId}/play`)}
+          onViewGame={(gameId, game) => navigate(`/admin/games/${gameId}`, { state: { game } })}
         />
       )}
 
@@ -436,16 +438,16 @@ export const SeasonDetail: React.FC<SeasonDetailProps> = ({ seasonId, onBack, on
       )}
 
       {showPrintModal && selectedMatchDay && (
-        <PrintMatchDay seasonId={seasonId} matchDay={selectedMatchDay} onClose={() => setShowPrintModal(false)} />
+        <PrintMatchDay seasonId={seasonId!} matchDay={selectedMatchDay} onClose={() => setShowPrintModal(false)} />
       )}
       {showPrintOptionsModal && selectedMatchDay && (
-        <PrintMatchDayOptions seasonId={seasonId} matchDay={selectedMatchDay} onClose={() => setShowPrintOptionsModal(false)} />
+        <PrintMatchDayOptions seasonId={seasonId!} matchDay={selectedMatchDay} onClose={() => setShowPrintOptionsModal(false)} />
       )}
       {showPrintTeamStandings && (
-        <PrintTeamStandings seasonId={seasonId} onClose={() => setShowPrintTeamStandings(false)} />
+        <PrintTeamStandings seasonId={seasonId!} onClose={() => setShowPrintTeamStandings(false)} />
       )}
       {showPrintPlayerStandings && (
-        <PrintPlayerStandings seasonId={seasonId} onClose={() => setShowPrintPlayerStandings(false)} />
+        <PrintPlayerStandings seasonId={seasonId!} onClose={() => setShowPrintPlayerStandings(false)} />
       )}
 
       {showPostponeModal && (

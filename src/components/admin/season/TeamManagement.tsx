@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { teamsApi, playersApi, seasonsApi } from '../../../services/api';
 import { useTranslation } from '../../../contexts/LanguageContext';
 import { useDateFormat } from '../../../hooks/useDateFormat';
 import { getPlayerDisplayName } from '../../../utils/playerUtils';
 
-import type { TeamManagementProps, Season, Team, Player, RosterChange } from '../../../types/index';
+import type { Season, Team, Player, RosterChange } from '../../../types/index';
 
-export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack }) => {
+export const TeamManagement: React.FC = () => {
+  const navigate = useNavigate();
+  const { seasonId } = useParams<{ seasonId: string }>();
   const { t } = useTranslation();
   const { formatDate } = useDateFormat();
   const [season, setSeason] = useState<Season | null>(null);
@@ -17,10 +20,10 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
   const [rosterChanges, setRosterChanges] = useState<RosterChange[]>([]);
 
   const loadData = async () => {
-    const seasonData = await seasonsApi.getById(seasonId);
+    const seasonData = await seasonsApi.getById(seasonId!);
     setSeason(seasonData ?? null);
 
-    const teamsData = await teamsApi.getBySeason(seasonId);
+    const teamsData = await teamsApi.getBySeason(seasonId!);
     setTeams(teamsData);
 
     const playersData = await playersApi.getAll();
@@ -93,7 +96,7 @@ export const TeamManagement: React.FC<TeamManagementProps> = ({ seasonId, onBack
             <p className="text-gray-600">{season.name}</p>
           </div>
           <button
-            onClick={onBack}
+            onClick={() => navigate(`/admin/seasons/${seasonId}`)}
             className="text-gray-600 hover:text-gray-800"
           >
             {t('common.leftArrow')} {t('teams.backToSeason')}

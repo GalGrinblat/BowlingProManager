@@ -1,3 +1,4 @@
+import React from 'react';
 jest.mock('../../../src/lib/supabase', () => ({
   supabase: {
     auth: { onAuthStateChange: jest.fn(), getUser: jest.fn() },
@@ -15,6 +16,18 @@ jest.mock('../../../src/lib/supabase', () => ({
     })),
   },
 }));
+jest.mock('react-router-dom', () => ({
+  useNavigate: () => jest.fn(),
+}));
+jest.mock('../../../src/contexts/AuthContext', () => ({
+  useAuth: () => ({
+    playerData: { id: 'test-player-id', firstName: 'Test', lastName: 'Player', active: true },
+    currentUser: null,
+    isAdmin: () => false,
+    isPlayer: () => true,
+    logout: jest.fn(),
+  }),
+}));
 
 beforeAll(() => {
   jest.spyOn(console, 'error').mockImplementation(() => {});
@@ -30,7 +43,7 @@ describe('PlayerDashboard', () => {
   it('renders player dashboard', () => {
     render(
       <LanguageProvider>
-        <PlayerDashboard playerId={"test-player-id"} onNavigate={() => {}} />
+        <PlayerDashboard />
       </LanguageProvider>
     );
     // TODO: Add assertions for player dashboard

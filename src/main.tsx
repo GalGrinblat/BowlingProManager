@@ -1,13 +1,26 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './App'
+import { RouterProvider } from 'react-router-dom'
+import { AuthProvider } from './contexts/AuthContext'
+import { LanguageProvider } from './contexts/LanguageContext'
+import { ToastProvider } from './contexts/ToastContext'
+import { ErrorBoundary } from './components/common/ErrorBoundary'
+import { router } from './router'
 import './styles/globals.css'
 
 const rootElement = document.getElementById('root');
 if (rootElement) {
   ReactDOM.createRoot(rootElement).render(
     <React.StrictMode>
-      <App />
+      <ErrorBoundary>
+        <AuthProvider>
+          <LanguageProvider>
+            <ToastProvider>
+              <RouterProvider router={router} />
+            </ToastProvider>
+          </LanguageProvider>
+        </AuthProvider>
+      </ErrorBoundary>
     </React.StrictMode>,
   );
 }

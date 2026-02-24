@@ -219,15 +219,6 @@ export interface LanguageContextType {
   locale: string;
 }
 
-/** NavigationState - Current view and entity IDs for app navigation */
-export interface NavigationState {
-  view: string;
-  leagueId?: string;
-  seasonId?: string;
-  gameId?: string;
-  playerId?: string;
-}
-
 // ============================================================================
 // Standings & Statistics Types - Calculated team rankings and player performance metrics
 // ============================================================================
@@ -352,97 +343,11 @@ export interface PlayerMatchResult {
 
 // --- Admin Components ---
 
-/** Props for AdminDashboard - Main admin hub for league management */
-export interface AdminDashboardProps {
-  onNavigate: (view: string, params?: Record<string, string>) => void;
-  org: Organization | null;
-  leagues: League[];
-  seasonsMap: Record<string, Season[]>;
-  gamesMap: Record<string, Game[]>;
-  isLoadingData: boolean;
-  onRefreshData: () => Promise<void>;
-}
-
-/** Props for PlayerRegistry - CRUD operations on organization's player roster */
-export interface PlayerRegistryProps {
-  onBack: () => void;
-  players: Player[];
-  isLoadingPlayers: boolean;
-  onRefreshPlayers: () => Promise<void>;
-}
-
-/** Props for LeagueManagement - Create and manage leagues */
-export interface LeagueManagementProps {
-  onBack: () => void;
-  onViewLeague: (leagueId: string) => void;
-  onRefreshData?: () => Promise<void>;
-}
-
-/** Props for LeagueDetail - View league details and seasons */
-export interface LeagueDetailProps {
-  leagueId: string;
-  onBack: () => void;
-  onViewSeason: (seasonId: string) => void;
-  onCreateSeason: (leagueId: string) => void;
-  onRefreshData?: () => Promise<void>;
-}
-
-/** Props for SeasonCreator - Create new season with team configuration */
-export interface SeasonCreatorProps {
-  leagueId: string;
-  onBack: () => void;
-  onSuccess: (seasonId: string) => void;
-  onRefreshData?: () => Promise<void>;
-}
-
-/** Props for SeasonDetail - View season schedule, standings, and games */
-export interface SeasonDetailProps {
-  seasonId: string;
-  onBack: () => void;
-  onPlayGame: (gameId: string) => void;
-  onViewGame: (gameId: string, game?: Game) => void;
-  onManageTeams: () => void;
-}
-
-/** Props for SeasonGame - Wrapper for recording game scores */
-export interface SeasonGameProps {
-  gameId: string;
-  onBack: () => void;
-}
-
-/** Props for TeamManagement - Handle roster changes and substitutions */
-export interface TeamManagementProps {
-  seasonId: string;
-  onBack: () => void;
-}
-
 /** Props for PrintMatchDay - Printable matchday sheet with team rosters and player info */
 export interface PrintMatchDayProps {
   seasonId: string;
   matchDay: number;
   onClose: () => void;
-}
-
-/** Props for Settings - Organization settings and data export/import */
-export interface SettingsProps {
-  onBack: () => void;
-  onRefreshData?: () => Promise<void>;
-}
-
-// --- Player Components ---
-
-/** Props for PlayerDashboard - Player's home view with stats and upcoming games */
-export interface PlayerDashboardProps {
-  playerId: string;
-  onViewGame: (gameId: string) => void;
-  onViewSeasonComparison: () => void;
-  onNavigate: (view: string, params?: Record<string, unknown>) => void;
-}
-
-/** Props for PlayerSeasonComparison - Compare player performance across seasons */
-export interface PlayerSeasonComparisonProps {
-  playerId: string;
-  onBack: () => void;
 }
 
 // --- Game/Scoring Components ---
@@ -487,12 +392,6 @@ export interface GameSummaryViewProps {
   onFinish: () => void;
 }
 
-/** Props for CompletedGameView - View details of a finished game */
-export interface CompletedGameViewProps {
-  game: Game;
-  onBack: () => void;
-}
-
 // --- Shared/Common Components ---
 
 /** Props for Header - Top navigation bar with user info */
@@ -507,9 +406,4 @@ export interface PaginationProps {
   totalItems: number;
   itemsPerPage: number;
   onPageChange: (page: number) => void;
-}
-
-/** Props for LoginView - Authentication screen */
-export interface LoginViewProps {
-  onLogin: (userId: string, role: 'admin' | 'player') => void;
 }
