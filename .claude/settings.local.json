@@ -19,7 +19,8 @@
       "Bash(npm install:*)",
       "Bash(npx vite:*)",
       "Bash(npx eslint:*)",
-      "Bash(npx jest --passWithNoTests)"
+      "Bash(npx jest --passWithNoTests)",
+      "Bash(du -sh /c/Code/BowlingAppAi/src/components/admin/*)"
     ]
   }
 }

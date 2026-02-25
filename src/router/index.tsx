@@ -1,18 +1,22 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { AdminDataProvider } from '../contexts/AdminDataContext';
 import { Header } from '../components/common/Header';
 import { LoginView } from '../components/common/LoginView';
-import { AdminDashboard } from '../components/admin/AdminDashboard';
-import { PlayerRegistry } from '../components/admin/players';
-import { LeagueManagement, LeagueDetail } from '../components/admin/league';
-import { SeasonCreator, SeasonDetail, TeamManagement } from '../components/admin/season';
-import { SeasonGame } from '../components/admin/game';
-import { Settings } from '../components/admin/Settings';
-import { UserManagement } from '../components/admin/UserManagement';
-import { PlayerDashboard } from '../components/player/PlayerDashboard';
-import { CompletedGameView } from '../components/common/CompletedGameView';
+
+const AdminDashboard    = lazy(() => import('../components/admin/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
+const PlayerRegistry    = lazy(() => import('../components/admin/players').then(m => ({ default: m.PlayerRegistry })));
+const LeagueManagement  = lazy(() => import('../components/admin/league').then(m => ({ default: m.LeagueManagement })));
+const LeagueDetail      = lazy(() => import('../components/admin/league').then(m => ({ default: m.LeagueDetail })));
+const SeasonCreator     = lazy(() => import('../components/admin/season').then(m => ({ default: m.SeasonCreator })));
+const SeasonDetail      = lazy(() => import('../components/admin/season').then(m => ({ default: m.SeasonDetail })));
+const TeamManagement    = lazy(() => import('../components/admin/season').then(m => ({ default: m.TeamManagement })));
+const SeasonGame        = lazy(() => import('../components/admin/game').then(m => ({ default: m.SeasonGame })));
+const Settings          = lazy(() => import('../components/admin/Settings').then(m => ({ default: m.Settings })));
+const UserManagement    = lazy(() => import('../components/admin/UserManagement').then(m => ({ default: m.UserManagement })));
+const PlayerDashboard   = lazy(() => import('../components/player/PlayerDashboard').then(m => ({ default: m.PlayerDashboard })));
+const CompletedGameView = lazy(() => import('../components/common/CompletedGameView').then(m => ({ default: m.CompletedGameView })));
 
 const RootLayout = () => {
   const { currentUser, logout, isLoading } = useAuth();
@@ -32,7 +36,13 @@ const RootLayout = () => {
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         <Header currentUser={currentUser} onLogout={logout} />
-        <Outlet />
+        <Suspense fallback={
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-600"></div>
+          </div>
+        }>
+          <Outlet />
+        </Suspense>
       </div>
     </div>
   );
