@@ -74,12 +74,12 @@ export const LeagueManagement: React.FC = () => {
     const data = await leaguesApi.getAll();
     setLeagues(data);
 
-    // Load seasons for each league
+    // Load seasons for all leagues in parallel
+    const seasonsResults = await Promise.all(
+      data.map(league => seasonsApi.getByLeague(league.id))
+    );
     const seasonsData: Record<string, any[]> = {};
-    for (const league of data) {
-      const seasons = await seasonsApi.getByLeague(league.id);
-      seasonsData[league.id] = seasons;
-    }
+    data.forEach((league, i) => { seasonsData[league.id] = seasonsResults[i] ?? []; });
     setSeasonsMap(seasonsData);
   };
 

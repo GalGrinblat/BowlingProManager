@@ -1,12 +1,13 @@
-import { seasonsApi, teamsApi, gamesApi } from '../services/api';
+import { seasonsApi, gamesApi } from '../services/api';
 import { calculateCurrentPlayerAverages } from '../utils/standingsUtils';
 import type { Game, GamePlayer } from '../types/index';
 
 export async function recalculatePlayerAveragesAndHandicaps(gameData: Game) {
-  const season = await seasonsApi.getById(gameData.seasonId);
-  const teams = await teamsApi.getBySeason(gameData.seasonId);
-  const allGames = await gamesApi.getBySeason(gameData.seasonId);
-  if (!season || !teams) return;
+  const [season, allGames] = await Promise.all([
+    seasonsApi.getById(gameData.seasonId),
+    gamesApi.getBySeason(gameData.seasonId),
+  ]);
+  if (!season) return;
 
   const useHandicap = season.seasonConfigurations.useHandicap ?? false;
   const handicapBasis = season.seasonConfigurations.handicapBasis ?? 0;

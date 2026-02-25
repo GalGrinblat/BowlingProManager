@@ -17,29 +17,31 @@ interface GameInitResult {
 async function fetchAndAssignTeams(gameObj: Game) {
   if (!gameObj.team1Id || !gameObj.team2Id) return;
 
-  const team1 = await teamsApi.getById(gameObj.team1Id);
-  const team2 = await teamsApi.getById(gameObj.team2Id);
+  const [team1, team2] = await Promise.all([
+    teamsApi.getById(gameObj.team1Id),
+    teamsApi.getById(gameObj.team2Id),
+  ]);
   if (!team1 || !team2) return;
 
   const buildGameTeam = async (team: Team): Promise<GameTeam> => {
-    const players = [];
-    for (let idx = 0; idx < (team.playerIds || []).length; idx++) {
-      const playerId = team.playerIds[idx]!;
-      const player = await playersApi.getById(playerId);
-      players.push({
-        playerId,
-        name: player ? getPlayerDisplayName(player) : '',
-        average: 0,
-        handicap: 0,
-        rank: idx + 1,
-        absent: false,
-      });
-    }
+    const playerObjects = await Promise.all(
+      (team.playerIds || []).map(playerId => playersApi.getById(playerId))
+    );
+    const players = playerObjects.map((player, idx) => ({
+      playerId: team.playerIds[idx]!,
+      name: player ? getPlayerDisplayName(player) : '',
+      average: 0,
+      handicap: 0,
+      rank: idx + 1,
+      absent: false,
+    }));
     return { name: team.name, players };
   };
 
-  gameObj.team1 = await buildGameTeam(team1);
-  gameObj.team2 = await buildGameTeam(team2);
+  [gameObj.team1, gameObj.team2] = await Promise.all([
+    buildGameTeam(team1),
+    buildGameTeam(team2),
+  ]);
 }
 
 export function useGameInitializer(gameId: string): GameInitResult & {

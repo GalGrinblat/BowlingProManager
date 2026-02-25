@@ -47,13 +47,14 @@ export const SeasonDetail: React.FC = () => {
     const seasonData = await seasonsApi.getById(seasonId!);
     setSeason(seasonData ?? null);
     if (!seasonData) return;
-    const leagueData = await leaguesApi.getById(seasonData.leagueId);
+
+    const [leagueData, teamsData, gamesData] = await Promise.all([
+      leaguesApi.getById(seasonData.leagueId),
+      teamsApi.getBySeason(seasonId!),
+      gamesApi.getBySeason(seasonId!),
+    ]);
     setLeague(leagueData ?? null);
-
-    const teamsData = await teamsApi.getBySeason(seasonId!);
     setTeams(teamsData);
-
-    const gamesData = await gamesApi.getBySeason(seasonId!);
     setGames(gamesData);
 
     if (gamesData.length > 0) {

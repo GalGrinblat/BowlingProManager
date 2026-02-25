@@ -23,29 +23,34 @@ export const LeagueDetail: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const loadLeagueData = async () => {
-    const leagueData = await leaguesApi.getById(leagueId!);
-    if (!leagueData) {
-      return;
-    }
+    const [leagueData, seasonsData] = await Promise.all([
+      leaguesApi.getById(leagueId!),
+      seasonsApi.getByLeague(leagueId!),
+    ]);
+    if (!leagueData) return;
     setLeague(leagueData);
-    const seasonsData = await seasonsApi.getByLeague(leagueId!);
     setSeasons(seasonsData.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
 
-    // Preload data for completed seasons
+    // Preload data for all completed seasons in parallel
+    const completedSeasons = seasonsData.filter(s => s.status === 'completed');
+    const seasonResults = await Promise.all(
+      completedSeasons.map(async season => {
+        const [teams, games] = await Promise.all([
+          teamsApi.getBySeason(season.id),
+          gamesApi.getBySeason(season.id),
+        ]);
+        return { seasonId: season.id, teams, games, standings: calculateTeamStandings(teams, games) };
+      })
+    );
+
     const standingsData: Record<string, any[]> = {};
     const teamsData: Record<string, Team[]> = {};
     const gamesData: Record<string, any[]> = {};
-
-    for (const season of seasonsData.filter(s => s.status === 'completed')) {
-      const teams = await teamsApi.getBySeason(season.id);
-      const games = await gamesApi.getBySeason(season.id);
-      const standings = calculateTeamStandings(teams, games);
-
-      standingsData[season.id] = standings;
-      teamsData[season.id] = teams;
-      gamesData[season.id] = games;
+    for (const r of seasonResults) {
+      standingsData[r.seasonId] = r.standings;
+      teamsData[r.seasonId] = r.teams;
+      gamesData[r.seasonId] = r.games;
     }
-
     setSeasonStandings(standingsData);
     setSeasonTeams(teamsData);
     setSeasonGames(gamesData);
