@@ -38,6 +38,7 @@ const he: TranslationDictionary = {
     view: 'צפה',
     leftArrow: '→',
     rightArrow: '←',
+    backToDashboard: 'חזור ללוח הבקרה',
     name: 'שם',
     average: 'ממוצע',
     points: 'נקודות',
@@ -122,7 +123,6 @@ const he: TranslationDictionary = {
     noActivePlayers: 'אין שחקנים פעילים',
     searchPlayers: 'חפש שחקנים...',
     totalPlayers: 'סה"כ {{count}} שחקנים',
-    backToDashboard: 'חזור ללוח הבקרה',
     addNewPlayer: 'הוסף שחקן חדש',
     cannotDeleteAssigned: 'לא ניתן למחוק שחקן כי הוא משובץ לקבוצות',
     removeFromTeamsFirst: 'אנא הסר אותו מכל הקבוצות תחילה, או סמן אותו כלא פעיל במקום זאת.',
@@ -635,7 +635,6 @@ const he: TranslationDictionary = {
   userManagement: {
     title: 'ניהול משתמשים',
     subtitle: 'ניהול תפקידי משתמשים וקישורי חשבונות שחקנים',
-    backToDashboard: 'חזרה ללוח הבקרה',
     guideTitle: '📌 מדריך ניהול משתמשים',
     guideEmailWhitelist: 'רשימת מיילים מורשים - רק מיילים ברשימה יכולים להתחבר עם Google',
     guideAdminRole: 'מנהל - יכול לנהל את כל הנתונים, שחקנים, ליגות, עונות ומשתמשים',

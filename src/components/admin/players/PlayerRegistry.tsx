@@ -245,7 +245,7 @@ export const PlayerRegistry: React.FC = () => {
               <p className="text-gray-600">Loading players...</p>
             </div>
             <button onClick={() => navigate('/admin')} className="text-gray-600 hover:text-gray-800">
-              {t('common.leftArrow')} {t('players.backToDashboard')}
+              {t('common.leftArrow')} {t('common.backToDashboard')}
             </button>
           </div>
         </div>
@@ -267,7 +267,7 @@ export const PlayerRegistry: React.FC = () => {
             <p className="text-gray-600">{t('players.totalPlayers').replace('{{count}}', String(players.length))}</p>
           </div>
           <button onClick={() => navigate('/admin')} className="text-gray-600 hover:text-gray-800">
-            {t('common.leftArrow')} {t('players.backToDashboard')}
+            {t('common.leftArrow')} {t('common.backToDashboard')}
           </button>
         </div>
       </div>

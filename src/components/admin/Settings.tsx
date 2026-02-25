@@ -64,7 +64,7 @@ export const Settings: React.FC = () => {
             onClick={() => navigate('/admin')}
             className="text-gray-600 hover:text-gray-800"
           >
-            {t('common.leftArrow')} {t('players.backToDashboard')}
+            {t('common.leftArrow')} {t('common.backToDashboard')}
           </button>
         </div>
       </div>

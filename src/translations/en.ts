@@ -38,6 +38,7 @@ const en: TranslationDictionary = {
     view: 'View',
     leftArrow: '←',
     rightArrow: '→',
+    backToDashboard: 'Back to Dashboard',
     name: 'Name',
     average: 'Average',
     points: 'Points',
@@ -122,7 +123,6 @@ const en: TranslationDictionary = {
     noActivePlayers: 'No active players',
     searchPlayers: 'Search players...',
     totalPlayers: '{{count}} total players',
-    backToDashboard: 'Back to Dashboard',
     addNewPlayer: 'Add New Player',
     cannotDeleteAssigned: 'Cannot delete player because they are assigned to teams',
     removeFromTeamsFirst: 'Please remove them from all teams first, or mark them as inactive instead.',
@@ -635,7 +635,6 @@ const en: TranslationDictionary = {
   userManagement: {
     title: 'User Management',
     subtitle: 'Manage user roles and player account links',
-    backToDashboard: 'Back to Dashboard',
     guideTitle: '📌 User Management Guide',
     guideEmailWhitelist: 'Email Whitelist - Only emails in the whitelist can sign in with Google',
     guideAdminRole: 'Admin - Can manage all data, players, leagues, seasons, and users',
