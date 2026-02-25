@@ -20,7 +20,8 @@
       "Bash(npx vite:*)",
       "Bash(npx eslint:*)",
       "Bash(npx jest --passWithNoTests)",
-      "Bash(du -sh /c/Code/BowlingAppAi/src/components/admin/*)"
+      "Bash(du -sh /c/Code/BowlingAppAi/src/components/admin/*)",
+      "Bash(npx jest --coverage)"
     ]
   }
 }
