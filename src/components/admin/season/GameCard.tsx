@@ -29,8 +29,8 @@ export const GameCard: React.FC<GameCardProps> = ({ game, team1, team2, h2h, onP
     }
   };
 
-  const team1TotalPoints = game.matches?.reduce((sum: number, m: GameMatch) => sum + (m.team1?.points || 0), 0) + (game.grandTotalPoints?.team1 || 0);
-  const team2TotalPoints = game.matches?.reduce((sum: number, m: GameMatch) => sum + (m.team2?.points || 0), 0) + (game.grandTotalPoints?.team2 || 0);
+  const team1TotalPoints = (game.matches?.reduce((sum: number, m: GameMatch) => sum + (m.team1?.points || 0), 0) ?? 0) + (game.grandTotalPoints?.team1 || 0);
+  const team2TotalPoints = (game.matches?.reduce((sum: number, m: GameMatch) => sum + (m.team2?.points || 0), 0) ?? 0) + (game.grandTotalPoints?.team2 || 0);
 
   return (
     <div className={`border rounded-lg p-4 transition-colors ${

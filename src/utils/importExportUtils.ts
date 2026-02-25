@@ -143,7 +143,7 @@ export const parseCSVImport = <T>(
         
         // Apply custom converter if available
         if (fieldConverters[header]) {
-          itemData[header] = fieldConverters[header](value);
+          itemData[header] = fieldConverters[header](value ?? '');
         } else if (value !== '') {
           // Skip empty values for other fields
           itemData[header] = value;

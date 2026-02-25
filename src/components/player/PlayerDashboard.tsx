@@ -185,8 +185,8 @@ export const PlayerDashboard: React.FC = () => {
     if (!details) return null;
     const { league, team1, team2 } = details;
     const isTeam1 = team1?.playerIds.includes(playerId);
-    const team1TotalPoints = game.matches?.reduce((sum: number, m: GameMatch) => sum + (m.team1?.points || 0), 0) + (game.grandTotalPoints?.team1 || 0);
-    const team2TotalPoints = game.matches?.reduce((sum: number, m: GameMatch) => sum + (m.team2?.points || 0), 0) + (game.grandTotalPoints?.team2 || 0);
+    const team1TotalPoints = (game.matches?.reduce((sum: number, m: GameMatch) => sum + (m.team1?.points || 0), 0) ?? 0) + (game.grandTotalPoints?.team1 || 0);
+    const team2TotalPoints = (game.matches?.reduce((sum: number, m: GameMatch) => sum + (m.team2?.points || 0), 0) ?? 0) + (game.grandTotalPoints?.team2 || 0);
     const playerWon = (isTeam1 && team1TotalPoints > team2TotalPoints) || (!isTeam1 && team2TotalPoints > team1TotalPoints);
     return { game, league, team1, team2, isTeam1, team1TotalPoints, team2TotalPoints, playerWon };
   }), [recentCompletedGames, gameDetailsMap, playerId]);
