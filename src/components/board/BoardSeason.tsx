@@ -253,7 +253,7 @@ export const BoardSeason: React.FC = () => {
             )}
           </div>
           <div className="text-sm text-gray-500">
-            {completedGames}/{totalGames} {t('seasons.gamesCompleted')}
+            {t('seasons.gamesComplete').replace('{{completed}}', String(completedGames)).replace('{{total}}', String(totalGames))}
           </div>
         </div>
       </div>

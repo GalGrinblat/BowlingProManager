@@ -78,7 +78,7 @@ export const BoardLeague: React.FC = () => {
               {t('board.setupSeason')}
             </span>
           )}
-          <span className="text-blue-600 text-sm">→</span>
+          <span className="text-blue-600 text-sm">{t('common.rightArrow')}</span>
         </div>
       </div>
     </Link>
@@ -88,7 +88,7 @@ export const BoardLeague: React.FC = () => {
     <div className="space-y-6">
       {/* Back link */}
       <Link to="/board" className="text-blue-600 hover:text-blue-700 text-sm font-semibold">
-        ← {t('board.allLeagues')}
+        {t('common.leftArrow')} {t('board.allLeagues')}
       </Link>
 
       {/* League header */}
@@ -137,7 +137,7 @@ export const BoardLeague: React.FC = () => {
 
       {seasons.length === 0 && (
         <div className="bg-white rounded-xl shadow-lg p-8 text-center text-gray-500">
-          {t('seasons.noSeasons')}
+          {t('seasons.noSeasonsYet')}
         </div>
       )}
     </div>

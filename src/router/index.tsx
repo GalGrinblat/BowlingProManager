@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from 'react';
+import { lazy, Suspense } from 'react';
 import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { AdminDataProvider } from '../contexts/AdminDataContext';
@@ -118,16 +118,17 @@ export const router = createBrowserRouter([
           { path: '/player/games/:gameId', element: <CompletedGameView /> },
         ],
       },
-      {
-        element: <BoardLayout />,
-        children: [
-          { path: '/board', element: <BoardHome /> },
-          { path: '/board/leagues/:leagueId', element: <BoardLeague /> },
-          { path: '/board/seasons/:seasonId', element: <BoardSeason /> },
-          { path: '/board/games/:gameId', element: <BoardGame /> },
-        ],
-      },
       { path: '*', element: <Navigate to="/login" replace /> },
+    ],
+  },
+  // Board routes sit outside RootLayout so they get only BoardHeader, not the admin Header
+  {
+    element: <BoardLayout />,
+    children: [
+      { path: '/board', element: <BoardHome /> },
+      { path: '/board/leagues/:leagueId', element: <BoardLeague /> },
+      { path: '/board/seasons/:seasonId', element: <BoardSeason /> },
+      { path: '/board/games/:gameId', element: <BoardGame /> },
     ],
   },
 ]);

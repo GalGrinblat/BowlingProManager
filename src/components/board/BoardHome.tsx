@@ -34,7 +34,7 @@ export const BoardHome: React.FC = () => {
       if (cancelled) return;
 
       const map: Record<string, Season[]> = {};
-      leagueList.forEach((l, i) => { map[l.id] = seasonResults[i]; });
+      leagueList.forEach((l, i) => { map[l.id] = seasonResults[i] ?? []; });
       setSeasonsByLeague(map);
 
       // Load recent completed games across all active seasons
@@ -62,10 +62,14 @@ export const BoardHome: React.FC = () => {
     (seasonsByLeague[leagueId] || []).find(s => s.status === 'active');
 
   const dayLabel = useMemo(() => {
-    const days = ['common.sunday','common.monday','common.tuesday','common.wednesday','common.thursday','common.friday','common.saturday'];
+    const dayMap: Record<string, string> = {
+      sunday: 'days.sunday', monday: 'days.monday', tuesday: 'days.tuesday',
+      wednesday: 'days.wednesday', thursday: 'days.thursday', friday: 'days.friday',
+      saturday: 'days.saturday',
+    };
     return (day: string) => {
-      const found = days.find(d => d.endsWith(day.toLowerCase()));
-      return found ? t(found) : day;
+      const key = dayMap[day.toLowerCase()];
+      return key ? t(key) : day;
     };
   }, [t]);
 
@@ -149,7 +153,7 @@ export const BoardHome: React.FC = () => {
                   </div>
                   <div className="shrink-0 flex items-center gap-2 text-xs text-gray-400 ml-2">
                     {game.completedAt && <span>{formatDate(game.completedAt)}</span>}
-                    <span className="text-blue-600 font-semibold">{t('board.viewFullGame')} →</span>
+                    <span className="text-blue-600 font-semibold">{t('board.viewFullGame')} {t('common.rightArrow')}</span>
                   </div>
                 </Link>
               );
