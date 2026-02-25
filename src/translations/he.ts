@@ -83,6 +83,27 @@ const he: TranslationDictionary = {
     signIn: 'התחבר עם Google',
     signingIn: 'מתחבר...',
     loginFailed: 'ההתחברות נכשלה. אנא נסה שוב.',
+    viewerPrompt: 'רוצה לבדוק את הדירוגים?',
+    viewAsGuest: 'כניסה כאורח',
+  },
+
+  // לוח תוצאות ציבורי
+  board: {
+    title: 'לוח תוצאות ציבורי',
+    subtitle: 'דירוגים ותוצאות חיות של הליגה',
+    allLeagues: 'כל הליגות',
+    noActiveLeagues: 'אין ליגות פעילות כרגע.',
+    backToLeague: 'חזרה לליגה',
+    signIn: 'כניסה',
+    backToAdmin: 'חזרה לניהול',
+    lastUpdated: 'עודכן {{date}}',
+    activeSeason: 'עונה פעילה',
+    completedSeason: 'הסתיימה',
+    setupSeason: 'עתידית',
+    recentResults: 'תוצאות אחרונות',
+    noRecentResults: 'אין תוצאות אחרונות עדיין.',
+    viewFullGame: 'צפה בתוצאה המלאה',
+    viewerNotice: 'תצוגה ציבורית בלבד לקריאה',
   },
 
   // רישום שחקנים

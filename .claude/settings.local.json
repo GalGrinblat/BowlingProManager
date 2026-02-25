@@ -21,7 +21,9 @@
       "Bash(npx eslint:*)",
       "Bash(npx jest --passWithNoTests)",
       "Bash(du -sh /c/Code/BowlingAppAi/src/components/admin/*)",
-      "Bash(npx jest --coverage)"
+      "Bash(npx jest --coverage)",
+      "Bash(npx jest tests/component/board/)",
+      "Bash(npx jest tests/component/board/ --no-coverage)"
     ]
   }
 }

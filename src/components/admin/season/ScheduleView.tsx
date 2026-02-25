@@ -13,16 +13,18 @@ interface ScheduleViewProps {
   selectedMatchDay: number | null;
   onRoundChange: (round: number) => void;
   onMatchDayChange: (matchDay: number | null) => void;
-  onShowPrintOptions: () => void;
-  onShowPostpone: () => void;
-  onPlayGame: (gameId: string) => void;
+  onShowPrintOptions?: () => void;
+  onShowPostpone?: () => void;
+  onPlayGame?: (gameId: string) => void;
   onViewGame: (gameId: string, game: Game) => void;
+  /** When true, hides print, postpone, and play/continue action buttons */
+  readOnly?: boolean;
 }
 
 export const ScheduleView: React.FC<ScheduleViewProps> = ({
   season, teams, games, selectedRound, selectedMatchDay,
   onRoundChange, onMatchDayChange, onShowPrintOptions, onShowPostpone,
-  onPlayGame, onViewGame
+  onPlayGame, onViewGame, readOnly = false
 }) => {
   const { t } = useTranslation();
   const { formatMatchDate } = useDateFormat();
@@ -74,24 +76,26 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
         <div className="bg-white rounded-xl shadow-lg p-4">
           <div className="flex justify-between items-center mb-2">
             <h3 className="text-sm font-semibold text-gray-600">{t('seasons.selectMatchDay')}</h3>
-            <div className="flex gap-2">
-              {selectedMatchDay && (
-                <button
-                  onClick={onShowPrintOptions}
-                  className="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 font-semibold text-xs"
-                >
-                  🖨️ {t('print.printOptions')}
-                </button>
-              )}
-              {season.status === 'active' && selectedMatchDay && (
-                <button
-                  onClick={onShowPostpone}
-                  className="px-3 py-1 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 font-semibold text-xs"
-                >
-                  📅 {t('seasons.postpone')}
-                </button>
-              )}
-            </div>
+            {!readOnly && (
+              <div className="flex gap-2">
+                {selectedMatchDay && (
+                  <button
+                    onClick={onShowPrintOptions}
+                    className="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 font-semibold text-xs"
+                  >
+                    🖨️ {t('print.printOptions')}
+                  </button>
+                )}
+                {season.status === 'active' && selectedMatchDay && (
+                  <button
+                    onClick={onShowPostpone}
+                    className="px-3 py-1 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 font-semibold text-xs"
+                  >
+                    📅 {t('seasons.postpone')}
+                  </button>
+                )}
+              </div>
+            )}
           </div>
           <div className="flex gap-2 flex-wrap">
             {matchDaysInRound.map(matchDay => {
@@ -148,8 +152,9 @@ export const ScheduleView: React.FC<ScheduleViewProps> = ({
                   team1={team1}
                   team2={team2}
                   h2h={h2h}
-                  onPlayGame={() => onPlayGame(game.id)}
+                  onPlayGame={() => onPlayGame?.(game.id)}
                   onViewGame={() => onViewGame(game.id, game)}
+                  readOnly={readOnly}
                 />
               );
             })}

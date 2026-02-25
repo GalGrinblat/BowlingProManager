@@ -411,6 +411,30 @@ VALUES ('My Bowling Organization', 'en')
 ON CONFLICT DO NOTHING;
 
 -- ============================================================================
+-- SCOREBOARD: ANON (PUBLIC) READ POLICIES
+-- ============================================================================
+-- These policies allow unauthenticated visitors to read public data for the
+-- /board/* scoreboard routes. users and allowed_emails remain fully private.
+
+CREATE POLICY "Anon read organization" ON public.organization
+  FOR SELECT USING (auth.role() = 'anon');
+
+CREATE POLICY "Anon read active leagues" ON public.leagues
+  FOR SELECT USING (auth.role() = 'anon' AND active = true);
+
+CREATE POLICY "Anon read seasons" ON public.seasons
+  FOR SELECT USING (auth.role() = 'anon');
+
+CREATE POLICY "Anon read teams" ON public.teams
+  FOR SELECT USING (auth.role() = 'anon');
+
+CREATE POLICY "Anon read games" ON public.games
+  FOR SELECT USING (auth.role() = 'anon');
+
+CREATE POLICY "Anon read players" ON public.players
+  FOR SELECT USING (auth.role() = 'anon');
+
+-- ============================================================================
 -- SCHEMA COMPLETE
 -- ============================================================================
 -- Run this entire SQL file in your Supabase SQL Editor

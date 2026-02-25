@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from '../../contexts/LanguageContext';
 import { logger } from '../../utils/logger';
@@ -59,6 +60,16 @@ export const LoginView: React.FC = () => {
         </svg>
         {isLoading ? t('auth.signingIn') : t('auth.signIn')}
       </button>
+
+      <div className="mt-6 text-center">
+        <p className="text-gray-500 text-sm mb-1">{t('auth.viewerPrompt')}</p>
+        <Link
+          to="/board"
+          className="text-blue-600 hover:text-blue-700 font-semibold text-sm underline"
+        >
+          {t('auth.viewAsGuest')}
+        </Link>
+      </div>
     </div>
   );
 };

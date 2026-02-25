@@ -11,9 +11,11 @@ interface GameCardProps {
   h2h: HeadToHeadStats;
   onPlayGame: () => void;
   onViewGame: () => void;
+  /** When true, hides the play/continue action button (used in public board) */
+  readOnly?: boolean;
 }
 
-export const GameCard: React.FC<GameCardProps> = ({ game, team1, team2, h2h, onPlayGame, onViewGame }) => {
+export const GameCard: React.FC<GameCardProps> = ({ game, team1, team2, h2h, onPlayGame, onViewGame, readOnly = false }) => {
   const { t } = useTranslation();
 
   const getStatusBadge = () => {
@@ -76,6 +78,8 @@ export const GameCard: React.FC<GameCardProps> = ({ game, team1, team2, h2h, onP
             >
               {t('games.viewResults')}
             </button>
+          ) : readOnly ? (
+            getStatusBadge()
           ) : (
             <button
               onClick={onPlayGame}

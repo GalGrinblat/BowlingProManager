@@ -83,6 +83,27 @@ const en: TranslationDictionary = {
     signIn: 'Sign in with Google',
     signingIn: 'Signing in...',
     loginFailed: 'Failed to sign in. Please try again.',
+    viewerPrompt: 'Just want to check the standings?',
+    viewAsGuest: 'Browse as guest',
+  },
+
+  // Public Scoreboard
+  board: {
+    title: 'Public Scoreboard',
+    subtitle: 'Live league standings and results',
+    allLeagues: 'All Leagues',
+    noActiveLeagues: 'No active leagues at this time.',
+    backToLeague: 'Back to League',
+    signIn: 'Sign In',
+    backToAdmin: 'Back to Admin',
+    lastUpdated: 'Updated {{date}}',
+    activeSeason: 'Active Season',
+    completedSeason: 'Completed',
+    setupSeason: 'Upcoming',
+    recentResults: 'Recent Results',
+    noRecentResults: 'No recent results yet.',
+    viewFullGame: 'View Full Score',
+    viewerNotice: 'Read-only public view',
   },
 
   // Player Registry

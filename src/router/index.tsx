@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { AdminDataProvider } from '../contexts/AdminDataContext';
 import { Header } from '../components/common/Header';
 import { LoginView } from '../components/common/LoginView';
+import { BoardHeader } from '../components/board/BoardHeader';
 
 const AdminDashboard    = lazy(() => import('../components/admin/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
 const PlayerRegistry    = lazy(() => import('../components/admin/players').then(m => ({ default: m.PlayerRegistry })));
@@ -17,6 +18,25 @@ const Settings          = lazy(() => import('../components/admin/Settings').then
 const UserManagement    = lazy(() => import('../components/admin/UserManagement').then(m => ({ default: m.UserManagement })));
 const PlayerDashboard   = lazy(() => import('../components/player/PlayerDashboard').then(m => ({ default: m.PlayerDashboard })));
 const CompletedGameView = lazy(() => import('../components/common/CompletedGameView').then(m => ({ default: m.CompletedGameView })));
+const BoardHome   = lazy(() => import('../components/board/BoardHome').then(m => ({ default: m.BoardHome })));
+const BoardLeague = lazy(() => import('../components/board/BoardLeague').then(m => ({ default: m.BoardLeague })));
+const BoardSeason = lazy(() => import('../components/board/BoardSeason').then(m => ({ default: m.BoardSeason })));
+const BoardGame   = lazy(() => import('../components/board/BoardGame').then(m => ({ default: m.BoardGame })));
+
+const BoardLayout = () => (
+  <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 p-4 md:p-8">
+    <div className="max-w-6xl mx-auto">
+      <BoardHeader />
+      <Suspense fallback={
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-600"></div>
+        </div>
+      }>
+        <Outlet />
+      </Suspense>
+    </div>
+  </div>
+);
 
 const RootLayout = () => {
   const { currentUser, logout, isLoading } = useAuth();
@@ -96,6 +116,15 @@ export const router = createBrowserRouter([
           { path: '/player', element: <PlayerDashboard /> },
           { path: '/player/games/:gameId/play', element: <SeasonGame /> },
           { path: '/player/games/:gameId', element: <CompletedGameView /> },
+        ],
+      },
+      {
+        element: <BoardLayout />,
+        children: [
+          { path: '/board', element: <BoardHome /> },
+          { path: '/board/leagues/:leagueId', element: <BoardLeague /> },
+          { path: '/board/seasons/:seasonId', element: <BoardSeason /> },
+          { path: '/board/games/:gameId', element: <BoardGame /> },
         ],
       },
       { path: '*', element: <Navigate to="/login" replace /> },
