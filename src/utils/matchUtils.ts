@@ -2,7 +2,7 @@ import type { BonusRule, Game, PlayerMatchResult, GameMatch, MatchPlayer, GamePl
 import { compareTeamScores, applyMatchWinnerPoints } from './comparisonUtils';
 import { ABSENT_PLAYER_PENALTY, MIN_BOWLING_SCORE, MAX_BOWLING_SCORE } from '../constants/bowling';
 
-const clampScore = (score: number): number =>
+export const clampScore = (score: number): number =>
   Math.max(MIN_BOWLING_SCORE, Math.min(MAX_BOWLING_SCORE, score));
 
 export const createEmptyMatch = (matchNumber: number, playersPerTeam: number): GameMatch => {
@@ -206,12 +206,28 @@ export const calculateMatchResults = (game: Game, matchIndex: number): void => {
   }
 };
 
+const isPinsInRange = (pins: string): boolean => {
+  if (pins === '') return false;
+  const value = parseInt(pins);
+  return !isNaN(value) && value >= MIN_BOWLING_SCORE && value <= MAX_BOWLING_SCORE;
+};
+
 export const validateMatch = (currentGame: Game, matchIndex: number): boolean => {
   if (!currentGame.matches) return false;
   const match = currentGame.matches[matchIndex];
   if (!match) return false;
   if (!currentGame.team1 || !currentGame.team2) return false;
-  const team1Valid = currentGame.team1.players.every((p: GamePlayer, idx: number) => !p || (p.absent || match.team1.players[idx]?.pins !== ''));
-  const team2Valid = currentGame.team2.players.every((p: GamePlayer, idx: number) => !p || (p.absent || match.team2.players[idx]?.pins !== ''));
+  const team1Valid = currentGame.team1.players.every((p: GamePlayer, idx: number) => {
+    if (!p) return true;
+    if (p.absent) return true;
+    const pins = match.team1.players[idx]?.pins ?? '';
+    return isPinsInRange(pins);
+  });
+  const team2Valid = currentGame.team2.players.every((p: GamePlayer, idx: number) => {
+    if (!p) return true;
+    if (p.absent) return true;
+    const pins = match.team2.players[idx]?.pins ?? '';
+    return isPinsInRange(pins);
+  });
   return team1Valid && team2Valid;
 };

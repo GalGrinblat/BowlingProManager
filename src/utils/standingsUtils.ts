@@ -1,5 +1,6 @@
 import type { Team, Game, TeamStanding, PlayerStats, CurrentPlayerAverages, GameMatch, GamePlayer, MatchPlayer, PlayerMatchResult } from '../types/index';
 import { getTeamData, forEachTeam } from './teamUtils';
+import { clampScore } from './matchUtils';
 
 /**
  * Standings Calculator - Calculate team and player standings from completed games
@@ -59,8 +60,8 @@ const processMatchStats = (
     
     if (playerStat && matchPlayers[playerIdx]) {
       const matchPlayer = matchPlayers[playerIdx];
-      const pins = parseInt(matchPlayer.pins) || 0;
-      
+      const pins = matchPlayer.pins !== '' ? clampScore(parseInt(matchPlayer.pins) || 0) : 0;
+
       if (pins > 0 || matchPlayer.pins !== '') {
         playerStat.gamesPlayed++;
         playerStat.totalPins += pins;
@@ -95,7 +96,7 @@ const calculateHighSeries = (
     if (playerStat) {
       const seriesTotal = matches?.reduce((sum: number, match: GameMatch) => {
         const pins = match[teamKey]?.players[playerIdx]?.pins;
-        return sum + (parseInt(pins ?? '') || 0);
+        return sum + (pins !== undefined && pins !== '' ? clampScore(parseInt(pins) || 0) : 0);
       }, 0) || 0;
       
       if (seriesTotal > playerStat.highSeries) {
@@ -128,8 +129,9 @@ const processPlayerAverages = (
     // Count pins from all matches in this game
     matches?.forEach((match: GameMatch) => {
       if (match[teamKey] && match[teamKey].players[playerIdx]) {
-        const pins = parseInt(match[teamKey].players[playerIdx].pins) || 0;
-        if (pins > 0 || match[teamKey].players[playerIdx].pins !== '') {
+        const rawPins = match[teamKey].players[playerIdx].pins;
+        const pins = rawPins !== '' ? clampScore(parseInt(rawPins) || 0) : 0;
+        if (pins > 0 || rawPins !== '') {
           const playerAvg = playerAverages[player.playerId];
           if (playerAvg) {
             playerAvg.totalPins += pins;

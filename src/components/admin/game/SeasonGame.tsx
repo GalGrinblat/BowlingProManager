@@ -4,7 +4,7 @@ import { gamesApi } from '../../../services/api';
 import { logger } from '../../../utils/logger';
 import { MatchView } from './MatchView';
 import { GameSummaryView } from './GameSummaryView';
-import { calculateMatchResults, calculateBonusPoints } from '../../../utils/matchUtils';
+import { calculateMatchResults, calculateBonusPoints, clampScore } from '../../../utils/matchUtils';
 import { calculatePlayerStats, calculateGameTotals, calculateGrandTotalPoints } from '../../../utils/statsUtils';
 import { applyLineupRule } from '../../../utils/lineupUtils';
 import { PreMatchSetup } from './PreMatchSetup';
@@ -99,17 +99,21 @@ export const SeasonGame: React.FC = () => {
     const match = updated.matches[matchIndex];
     if (!match) return;
 
+    // Clamp to valid bowling score range (0–300); preserve empty string for unfinished inputs
+    const parsedPins = parseInt(pins);
+    const sanitizedPins = pins === '' ? '' : isNaN(parsedPins) ? '' : String(clampScore(parsedPins));
+
     if (team === 'team1' && match.team1?.players?.[playerIndex] && updated.team1?.players?.[playerIndex]) {
-      match.team1.players[playerIndex].pins = pins;
+      match.team1.players[playerIndex].pins = sanitizedPins;
       const playerObj = updated.team1.players[playerIndex];
       if (playerObj) {
-        match.team1.players[playerIndex].bonusPoints = calculateBonusPoints(pins, playerObj.average, playerObj.absent, game.bonusRules ?? []);
+        match.team1.players[playerIndex].bonusPoints = calculateBonusPoints(sanitizedPins, playerObj.average, playerObj.absent, game.bonusRules ?? []);
       }
     } else if (team === 'team2' && match.team2?.players?.[playerIndex] && updated.team2?.players?.[playerIndex]) {
-      match.team2.players[playerIndex].pins = pins;
+      match.team2.players[playerIndex].pins = sanitizedPins;
       const playerObj = updated.team2.players[playerIndex];
       if (playerObj) {
-        match.team2.players[playerIndex].bonusPoints = calculateBonusPoints(pins, playerObj.average, playerObj.absent, game.bonusRules ?? []);
+        match.team2.players[playerIndex].bonusPoints = calculateBonusPoints(sanitizedPins, playerObj.average, playerObj.absent, game.bonusRules ?? []);
       }
     }
 
