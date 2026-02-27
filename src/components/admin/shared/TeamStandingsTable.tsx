@@ -80,7 +80,7 @@ export const TeamStandingsTable: React.FC<TeamStandingsTableProps> = ({
                 {t('common.team')}
               </th>
               <th className={`${headerPadding} font-semibold text-gray-700 text-center text-sm`}>
-                {t('seasons.gamesPlayed')}
+                {t('common.gamesPlayed')}
               </th>
               <th className={`${headerPadding} font-semibold text-gray-700 text-center text-sm`}>
                 {t('common.wins')}

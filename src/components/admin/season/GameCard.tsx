@@ -21,7 +21,7 @@ export const GameCard: React.FC<GameCardProps> = ({ game, team1, team2, h2h, onP
   const getStatusBadge = () => {
     switch (game.status) {
       case 'completed':
-        return <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold">{t('games.completed')}</span>;
+        return <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold">{t('common.completed')}</span>;
       case 'in-progress':
         return <span className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm font-semibold">{t('games.inProgress')}</span>;
       default:

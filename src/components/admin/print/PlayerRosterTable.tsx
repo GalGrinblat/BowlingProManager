@@ -30,7 +30,7 @@ export const PlayerRosterTable: React.FC<PlayerRosterTableProps> = ({ teamName, 
         <thead className="bg-gray-100">
           <tr>
             <th className={`${isRTL ? 'text-right' : 'text-left'} px-2 py-2 font-semibold`}>{t('common.player')}</th>
-            <th className="text-center px-2 py-2 font-semibold">{t('seasons.gamesPlayed')}</th>
+            <th className="text-center px-2 py-2 font-semibold">{t('common.gamesPlayed')}</th>
             <th className="text-center px-2 py-2 font-semibold">{t('common.average')}</th>
             <th className="text-center px-2 py-2 font-semibold">{t('common.handicap')}</th>
           </tr>

@@ -50,7 +50,7 @@ export const PlayerAveragesStep: React.FC<PlayerAveragesStepProps> = ({
             <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('seasons.createSeason')}</h1>
             <p className="text-gray-600">{league.name}</p>
           </div>
-          <button onClick={onCancel} className="text-gray-600 hover:text-gray-800">{t('common.leftArrow')} {t('seasons.backToLeague')}</button>
+          <button onClick={onCancel} className="text-gray-600 hover:text-gray-800">{t('common.leftArrow')} {t('common.backToLeague')}</button>
         </div>
       </div>
       <div className="bg-white rounded-xl shadow-lg p-6">
@@ -62,7 +62,7 @@ export const PlayerAveragesStep: React.FC<PlayerAveragesStepProps> = ({
               <tr>
                 <th className={`px-6 py-3 ${textAlign} text-xs font-medium text-gray-500 uppercase tracking-wider`}>{t('seasons.playerName')}</th>
                 <th className={`px-6 py-3 ${textAlign} text-xs font-medium text-gray-500 uppercase tracking-wider`}>{t('common.team')}</th>
-                <th className={`px-6 py-3 ${textAlign} text-xs font-medium text-gray-500 uppercase tracking-wider`}>{t('seasons.average')}</th>
+                <th className={`px-6 py-3 ${textAlign} text-xs font-medium text-gray-500 uppercase tracking-wider`}>{t('common.average')}</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">

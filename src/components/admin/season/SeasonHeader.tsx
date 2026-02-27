@@ -32,7 +32,7 @@ export const SeasonHeader: React.FC<SeasonHeaderProps> = ({
             <h1 className="text-3xl font-bold text-gray-800">{season.name}</h1>
             {isCompleted && (
               <span className="px-3 py-1 bg-green-100 text-green-700 rounded-lg text-sm font-semibold">
-                {t('seasons.completed')}
+                {t('common.completed')}
               </span>
             )}
           </div>
@@ -48,7 +48,7 @@ export const SeasonHeader: React.FC<SeasonHeaderProps> = ({
             onClick={onBack}
             className="text-gray-600 hover:text-gray-800"
           >
-            {t('common.leftArrow')} {t('seasons.backToLeague')}
+            {t('common.leftArrow')} {t('common.backToLeague')}
           </button>
           {season.status === 'active' && (
             <div className="flex gap-2">

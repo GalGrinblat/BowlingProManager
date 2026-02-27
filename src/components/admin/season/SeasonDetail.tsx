@@ -274,7 +274,7 @@ export const SeasonDetail: React.FC = () => {
   const isCompleted = season?.status === 'completed';
   const champion = isCompleted && teamStandings.length > 0 ? teamStandings[0] : null;
 
-  if (!season || !league) return <div>{t('seasons.loading')}</div>;
+  if (!season || !league) return <div>{t('common.loading')}</div>;
 
   const hasMultipleRounds = season.seasonConfigurations.numberOfRounds > 1;
   const getMatchDayLabel = (round: number, matchDay: number) =>

@@ -54,19 +54,19 @@ export const PlayerStandingsTable: React.FC<PlayerStandingsTableProps> = ({
                 {t('common.team')}
               </th>
               <th className={`${headerPadding} font-semibold text-gray-700 text-center text-sm`}>
-                {t('seasons.gamesPlayed')}
+                {t('common.gamesPlayed')}
               </th>
               <th className={`${headerPadding} font-semibold text-gray-700 text-center text-sm ${compact ? '' : 'hidden lg:table-cell'}`}>
                 {t('seasons.pins')}
               </th>
               <th className={`${headerPadding} font-semibold text-gray-700 text-center text-sm`}>
-                {t('seasons.avg')}
+                {t('common.average')}
               </th>
               <th className={`${headerPadding} font-semibold text-gray-700 text-center text-sm ${compact ? '' : 'hidden sm:table-cell'}`}>
-                {t('seasons.highGame')}
+                {t('common.highGame')}
               </th>
               <th className={`${headerPadding} font-semibold text-gray-700 text-center text-sm ${compact ? '' : 'hidden md:table-cell'}`}>
-                {t('seasons.highSeries')}
+                {t('common.highSeries')}
               </th>
               {!compact && (
                 <th className={`${headerPadding} font-semibold text-gray-700 text-center text-sm hidden sm:table-cell`}>

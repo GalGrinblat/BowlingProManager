@@ -34,7 +34,7 @@ export const ChampionBanner: React.FC<ChampionBannerProps> = ({ champion }) => {
           </div>
           <div>
             <div className="text-2xl font-bold">{champion.totalPinsWithHandicap.toLocaleString(locale)}</div>
-            <div className="text-sm opacity-90">{t('seasons.totalPins')}</div>
+            <div className="text-sm opacity-90">{t('common.totalPins')}</div>
           </div>
         </div>
       </div>

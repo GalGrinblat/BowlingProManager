@@ -86,7 +86,7 @@ export const SeasonConfigStep: React.FC<SeasonConfigStepProps> = ({
             <p className="text-gray-600">{league.name}</p>
           </div>
           <button onClick={onBack} className="text-gray-600 hover:text-gray-800">
-            {t('common.leftArrow')} {t('seasons.backToLeague')}
+            {t('common.leftArrow')} {t('common.backToLeague')}
           </button>
         </div>
       </div>

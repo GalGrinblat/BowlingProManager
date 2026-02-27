@@ -331,7 +331,7 @@ export const PlayerDashboard: React.FC = () => {
             <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('playerDashboard.overallStatistics')}</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="text-center p-4 bg-blue-50 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">{t('playerDashboard.gamesPlayed')}</p>
+                <p className="text-sm text-gray-600 mb-1">{t('common.gamesPlayed')}</p>
                 <p className="text-3xl font-bold text-blue-600">{playerStats.gamesPlayed}</p>
               </div>
               <div className="text-center p-4 bg-green-50 rounded-lg">
@@ -339,11 +339,11 @@ export const PlayerDashboard: React.FC = () => {
                 <p className="text-3xl font-bold text-green-600">{playerStats.average.toFixed(1)}</p>
               </div>
               <div className="text-center p-4 bg-purple-50 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">{t('playerDashboard.highGame')}</p>
+                <p className="text-sm text-gray-600 mb-1">{t('common.highGame')}</p>
                 <p className="text-3xl font-bold text-purple-600">{playerStats.highGame}</p>
               </div>
               <div className="text-center p-4 bg-orange-50 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">{t('playerDashboard.highSeries')}</p>
+                <p className="text-sm text-gray-600 mb-1">{t('common.highSeries')}</p>
                 <p className="text-3xl font-bold text-orange-600">{playerStats.highSeries}</p>
               </div>
             </div>

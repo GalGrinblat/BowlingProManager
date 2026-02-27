@@ -77,7 +77,7 @@ export const AdminDashboard: React.FC = () => {
 
       {/* Active Leagues */}
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('dashboard.activeLeagues')}</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('common.activeLeagues')}</h2>
         {activeLeagues.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
             <p>{t('dashboard.noActiveLeagues')}</p>
@@ -128,7 +128,7 @@ export const AdminDashboard: React.FC = () => {
                           </p>
                           {nextMatchDay && (
                             <p className="text-sm text-blue-600 font-medium">
-                              📅 {t('dashboard.next')}: {formatMatchDate(nextMatchDay.date || null)}
+                              📅 {t('common.next')}: {formatMatchDate(nextMatchDay.date || null)}
                               {nextMatchDay.postponed && <span className="text-orange-600 ml-1">({t('dashboard.postponed')})</span>}
                             </p>
                           )}
@@ -136,10 +136,10 @@ export const AdminDashboard: React.FC = () => {
                       )}
                     </div>
                     <div className="text-right text-sm text-gray-500">
-                      <div className="ltr-content">{seasons.length} {seasons.length !== 1 ? t('dashboard.seasons') : t('dashboard.season')}</div>
+                      <div className="ltr-content">{seasons.length} {seasons.length !== 1 ? t('common.seasons') : t('common.season')}</div>
                       <div className="text-xs mt-1">
                         {league.dayOfWeek && <div>{t(`days.${league.dayOfWeek.toLowerCase()}Plural`)}</div>}
-                        <span className="ltr-content">{league.defaultSeasonConfigurations.playersPerTeam} {t('dashboard.playersPerTeam')}</span>
+                        <span className="ltr-content">{league.defaultSeasonConfigurations.playersPerTeam} {t('common.playersPerTeam')}</span>
                       </div>
                     </div>
                   </div>

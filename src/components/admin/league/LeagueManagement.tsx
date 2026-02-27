@@ -354,7 +354,7 @@ export const LeagueManagement: React.FC = () => {
       <div className="bg-white rounded-xl shadow-lg p-6">
         <div className="mb-4">
           <h2 className="text-xl font-bold text-gray-800">
-            {t('leagues.activeLeagues')} (<span className="ltr-content">{activeLeagues.length}</span>)
+            {t('common.activeLeagues')} (<span className="ltr-content">{activeLeagues.length}</span>)
           </h2>
           <p className="text-sm text-gray-600 mt-1">
             {t('leagues.currentLeagues')}
@@ -382,8 +382,8 @@ export const LeagueManagement: React.FC = () => {
                       <div className="flex gap-4 mt-2 text-sm text-gray-500">
                         {league.dayOfWeek && <span>📅 {t(`days.${league.dayOfWeek.toLowerCase()}Plural`)}</span>}
                         <span>📊 {t('leagues.handicap.use')}: <span className="ltr-content">{league.defaultSeasonConfigurations.useHandicap !== false ? `${league.defaultSeasonConfigurations.handicapBasis} (${league.defaultSeasonConfigurations.handicapPercentage || 100}%)` : t('leagues.handicap.disabled')}</span></span>
-                        <span>👥 <span className="ltr-content">{league.defaultSeasonConfigurations.playersPerTeam}</span> {t('leagues.playersPerTeam')}</span>
-                        <span>🎳 <span className="ltr-content">{seasons.length}</span> {seasons.length === 1 ? t('leagues.season') : t('leagues.seasons')}</span>
+                        <span>👥 <span className="ltr-content">{league.defaultSeasonConfigurations.playersPerTeam}</span> {t('common.playersPerTeam')}</span>
+                        <span>🎳 <span className="ltr-content">{seasons.length}</span> {seasons.length === 1 ? t('common.season') : t('common.seasons')}</span>
                       </div>
                       {activeSeason && (
                         <div className="mt-2 inline-block px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">
@@ -453,7 +453,7 @@ export const LeagueManagement: React.FC = () => {
                       <h3 className="font-semibold text-gray-600">{league.name}</h3>
                       <div className="text-sm text-gray-500 mt-1">
                         {league.dayOfWeek && <span>{t(`days.${league.dayOfWeek.toLowerCase()}Plural`)} • </span>}
-                        <span className="ltr-content">{seasons.length}</span> {seasons.length === 1 ? t('leagues.season') : t('leagues.seasons')}
+                        <span className="ltr-content">{seasons.length}</span> {seasons.length === 1 ? t('common.season') : t('common.seasons')}
                       </div>
                     </div>
                     <div className="flex gap-2">

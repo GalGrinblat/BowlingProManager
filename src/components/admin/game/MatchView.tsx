@@ -107,7 +107,7 @@ export const MatchView: React.FC<MatchViewProps> = ({ matchNumber, game, onUpdat
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="bg-orange-600 text-white p-4 rounded-lg">
           <div className="text-center">
-            <div className="text-sm font-bold uppercase tracking-wider opacity-90 mb-1">{t('games.totalPins')}</div>
+            <div className="text-sm font-bold uppercase tracking-wider opacity-90 mb-1">{t('common.totalPins')}</div>
             <div className="text-3xl font-bold mb-2">{match.team1.totalPins}</div>
             <div className="text-xs font-bold uppercase tracking-wider opacity-90 mb-1">{t('games.totalPinsHC')}</div>
             <div className="text-2xl font-bold mb-3">{match.team1.totalWithHandicap}</div>
@@ -131,7 +131,7 @@ export const MatchView: React.FC<MatchViewProps> = ({ matchNumber, game, onUpdat
 
         <div className="bg-blue-600 text-white p-4 rounded-lg">
           <div className="text-center">
-            <div className="text-sm font-bold uppercase tracking-wider opacity-90 mb-1">{t('games.totalPins')}</div>
+            <div className="text-sm font-bold uppercase tracking-wider opacity-90 mb-1">{t('common.totalPins')}</div>
             <div className="text-3xl font-bold mb-2">{match.team2.totalPins}</div>
             <div className="text-xs font-bold uppercase tracking-wider opacity-90 mb-1">{t('games.totalPinsHC')}</div>
             <div className="text-2xl font-bold mb-3">{match.team2.totalWithHandicap}</div>

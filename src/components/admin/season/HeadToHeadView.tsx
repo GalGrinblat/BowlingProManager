@@ -61,7 +61,7 @@ export const HeadToHeadView: React.FC<HeadToHeadViewProps> = ({ teams, games }) 
                           {teamWins}-{opponentWins}{h2h.ties > 0 ? `-${h2h.ties}` : ''}
                         </div>
                         <div className="text-xs text-gray-500 mt-1">
-                          {t('seasons.avg')}: {h2h.team1AvgPoints.toFixed(1)} {t('seasons.pts')}
+                          {t('common.average')}: {h2h.team1AvgPoints.toFixed(1)} {t('common.pts')}
                         </div>
                       </div>
                     </div>

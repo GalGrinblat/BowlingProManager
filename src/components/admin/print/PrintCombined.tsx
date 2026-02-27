@@ -97,7 +97,7 @@ export const PrintCombined: React.FC<PrintCombinedProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [seasonId, matchDay]);
 
-  if (!season || !league) return <div>{t('seasons.loading')}</div>;
+  if (!season || !league) return <div>{t('common.loading')}</div>;
 
   const completedGames = games.filter(g => g.status === 'completed');
   const getTeamName = (teamId: string) => teams.find(t => t.id === teamId)?.name || teamId;
@@ -124,7 +124,7 @@ export const PrintCombined: React.FC<PrintCombinedProps> = ({
               <h2 className="text-2xl font-semibold text-gray-700 mb-4">{season.name}</h2>
               <h3 className="text-xl font-semibold text-blue-600">{t('seasons.teamStandings')}</h3>
               <div className="mt-4 text-sm text-gray-600">
-                <span>{t('seasons.gamesPlayed')}: {completedGames.length}</span>
+                <span>{t('common.gamesPlayed')}: {completedGames.length}</span>
               </div>
             </div>
             {teamStandings.length === 0 ? (
@@ -146,7 +146,7 @@ export const PrintCombined: React.FC<PrintCombinedProps> = ({
               <h2 className="text-2xl font-semibold text-gray-700 mb-4">{season.name}</h2>
               <h3 className="text-xl font-semibold text-blue-600">{t('seasons.playerStandings')}</h3>
               <div className="mt-4 text-sm text-gray-600">
-                <span>{t('seasons.gamesPlayed')}: {completedGames.length}</span>
+                <span>{t('common.gamesPlayed')}: {completedGames.length}</span>
               </div>
             </div>
             {playerStats.length === 0 ? (
