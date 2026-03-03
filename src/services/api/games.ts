@@ -27,6 +27,7 @@ const mapGameFromDb = (data: GameRow): Game => ({
   teamMatchPointsPerWin: data.team_match_points_per_win,
   teamGamePointsPerWin: data.team_game_points_per_win,
   grandTotalPoints: data.grand_total_points ?? undefined,
+  pendingScores: data.pending_scores ?? undefined,
   scheduledDate: data.scheduled_date ?? undefined,
   postponed: data.postponed,
   originalDate: data.original_date ?? undefined,
@@ -56,6 +57,7 @@ const mapGameToDb = (data: Partial<Game>): Record<string, unknown> => {
   if (data.teamMatchPointsPerWin !== undefined) dbData.team_match_points_per_win = data.teamMatchPointsPerWin;
   if (data.teamGamePointsPerWin !== undefined) dbData.team_game_points_per_win = data.teamGamePointsPerWin;
   if (data.grandTotalPoints !== undefined) dbData.grand_total_points = data.grandTotalPoints;
+  if (data.pendingScores !== undefined) dbData.pending_scores = data.pendingScores;
   if (data.scheduledDate !== undefined) dbData.scheduled_date = data.scheduledDate;
   if (data.postponed !== undefined) dbData.postponed = data.postponed;
   if (data.originalDate !== undefined) dbData.original_date = data.originalDate;

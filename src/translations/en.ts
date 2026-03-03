@@ -24,7 +24,9 @@ const en: TranslationDictionary = {
     playerStandingsDesc: 'Current player standings and statistics',
     printSelected: 'Print Selected',
     selectAtLeastOne: 'Please select at least one option to print',
-    printPreview: 'Print Preview'
+    printPreview: 'Print Preview',
+    scanToEnterScores: 'Scan to enter scores',
+    playerScoreEntry: 'Player Score Entry',
   },
   // Common words and actions
   common: {
@@ -449,6 +451,23 @@ const en: TranslationDictionary = {
     hc: 'HC',
     summary: 'Summary',
     enterAllScores: 'Please enter all scores before proceeding',
+    scoreEntryLink: 'Player Score Entry Link',
+    copyLink: 'Copy Link',
+    linkCopied: 'Link copied!',
+    pendingSubmissions: 'Pending Score Submissions',
+    pendingSubmissionsDesc: '{{count}} player submission(s) awaiting review',
+    reviewSubmissions: 'Review Submissions',
+    noSubmissions: 'No pending submissions',
+    submittedBy: 'Submitted by',
+    submittedAt: 'Submitted',
+    applyScores: 'Apply',
+    dismissSubmission: 'Dismiss',
+    applyAllScores: 'Apply All',
+    dismissAll: 'Dismiss All',
+    submissionApplied: 'Scores applied',
+    submissionDismissed: 'Submission dismissed',
+    skipReview: 'Skip Review',
+    matchScore: 'Match {{num}}',
   },
 
   // Records
@@ -463,6 +482,28 @@ const en: TranslationDictionary = {
     noRecords: 'No records',
     noCompletedGames: 'No completed games yet. Records will appear once games are played.',
     day: 'Day',
+  },
+
+  // Player Score Entry (public page)
+  scoreEntry: {
+    title: 'Enter Your Scores',
+    subtitle: 'Match Day {{matchDay}} · Round {{round}}',
+    selectTeam: 'Select Your Team',
+    selectPlayer: 'Select Your Name',
+    enterScores: 'Enter Your Scores',
+    matchNumber: 'Match {{num}}',
+    pinsLabel: 'Pins',
+    submit: 'Submit Scores',
+    submitting: 'Submitting...',
+    successTitle: 'Scores Submitted!',
+    successMessage: 'Your scores have been submitted and will be reviewed by the admin.',
+    submitAnother: 'Submit Another',
+    gameNotFound: 'Game not found.',
+    gameClosed: 'This game has already been completed. Score entry is closed.',
+    loadError: 'Could not load game information. Please try again.',
+    teamNotSetUp: 'Team rosters are not yet available. Please check back once the admin has set up the game.',
+    alreadySubmitted: 'Scores for this player have already been submitted.',
+    invalidScore: 'Please enter a valid score (0–300) for all matches.',
   },
 
   // Settings

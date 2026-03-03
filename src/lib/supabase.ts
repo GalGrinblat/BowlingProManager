@@ -8,6 +8,7 @@ import type {
   GameTeam,
   ScheduleMatchDay,
   CurrentPlayerAverages,
+  ScoreSubmission,
 } from '../types/index';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -162,6 +163,7 @@ export type Database = {
           team_match_points_per_win: number;
           team_game_points_per_win: number;
           grand_total_points: { team1: number; team2: number } | null;
+          pending_scores: ScoreSubmission[] | null;
           scheduled_date: string | null;
           postponed: boolean;
           original_date: string | null;

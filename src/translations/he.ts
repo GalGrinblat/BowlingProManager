@@ -24,7 +24,9 @@ const he: TranslationDictionary = {
     playerStandingsDesc: 'דירוג שחקנים ונתונים סטטיסטיים עדכניים',
     printSelected: 'הדפס נבחרים',
     selectAtLeastOne: 'אנא בחר לפחות אפשרות אחת להדפסה',
-    printPreview: 'תצוגה מקדימה להדפסה'
+    printPreview: 'תצוגה מקדימה להדפסה',
+    scanToEnterScores: 'סרוק להזנת ניקוד',
+    playerScoreEntry: 'הזנת ניקוד שחקנים',
   },
   // מילים ופעולות נפוצות
   common: {
@@ -449,6 +451,23 @@ const he: TranslationDictionary = {
     hc: 'הנד\'',
     summary: 'סיכום',
     enterAllScores: 'אנא הזן את כל הניקודים לפני המשך',
+    scoreEntryLink: 'קישור להזנת ניקוד שחקנים',
+    copyLink: 'העתק קישור',
+    linkCopied: 'הקישור הועתק!',
+    pendingSubmissions: 'הגשות ניקוד ממתינות',
+    pendingSubmissionsDesc: '{{count}} הגשה/ות ממתינות לבדיקה',
+    reviewSubmissions: 'בדוק הגשות',
+    noSubmissions: 'אין הגשות ממתינות',
+    submittedBy: 'הוגש על ידי',
+    submittedAt: 'הוגש',
+    applyScores: 'אשר',
+    dismissSubmission: 'דחה',
+    applyAllScores: 'אשר הכל',
+    dismissAll: 'דחה הכל',
+    submissionApplied: 'ניקוד הוחל',
+    submissionDismissed: 'הגשה נדחתה',
+    skipReview: 'דלג על בדיקה',
+    matchScore: 'מקצה {{num}}',
   },
 
   // שיאים
@@ -463,6 +482,28 @@ const he: TranslationDictionary = {
     noRecords: 'אין שיאים',
     noCompletedGames: 'אין עדיין משחקים שהושלמו. שיאים יופיעו לאחר שמשחקים יתקיימו.',
     day: 'יום',
+  },
+
+  // הזנת ניקוד שחקנים (דף ציבורי)
+  scoreEntry: {
+    title: 'הזן את הניקוד שלך',
+    subtitle: 'מחזור {{matchDay}} · סיבוב {{round}}',
+    selectTeam: 'בחר את הקבוצה שלך',
+    selectPlayer: 'בחר את שמך',
+    enterScores: 'הזן את הניקוד שלך',
+    matchNumber: 'מקצה {{num}}',
+    pinsLabel: 'פינים',
+    submit: 'שלח ניקוד',
+    submitting: 'שולח...',
+    successTitle: 'הניקוד נשלח!',
+    successMessage: 'הניקוד שלך נשלח ויועבר לאישור המנהל.',
+    submitAnother: 'שלח ניקוד נוסף',
+    gameNotFound: 'המשחק לא נמצא.',
+    gameClosed: 'משחק זה הסתיים כבר. הזנת ניקוד סגורה.',
+    loadError: 'לא ניתן לטעון את פרטי המשחק. אנא נסה שוב.',
+    teamNotSetUp: 'סגלי הקבוצות עדיין אינם זמינים. בדוק שוב לאחר שהמנהל יגדיר את המשחק.',
+    alreadySubmitted: 'הניקוד של שחקן זה כבר נשלח.',
+    invalidScore: 'אנא הזן ניקוד תקין (0–300) לכל המקצים.',
   },
 
   // הגדרות

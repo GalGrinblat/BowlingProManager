@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { gamesApi } from '../../../services/api';
 import { logger } from '../../../utils/logger';
 import { MatchView } from './MatchView';
 import { GameSummaryView } from './GameSummaryView';
+import { PendingSubmissionsPanel } from './PendingSubmissionsPanel';
 import { calculateMatchResults, calculateBonusPoints, clampScore } from '../../../utils/matchUtils';
 import { calculatePlayerStats, calculateGameTotals, calculateGrandTotalPoints } from '../../../utils/statsUtils';
 import { applyLineupRule } from '../../../utils/lineupUtils';
@@ -11,7 +12,7 @@ import { PreMatchSetup } from './PreMatchSetup';
 import { useGameInitializer } from '../../../hooks/useGameInitializer';
 import { useTranslation } from '../../../contexts/LanguageContext';
 
-import type { Game, GamePlayer, GameMatch, MatchPlayer } from '../../../types/index';
+import type { Game, GamePlayer, GameMatch, MatchPlayer, ScoreSubmission } from '../../../types/index';
 
 export const SeasonGame: React.FC = () => {
   const navigate = useNavigate();
@@ -25,6 +26,31 @@ export const SeasonGame: React.FC = () => {
     team1Players, setTeam1Players,
     team2Players, setTeam2Players,
   } = useGameInitializer(gameId!);
+
+  const [showPendingReview, setShowPendingReview] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  // When the game loads, check for pending submissions
+  React.useEffect(() => {
+    if (game && (game.pendingScores?.length ?? 0) > 0 && showPreMatch) {
+      setShowPendingReview(true);
+    }
+  }, [game?.id, showPreMatch]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const scoreEntryUrl = `${window.location.origin}/score/${gameId}`;
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(scoreEntryUrl).then(() => {
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    });
+  };
+
+  const handlePendingReviewDone = async (updatedGame: Game, remaining: ScoreSubmission[]) => {
+    const saved = await gamesApi.update(gameId!, { ...updatedGame, pendingScores: remaining });
+    if (saved) setGame(saved);
+    setShowPendingReview(false);
+  };
 
   const handlePreMatchContinue = async () => {
     if (!game || !game.team1 || !game.team2) return;
@@ -264,17 +290,52 @@ export const SeasonGame: React.FC = () => {
     );
   }
 
-  if (showPreMatch) {
+  // Pending submissions review (shown before pre-match setup)
+  if (showPendingReview) {
     return (
-      <PreMatchSetup
+      <PendingSubmissionsPanel
         game={game}
-        team1Players={team1Players}
-        team2Players={team2Players}
-        onToggleAbsent={toggleAbsent}
-        onMovePlayer={movePlayer}
-        onContinue={handlePreMatchContinue}
-        onBack={() => navigate(-1)}
+        onApply={handlePendingReviewDone}
+        onSkip={() => setShowPendingReview(false)}
       />
+    );
+  }
+
+  if (showPreMatch) {
+    const pendingCount = game.pendingScores?.length ?? 0;
+    return (
+      <>
+        {/* Score entry link bar */}
+        <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 flex flex-wrap items-center gap-3">
+          <span className="text-sm font-semibold text-blue-700">{t('games.scoreEntryLink')}:</span>
+          <code className="text-xs bg-white border border-blue-200 rounded px-2 py-1 text-blue-600 break-all flex-1">
+            {scoreEntryUrl}
+          </code>
+          <button
+            onClick={handleCopyLink}
+            className="shrink-0 px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors font-semibold"
+          >
+            {linkCopied ? t('games.linkCopied') : t('games.copyLink')}
+          </button>
+          {pendingCount > 0 && (
+            <button
+              onClick={() => setShowPendingReview(true)}
+              className="shrink-0 px-3 py-1 bg-amber-500 text-white text-xs rounded hover:bg-amber-600 transition-colors font-semibold"
+            >
+              📋 {t('games.reviewSubmissions')} ({pendingCount})
+            </button>
+          )}
+        </div>
+        <PreMatchSetup
+          game={game}
+          team1Players={team1Players}
+          team2Players={team2Players}
+          onToggleAbsent={toggleAbsent}
+          onMovePlayer={movePlayer}
+          onContinue={handlePreMatchContinue}
+          onBack={() => navigate(-1)}
+        />
+      </>
     );
   }
 
