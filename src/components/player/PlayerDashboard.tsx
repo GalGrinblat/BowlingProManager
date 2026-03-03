@@ -68,6 +68,14 @@ export const PlayerDashboard: React.FC = () => {
           });
         setPlayerLeagues(leagues);
 
+        // Build lookup maps for record context (no extra API calls — reuse already-fetched data)
+        const seasonsById = new Map(
+          validSeasons.filter((s): s is Season => s !== undefined).map(s => [s.id, s])
+        );
+        const leaguesById = new Map(
+          leaguesData.filter((l): l is League => !!l).map(l => [l.id, l])
+        );
+
         // Get recent completed games
         const allGames = await gamesApi.getAll();
         if (cancelled) return;
@@ -100,7 +108,7 @@ export const PlayerDashboard: React.FC = () => {
         setGameDetailsMap(detailsMap);
 
         // Calculate player statistics across all games — synchronous, no API calls
-        const stats = computePlayerStats(allGames, teamsById, playerResult);
+        const stats = computePlayerStats(allGames, teamsById, seasonsById, leaguesById, playerResult);
         if (cancelled) return;
         setPlayerStats(stats);
       } catch (error) {
@@ -121,6 +129,8 @@ export const PlayerDashboard: React.FC = () => {
   const computePlayerStats = (
     allGames: Game[],
     teamsById: Map<string, Team>,
+    seasonsById: Map<string, Season>,
+    leaguesById: Map<string, League>,
     playerResult: Player | undefined
   ): PlayerStats => {
     const stats: PlayerStats = {
@@ -131,6 +141,7 @@ export const PlayerDashboard: React.FC = () => {
       average: 0,
       highGame: 0,
       highSeries: 0,
+      highSeriesByCount: {},
       seriesCount: 0,
       pointsScored: 0,
     };
@@ -160,7 +171,18 @@ export const PlayerDashboard: React.FC = () => {
               stats.totalPins += pins;
               seriesPins += pins;
               playedMatch = true;
-              if (pins > stats.highGame) stats.highGame = pins;
+              if (pins > stats.highGame) {
+                stats.highGame = pins;
+                const season = seasonsById.get(game.seasonId);
+                const league = season ? leaguesById.get(season.leagueId) : undefined;
+                stats.highGameContext = {
+                  date: game.scheduledDate || game.completedAt || '',
+                  leagueName: league?.name ?? '',
+                  seasonName: season?.name ?? '',
+                  round: game.round,
+                  matchDay: game.matchDay,
+                };
+              }
             }
             if (match.playerMatches && match.playerMatches[playerIndex]) {
               const points = isOnTeam1
@@ -172,7 +194,36 @@ export const PlayerDashboard: React.FC = () => {
         });
       }
       if (playedMatch) {
-        if (seriesPins > stats.highSeries) stats.highSeries = seriesPins;
+        if (seriesPins > stats.highSeries) {
+          stats.highSeries = seriesPins;
+          const season = seasonsById.get(game.seasonId);
+          const league = season ? leaguesById.get(season.leagueId) : undefined;
+          stats.highSeriesContext = {
+            date: game.scheduledDate || game.completedAt || '',
+            leagueName: league?.name ?? '',
+            seasonName: season?.name ?? '',
+            round: game.round,
+            matchDay: game.matchDay,
+          };
+        }
+
+        const seriesLength = game.matchesPerGame;
+        const existing = stats.highSeriesByCount![seriesLength];
+        if (!existing || seriesPins > existing.pins) {
+          const season = seasonsById.get(game.seasonId);
+          const league = season ? leaguesById.get(season.leagueId) : undefined;
+          stats.highSeriesByCount![seriesLength] = {
+            pins: seriesPins,
+            context: {
+              date: game.scheduledDate || game.completedAt || '',
+              leagueName: league?.name ?? '',
+              seasonName: season?.name ?? '',
+              round: game.round,
+              matchDay: game.matchDay,
+            },
+          };
+        }
+
         stats.seriesCount++;
       }
     }
@@ -366,7 +417,7 @@ export const PlayerDashboard: React.FC = () => {
           {/* Overall Stats */}
           <div className="bg-white rounded-xl shadow-lg p-6">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('playerDashboard.overallStatistics')}</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               <div className="text-center p-4 bg-blue-50 rounded-lg">
                 <p className="text-sm text-gray-600 mb-1">{t('common.gamesPlayed')}</p>
                 <p className="text-3xl font-bold text-blue-600">{playerStats.gamesPlayed}</p>
@@ -375,15 +426,44 @@ export const PlayerDashboard: React.FC = () => {
                 <p className="text-sm text-gray-600 mb-1">{t('common.average')}</p>
                 <p className="text-3xl font-bold text-green-600">{playerStats.average.toFixed(1)}</p>
               </div>
-              <div className="text-center p-4 bg-purple-50 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">{t('common.highGame')}</p>
-                <p className="text-3xl font-bold text-purple-600">{playerStats.highGame}</p>
-              </div>
-              <div className="text-center p-4 bg-orange-50 rounded-lg">
-                <p className="text-sm text-gray-600 mb-1">{t('common.highSeries')}</p>
-                <p className="text-3xl font-bold text-orange-600">{playerStats.highSeries}</p>
+              <div className="p-4 bg-purple-50 rounded-lg">
+                <p className="text-sm text-gray-600 mb-1 text-center">{t('common.highGame')}</p>
+                <p className="text-3xl font-bold text-purple-600 text-center">{playerStats.highGame}</p>
+                {playerStats.highGameContext && (
+                  <div className="mt-2 text-xs text-gray-500 space-y-0.5">
+                    <p className="font-medium truncate">{playerStats.highGameContext.leagueName}</p>
+                    <p className="truncate">{playerStats.highGameContext.seasonName}</p>
+                    <p>{t('common.round')} {playerStats.highGameContext.round} · {t('common.matchDay')} {playerStats.highGameContext.matchDay}</p>
+                    {playerStats.highGameContext.date && <p>{formatDate(playerStats.highGameContext.date)}</p>}
+                  </div>
+                )}
               </div>
             </div>
+
+            {/* Per-Length High Series Records */}
+            {Object.keys(playerStats.highSeriesByCount ?? {}).length > 0 && (
+              <div className="mt-6">
+                <h3 className="text-lg font-semibold text-gray-700 mb-3">{t('playerDashboard.highSeriesRecords')}</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  {Object.entries(playerStats.highSeriesByCount!)
+                    .sort(([a], [b]) => Number(a) - Number(b))
+                    .map(([count, record]) => (
+                      <div key={count} className="p-4 bg-orange-50 rounded-lg">
+                        <p className="text-sm text-gray-600 mb-1 text-center">
+                          {t('playerDashboard.highNGameSeries').replace('{{n}}', count)}
+                        </p>
+                        <p className="text-3xl font-bold text-orange-600 text-center">{record.pins}</p>
+                        <div className="mt-2 text-xs text-gray-500 space-y-0.5">
+                          <p className="font-medium truncate">{record.context.leagueName}</p>
+                          <p className="truncate">{record.context.seasonName}</p>
+                          <p>{t('common.round')} {record.context.round} · {t('common.matchDay')} {record.context.matchDay}</p>
+                          {record.context.date && <p>{formatDate(record.context.date)}</p>}
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {playerStats.gamesPlayed === 0 && (

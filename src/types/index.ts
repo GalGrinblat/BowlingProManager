@@ -236,6 +236,15 @@ export interface TeamStanding {
   totalPinsWithHandicap: number;
 }
 
+/** PlayerRecordContext - Where and when a personal record was achieved */
+export interface PlayerRecordContext {
+  date: string;
+  leagueName: string;
+  seasonName: string;
+  round: number;
+  matchDay: number;
+}
+
 /** PlayerStats - Aggregated player performance statistics across games */
 export interface PlayerStats {
   playerId: string;
@@ -244,7 +253,10 @@ export interface PlayerStats {
   totalPins: number;
   average: number;
   highGame: number;
+  highGameContext?: PlayerRecordContext;
   highSeries: number;
+  highSeriesContext?: PlayerRecordContext;
+  highSeriesByCount?: Record<number, { pins: number; context: PlayerRecordContext }>;
   seriesCount: number;
   teamId?: string;
   teamName?: string;

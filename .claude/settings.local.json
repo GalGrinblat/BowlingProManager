@@ -25,7 +25,8 @@
       "Bash(npx jest tests/component/board/)",
       "Bash(npx jest tests/component/board/ --no-coverage)",
       "Bash(git -C \"c:/Code/BowlingAppAi\" remote get-url origin)",
-      "Bash(git -C \"c:/Code/BowlingAppAi\" remote set-url origin https://github.com/GalGrinblat/BowlingProManager.git)"
+      "Bash(git -C \"c:/Code/BowlingAppAi\" remote set-url origin https://github.com/GalGrinblat/BowlingProManager.git)",
+      "Bash(NODE_OPTIONS=\"--max-old-space-size=4096\" npx tsc --noEmit --skipLibCheck)"
     ]
   }
 }

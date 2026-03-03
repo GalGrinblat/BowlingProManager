@@ -553,6 +553,8 @@ const en: TranslationDictionary = {
     notLinkedBrowseBoard: 'Browse the Public Scoreboard',
     myLeagues: 'My Leagues',
     viewStandings: 'View Standings',
+    highSeriesRecords: 'High Series Records',
+    highNGameSeries: 'High {{n}}-Game Series',
     seasonHistory: 'Season History',
     noCompletedSeasons: 'No Completed Seasons',
     noCompletedSeasonsDesc: "You haven't participated in any completed seasons yet.",

@@ -553,6 +553,8 @@ const he: TranslationDictionary = {
     notLinkedBrowseBoard: 'עיין בלוח התוצאות הציבורי',
     myLeagues: 'הליגות שלי',
     viewStandings: 'צפה בדירוגים',
+    highSeriesRecords: 'שיאי סדרות',
+    highNGameSeries: 'סדרת {{n}} משחקים גבוהה',
     seasonHistory: 'היסטוריית עונות',
     noCompletedSeasons: 'אין עונות שהושלמו',
     noCompletedSeasonsDesc: 'עדיין לא השתתפת בעונות שהושלמו.',
