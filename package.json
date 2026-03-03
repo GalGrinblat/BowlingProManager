@@ -1,7 +1,7 @@
 {
-  "name": "bowling-league-app",
+  "name": "bowling-pro-manager",
   "version": "1.0.0",
-  "description": "An n-match bowling league scoring application with configurable matches per game and handicap calculations",
+  "description": "Bowling Pro Manager — a bowling league management app with configurable scoring, handicap calculations, and standings",
   "type": "module",
   "scripts": {
     "dev": "vite",

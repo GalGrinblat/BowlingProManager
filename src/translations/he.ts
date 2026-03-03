@@ -89,7 +89,7 @@ const he: TranslationDictionary = {
     selectRole: 'בחר תפקיד',
     loginAs: 'התחבר בתור',
     welcome: 'ברוך הבא',
-    subtitle: 'התחבר כדי לגשת לליגת הבאולינג שלך',
+    subtitle: "התחבר כדי לגשת לבאולינג פרו מנג'ר",
     signIn: 'התחבר עם Google',
     signingIn: 'מתחבר...',
     loginFailed: 'ההתחברות נכשלה. אנא נסה שוב.',

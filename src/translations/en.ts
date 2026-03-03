@@ -89,7 +89,7 @@ const en: TranslationDictionary = {
     selectRole: 'Select Role',
     loginAs: 'Login as',
     welcome: 'Welcome',
-    subtitle: 'Sign in to access your bowling league',
+    subtitle: 'Sign in to access Bowling Pro Manager',
     signIn: 'Sign in with Google',
     signingIn: 'Signing in...',
     loginFailed: 'Failed to sign in. Please try again.',

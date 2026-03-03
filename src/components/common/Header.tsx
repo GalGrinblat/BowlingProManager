@@ -28,7 +28,7 @@ export const Header: React.FC<HeaderProps> = ({ currentUser, onLogout }) => {
         <div className="flex items-center gap-2 sm:gap-3">
           <Trophy className="text-orange-600 hidden sm:block" size={40} strokeWidth={2.5} />
           <h1 className="bowling-title text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-gray-900">
-            BOWLING LEAGUE MANAGER
+            BOWLING PRO MANAGER
           </h1>
           <Trophy className="text-orange-600 hidden sm:block" size={40} strokeWidth={2.5} />
         </div>
@@ -57,7 +57,7 @@ export const Header: React.FC<HeaderProps> = ({ currentUser, onLogout }) => {
           )}
         </div>
       </div>
-      <p className="text-gray-600 font-semibold text-sm sm:text-base lg:text-lg">Bowling League Management System</p>
+      <p className="text-gray-600 font-semibold text-sm sm:text-base lg:text-lg">באולינג פרו מנג'ר</p>
     </div>
   );
 }
