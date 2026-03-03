@@ -22,6 +22,7 @@ const BoardHome   = lazy(() => import('../components/board/BoardHome').then(m =>
 const BoardLeague = lazy(() => import('../components/board/BoardLeague').then(m => ({ default: m.BoardLeague })));
 const BoardSeason = lazy(() => import('../components/board/BoardSeason').then(m => ({ default: m.BoardSeason })));
 const BoardGame   = lazy(() => import('../components/board/BoardGame').then(m => ({ default: m.BoardGame })));
+const PlayerScoreEntry = lazy(() => import('../components/score').then(m => ({ default: m.PlayerScoreEntry })));
 
 const BoardLayout = () => (
   <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 p-4 md:p-8">
@@ -130,5 +131,18 @@ export const router = createBrowserRouter([
       { path: '/board/seasons/:seasonId', element: <BoardSeason /> },
       { path: '/board/games/:gameId', element: <BoardGame /> },
     ],
+  },
+  // Public score entry — no layout wrapper, no auth required
+  {
+    path: '/score/:gameId',
+    element: (
+      <Suspense fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-600" />
+        </div>
+      }>
+        <PlayerScoreEntry />
+      </Suspense>
+    ),
   },
 ]);

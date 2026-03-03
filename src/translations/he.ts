@@ -24,7 +24,9 @@ const he: TranslationDictionary = {
     playerStandingsDesc: 'דירוג שחקנים ונתונים סטטיסטיים עדכניים',
     printSelected: 'הדפס נבחרים',
     selectAtLeastOne: 'אנא בחר לפחות אפשרות אחת להדפסה',
-    printPreview: 'תצוגה מקדימה להדפסה'
+    printPreview: 'תצוגה מקדימה להדפסה',
+    scanToEnterScores: 'סרוק להזנת ניקוד',
+    playerScoreEntry: 'הזנת ניקוד שחקנים',
   },
   // מילים ופעולות נפוצות
   common: {
@@ -449,6 +451,24 @@ const he: TranslationDictionary = {
     hc: 'הנד\'',
     summary: 'סיכום',
     enterAllScores: 'אנא הזן את כל הניקודים לפני המשך',
+    scoreEntryLink: 'קישור להזנת ניקוד שחקנים',
+    copyLink: 'העתק קישור',
+    linkCopied: 'הקישור הועתק!',
+    pendingSubmissions: 'הגשות ניקוד ממתינות',
+    pendingSubmissionsDesc: '{{count}} הגשה/ות ממתינות לבדיקה',
+    reviewSubmissions: 'בדוק הגשות',
+    noSubmissions: 'אין הגשות ממתינות',
+    submittedAt: 'הוגש',
+    applyScores: 'אשר',
+    dismissSubmission: 'דחה',
+    applyAllScores: 'אשר הכל',
+    dismissAll: 'דחה הכל',
+    submissionApplied: 'ניקוד הוחל',
+    submissionDismissed: 'הגשה נדחתה',
+    skipReview: 'דלג על בדיקה',
+    matchScore: 'מקצה {{num}}',
+    allPresent: 'כולם נוכחים',
+    preMatchTitle: 'היעדרויות לפני המשחק',
   },
 
   // שיאים
@@ -463,6 +483,32 @@ const he: TranslationDictionary = {
     noRecords: 'אין שיאים',
     noCompletedGames: 'אין עדיין משחקים שהושלמו. שיאים יופיעו לאחר שמשחקים יתקיימו.',
     day: 'יום',
+  },
+
+  // הזנת ניקוד שחקנים (דף ציבורי)
+  scoreEntry: {
+    title: 'הזן ניקוד משחק',
+    subtitle: 'מחזור {{matchDay}} · סיבוב {{round}}',
+    team1Label: 'קבוצה 1',
+    team2Label: 'קבוצה 2',
+    preMatchTitle: 'הגדרת טרום משחק',
+    preMatchDesc: 'סמן שחקנים נעדרים לפני הזנת הניקוד.',
+    markAbsent: 'נעדר',
+    markPresent: 'נוכח',
+    stepPreMatch: 'הגדרה',
+    stepMatch: 'מקצה {{num}}',
+    matchNumber: 'מקצה {{num}}',
+    pinsLabel: 'פינים',
+    submit: 'שלח לאישור',
+    submitting: 'שולח...',
+    successTitle: 'נשלח!',
+    successMessage: 'ניקוד המשחק נשלח וממתין לאישור המנהל.',
+    submitAnother: 'שלח שוב',
+    gameNotFound: 'המשחק לא נמצא.',
+    gameClosed: 'משחק זה הסתיים כבר. הזנת ניקוד סגורה.',
+    loadError: 'לא ניתן לטעון את פרטי המשחק. אנא נסה שוב.',
+    teamNotSetUp: 'סגלי הקבוצות עדיין אינם זמינים. בדוק שוב לאחר שהמנהל יגדיר את המשחק.',
+    invalidScore: 'אנא הזן ניקוד תקין (0–300) לכל שחקן.',
   },
 
   // הגדרות

@@ -129,6 +129,30 @@ export interface GameTeam {
 export type GameStatus = 'pending' | 'in-progress' | 'completed';
 export type SeasonStatus = 'setup' | 'active' | 'completed';
 
+/**
+ * ScoreSubmission - Full-game data entered by a player via the public link,
+ * awaiting admin approval. Covers both the pre-match setup (absences) and
+ * all match scores for both teams.
+ */
+export interface ScoreSubmission {
+  /** Unique submission ID (UUID) */
+  id: string;
+  submittedAt: DateString;
+  /**
+   * Absent flag per player position for each team (index matches lineup order).
+   */
+  team1Absent: boolean[];
+  team2Absent: boolean[];
+  /**
+   * Scores for every match in the game (0-based index).
+   * Each entry holds one pin-count string per player for both teams.
+   */
+  matches: {
+    team1Pins: string[];
+    team2Pins: string[];
+  }[];
+}
+
 /** Game - Multi-match bowling game between two teams with scoring and status tracking */
 export interface Game {
   // Identity
@@ -168,6 +192,9 @@ export interface Game {
   matches?: GameMatch[];
   /** Points awarded for highest total pins across all matches */
   grandTotalPoints?: { team1: number; team2: number };
+
+  /** Player-submitted scores pending admin review */
+  pendingScores?: ScoreSubmission[];
 }
 
 // ============================================================================

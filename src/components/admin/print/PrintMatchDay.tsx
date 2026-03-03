@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { QRCodeSVG } from 'qrcode.react';
 import { seasonsApi, teamsApi, gamesApi, leaguesApi, playersApi } from '../../../services/api';
 import { calculateTeamStandings, calculateCurrentPlayerAverages } from '../../../utils/standingsUtils';
 import { calculateHeadToHead } from '../../../utils/headToHeadUtils';
@@ -426,7 +427,7 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
 
                     {/* Signature Section */}
                     <div className="mt-8 border-t-2 border-gray-300 pt-6">
-                      <div className="grid grid-cols-2 gap-8">
+                      <div className="grid grid-cols-3 gap-8 items-start">
                         {/* Team 1 Signature */}
                         <div className="space-y-4">
                           <div>
@@ -441,6 +442,16 @@ export const PrintMatchDay: React.FC<PrintMatchDayProps> = ({
                             </label>
                             <div className="border-b-2 border-gray-400 w-48"></div>
                           </div>
+                        </div>
+
+                        {/* QR Code for player score entry */}
+                        <div className="text-center">
+                          <QRCodeSVG
+                            value={`${window.location.origin}/score/${game.id}`}
+                            size={100}
+                            className="mx-auto"
+                          />
+                          <p className="text-xs text-gray-500 mt-2">{t('print.scanToEnterScores')}</p>
                         </div>
 
                         {/* Team 2 Signature */}

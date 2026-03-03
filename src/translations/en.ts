@@ -24,7 +24,9 @@ const en: TranslationDictionary = {
     playerStandingsDesc: 'Current player standings and statistics',
     printSelected: 'Print Selected',
     selectAtLeastOne: 'Please select at least one option to print',
-    printPreview: 'Print Preview'
+    printPreview: 'Print Preview',
+    scanToEnterScores: 'Scan to enter scores',
+    playerScoreEntry: 'Player Score Entry',
   },
   // Common words and actions
   common: {
@@ -449,6 +451,24 @@ const en: TranslationDictionary = {
     hc: 'HC',
     summary: 'Summary',
     enterAllScores: 'Please enter all scores before proceeding',
+    scoreEntryLink: 'Player Score Entry Link',
+    copyLink: 'Copy Link',
+    linkCopied: 'Link copied!',
+    pendingSubmissions: 'Pending Score Submissions',
+    pendingSubmissionsDesc: '{{count}} submission(s) awaiting review',
+    reviewSubmissions: 'Review Submissions',
+    noSubmissions: 'No pending submissions',
+    submittedAt: 'Submitted',
+    applyScores: 'Apply',
+    dismissSubmission: 'Dismiss',
+    applyAllScores: 'Apply All',
+    dismissAll: 'Dismiss All',
+    submissionApplied: 'Scores applied',
+    submissionDismissed: 'Submission dismissed',
+    skipReview: 'Skip Review',
+    matchScore: 'Match {{num}}',
+    allPresent: 'All present',
+    preMatchTitle: 'Pre-Match Absences',
   },
 
   // Records
@@ -463,6 +483,32 @@ const en: TranslationDictionary = {
     noRecords: 'No records',
     noCompletedGames: 'No completed games yet. Records will appear once games are played.',
     day: 'Day',
+  },
+
+  // Player Score Entry (public page)
+  scoreEntry: {
+    title: 'Enter Game Scores',
+    subtitle: 'Match Day {{matchDay}} · Round {{round}}',
+    team1Label: 'Team 1',
+    team2Label: 'Team 2',
+    preMatchTitle: 'Pre-Match Setup',
+    preMatchDesc: 'Mark any absent players before entering scores.',
+    markAbsent: 'Absent',
+    markPresent: 'Present',
+    stepPreMatch: 'Setup',
+    stepMatch: 'Match {{num}}',
+    matchNumber: 'Match {{num}}',
+    pinsLabel: 'Pins',
+    submit: 'Submit for Approval',
+    submitting: 'Submitting...',
+    successTitle: 'Submitted!',
+    successMessage: 'The game scores have been submitted and are awaiting admin approval.',
+    submitAnother: 'Submit Again',
+    gameNotFound: 'Game not found.',
+    gameClosed: 'This game has already been completed. Score entry is closed.',
+    loadError: 'Could not load game information. Please try again.',
+    teamNotSetUp: 'Team rosters are not yet available. Please check back once the admin has set up the game.',
+    invalidScore: 'Please enter a valid score (0–300) for every player.',
   },
 
   // Settings
