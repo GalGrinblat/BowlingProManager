@@ -26,17 +26,17 @@ const GAME_COLS_PUBLIC = `
 `;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const mapGamePublic = (d: Record<string, any>): Game => ({
-  id: d.id,
-  seasonId: d.season_id,
-  round: d.round,
-  matchDay: d.match_day,
-  team1Id: d.team1_id,
-  team2Id: d.team2_id,
+const mapGamePublic = (d: Record<string, unknown>): Game => ({
+  id: d.id as string,
+  seasonId: d.season_id as string,
+  round: d.round as number,
+  matchDay: d.match_day as number,
+  team1Id: d.team1_id as string,
+  team2Id: d.team2_id as string,
   status: d.status as GameStatus,
   createdAt: '',
-  matchesPerGame: d.matches_per_game,
-  useHandicap: d.use_handicap,
+  matchesPerGame: d.matches_per_game as number,
+  useHandicap: d.use_handicap as boolean,
   lineupStrategy: 'flexible',
   lineupRule: 'standard',
   playerMatchPointsPerWin: 0,
@@ -49,7 +49,7 @@ const mapGamePublic = (d: Record<string, any>): Game => ({
   team1: (d.team1_data as GameTeam) ?? undefined,
   team2: (d.team2_data as GameTeam) ?? undefined,
   matches: (d.matches as GameMatch[]) ?? undefined,
-  scheduledDate: d.scheduled_date ?? undefined,
+  scheduledDate: (d.scheduled_date as string) ?? undefined,
   pendingScores: (d.pending_scores as ScoreSubmission[]) ?? undefined,
 });
 

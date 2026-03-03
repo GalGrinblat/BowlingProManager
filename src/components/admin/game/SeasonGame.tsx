@@ -30,12 +30,13 @@ export const SeasonGame: React.FC = () => {
   const [showPendingReview, setShowPendingReview] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
 
-  // When the game loads, check for pending submissions
+  // When the game loads with pending submissions, show the review panel first
+  const pendingCount = game?.pendingScores?.length ?? 0;
   React.useEffect(() => {
-    if (game && (game.pendingScores?.length ?? 0) > 0 && showPreMatch) {
+    if (pendingCount > 0 && showPreMatch) {
       setShowPendingReview(true);
     }
-  }, [game?.id, showPreMatch]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [pendingCount, showPreMatch]);
 
   const scoreEntryUrl = `${window.location.origin}/score/${gameId}`;
 
@@ -302,7 +303,6 @@ export const SeasonGame: React.FC = () => {
   }
 
   if (showPreMatch) {
-    const pendingCount = game.pendingScores?.length ?? 0;
     return (
       <>
         {/* Score entry link bar */}

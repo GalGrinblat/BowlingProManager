@@ -130,21 +130,27 @@ export type GameStatus = 'pending' | 'in-progress' | 'completed';
 export type SeasonStatus = 'setup' | 'active' | 'completed';
 
 /**
- * ScoreSubmission - Player-submitted scores awaiting admin approval.
- * Stored in game.pendingScores; one entry per player per submission event.
+ * ScoreSubmission - Full-game data entered by a player via the public link,
+ * awaiting admin approval. Covers both the pre-match setup (absences) and
+ * all match scores for both teams.
  */
 export interface ScoreSubmission {
   /** Unique submission ID (UUID) */
   id: string;
-  /** Display name of the submitting player */
-  playerName: string;
-  /** Which team this player belongs to */
-  team: 'team1' | 'team2';
-  /** Zero-based position of the player in the team lineup */
-  playerIndex: number;
-  /** Pin counts per match (index = matchIndex, value = pins string) */
-  scores: string[];
   submittedAt: DateString;
+  /**
+   * Absent flag per player position for each team (index matches lineup order).
+   */
+  team1Absent: boolean[];
+  team2Absent: boolean[];
+  /**
+   * Scores for every match in the game (0-based index).
+   * Each entry holds one pin-count string per player for both teams.
+   */
+  matches: {
+    team1Pins: string[];
+    team2Pins: string[];
+  }[];
 }
 
 /** Game - Multi-match bowling game between two teams with scoring and status tracking */
