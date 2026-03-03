@@ -45,7 +45,7 @@ npm run preview
 
 ### First-Time Setup
 1. Start the dev server: `npm run dev`
-2. Open browser to `http://localhost:5173/BowlingAppAi/`
+2. Open browser to `http://localhost:5173/`
 3. Login as admin (role: 'admin')
 4. Create players in Player Registry (see documentation/PLAYER_REGISTRY.md)
 5. Create a league (see documentation/LEAGUE_OVERVIEW.md)
