@@ -19,6 +19,8 @@ jest.mock('../../../src/contexts/AdminDataContext', () => ({
     loadPlayers: jest.fn(),
     players: [],
     isLoadingPlayers: false,
+    users: [],
+    isLoadingUsers: false,
   }),
 }));
 
