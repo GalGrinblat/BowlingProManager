@@ -239,20 +239,25 @@ export const PlayerDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Quick Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* My Leagues */}
+      {playerLeagues.length > 0 && (
         <div className="bg-white rounded-xl shadow-lg p-6">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-green-100 rounded-lg">
-              <span className="text-2xl">🏆</span>
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">{playerLeagues.length === 1 ? t('playerDashboard.activeLeagues') : t('playerDashboard.activeLeaguesPlural')}</p>
-              <p className="text-2xl font-bold text-gray-800">{playerLeagues.length}</p>
-            </div>
+          <h2 className="text-xl font-bold text-gray-800 mb-4">{t('playerDashboard.myLeagues')}</h2>
+          <div className="space-y-3">
+            {playerLeagues.map(league => (
+              <div key={league.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <p className="font-semibold text-gray-800">{league.name}</p>
+                <a
+                  href={`/board/leagues/${league.id}`}
+                  className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline whitespace-nowrap"
+                >
+                  {t('playerDashboard.viewStandings')} →
+                </a>
+              </div>
+            ))}
           </div>
         </div>
-      </div>
+      )}
 
       {/* View Tabs */}
       <div className="bg-white rounded-xl shadow-lg p-2 flex gap-1 sm:gap-2 overflow-x-auto">

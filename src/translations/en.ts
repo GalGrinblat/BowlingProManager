@@ -551,6 +551,8 @@ const en: TranslationDictionary = {
     notLinkedDesc: "Your account isn't linked to a player profile yet. Please contact your league admin to get set up.",
     notLinkedSignedInAs: 'Signed in as',
     notLinkedBrowseBoard: 'Browse the Public Scoreboard',
+    myLeagues: 'My Leagues',
+    viewStandings: 'View Standings',
     seasonHistory: 'Season History',
     noCompletedSeasons: 'No Completed Seasons',
     noCompletedSeasonsDesc: "You haven't participated in any completed seasons yet.",

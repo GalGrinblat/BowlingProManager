@@ -551,6 +551,8 @@ const he: TranslationDictionary = {
     notLinkedDesc: 'החשבון שלך אינו מקושר לפרופיל שחקן. פנה למנהל הליגה להשלמת ההגדרה.',
     notLinkedSignedInAs: 'מחובר כ',
     notLinkedBrowseBoard: 'עיין בלוח התוצאות הציבורי',
+    myLeagues: 'הליגות שלי',
+    viewStandings: 'צפה בדירוגים',
     seasonHistory: 'היסטוריית עונות',
     noCompletedSeasons: 'אין עונות שהושלמו',
     noCompletedSeasonsDesc: 'עדיין לא השתתפת בעונות שהושלמו.',
