@@ -32,13 +32,14 @@ export const PlayerDashboard: React.FC = () => {
       setIsLoading(true);
       setLoadError(null);
       try {
-        const playerData = await playersApi.getById(playerId);
+        const playerResult = await playersApi.getById(playerId);
         if (cancelled) return;
-        setPlayer(playerData ?? null);
+        setPlayer(playerResult ?? null);
 
-        // Find all teams this player is on
+        // Find all teams this player is on — build a lookup Map for O(1) access later
         const allTeams = await teamsApi.getAll();
         if (cancelled) return;
+        const teamsById = new Map(allTeams.map(t => [t.id, t]));
         const playerTeams = allTeams.filter(team => team.playerIds.includes(playerId));
 
         // Get unique seasons the player is in
@@ -70,16 +71,12 @@ export const PlayerDashboard: React.FC = () => {
         // Get recent completed games
         const allGames = await gamesApi.getAll();
         if (cancelled) return;
-        const completedPlayerGamesPromises = allGames.map(async game => {
-          const team1 = await teamsApi.getById(game.team1Id);
-          const team2 = await teamsApi.getById(game.team2Id);
-          const isPlayerGame = (team1?.playerIds.includes(playerId) || team2?.playerIds.includes(playerId)) &&
-                 game.status === 'completed';
-          return isPlayerGame ? game : null;
+        const completedPlayerGames = allGames.filter(game => {
+          const team1 = teamsById.get(game.team1Id);
+          const team2 = teamsById.get(game.team2Id);
+          return (team1?.playerIds.includes(playerId) || team2?.playerIds.includes(playerId))
+            && game.status === 'completed';
         });
-        const completedPlayerGamesResults = await Promise.all(completedPlayerGamesPromises);
-        if (cancelled) return;
-        const completedPlayerGames = completedPlayerGamesResults.filter((game): game is Game => game !== null);
 
         // Sort by completion date (most recent first)
         const sortedCompletedGames = completedPlayerGames.sort((a, b) => {
@@ -95,15 +92,15 @@ export const PlayerDashboard: React.FC = () => {
         for (const game of topGames) {
           const season = await seasonsApi.getById(game.seasonId);
           const league = season ? await leaguesApi.getById(season.leagueId) : null;
-          const team1 = await teamsApi.getById(game.team1Id);
-          const team2 = await teamsApi.getById(game.team2Id);
+          const team1 = teamsById.get(game.team1Id);
+          const team2 = teamsById.get(game.team2Id);
           if (cancelled) return;
           detailsMap[game.id] = { season: season ?? null, league: league ?? null, team1, team2 };
         }
         setGameDetailsMap(detailsMap);
 
-        // Calculate player statistics across all games
-        const stats = await computePlayerStats(allGames);
+        // Calculate player statistics across all games — synchronous, no API calls
+        const stats = computePlayerStats(allGames, teamsById, playerResult);
         if (cancelled) return;
         setPlayerStats(stats);
       } catch (error) {
@@ -121,11 +118,14 @@ export const PlayerDashboard: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playerId]);
 
-  const computePlayerStats = async (allGames: Game[]): Promise<PlayerStats> => {
-    const playerData = await playersApi.getById(playerId);
+  const computePlayerStats = (
+    allGames: Game[],
+    teamsById: Map<string, Team>,
+    playerResult: Player | undefined
+  ): PlayerStats => {
     const stats: PlayerStats = {
       playerId: playerId,
-      playerName: playerData ? getPlayerDisplayName(playerData) : '',
+      playerName: playerResult ? getPlayerDisplayName(playerResult) : '',
       gamesPlayed: 0,
       totalPins: 0,
       average: 0,
@@ -138,8 +138,8 @@ export const PlayerDashboard: React.FC = () => {
     const completedGames = allGames.filter((g: Game) => g.status === 'completed');
 
     for (const game of completedGames) {
-      const team1 = await teamsApi.getById(game.team1Id);
-      const team2 = await teamsApi.getById(game.team2Id);
+      const team1 = teamsById.get(game.team1Id);
+      const team2 = teamsById.get(game.team2Id);
       const isOnTeam1 = team1?.playerIds.includes(playerId);
       const isOnTeam2 = team2?.playerIds.includes(playerId);
       if (!isOnTeam1 && !isOnTeam2) continue;
