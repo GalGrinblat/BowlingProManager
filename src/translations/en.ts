@@ -516,6 +516,10 @@ const en: TranslationDictionary = {
     postponed: 'Postponed',
     loadingDashboard: 'Loading dashboard data...',
     defaultOrgName: 'My Bowling Organization',
+    pendingUsersTitle: 'Players Awaiting Setup',
+    pendingUsersDesc: 'player account(s) not yet linked',
+    pendingUsersMore: 'more',
+    pendingUsersAction: 'Go to User Management',
   },
 
   // Player Dashboard
@@ -543,6 +547,10 @@ const en: TranslationDictionary = {
     pointsPerGame: 'Points per Game',
     noStatisticsYet: 'No Statistics Yet',
     noStatisticsDesc: 'Complete some games to see your statistics here.',
+    notLinkedTitle: 'Account Not Linked Yet',
+    notLinkedDesc: "Your account isn't linked to a player profile yet. Please contact your league admin to get set up.",
+    notLinkedSignedInAs: 'Signed in as',
+    notLinkedBrowseBoard: 'Browse the Public Scoreboard',
     seasonHistory: 'Season History',
     noCompletedSeasons: 'No Completed Seasons',
     noCompletedSeasonsDesc: "You haven't participated in any completed seasons yet.",

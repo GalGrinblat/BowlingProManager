@@ -10,8 +10,9 @@ export const AdminDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { formatMatchDate } = useDateFormat();
-  const { org, leagues, seasonsMap, gamesMap, isLoadingData } = useAdminData();
+  const { org, leagues, seasonsMap, gamesMap, isLoadingData, users, isLoadingUsers } = useAdminData();
   const activeLeagues = leagues.filter(l => l.active);
+  const pendingUsers = users.filter(u => u.role === 'player' && u.playerId === null);
 
   if (isLoadingData) {
     return (
@@ -35,6 +36,31 @@ export const AdminDashboard: React.FC = () => {
         <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('dashboard.adminTitle')}</h1>
         <p className="text-gray-600">{org?.name || t('dashboard.defaultOrgName')}</p>
       </div>
+
+      {/* Pending Users Alert */}
+      {!isLoadingUsers && pendingUsers.length > 0 && (
+        <div className="bg-gradient-to-r from-amber-400 to-orange-500 rounded-xl shadow-lg p-5 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4 text-white min-w-0">
+            <span className="text-3xl shrink-0">⚠️</span>
+            <div className="min-w-0">
+              <p className="font-bold text-lg">{t('dashboard.pendingUsersTitle')}</p>
+              <p className="text-amber-100 text-sm">
+                {pendingUsers.length} {t('dashboard.pendingUsersDesc')}
+              </p>
+              <p className="text-amber-200 text-xs mt-1 truncate">
+                {pendingUsers.slice(0, 3).map(u => u.email).join(', ')}
+                {pendingUsers.length > 3 && ` +${pendingUsers.length - 3} ${t('dashboard.pendingUsersMore')}`}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => navigate('/admin/users')}
+            className="shrink-0 bg-white text-orange-600 font-bold px-4 py-2 rounded-lg hover:bg-orange-50 transition-colors"
+          >
+            {t('dashboard.pendingUsersAction')}
+          </button>
+        </div>
+      )}
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

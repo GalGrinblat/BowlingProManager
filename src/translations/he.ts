@@ -516,6 +516,10 @@ const he: TranslationDictionary = {
     postponed: 'נדחה',
     loadingDashboard: 'טוען נתוני לוח בקרה...',
     defaultOrgName: 'ארגון הבאולינג שלי',
+    pendingUsersTitle: 'שחקנים ממתינים להגדרה',
+    pendingUsersDesc: 'חשבון/ות שחקן ממתינים לקישור',
+    pendingUsersMore: 'נוספים',
+    pendingUsersAction: 'עבור לניהול משתמשים',
   },
 
   // לוח בקרה - שחקן
@@ -543,6 +547,10 @@ const he: TranslationDictionary = {
     pointsPerGame: 'נקודות למשחק',
     noStatisticsYet: 'עדיין אין סטטיסטיקות',
     noStatisticsDesc: 'השלם כמה משחקים כדי לראות את הסטטיסטיקות שלך כאן.',
+    notLinkedTitle: 'החשבון עדיין לא מקושר',
+    notLinkedDesc: 'החשבון שלך אינו מקושר לפרופיל שחקן. פנה למנהל הליגה להשלמת ההגדרה.',
+    notLinkedSignedInAs: 'מחובר כ',
+    notLinkedBrowseBoard: 'עיין בלוח התוצאות הציבורי',
     seasonHistory: 'היסטוריית עונות',
     noCompletedSeasons: 'אין עונות שהושלמו',
     noCompletedSeasonsDesc: 'עדיין לא השתתפת בעונות שהושלמו.',

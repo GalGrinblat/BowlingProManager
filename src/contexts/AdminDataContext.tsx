@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { organizationApi, leaguesApi, seasonsApi, gamesApi, playersApi } from '../services/api';
+import { organizationApi, leaguesApi, seasonsApi, gamesApi, playersApi, usersApi } from '../services/api';
+import type { DatabaseUser } from '../services/api';
 import { useAuth } from './AuthContext';
 import { useToast } from './ToastContext';
 import { logger } from '../utils/logger';
@@ -13,8 +14,11 @@ interface AdminDataContextType {
   isLoadingData: boolean;
   players: Player[];
   isLoadingPlayers: boolean;
+  users: DatabaseUser[];
+  isLoadingUsers: boolean;
   loadDashboardData: () => Promise<void>;
   loadPlayers: () => Promise<void>;
+  loadUsers: () => Promise<void>;
 }
 
 const AdminDataContext = createContext<AdminDataContextType | null>(null);
@@ -36,6 +40,8 @@ export const AdminDataProvider: React.FC<{ children: ReactNode }> = ({ children 
   const [isLoadingData, setIsLoadingData] = useState(false);
   const [players, setPlayers] = useState<Player[]>([]);
   const [isLoadingPlayers, setIsLoadingPlayers] = useState(false);
+  const [users, setUsers] = useState<DatabaseUser[]>([]);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
 
   const isAdminUser = !authLoading && currentUser && isAdmin();
 
@@ -85,10 +91,23 @@ export const AdminDataProvider: React.FC<{ children: ReactNode }> = ({ children 
     }
   };
 
+  const loadUsers = async () => {
+    setIsLoadingUsers(true);
+    try {
+      const usersData = await usersApi.getAll();
+      setUsers(usersData);
+    } catch (error) {
+      logger.error('Error loading users:', error);
+    } finally {
+      setIsLoadingUsers(false);
+    }
+  };
+
   React.useEffect(() => {
     if (isAdminUser) {
       loadDashboardData();
       loadPlayers();
+      loadUsers();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAdminUser]);
@@ -97,7 +116,8 @@ export const AdminDataProvider: React.FC<{ children: ReactNode }> = ({ children 
     <AdminDataContext.Provider value={{
       org, leagues, seasonsMap, gamesMap, isLoadingData,
       players, isLoadingPlayers,
-      loadDashboardData, loadPlayers,
+      users, isLoadingUsers,
+      loadDashboardData, loadPlayers, loadUsers,
     }}>
       {children}
     </AdminDataContext.Provider>

@@ -11,7 +11,7 @@ import type { Game, GameMatch, League, Player, PlayerStats, Season, Team } from 
 
 export const PlayerDashboard: React.FC = () => {
   const navigate = useNavigate();
-  const { playerData } = useAuth();
+  const { playerData, isLoading: authIsLoading, session } = useAuth();
   const playerId = playerData?.id ?? '';
   const { t } = useTranslation();
   const { formatDate } = useDateFormat();
@@ -28,6 +28,7 @@ export const PlayerDashboard: React.FC = () => {
     let cancelled = false;
 
     const load = async () => {
+      if (!playerId) { setIsLoading(false); return; }
       setIsLoading(true);
       setLoadError(null);
       try {
@@ -191,9 +192,40 @@ export const PlayerDashboard: React.FC = () => {
     return { game, league, team1, team2, isTeam1, team1TotalPoints, team2TotalPoints, playerWon };
   }), [recentCompletedGames, gameDetailsMap, playerId]);
 
-  if (isLoading) return <div>Loading...</div>;
-  if (loadError) return <div>{loadError}</div>;
-  if (!player) return <div>Loading...</div>;
+  if (authIsLoading) return (
+    <div className="flex items-center justify-center min-h-64">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-purple-600"></div>
+    </div>
+  );
+
+  if (!playerData) return (
+    <div className="max-w-lg mx-auto mt-16 px-4">
+      <div className="bg-gradient-to-r from-amber-400 to-orange-500 rounded-xl shadow-lg p-8 text-white text-center">
+        <p className="text-5xl mb-4">🔗</p>
+        <h2 className="text-2xl font-bold mb-2">{t('playerDashboard.notLinkedTitle')}</h2>
+        <p className="text-amber-100 mb-1">{t('playerDashboard.notLinkedDesc')}</p>
+        {session?.user?.email && (
+          <p className="text-amber-200 text-sm mb-6">
+            {t('playerDashboard.notLinkedSignedInAs')}: <strong>{session.user.email}</strong>
+          </p>
+        )}
+        <a
+          href="/board"
+          className="inline-block bg-white text-orange-600 font-bold px-6 py-3 rounded-lg hover:bg-orange-50 transition-colors"
+        >
+          {t('playerDashboard.notLinkedBrowseBoard')}
+        </a>
+      </div>
+    </div>
+  );
+
+  if (isLoading) return (
+    <div className="flex items-center justify-center min-h-64">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-purple-600"></div>
+    </div>
+  );
+  if (loadError) return <div className="text-red-600 p-6">{loadError}</div>;
+  if (!player) return null;
 
   return (
     <div className="space-y-6">

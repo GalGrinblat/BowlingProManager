@@ -201,7 +201,7 @@ export interface AuthContextType {
   logout: () => void;
   isAdmin: () => boolean;
   isPlayer: () => boolean;
-  session?: { user: { id: string } } | null;
+  session?: { user: { id: string; email?: string } } | null;
 }
 
 /** TranslationDictionary - Nested translation key-value structure */
