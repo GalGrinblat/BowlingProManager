@@ -114,7 +114,6 @@ export const router = createBrowserRouter([
         element: <RequirePlayer />,
         children: [
           { path: '/player', element: <PlayerDashboard /> },
-          { path: '/player/games/:gameId/play', element: <SeasonGame /> },
           { path: '/player/games/:gameId', element: <CompletedGameView /> },
         ],
       },
