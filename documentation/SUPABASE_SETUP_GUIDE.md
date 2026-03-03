@@ -1,4 +1,4 @@
-# Supabase Setup Guide for BowlingAppAi
+# Supabase Setup Guide for Bowling Pro Manager
 
 Follow these steps to set up your Supabase backend with Google OAuth.
 
@@ -8,7 +8,7 @@ Follow these steps to set up your Supabase backend with Google OAuth.
 2. Sign up or log in
 3. Click **"New Project"**
 4. Fill in the details:
-   - **Name**: BowlingAppAi (or your preferred name)
+   - **Name**: Bowling Pro Manager (or your preferred name)
    - **Database Password**: Choose a strong password (save it!)
    - **Region**: Choose closest to your users
 5. Click **"Create new project"**
@@ -44,11 +44,11 @@ Follow these steps to set up your Supabase backend with Google OAuth.
 4. Click **"+ CREATE CREDENTIALS"** → **OAuth client ID**
 5. If prompted, configure the OAuth consent screen:
    - Choose **External** user type
-   - Fill in app name: "BowlingAppAi"
+   - Fill in app name: "Bowling Pro Manager"
    - Add your email as support email
    - Click **Save and Continue** through the rest
 6. For Application type, choose **Web application**
-7. Name it: "BowlingAppAi"
+7. Name it: "Bowling Pro Manager"
 8. Under **Authorized redirect URIs**, add:
    ```
    https://[your-project-id].supabase.co/auth/v1/callback
@@ -82,7 +82,7 @@ Follow these steps to set up your Supabase backend with Google OAuth.
 
 ## Step 6: Create Environment Variables File
 
-1. In your BowlingAppAi project folder, create a file called `.env.local`
+1. In your Bowling Pro Manager project folder, create a file called `.env.local`
 2. Copy the contents from `.env.example`
 3. Replace the placeholder values with your actual credentials:
    ```env

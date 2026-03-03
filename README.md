@@ -1,5 +1,5 @@
 
-# Bowling League Management System
+# Bowling Pro Manager
 
 A comprehensive bowling league management system built with React, Vite, and Tailwind CSS. This app supports multi-league organizations, season tracking, automated scheduling, configurable rules, and advanced scoring. For full details on features, rules, and workflows, see the documentation links below.
 
