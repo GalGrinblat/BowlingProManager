@@ -7,7 +7,6 @@ import { postponeMatchDay } from '../../../utils/scheduleUtils';
 import { calculateSeasonRecords } from '../../../utils/recordsUtils';
 import { useTranslation } from '../../../contexts/LanguageContext';
 import { exportSeason, downloadExportFile, readImportFile, importLeagueOrSeason } from '../../../utils/leagueImportExportUtils';
-import { PrintMatchDay } from '../print/PrintMatchDay';
 import { PrintMatchDayOptions } from '../print/PrintMatchDayOptions';
 import { PrintTeamStandings } from '../print/PrintTeamStandings';
 import { PrintPlayerStandings } from '../print/PrintPlayerStandings';
@@ -37,7 +36,6 @@ export const SeasonDetail: React.FC = () => {
   const [selectedMatchDay, setSelectedMatchDay] = useState<number | null>(null);
   const [standingsFilter, setStandingsFilter] = useState<{round: number, matchDay: number} | null>(null);
   const [showPostponeModal, setShowPostponeModal] = useState(false);
-  const [showPrintModal, setShowPrintModal] = useState(false);
   const [showPrintOptionsModal, setShowPrintOptionsModal] = useState(false);
   const [showPrintTeamStandings, setShowPrintTeamStandings] = useState(false);
   const [showPrintPlayerStandings, setShowPrintPlayerStandings] = useState(false);
@@ -438,9 +436,6 @@ export const SeasonDetail: React.FC = () => {
         </div>
       )}
 
-      {showPrintModal && selectedMatchDay && (
-        <PrintMatchDay seasonId={seasonId!} matchDay={selectedMatchDay} onClose={() => setShowPrintModal(false)} />
-      )}
       {showPrintOptionsModal && selectedMatchDay && (
         <PrintMatchDayOptions seasonId={seasonId!} matchDay={selectedMatchDay} onClose={() => setShowPrintOptionsModal(false)} />
       )}
