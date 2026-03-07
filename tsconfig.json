@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2020",
     "useDefineForClassFields": true,
-    "lib": ["ES2020", "ES2022.error", "DOM", "DOM.Iterable"],
+    "lib": ["ES2020", "ES2022.error", "DOM", "DOM.Iterable"],   /* ES2022.error adds ErrorOptions.cause type; target stays ES2020 */
     "module": "ESNext",
     "skipLibCheck": true,
 
