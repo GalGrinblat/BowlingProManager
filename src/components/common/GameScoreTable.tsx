@@ -26,30 +26,30 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
   , [totals.team1TotalPoints, totals.team2TotalPoints]);
 
   return (
-    <div className="p-4">
-      <div className="grid md:grid-cols-2 gap-4" dir={direction}>
+    <div className="p-0 sm:p-3">
+      <div className="grid md:grid-cols-2 gap-3 sm:gap-4" dir={direction}>
         {/* Team 1 Table */}
         <div className="overflow-x-auto">
           <table className="w-full text-sm border-2 border-orange-200">
             <thead className="bg-orange-100 border-b-2 border-orange-300">
               <tr>
-                <th colSpan={matches.length + 3} className={`px-2 py-2 font-bold text-orange-700 ${isRTL ? 'text-right' : 'text-left'}`}>
+                <th colSpan={matches.length + 3} className={`px-2 py-1.5 font-bold text-orange-700 ${isRTL ? 'text-right' : 'text-left'}`}>
                   🟠 {game.team1?.name}
                 </th>
               </tr>
               <tr className="bg-gray-50">
-                <th className={`px-2 py-2 text-xs font-bold text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
+                <th className={`px-1 sm:px-2 py-1.5 text-xs font-bold text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
                   {t('common.player')}
                 </th>
                 {matches.map((match, idx) => (
-                  <th key={`match-${match.matchNumber}`} className="px-2 py-2 text-center text-xs font-bold text-gray-700">
-                    {t('gameHistory.match')} {idx + 1}
+                  <th key={`match-${match.matchNumber}`} className="px-1 sm:px-2 py-1.5 text-center text-xs font-bold text-gray-700">
+                    <span className="hidden sm:inline">{t('gameHistory.match')} </span>{idx + 1}
                   </th>
                 ))}
-                <th className="px-2 py-2 text-center text-xs font-bold text-gray-700 bg-gray-100">
+                <th className="px-1 sm:px-2 py-1.5 text-center text-xs font-bold text-gray-700 bg-gray-100">
                   {t('common.total')}
                 </th>
-                <th className="px-2 py-2 text-center text-xs font-bold text-gray-700 bg-gray-100">
+                <th className="px-1 sm:px-2 py-1.5 text-center text-xs font-bold text-gray-700 bg-gray-100">
                   {t('common.pts')}
                 </th>
               </tr>
@@ -68,8 +68,8 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
 
                 return (
                   <tr key={player.playerId} className="border-b border-gray-100 hover:bg-orange-50">
-                    <td className={`px-2 py-1.5 text-xs font-semibold text-gray-800 ${isRTL ? 'text-right' : 'text-left'}`}>
-                      {playerIdx + 1}. {player.name}
+                    <td className={`px-1 sm:px-2 py-1.5 text-xs font-semibold text-gray-800 ${isRTL ? 'text-right' : 'text-left'}`}>
+                      <div className="max-w-[72px] sm:max-w-none truncate">{playerIdx + 1}. {player.name}</div>
                     </td>
                     {matches.map((match) => {
                       const matchPlayer = match.team1?.players[playerIdx];
@@ -96,7 +96,7 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
 
               {/* Team 1 Pins */}
               <tr className="bg-orange-100 border-t-2 border-orange-300 font-bold text-xs">
-                <td className={`px-2 py-1.5 text-gray-800 ${isRTL ? 'text-right' : 'text-left'}`}>
+                <td className={`px-1 sm:px-2 py-1.5 text-gray-800 ${isRTL ? 'text-right' : 'text-left'}`}>
                   {t('gameHistory.teamTotal')}
                 </td>
                 {matches.map((match) => (
@@ -112,7 +112,7 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
 
               {/* Team 1 Handicap */}
               <tr className="bg-orange-50 font-semibold text-xs">
-                <td className={`px-2 py-1.5 text-gray-600 ${isRTL ? 'text-right' : 'text-left'}`}>
+                <td className={`px-1 sm:px-2 py-1.5 text-gray-600 ${isRTL ? 'text-right' : 'text-left'}`}>
                   {t('gameHistory.hdc')}
                 </td>
                 {matches.map((match) => {
@@ -133,7 +133,7 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
 
               {/* Team 1 Team Totals */}
               <tr className="bg-orange-100 border-t border-orange-200 font-semibold text-xs">
-                <td className={`px-2 py-1.5 text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
+                <td className={`px-1 sm:px-2 py-1.5 text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
                   {t('gameHistory.withHandicap')}
                 </td>
                 {matches.map((match) => {
@@ -162,23 +162,23 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
           <table className="w-full text-sm border-2 border-blue-200">
             <thead className="bg-blue-100 border-b-2 border-blue-300">
               <tr>
-                <th colSpan={matches.length + 3} className={`px-2 py-2 font-bold text-blue-700 ${isRTL ? 'text-right' : 'text-left'}`}>
+                <th colSpan={matches.length + 3} className={`px-2 py-1.5 font-bold text-blue-700 ${isRTL ? 'text-right' : 'text-left'}`}>
                   🔵 {game.team2?.name}
                 </th>
               </tr>
               <tr className="bg-gray-50">
-                <th className={`px-2 py-2 text-xs font-bold text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
+                <th className={`px-1 sm:px-2 py-1.5 text-xs font-bold text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
                   {t('common.player')}
                 </th>
                 {matches.map((match, idx) => (
-                  <th key={`match-${match.matchNumber}`} className="px-2 py-2 text-center text-xs font-bold text-gray-700">
-                    {t('gameHistory.match')} {idx + 1}
+                  <th key={`match-${match.matchNumber}`} className="px-1 sm:px-2 py-1.5 text-center text-xs font-bold text-gray-700">
+                    <span className="hidden sm:inline">{t('gameHistory.match')} </span>{idx + 1}
                   </th>
                 ))}
-                <th className="px-2 py-2 text-center text-xs font-bold text-gray-700 bg-gray-100">
+                <th className="px-1 sm:px-2 py-1.5 text-center text-xs font-bold text-gray-700 bg-gray-100">
                   {t('common.total')}
                 </th>
-                <th className="px-2 py-2 text-center text-xs font-bold text-gray-700 bg-gray-100">
+                <th className="px-1 sm:px-2 py-1.5 text-center text-xs font-bold text-gray-700 bg-gray-100">
                   {t('common.pts')}
                 </th>
               </tr>
@@ -197,8 +197,8 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
 
                 return (
                   <tr key={player.playerId} className="border-b border-gray-100 hover:bg-blue-50">
-                    <td className={`px-2 py-1.5 text-xs font-semibold text-gray-800 ${isRTL ? 'text-right' : 'text-left'}`}>
-                      {playerIdx + 1}. {player.name}
+                    <td className={`px-1 sm:px-2 py-1.5 text-xs font-semibold text-gray-800 ${isRTL ? 'text-right' : 'text-left'}`}>
+                      <div className="max-w-[72px] sm:max-w-none truncate">{playerIdx + 1}. {player.name}</div>
                     </td>
                     {matches.map((match) => {
                       const matchPlayer = match.team2?.players[playerIdx];
@@ -225,7 +225,7 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
 
               {/* Team 2 Pins */}
               <tr className="bg-blue-100 border-t-2 border-blue-300 font-bold text-xs">
-                <td className={`px-2 py-1.5 text-gray-800 ${isRTL ? 'text-right' : 'text-left'}`}>
+                <td className={`px-1 sm:px-2 py-1.5 text-gray-800 ${isRTL ? 'text-right' : 'text-left'}`}>
                   {t('gameHistory.teamTotal')}
                 </td>
                 {matches.map((match) => (
@@ -241,7 +241,7 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
 
               {/* Team 2 Handicap */}
               <tr className="bg-blue-50 font-semibold text-xs">
-                <td className={`px-2 py-1.5 text-gray-600 ${isRTL ? 'text-right' : 'text-left'}`}>
+                <td className={`px-1 sm:px-2 py-1.5 text-gray-600 ${isRTL ? 'text-right' : 'text-left'}`}>
                   {t('gameHistory.hdc')}
                 </td>
                 {matches.map((match) => {
@@ -262,7 +262,7 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
 
               {/* Team 2 Team Totals */}
               <tr className="bg-blue-100 border-t border-blue-200 font-semibold text-xs">
-                <td className={`px-2 py-1.5 text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
+                <td className={`px-1 sm:px-2 py-1.5 text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
                   {t('gameHistory.withHandicap')}
                 </td>
                 {matches.map((match) => {
