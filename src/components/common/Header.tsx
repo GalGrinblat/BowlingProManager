@@ -50,7 +50,7 @@ export const Header: React.FC<HeaderProps> = ({ currentUser, onLogout }) => {
               </div>
               <button
                 onClick={onLogout}
-                className="px-3 py-1.5 sm:py-2 text-xs sm:text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 font-semibold touch-manipulation"
+                className="px-3 py-1.5 sm:py-2 text-xs sm:text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 font-semibold touch-manipulation"
               >
                 {t('auth.logout')}
               </button>
