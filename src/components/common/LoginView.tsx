@@ -4,6 +4,10 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useTranslation } from '../../contexts/LanguageContext';
 import { logger } from '../../utils/logger';
 
+const isStandalone = () =>
+  (navigator as Navigator & { standalone?: boolean }).standalone === true ||
+  window.matchMedia('(display-mode: standalone)').matches;
+
 export const LoginView: React.FC = () => {
   const { loginWithGoogle } = useAuth();
   const { t } = useTranslation();
@@ -32,6 +36,21 @@ export const LoginView: React.FC = () => {
           {t('auth.subtitle')}
         </p>
       </div>
+
+      {isStandalone() && (
+        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
+          <p className="font-semibold mb-1">📱 {t('auth.standaloneTitle')}</p>
+          <p className="mb-2">{t('auth.standaloneDesc')}</p>
+          <a
+            href={window.location.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block bg-amber-600 text-white px-4 py-2 rounded font-semibold hover:bg-amber-700 transition-colors"
+          >
+            {t('auth.openInBrowser')}
+          </a>
+        </div>
+      )}
 
       <button
         onClick={handleGoogleLogin}

@@ -124,52 +124,50 @@ export const LeagueDetail: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <div className="flex justify-between items-start mb-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">{league.name}</h1>
+        <div className="flex flex-wrap justify-between items-start gap-3 mb-4">
+          <div className="min-w-0">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">{league.name}</h1>
             {league.description && (
               <p className="text-gray-600">{league.description}</p>
             )}
           </div>
-          <div className="flex flex-col items-end gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={() => navigate('/admin/leagues')}
-              className="text-gray-600 hover:text-gray-800"
+              className="text-gray-600 hover:text-gray-800 whitespace-nowrap"
             >
               {t('common.leftArrow')} {t('leagues.backToLeagues')}
             </button>
-            <div className="flex gap-2">
-              <button
-                onClick={() => navigate(`/admin/leagues/${leagueId}/seasons/new`)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
-              >
-                + {t('seasons.createSeason')}
-              </button>
-              <button
-                onClick={handleExportLeague}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold"
-                title={t('leagues.exportLeagueDesc')}
-              >
-                📥 {t('leagues.exportLeague')}
-              </button>
-              <button
-                onClick={handleImportClick}
-                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-semibold"
-                title={t('leagues.importLeagueDesc')}
-              >
-                📤 {t('leagues.importLeague')}
-              </button>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".json"
-                onChange={handleImportFile}
-                className="hidden"
-              />
-            </div>
+            <button
+              onClick={() => navigate(`/admin/leagues/${leagueId}/seasons/new`)}
+              className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold text-sm whitespace-nowrap"
+            >
+              + <span className="hidden sm:inline">{t('seasons.createSeason')}</span><span className="sm:hidden">{t('common.season')}</span>
+            </button>
+            <button
+              onClick={handleExportLeague}
+              className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold text-sm whitespace-nowrap"
+              title={t('leagues.exportLeagueDesc')}
+            >
+              📥 <span className="hidden sm:inline">{t('leagues.exportLeague')}</span>
+            </button>
+            <button
+              onClick={handleImportClick}
+              className="px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-semibold text-sm whitespace-nowrap"
+              title={t('leagues.importLeagueDesc')}
+            >
+              📤 <span className="hidden sm:inline">{t('leagues.importLeague')}</span>
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json"
+              onChange={handleImportFile}
+              className="hidden"
+            />
           </div>
         </div>
-        <div className="flex gap-4 text-sm text-gray-600">
+        <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600">
           {league.dayOfWeek && <span>📅 {t(`days.${league.dayOfWeek.toLowerCase()}Plural`)}</span>}
           <span>👥 <span className="ltr-content">{league.defaultSeasonConfigurations.playersPerTeam}</span> {t('common.playersPerTeam')}</span>
           <span>🎳 <span className="ltr-content">{league.defaultSeasonConfigurations.matchesPerGame || 3}</span> {t('leagues.matchesPerGame')}</span>
@@ -233,7 +231,7 @@ export const LeagueDetail: React.FC = () => {
                           <span className="text-sm text-gray-500">• {champion.points} points</span>
                         </div>
                       )}
-                      <div className="flex gap-4 text-sm text-gray-600">
+                      <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600">
                         <span>👥 <span className="ltr-content">{teams.length}</span> {t('leagues.teams')}</span>
                         <span>🎳 <span className="ltr-content">{games.length}</span> {t('leagues.games')}</span>
                         <span>📅 <span className="ltr-content">{formatDate(season.startDate)}</span></span>

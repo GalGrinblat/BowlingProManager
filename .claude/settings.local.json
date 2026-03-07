@@ -29,7 +29,12 @@
       "Bash(NODE_OPTIONS=\"--max-old-space-size=4096\" npx tsc --noEmit --skipLibCheck)",
       "Bash(npm run check)",
       "Bash(npx jest --version)",
-      "WebFetch(domain:raw.githubusercontent.com)"
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(git -C c:/Code/BowlingProManager show 42ade30 --name-only)",
+      "Bash(node -e \"require\\(''sharp''\\)\")",
+      "Bash(where convert)",
+      "Bash(magick --version)",
+      "Bash(node -e \"require\\(''vite''\\)\")"
     ]
   }
 }

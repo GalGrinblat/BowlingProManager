@@ -39,7 +39,7 @@ export const AdminDashboard: React.FC = () => {
 
       {/* Pending Users Alert */}
       {!isLoadingUsers && pendingUsers.length > 0 && (
-        <div className="bg-gradient-to-r from-amber-400 to-orange-500 rounded-xl shadow-lg p-5 flex items-center justify-between gap-4">
+        <div className="bg-gradient-to-r from-amber-400 to-orange-500 rounded-xl shadow-lg p-5 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-4 text-white min-w-0">
             <span className="text-3xl shrink-0">⚠️</span>
             <div className="min-w-0">

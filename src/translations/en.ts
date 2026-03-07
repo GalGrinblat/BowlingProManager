@@ -95,6 +95,9 @@ const en: TranslationDictionary = {
     loginFailed: 'Failed to sign in. Please try again.',
     viewerPrompt: 'Just want to check the standings?',
     viewAsGuest: 'Browse as guest',
+    standaloneTitle: 'Running as installed app',
+    standaloneDesc: 'Google Sign-In requires opening in your browser first. After signing in, return to the app.',
+    openInBrowser: 'Open in Browser',
   },
 
   // Public Scoreboard

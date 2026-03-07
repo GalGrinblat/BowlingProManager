@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { playersApi } from '../../services/api/players';
 import { leaguesApi } from '../../services/api/leagues';
 import { seasonsApi } from '../../services/api/seasons';
@@ -22,7 +22,8 @@ export const PlayerDashboard: React.FC = () => {
   const [player, setPlayer] = useState<Player | null>(null);
   const [playerLeagues, setPlayerLeagues] = useState<League[]>([]);
   const [recentCompletedGames, setRecentCompletedGames] = useState<Game[]>([]);
-  const [view, setView] = useState('dashboard'); // dashboard, stats, leagues, history
+  const [searchParams, setSearchParams] = useSearchParams();
+  const view = searchParams.get('view') ?? 'dashboard';
   const [playerStats, setPlayerStats] = useState<PlayerStats | null>(null);
   const [gameDetailsMap, setGameDetailsMap] = useState<Record<string, { season: Season | null, league: League | null, team1: Team | undefined, team2: Team | undefined }>>({});
   const [isLoading, setIsLoading] = useState(true);
@@ -321,7 +322,7 @@ export const PlayerDashboard: React.FC = () => {
       {/* View Tabs */}
       <div className="bg-white rounded-xl shadow-lg p-2 flex gap-1 sm:gap-2 overflow-x-auto">
         <button
-          onClick={() => setView('dashboard')}
+          onClick={() => setSearchParams({ view: 'dashboard' })}
           className={`flex-1 min-w-[90px] py-2 sm:py-3 px-2 sm:px-4 rounded-lg font-semibold text-xs sm:text-base transition-colors whitespace-nowrap ${
             view === 'dashboard'
               ? 'bg-purple-600 text-white'
@@ -331,7 +332,7 @@ export const PlayerDashboard: React.FC = () => {
           🏠 {t('playerDashboard.dashboard')}
         </button>
         <button
-          onClick={() => setView('stats')}
+          onClick={() => setSearchParams({ view: 'stats' })}
           className={`flex-1 min-w-[90px] py-2 sm:py-3 px-2 sm:px-4 rounded-lg font-semibold text-xs sm:text-base transition-colors whitespace-nowrap ${
             view === 'stats'
               ? 'bg-purple-600 text-white'
@@ -372,14 +373,14 @@ export const PlayerDashboard: React.FC = () => {
                             {formatDate(game.completedAt || '')}
                           </span>
                         </div>
-                        <div className="flex items-center gap-4">
-                          <span className={`font-semibold ${isTeam1 ? 'text-blue-600' : 'text-gray-700'}`}>
+                        <div className="flex items-center flex-wrap gap-x-4 gap-y-1">
+                          <span className={`font-semibold min-w-0 truncate ${isTeam1 ? 'text-blue-600' : 'text-gray-700'}`}>
                             {game.team1?.name || team1?.name}
                           </span>
-                          <span className="text-gray-400">
+                          <span className="text-gray-400 shrink-0">
                             <span className="font-bold">{team1TotalPoints}</span> - <span className="font-bold">{team2TotalPoints}</span>
                           </span>
-                          <span className={`font-semibold ${!isTeam1 ? 'text-blue-600' : 'text-gray-700'}`}>
+                          <span className={`font-semibold min-w-0 truncate ${!isTeam1 ? 'text-blue-600' : 'text-gray-700'}`}>
                             {game.team2?.name || team2?.name}
                           </span>
                         </div>

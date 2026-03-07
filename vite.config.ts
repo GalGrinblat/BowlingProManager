@@ -1,11 +1,55 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
   plugins: [
     tailwindcss(),
     react(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      manifest: {
+        name: 'Bowling Pro Manager',
+        short_name: 'BowlingPro',
+        description: 'Bowling league management — standings, stats, and scores.',
+        display: 'standalone',
+        start_url: '/',
+        scope: '/',
+        background_color: '#1e1b4b',
+        theme_color: '#7c3aed',
+        icons: [
+          {
+            src: '/icons/icon-192x192.png',
+            sizes: '192x192',
+            type: 'image/png',
+          },
+          {
+            src: '/icons/icon-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any maskable',
+          },
+        ],
+      },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/.*\.supabase\.co\//,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'supabase-api-cache',
+              networkTimeoutSeconds: 10,
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 5 * 60,
+              },
+            },
+          },
+        ],
+      },
+    }),
   ],
   base: '/',
   server: {

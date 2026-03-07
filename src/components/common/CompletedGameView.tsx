@@ -35,16 +35,16 @@ export const CompletedGameView: React.FC = () => {
     <div className="space-y-6" dir={direction}>
       {/* Header */}
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800">{t('gameHistory.title')}</h1>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">{t('gameHistory.title')}</h1>
             <p className="text-sm text-gray-500 mt-1">
               {t('common.round')} {game.round} • {t('common.matchDay')} {game.matchDay} • {t('playerDashboard.completedOn')} {formatDate(game.completedAt ?? '')}
             </p>
           </div>
           <button
             onClick={() => navigate(-1)}
-            className="text-gray-600 hover:text-gray-800"
+            className="shrink-0 text-gray-600 hover:text-gray-800"
           >
             {isRTL ? t('common.rightArrow') : t('common.leftArrow')} {t('common.back')}
           </button>
@@ -65,10 +65,10 @@ export const CompletedGameView: React.FC = () => {
       {/* Game Summary Table */}
       <div className="bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-3">
-          <div className="flex items-center justify-center gap-3 text-white font-bold text-lg">
-            <span className="text-orange-300">{game.team1?.name}</span>
-            <span>{team1TotalPoints} 🆚 {team2TotalPoints}</span>
-            <span className="text-blue-300">{game.team2?.name}</span>
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-white font-bold text-lg text-center">
+            <span className="text-orange-300 min-w-0 truncate max-w-[35%]">{game.team1?.name}</span>
+            <span className="shrink-0">{team1TotalPoints} 🆚 {team2TotalPoints}</span>
+            <span className="text-blue-300 min-w-0 truncate max-w-[35%]">{game.team2?.name}</span>
           </div>
         </div>
 

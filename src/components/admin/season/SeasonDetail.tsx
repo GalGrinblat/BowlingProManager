@@ -140,7 +140,7 @@ export const SeasonDetail: React.FC = () => {
       const result = await importLeagueOrSeason(importData);
       if (result.success) {
         alert(t('seasons.importSuccess'));
-        window.location.reload();
+        navigate(0);
       } else {
         alert(`${t('seasons.importError')}: ${result.error}`);
       }
@@ -336,7 +336,7 @@ export const SeasonDetail: React.FC = () => {
 
       {view === 'teamStandings' && (
         <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6">
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex flex-wrap justify-between items-center gap-2 mb-4">
             <h2 className="text-xl font-bold text-gray-800">{getStandingsTitle(t('seasons.teamStandings'))}</h2>
             <div className="flex items-center gap-2">
               {completedMatchDayEvents.length > 0 && (
@@ -392,7 +392,7 @@ export const SeasonDetail: React.FC = () => {
       {view === 'playerStandings' && (
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="p-4 sm:p-6">
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex flex-wrap justify-between items-center gap-2 mb-4">
               <h2 className="text-xl font-bold text-gray-800">{getStandingsTitle(t('seasons.playerStandings'))}</h2>
               <div className="flex items-center gap-2">
                 {completedMatchDayEvents.length > 0 && (

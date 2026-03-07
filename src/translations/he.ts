@@ -95,6 +95,9 @@ const he: TranslationDictionary = {
     loginFailed: 'ההתחברות נכשלה. אנא נסה שוב.',
     viewerPrompt: 'רוצה לבדוק את הדירוגים?',
     viewAsGuest: 'כניסה כאורח',
+    standaloneTitle: 'פועל כאפליקציה מותקנת',
+    standaloneDesc: 'כניסה עם Google מצריכה פתיחה בדפדפן תחילה. לאחר הכניסה, חזור לאפליקציה.',
+    openInBrowser: 'פתח בדפדפן',
   },
 
   // לוח תוצאות ציבורי

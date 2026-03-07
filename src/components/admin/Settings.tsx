@@ -201,7 +201,7 @@ export const Settings: React.FC = () => {
                 if (confirm(t('settings.confirmDeleteAll'))) {
                   if (confirm(t('settings.finalWarning'))) {
                     utilApi.clearAll();
-                    window.location.reload();
+                    navigate('/', { replace: true });
                   }
                 }
               }}
