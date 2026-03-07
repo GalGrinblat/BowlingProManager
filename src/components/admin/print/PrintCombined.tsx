@@ -10,6 +10,7 @@ import { MatchDayReport } from './MatchDayReport';
 import './printStyles.css';
 
 import type { Game, League, Season, Team, TeamStanding, PlayerStats, CurrentPlayerAverages } from '../../../types/index';
+import type { PlayerData } from './PlayerRosterTable';
 
 interface PrintCombinedProps {
   seasonId: string;
@@ -32,7 +33,7 @@ export const PrintCombined: React.FC<PrintCombinedProps> = ({
   const [matchDayGames, setMatchDayGames] = useState<Game[]>([]);
   const [teamStandings, setTeamStandings] = useState<TeamStanding[]>([]);
   const [playerStats, setPlayerStats] = useState<PlayerStats[]>([]);
-  const [teamPlayersMap, setTeamPlayersMap] = useState<Record<string, any[]>>({});
+  const [teamPlayersMap, setTeamPlayersMap] = useState<Record<string, PlayerData[]>>({});
 
   const getTeamPlayers = async (team: Team, seasonData: Season, averages: CurrentPlayerAverages) => {
     const playerPromises = team.playerIds.map(async (playerId: string) => {
@@ -84,7 +85,7 @@ export const PrintCombined: React.FC<PrintCombinedProps> = ({
         averagesToUse = calculateCurrentPlayerAverages(previousGames);
       }
 
-      const playersMap: Record<string, any[]> = {};
+      const playersMap: Record<string, PlayerData[]> = {};
       for (const team of teamsData) {
         playersMap[team.id] = await getTeamPlayers(team, seasonData, averagesToUse);
       }

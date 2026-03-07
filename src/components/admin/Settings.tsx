@@ -32,7 +32,7 @@ export const Settings: React.FC = () => {
   };
 
   useEffect(() => {
-    loadOrganization();
+    loadOrganization(); // eslint-disable-line react-hooks/set-state-in-effect
   }, []);
 
   const handleSave = async () => {

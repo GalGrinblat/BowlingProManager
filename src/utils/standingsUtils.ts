@@ -32,7 +32,8 @@ const initializePlayerStat = (
       highGame: 0,
       highSeries: 0,
       pointsScored: 0,
-      seriesCount: 0
+      seriesCount: 0,
+      highSeriesByCount: {}
     };
     playerStats.push(playerStat);
   }
@@ -248,7 +249,8 @@ export const calculatePlayerSeasonStats = (teams: Team[], games: Game[]): Player
         highGame: 0,
         highSeries: 0,
         seriesCount: 0,
-        pointsScored: 0
+        pointsScored: 0,
+        highSeriesByCount: {}
       });
     });
   });

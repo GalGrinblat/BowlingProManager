@@ -7,11 +7,17 @@ export interface SortOption<T> {
 
 export function sortByOption<T>(arr: T[], option: SortOption<T>) {
   return [...arr].sort((a, b) => {
-    const key = option.key;
-    if (option.direction === 'asc') {
-      return String(a[key]).localeCompare(String(b[key]), undefined, { sensitivity: 'base' });
-    } else {
-      return String(b[key]).localeCompare(String(a[key]), undefined, { sensitivity: 'base' });
+    const aVal = a[option.key];
+    const bVal = b[option.key];
+
+    // Numeric sort — preserves correct numeric order (10 > 2, not "10" < "2")
+    if (typeof aVal === 'number' && typeof bVal === 'number') {
+      return option.direction === 'asc' ? aVal - bVal : bVal - aVal;
     }
+
+    // String / fallback sort
+    return option.direction === 'asc'
+      ? String(aVal).localeCompare(String(bVal), undefined, { sensitivity: 'base' })
+      : String(bVal).localeCompare(String(aVal), undefined, { sensitivity: 'base' });
   });
 }

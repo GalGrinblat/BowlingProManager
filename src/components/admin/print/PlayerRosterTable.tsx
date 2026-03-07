@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from '../../../contexts/LanguageContext';
 
-interface PlayerData {
+export interface PlayerData {
   id: string;
   name: string;
   average: number;

@@ -256,7 +256,7 @@ export interface PlayerStats {
   highGameContext?: PlayerRecordContext;
   highSeries: number;
   highSeriesContext?: PlayerRecordContext;
-  highSeriesByCount?: Record<number, { pins: number; context: PlayerRecordContext }>;
+  highSeriesByCount: Record<number, { pins: number; context: PlayerRecordContext }>;
   seriesCount: number;
   teamId?: string;
   teamName?: string;

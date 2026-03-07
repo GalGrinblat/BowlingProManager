@@ -16,7 +16,6 @@
     "check": "node scripts/start-of-day.js"
   },
   "dependencies": {
-    "@babel/generator": "^7.29.0",
     "@supabase/supabase-js": "^2.95.3",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",

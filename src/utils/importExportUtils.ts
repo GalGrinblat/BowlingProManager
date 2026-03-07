@@ -95,7 +95,7 @@ export const parseJSONImport = <T>(
 
     return { validData, errors };
   } catch (error) {
-    throw new Error(`Invalid JSON format: ${error}`);
+    throw new Error(`Invalid JSON format: ${error}`, { cause: error });
   }
 };
 
@@ -161,7 +161,7 @@ export const parseCSVImport = <T>(
 
     return { validData, errors };
   } catch (error) {
-    throw new Error(`Error parsing CSV: ${error}`);
+    throw new Error(`Error parsing CSV: ${error}`, { cause: error });
   }
 };
 
