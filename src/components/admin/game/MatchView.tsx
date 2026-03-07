@@ -162,7 +162,7 @@ export const MatchView: React.FC<MatchViewProps> = ({ matchNumber, game, onUpdat
 
         <button
           onClick={() => onNavigate('next')}
-          className="flex items-center justify-center gap-1 sm:gap-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 sm:py-4 rounded-lg font-bold uppercase text-xs sm:text-sm hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg touch-manipulation"
+          className="flex items-center justify-center gap-1 sm:gap-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 sm:py-4 rounded-lg font-bold uppercase text-xs sm:text-sm hover:from-green-700 hover:to-emerald-700 transition-colors shadow-lg touch-manipulation"
         >
           {matchNumber === totalMatches ? t('games.summary') : t('common.next')}
           {isRTL ? <ArrowLeft size={18} /> : <ArrowRight size={18} />}

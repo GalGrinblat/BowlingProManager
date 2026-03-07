@@ -16,7 +16,7 @@ export const SeasonProgressBar: React.FC<SeasonProgressBarProps> = ({ progressPe
       </div>
       <div className="bg-blue-400 rounded-full h-3">
         <div
-          className="bg-white rounded-full h-3 transition-all duration-500"
+          className="bg-white rounded-full h-3 transition-[width] duration-500"
           style={{ width: `${progressPercent}%` }}
         />
       </div>

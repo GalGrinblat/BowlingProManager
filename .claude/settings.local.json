@@ -28,7 +28,8 @@
       "Bash(git -C \"c:/Code/BowlingAppAi\" remote set-url origin https://github.com/GalGrinblat/BowlingProManager.git)",
       "Bash(NODE_OPTIONS=\"--max-old-space-size=4096\" npx tsc --noEmit --skipLibCheck)",
       "Bash(npm run check)",
-      "Bash(npx jest --version)"
+      "Bash(npx jest --version)",
+      "WebFetch(domain:raw.githubusercontent.com)"
     ]
   }
 }

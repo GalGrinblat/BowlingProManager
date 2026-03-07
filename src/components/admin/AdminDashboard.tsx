@@ -66,7 +66,7 @@ export const AdminDashboard: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <button
           onClick={() => navigate('/admin/players')}
-          className="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all touch-manipulation"
+          className="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow touch-manipulation"
         >
           <div className="text-4xl mb-2">👥</div>
           <h3 className="text-xl font-bold mb-1">{t('dashboard.managePlayers')}</h3>
@@ -75,7 +75,7 @@ export const AdminDashboard: React.FC = () => {
 
         <button
           onClick={() => navigate('/admin/leagues')}
-          className="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all touch-manipulation"
+          className="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow touch-manipulation"
         >
           <div className="text-4xl mb-2">🏆</div>
           <h3 className="text-xl font-bold mb-1">{t('dashboard.manageLeagues')}</h3>
@@ -84,7 +84,7 @@ export const AdminDashboard: React.FC = () => {
 
         <button
           onClick={() => navigate('/admin/users')}
-          className="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all touch-manipulation"
+          className="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow touch-manipulation"
         >
           <div className="text-4xl mb-2">🔐</div>
           <h3 className="text-xl font-bold mb-1">{t('dashboard.manageUsers')}</h3>
@@ -93,7 +93,7 @@ export const AdminDashboard: React.FC = () => {
 
         <button
           onClick={() => navigate('/admin/settings')}
-          className="bg-gradient-to-br from-green-500 to-green-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all touch-manipulation"
+          className="bg-gradient-to-br from-green-500 to-green-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow touch-manipulation"
         >
           <div className="text-4xl mb-2">⚙️</div>
           <h3 className="text-xl font-bold mb-1">{t('settings.title')}</h3>
@@ -136,9 +136,10 @@ export const AdminDashboard: React.FC = () => {
               }
 
               return (
-                <div
+                <button
                   key={league.id}
-                  className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors cursor-pointer"
+                  type="button"
+                  className="w-full text-left border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors"
                   onClick={() => navigate(`/admin/leagues/${league.id}`)}
                 >
                   <div className="flex justify-between items-start">
@@ -169,7 +170,7 @@ export const AdminDashboard: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                </div>
+                </button>
               );
             })}
           </div>

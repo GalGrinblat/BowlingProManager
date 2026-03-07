@@ -81,13 +81,13 @@ export const PlayerScoreInput: React.FC<PlayerScoreInputProps> = ({
             </div>
           )}
           <div className="text-center">
-            <label className="text-gray-400 text-sm block">{t('games.withHdc')}</label>
+            <span className="text-gray-400 text-sm block">{t('games.withHdc')}</span>
             <div className={`w-16 px-2 py-1 ${textColor} font-bold text-sm text-center`}>
               {scoreWithHandicap}
             </div>
           </div>
           <div className="text-center">
-            <label className="text-gray-400 text-sm block">{t('common.score')}</label>
+            <span className="text-gray-400 text-sm block">{t('common.score')}</span>
             <div className="w-16 px-2 py-1 bg-red-700 text-yellow-300 rounded border border-red-600 font-bold text-center text-sm">
               {absentScore}
             </div>
@@ -116,14 +116,16 @@ export const PlayerScoreInput: React.FC<PlayerScoreInputProps> = ({
             </div>
           )}
           <div className="text-center">
-            <label className="text-gray-400 text-sm block">{t('games.withHdc')}</label>
+            <span className="text-gray-400 text-sm block">{t('games.withHdc')}</span>
             <div className={`w-16 px-2 py-1 ${textColor} font-bold text-sm text-center`}>
               {scoreWithHandicap}
             </div>
           </div>
           <div className="text-center">
-            <label className="text-gray-400 text-sm block">{t('common.score')}</label>
+            <label htmlFor={`score-${matchIdx}-${teamKey}-${playerIdx}`} className="text-gray-400 text-sm block">{t('common.score')}</label>
             <input
+              id={`score-${matchIdx}-${teamKey}-${playerIdx}`}
+              name={`score-${teamKey}-${playerIdx}`}
               type="number"
               inputMode='numeric'
               value={matchPlayer.pins}

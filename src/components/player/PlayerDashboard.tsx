@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { playersApi, leaguesApi, seasonsApi, teamsApi, gamesApi } from '../../services/api';
+import { playersApi } from '../../services/api/players';
+import { leaguesApi } from '../../services/api/leagues';
+import { seasonsApi } from '../../services/api/seasons';
+import { teamsApi } from '../../services/api/teams';
+import { gamesApi } from '../../services/api/games';
 import { logger } from '../../utils/logger';
 import { useTranslation } from '../../contexts/LanguageContext';
 import { useDateFormat } from '../../hooks/useDateFormat';
@@ -95,17 +99,21 @@ export const PlayerDashboard: React.FC = () => {
         const topGames = sortedCompletedGames.slice(0, 5);
         setRecentCompletedGames(topGames);
 
-        // Preload game details for rendering
-        const detailsMap: Record<string, { season: Season | null, league: League | null, team1: Team | undefined, team2: Team | undefined }> = {};
-        for (const game of topGames) {
-          const season = await seasonsApi.getById(game.seasonId);
-          const league = season ? await leaguesApi.getById(season.leagueId) : null;
-          const team1 = teamsById.get(game.team1Id);
-          const team2 = teamsById.get(game.team2Id);
-          if (cancelled) return;
-          detailsMap[game.id] = { season: season ?? null, league: league ?? null, team1, team2 };
-        }
-        setGameDetailsMap(detailsMap);
+        // Preload game details for rendering — parallel fetches
+        const detailEntries = await Promise.all(
+          topGames.map(async game => {
+            const season = await seasonsApi.getById(game.seasonId);
+            const league = season ? await leaguesApi.getById(season.leagueId) : null;
+            return [game.id, {
+              season: season ?? null,
+              league: league ?? null,
+              team1: teamsById.get(game.team1Id),
+              team2: teamsById.get(game.team2Id),
+            }] as const;
+          })
+        );
+        if (cancelled) return;
+        setGameDetailsMap(Object.fromEntries(detailEntries));
 
         // Calculate player statistics across all games — synchronous, no API calls
         const stats = computePlayerStats(allGames, teamsById, seasonsById, leaguesById, playerResult);
@@ -346,9 +354,10 @@ export const PlayerDashboard: React.FC = () => {
                   if (!data) return null;
                   const { game, league, team1, team2, isTeam1, team1TotalPoints, team2TotalPoints, playerWon } = data;
                   return (
-                    <div
+                    <button
                       key={game.id}
-                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                      type="button"
+                      className="w-full text-left flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                       onClick={() => navigate(`/player/games/${game.id}`, { state: { game } })}
                     >
                       <div className="flex-1">
@@ -391,7 +400,7 @@ export const PlayerDashboard: React.FC = () => {
                         )}
                         <span className="text-purple-600 font-semibold">{t('common.view')} {t('common.rightArrow')}</span>
                       </div>
-                    </div>
+                    </button>
                   );
                 })}
               </div>

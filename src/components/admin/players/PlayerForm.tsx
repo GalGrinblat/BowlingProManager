@@ -20,11 +20,14 @@ export const PlayerForm: React.FC<PlayerFormProps> = ({ formData, isEditing, onF
       <form onSubmit={onSubmit} className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label htmlFor="player-first-name" className="block text-sm font-semibold text-gray-700 mb-2">
               {t('players.firstName')} *
             </label>
             <input
+              id="player-first-name"
               type="text"
+              name="firstName"
+              autoComplete="given-name"
               value={formData.firstName}
               onChange={(e) => onFormDataChange({ ...formData, firstName: e.target.value })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -32,22 +35,28 @@ export const PlayerForm: React.FC<PlayerFormProps> = ({ formData, isEditing, onF
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label htmlFor="player-middle-name" className="block text-sm font-semibold text-gray-700 mb-2">
               {t('players.middleName')}
             </label>
             <input
+              id="player-middle-name"
               type="text"
+              name="middleName"
+              autoComplete="additional-name"
               value={formData.middleName}
               onChange={(e) => onFormDataChange({ ...formData, middleName: e.target.value })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label htmlFor="player-last-name" className="block text-sm font-semibold text-gray-700 mb-2">
               {t('players.lastName')} *
             </label>
             <input
+              id="player-last-name"
               type="text"
+              name="lastName"
+              autoComplete="family-name"
               value={formData.lastName}
               onChange={(e) => onFormDataChange({ ...formData, lastName: e.target.value })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"

@@ -13,7 +13,7 @@ export const Header: React.FC<HeaderProps> = ({ currentUser, onLogout }) => {
   };
 
   return (
-    <div className="text-center mb-8 animate-slide-in">
+    <header className="text-center mb-8 animate-slide-in">
       <div className="flex items-center justify-between mb-4">
         <div className="flex-1 flex justify-start items-center">
           {/* Language Toggle */}
@@ -21,16 +21,17 @@ export const Header: React.FC<HeaderProps> = ({ currentUser, onLogout }) => {
             onClick={toggleLanguage}
             className="px-3 py-1.5 text-xs font-semibold bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors touch-manipulation"
             title="Switch Language / החלף שפה"
+            aria-label="Switch language"
           >
             {language === 'en' ? '🌐 עב' : '🌐 EN' }
           </button>
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
-          <Trophy className="text-orange-600 hidden sm:block" size={40} strokeWidth={2.5} />
+          <span aria-hidden="true"><Trophy className="text-orange-600 hidden sm:block" size={40} strokeWidth={2.5} /></span>
           <h1 className="bowling-title text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-gray-900">
             BOWLING PRO MANAGER
           </h1>
-          <Trophy className="text-orange-600 hidden sm:block" size={40} strokeWidth={2.5} />
+          <span aria-hidden="true"><Trophy className="text-orange-600 hidden sm:block" size={40} strokeWidth={2.5} /></span>
         </div>
         <div className="flex-1 flex justify-end items-center">
           {currentUser && (
@@ -58,6 +59,6 @@ export const Header: React.FC<HeaderProps> = ({ currentUser, onLogout }) => {
         </div>
       </div>
       <p className="text-gray-600 font-semibold text-sm sm:text-base lg:text-lg">באולינג פרו מנג'ר</p>
-    </div>
+    </header>
   );
 }

@@ -36,11 +36,11 @@ export const LoginView: React.FC = () => {
       <button
         onClick={handleGoogleLogin}
         disabled={isLoading}
-        className={`w-full bg-white border border-gray-300 text-gray-700 py-4 px-6 rounded-lg font-semibold hover:bg-gray-50 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-3 ${
+        className={`w-full bg-white border border-gray-300 text-gray-700 py-4 px-6 rounded-lg font-semibold hover:bg-gray-50 transition-[background-color,box-shadow] shadow-md hover:shadow-lg flex items-center justify-center gap-3 ${
           isLoading ? 'opacity-50 cursor-not-allowed' : ''
         }`}
       >
-        <svg className="w-6 h-6" viewBox="0 0 24 24">
+        <svg className="w-6 h-6" viewBox="0 0 24 24" aria-hidden="true">
           <path
             fill="#4285F4"
             d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"

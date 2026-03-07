@@ -76,7 +76,7 @@ export const GameSummaryView: React.FC<GameSummaryViewProps> = ({ game, totals, 
 
         <button
           onClick={onFinish}
-          className={`bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 rounded-lg font-bold uppercase text-sm hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg ${isRTL ? 'col-start-1' : ''}`}
+          className={`bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 rounded-lg font-bold uppercase text-sm hover:from-green-700 hover:to-emerald-700 transition-colors shadow-lg ${isRTL ? 'col-start-1' : ''}`}
         >
           {t('summary.saveGame')}
         </button>

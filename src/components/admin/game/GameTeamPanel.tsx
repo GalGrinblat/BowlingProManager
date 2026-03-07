@@ -23,7 +23,7 @@ const PlayerRow: React.FC<PlayerRowProps> = ({
   totalPlayers
 }) => (
   <div
-    className={`p-4 rounded-lg border-2 transition-all ${
+    className={`p-4 rounded-lg border-2 transition-[background-color,border-color] ${
       player.absent ? 'bg-red-900/20 border-red-500' : 'bg-gray-700 border-gray-600'
     } ${lineupStrategy === 'flexible' ? 'cursor-move' : ''}`}
     draggable={lineupStrategy === 'flexible'}
