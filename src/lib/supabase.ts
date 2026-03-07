@@ -166,6 +166,8 @@ export type Database = {
           postponed: boolean;
           original_date: string | null;
           completed_at: string | null;
+          pending_submission: import('../types/index').PendingSubmission | null;
+          pending_submission_session_id: string | null;
           created_at: string;
           updated_at: string;
         };

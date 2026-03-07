@@ -100,6 +100,49 @@ const he: TranslationDictionary = {
     openInBrowser: 'פתח בדפדפן',
   },
 
+  // הזנת תוצאות שחקן (נתיב ציבורי /score/:gameId)
+  score: {
+    title: 'הזנת תוצאות משחק',
+    step1: 'הגדרה לפני המשחק',
+    step2: 'הזן תוצאות',
+    step3: 'נשלח',
+    stepOf: 'שלב {{current}} מתוך {{total}}',
+    continueToScores: 'המשך להזנת תוצאות',
+    submitScores: 'שלח תוצאות',
+    submitting: 'שולח...',
+    submitted: 'התוצאות נשלחו!',
+    submittedDesc: 'התוצאות נשלחו למנהל לאישור.',
+    shareLink: 'העתק קישור להזנת תוצאות',
+    linkCopied: 'הקישור הועתק!',
+    alreadyComplete: 'התוצאות כבר נרשמו',
+    alreadyCompleteDesc: 'המשחק הזה כבר הסתיים.',
+    postponed: 'המשחק נדחה',
+    postponedDesc: 'משחק זה נדחה לתאריך אחר.',
+    notFound: 'המשחק לא נמצא',
+    notFoundDesc: 'קישור הזנת התוצאות אינו תקין או שפג תוקפו.',
+    loadError: 'טעינת המשחק נכשלה. אנא בדוק את החיבור ונסה שוב.',
+    submitError: 'השליחה נכשלה. אנא נסה שוב.',
+    pendingWarning: 'קיימת הגשה ממתינה לאישור. ההגשה שלך תחליף אותה.',
+    draftRestored: 'ההתקדמות הקודמת שלך שוחזרה.',
+    lineupLocked: 'הסגל נעול על פי כללי הליגה.',
+    leaveWarning: 'התוצאות שלך יאבדו אם תעזוב את הדף.',
+    retry: 'נסה שוב',
+    scanToEnter: 'סרוק להזנת תוצאות',
+  },
+
+  // מנהל: פאנל הגשה ממתינה
+  pending: {
+    title: 'הגשת שחקן ממתינה לאישור',
+    submittedAt: 'נשלח בתאריך',
+    absences: 'היעדרויות שדווחו',
+    scores: 'תוצאות שהוגשו',
+    noAbsences: 'לא דווחו היעדרויות',
+    apply: 'החל הגשה',
+    dismiss: 'בטל',
+    dismissConfirm: 'האם אתה בטוח? התוצאות שהוגשו יאבדו לצמיתות.',
+    applySuccess: 'ההגשה הוחלה בהצלחה.',
+  },
+
   // לוח תוצאות ציבורי
   board: {
     title: 'לוח תוצאות ציבורי',

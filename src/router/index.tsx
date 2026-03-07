@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
+import ScoreLayout from '../components/score/ScoreLayout';
 import { useAuth } from '../contexts/AuthContext';
 import { AdminDataProvider } from '../contexts/AdminDataContext';
 import { Header } from '../components/common/Header';
@@ -18,10 +19,11 @@ const Settings          = lazy(() => import('../components/admin/Settings').then
 const UserManagement    = lazy(() => import('../components/admin/UserManagement').then(m => ({ default: m.UserManagement })));
 const PlayerDashboard   = lazy(() => import('../components/player/PlayerDashboard').then(m => ({ default: m.PlayerDashboard })));
 const CompletedGameView = lazy(() => import('../components/common/CompletedGameView').then(m => ({ default: m.CompletedGameView })));
-const BoardHome   = lazy(() => import('../components/board/BoardHome').then(m => ({ default: m.BoardHome })));
-const BoardLeague = lazy(() => import('../components/board/BoardLeague').then(m => ({ default: m.BoardLeague })));
-const BoardSeason = lazy(() => import('../components/board/BoardSeason').then(m => ({ default: m.BoardSeason })));
-const BoardGame   = lazy(() => import('../components/board/BoardGame').then(m => ({ default: m.BoardGame })));
+const BoardHome        = lazy(() => import('../components/board/BoardHome').then(m => ({ default: m.BoardHome })));
+const BoardLeague      = lazy(() => import('../components/board/BoardLeague').then(m => ({ default: m.BoardLeague })));
+const BoardSeason      = lazy(() => import('../components/board/BoardSeason').then(m => ({ default: m.BoardSeason })));
+const BoardGame        = lazy(() => import('../components/board/BoardGame').then(m => ({ default: m.BoardGame })));
+const PlayerScoreEntry = lazy(() => import('../components/score/PlayerScoreEntry').then(m => ({ default: m.PlayerScoreEntry })));
 
 const BoardLayout = () => (
   <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 p-4 md:p-8">
@@ -128,6 +130,13 @@ export const router = createBrowserRouter([
       { path: '/board/leagues/:leagueId', element: <BoardLeague /> },
       { path: '/board/seasons/:seasonId', element: <BoardSeason /> },
       { path: '/board/games/:gameId', element: <BoardGame /> },
+    ],
+  },
+  // Public score entry — no auth required, no Header
+  {
+    element: <ScoreLayout />,
+    children: [
+      { path: '/score/:gameId', element: <PlayerScoreEntry /> },
     ],
   },
 ]);

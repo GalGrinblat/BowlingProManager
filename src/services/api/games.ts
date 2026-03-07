@@ -1,7 +1,7 @@
 import { supabase } from '../../lib/supabase';
 import type { GameRow } from '../../lib/supabase';
 import { handleError } from './helpers';
-import type { Game } from '../../types/index';
+import type { Game, PendingSubmission } from '../../types/index';
 
 const mapGameFromDb = (data: GameRow): Game => ({
   id: data.id,
@@ -30,7 +30,8 @@ const mapGameFromDb = (data: GameRow): Game => ({
   scheduledDate: data.scheduled_date ?? undefined,
   postponed: data.postponed,
   originalDate: data.original_date ?? undefined,
-  updatedAt: data.updated_at ?? undefined
+  updatedAt: data.updated_at ?? undefined,
+  pendingSubmission: data.pending_submission ?? undefined,
 });
 
 const mapGameToDb = (data: Partial<Game>): Record<string, unknown> => {
@@ -59,6 +60,7 @@ const mapGameToDb = (data: Partial<Game>): Record<string, unknown> => {
   if (data.scheduledDate !== undefined) dbData.scheduled_date = data.scheduledDate;
   if (data.postponed !== undefined) dbData.postponed = data.postponed;
   if (data.originalDate !== undefined) dbData.original_date = data.originalDate;
+  if (data.pendingSubmission !== undefined) dbData.pending_submission = data.pendingSubmission ?? null;
   return dbData;
 };
 
@@ -183,5 +185,32 @@ export const gamesApi = {
       handleError(error, 'gamesApi.delete');
       return false;
     }
-  }
+  },
+
+  submitPending: async (id: string, submission: PendingSubmission): Promise<boolean> => {
+    try {
+      const { error } = await supabase.rpc('submit_pending_score', {
+        p_game_id: id,
+        p_submission: submission,
+        p_session_id: submission.sessionId,
+      });
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      handleError(error, 'gamesApi.submitPending');
+      return false;
+    }
+  },
+
+  clearPending: async (id: string): Promise<void> => {
+    try {
+      const { error } = await supabase
+        .from('games')
+        .update({ pending_submission: null, pending_submission_session_id: null })
+        .eq('id', id);
+      if (error) throw error;
+    } catch (error) {
+      handleError(error, 'gamesApi.clearPending');
+    }
+  },
 };

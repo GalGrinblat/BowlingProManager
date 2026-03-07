@@ -100,6 +100,49 @@ const en: TranslationDictionary = {
     openInBrowser: 'Open in Browser',
   },
 
+  // Player Score Entry (public /score/:gameId route)
+  score: {
+    title: 'Enter Match Scores',
+    step1: 'Pre-Match Setup',
+    step2: 'Enter Scores',
+    step3: 'Submitted',
+    stepOf: 'Step {{current}} of {{total}}',
+    continueToScores: 'Continue to Scores',
+    submitScores: 'Submit Scores',
+    submitting: 'Submitting...',
+    submitted: 'Scores submitted!',
+    submittedDesc: 'Your scores have been sent to the admin for review.',
+    shareLink: 'Copy score entry link',
+    linkCopied: 'Link copied!',
+    alreadyComplete: 'Scores already recorded',
+    alreadyCompleteDesc: 'This game has already been completed.',
+    postponed: 'Game postponed',
+    postponedDesc: 'This game has been postponed.',
+    notFound: 'Game not found',
+    notFoundDesc: 'This score entry link is invalid or has expired.',
+    loadError: 'Failed to load game. Please check your connection and try again.',
+    submitError: 'Failed to submit. Please try again.',
+    pendingWarning: 'Another submission is already pending review. Yours will replace it.',
+    draftRestored: 'Your previous progress has been restored.',
+    lineupLocked: 'Lineup is locked by the league rules.',
+    leaveWarning: 'Your scores will be lost if you leave this page.',
+    retry: 'Retry',
+    scanToEnter: 'Scan to enter scores',
+  },
+
+  // Admin: Pending Submission Panel
+  pending: {
+    title: 'Player Submission Pending',
+    submittedAt: 'Submitted at',
+    absences: 'Reported Absences',
+    scores: 'Submitted Scores',
+    noAbsences: 'No absences reported',
+    apply: 'Apply Submission',
+    dismiss: 'Dismiss',
+    dismissConfirm: 'Are you sure? The submitted scores will be permanently lost.',
+    applySuccess: 'Submission applied successfully.',
+  },
+
   // Public Scoreboard
   board: {
     title: 'Public Scoreboard',

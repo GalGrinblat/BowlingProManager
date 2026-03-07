@@ -8,6 +8,7 @@ import { calculateMatchResults, calculateBonusPoints, clampScore } from '../../.
 import { calculatePlayerStats, calculateGameTotals, calculateGrandTotalPoints } from '../../../utils/statsUtils';
 import { applyLineupRule } from '../../../utils/lineupUtils';
 import { PreMatchSetup } from './PreMatchSetup';
+import { PendingSubmissionPanel } from './PendingSubmissionPanel';
 import { useGameInitializer } from '../../../hooks/useGameInitializer';
 import { useTranslation } from '../../../contexts/LanguageContext';
 
@@ -222,6 +223,27 @@ export const SeasonGame: React.FC = () => {
     navigate(-1);
   };
 
+  const handleApplySubmission = async (updatedGame: Game) => {
+    setGame(updatedGame);
+    setShowPreMatch(false);
+    setCurrentMatch(1);
+    try {
+      await gamesApi.update(gameId!, updatedGame);
+      await gamesApi.clearPending(gameId!);
+    } catch (error) {
+      logger.error('Failed to apply pending submission:', error);
+    }
+  };
+
+  const handleDismissSubmission = async () => {
+    try {
+      await gamesApi.clearPending(gameId!);
+      setGame(prev => prev ? { ...prev, pendingSubmission: undefined } : prev);
+    } catch (error) {
+      logger.error('Failed to dismiss pending submission:', error);
+    }
+  };
+
   const finishGame = async () => {
     if (!game?.team1 || !game?.team2 || !game?.matches) return;
     const updated: Game = {
@@ -245,10 +267,21 @@ export const SeasonGame: React.FC = () => {
       team2: game.team2,
     };
     await gamesApi.update(gameId!, updated);
+    await gamesApi.clearPending(gameId!);
     navigate(-1);
   };
 
   if (!game) return <div>{t('common.loading')}</div>;
+
+  if (game.pendingSubmission && game.status !== 'completed') {
+    return (
+      <PendingSubmissionPanel
+        game={game}
+        onApply={handleApplySubmission}
+        onDismiss={handleDismissSubmission}
+      />
+    );
+  }
 
   if (showSummary) {
     const totals = calculateGameTotals(game);

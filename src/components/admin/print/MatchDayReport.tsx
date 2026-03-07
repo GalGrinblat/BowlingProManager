@@ -1,4 +1,5 @@
 import React from 'react';
+import { QRCodeSVG } from 'qrcode.react';
 import { useTranslation } from '../../../contexts/LanguageContext';
 import { useDateFormat } from '../../../hooks/useDateFormat';
 import { calculateHeadToHead } from '../../../utils/headToHeadUtils';
@@ -126,10 +127,19 @@ export const MatchDayReport: React.FC<MatchDayReportProps> = ({
                 </div>
               </div>
 
-              {/* Signature Section */}
+              {/* Signature + QR Section */}
               <div className="mt-8 border-t-2 border-gray-300 pt-6">
-                <div className="grid grid-cols-2 gap-8">
+                <div className="grid grid-cols-3 gap-8 items-start">
                   <SignatureBlock teamName={team1.name} />
+                  <div className="flex flex-col items-center justify-center gap-2 pt-2">
+                    <QRCodeSVG
+                      value={`${window.location.origin}/score/${game.id}`}
+                      size={96}
+                      bgColor="transparent"
+                      fgColor="#1f2937"
+                    />
+                    <span className="text-xs text-gray-500 text-center">{t('score.scanToEnter')}</span>
+                  </div>
                   <SignatureBlock teamName={team2.name} />
                 </div>
               </div>

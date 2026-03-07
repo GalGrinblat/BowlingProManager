@@ -129,6 +129,17 @@ export interface GameTeam {
 export type GameStatus = 'pending' | 'in-progress' | 'completed';
 export type SeasonStatus = 'setup' | 'active' | 'completed';
 
+/** PendingSubmission - Player-submitted score data awaiting admin approval */
+export interface PendingSubmission {
+  submittedAt: string;
+  sessionId: string;
+  team1AbsentFlags: boolean[];
+  team2AbsentFlags: boolean[];
+  team1PlayerOrder: string[]; // playerId order as the player set it up
+  team2PlayerOrder: string[];
+  matchScores: Array<{ team1Pins: string[]; team2Pins: string[] }>;
+}
+
 /** Game - Multi-match bowling game between two teams with scoring and status tracking */
 export interface Game {
   // Identity
@@ -168,6 +179,8 @@ export interface Game {
   matches?: GameMatch[];
   /** Points awarded for highest total pins across all matches */
   grandTotalPoints?: { team1: number; team2: number };
+  /** Player-submitted score data pending admin approval */
+  pendingSubmission?: PendingSubmission;
 }
 
 // ============================================================================
