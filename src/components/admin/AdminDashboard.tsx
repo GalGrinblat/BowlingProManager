@@ -14,6 +14,24 @@ export const AdminDashboard: React.FC = () => {
   const activeLeagues = leagues.filter(l => l.active);
   const pendingUsers = users.filter(u => u.role === 'player' && u.playerId === null);
 
+  type PendingSeasonEntry = { seasonId: string; leagueName: string; seasonName: string; count: number };
+  const seasonsWithPendingGames: PendingSeasonEntry[] = [];
+  for (const [leagueId, seasons] of Object.entries(seasonsMap)) {
+    for (const season of seasons) {
+      const games = gamesMap[season.id] ?? [];
+      const pendingCount = games.filter(g => g.pendingSubmission != null).length;
+      if (pendingCount > 0) {
+        const league = leagues.find(l => l.id === leagueId);
+        seasonsWithPendingGames.push({
+          seasonId: season.id,
+          leagueName: league?.name ?? '',
+          seasonName: season.name,
+          count: pendingCount,
+        });
+      }
+    }
+  }
+
   if (isLoadingData) {
     return (
       <div className="space-y-6">
@@ -59,6 +77,34 @@ export const AdminDashboard: React.FC = () => {
           >
             {t('dashboard.pendingUsersAction')}
           </button>
+        </div>
+      )}
+
+      {/* Pending Score Submissions Alert */}
+      {seasonsWithPendingGames.length > 0 && (
+        <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl shadow-lg p-5 flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-4 text-white min-w-0">
+            <span className="text-3xl shrink-0">📋</span>
+            <div className="min-w-0">
+              <p className="font-bold text-lg">{t('dashboard.pendingSubmissionsTitle')}</p>
+              {seasonsWithPendingGames.map(({ seasonId, leagueName, seasonName, count }) => (
+                <p key={seasonId} className="text-blue-100 text-sm">
+                  {leagueName} — {seasonName}: {count} {t('dashboard.pendingSubmissionsDesc')}
+                </p>
+              ))}
+            </div>
+          </div>
+          <div className="flex flex-col gap-2 shrink-0">
+            {seasonsWithPendingGames.map(({ seasonId, seasonName }) => (
+              <button
+                key={seasonId}
+                onClick={() => navigate(`/admin/seasons/${seasonId}`)}
+                className="bg-white text-indigo-600 font-bold px-4 py-2 rounded-lg hover:bg-indigo-50 transition-colors text-sm"
+              >
+                {t('dashboard.pendingSubmissionsAction')}: {seasonName}
+              </button>
+            ))}
+          </div>
         </div>
       )}
 

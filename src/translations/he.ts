@@ -473,6 +473,7 @@ const he: TranslationDictionary = {
     viewResults: 'צפה בתוצאות',
     continue: 'המשך',
     startGame: 'התחל משחק',
+    viewPendingSubmission: 'הגשה ממתינה',
     preGameSetup: 'הגדרת טרום משחק',
     reviewPlayers: 'סקור שחקנים וסמן היעדרויות לפני תחילת המשחק',
     lineupStrategyLabel: 'אסטרטגיית סידור:',
@@ -568,6 +569,9 @@ const he: TranslationDictionary = {
     pendingUsersDesc: 'חשבון/ות שחקן ממתינים לקישור',
     pendingUsersMore: 'נוספים',
     pendingUsersAction: 'עבור לניהול משתמשים',
+    pendingSubmissionsTitle: 'הגשות ניקוד ממתינות',
+    pendingSubmissionsDesc: 'משחק/ים עם ניקוד שהוגש על ידי שחקנים ממתין לאישור',
+    pendingSubmissionsAction: 'עבור לעונה',
   },
 
   // לוח בקרה - שחקן

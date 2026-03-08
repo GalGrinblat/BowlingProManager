@@ -473,6 +473,7 @@ const en: TranslationDictionary = {
     viewResults: 'View Results',
     continue: 'Continue',
     startGame: 'Start Game',
+    viewPendingSubmission: 'Pending Submission',
     preGameSetup: 'Pre-Game Setup',
     reviewPlayers: 'Review players and mark any absences before starting the match',
     lineupStrategyLabel: 'Lineup Strategy:',
@@ -568,6 +569,9 @@ const en: TranslationDictionary = {
     pendingUsersDesc: 'player account(s) not yet linked',
     pendingUsersMore: 'more',
     pendingUsersAction: 'Go to User Management',
+    pendingSubmissionsTitle: 'Pending Score Submissions',
+    pendingSubmissionsDesc: 'game(s) with player-submitted scores awaiting review',
+    pendingSubmissionsAction: 'Go to Season',
   },
 
   // Player Dashboard

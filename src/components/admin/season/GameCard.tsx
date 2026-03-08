@@ -70,7 +70,15 @@ export const GameCard: React.FC<GameCardProps> = ({ game, team1, team2, h2h, onP
             )}
           </div>
         </div>
-        <div className="ml-4">
+        <div className="ml-4 flex flex-col gap-2 items-end">
+          {!readOnly && game.pendingSubmission != null && (
+            <button
+              onClick={onPlayGame}
+              className="px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 font-semibold text-sm"
+            >
+              📋 {t('games.viewPendingSubmission')}
+            </button>
+          )}
           {game.status === 'completed' ? (
             <button
               onClick={onViewGame}
