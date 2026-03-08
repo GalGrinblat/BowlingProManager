@@ -1,14 +1,16 @@
-# Bowling League App — AI Coding Agent Instructions
+# CLAUDE.md — Bowling League Management System
 
-> **Sync note**: This file is mirrored in [CLAUDE.md](../CLAUDE.md) for Claude Code. When updating either file, update the other to keep them in sync.
+> **Sync note**: This file is mirrored in [.github/copilot-instructions.md](.github/copilot-instructions.md) for GitHub Copilot. When updating either file, update the other to keep them in sync.
 
 ## Tech Stack
 
-- **React 18** + **TypeScript** (strict mode, no `any`)
-- **Vite 4.5** — dev server on `http://localhost:5173`
-- **Tailwind CSS 3** — utility-first, RTL support for Hebrew
+- **React 19** + **TypeScript** (strict mode, no `any`)
+- **Vite 7** — dev server on `http://localhost:5173`
+- **Tailwind CSS 4** — utility-first, RTL support for Hebrew
 - **Supabase** — PostgreSQL backend + auth
 - **Jest** + **React Testing Library** — test suite in `tests/`
+- **React Router v7** — URL-based routing with `createBrowserRouter`
+- **vite-plugin-pwa** — PWA support, service worker, installable app
 
 ## Essential Commands
 
@@ -34,9 +36,13 @@ src/
   components/
     admin/        # Admin dashboard, league/season/player/game management
     player/       # Player dashboard & stats views
+    board/        # Public scoreboards (no auth required)
+    score/        # Public score entry (no auth required)
     common/       # Header, Login, ErrorBoundary, Pagination
-  services/api/   # Supabase API layer (organizationApi, playersApi, leaguesApi, seasonsApi, teamsApi, gamesApi, usersApi)
-  contexts/       # AuthContext (roles), LanguageContext (en/he)
+  router/
+    index.tsx     # React Router v7 — createBrowserRouter, route guards, lazy loading
+  services/api/   # Supabase API layer (organizationApi, playersApi, leaguesApi, seasonsApi, teamsApi, gamesApi, usersApi, boardApi)
+  contexts/       # AuthContext (roles), LanguageContext (en/he), AdminDataContext
   hooks/          # Custom React hooks
   utils/          # Pure business logic — matchUtils, standingsUtils, scheduleUtils, statsUtils, etc.
   models/         # Data creators & default values
@@ -48,7 +54,11 @@ tests/
   unit/           # Utils and API layer
   component/      # React component tests
   integration/    # Full flow tests (scoringFlow, seasonFlow)
-documentation/    # Detailed feature docs (95KB of MD files)
+documentation/
+  admin/          # Admin-facing feature docs (GENERAL, leagues, seasons, print, users, settings)
+  player/         # Player-facing feature docs (GENERAL, dashboard)
+  public/         # Public feature docs (GENERAL, board, score entry)
+  tech/           # Technical docs (routing, PWA, testing, Supabase setup, issues)
 ```
 
 ## Data Model Hierarchy
@@ -73,7 +83,7 @@ Organization
 - Formula: `Math.round((basis - average) * (percentage / 100))`
 - Dynamic: recalculates before each game using completed season averages
 - Config per league: `useHandicap`, `handicapBasis` (default 160), `handicapPercentage` (default 100%)
-- Key files: `src/components/admin/game/SeasonGame.tsx`, `src/utils/standingsUtils.ts`
+- Key files: [SeasonGame](src/components/admin/game/SeasonGame.tsx), [standingsUtils](src/utils/standingsUtils.ts)
 
 ### Scoring (multi-layer, all values configurable per league/season)
 1. **Individual match points** — player vs player comparison with handicap (`playerMatchPointsPerWin`, default 1)
@@ -81,14 +91,14 @@ Organization
 3. **Match winner points** — team with higher total wins (`teamMatchPointsPerWin`, default 1)
 4. **Grand total points** — team with highest combined pins across all matches (`teamGamePointsPerWin`, default 2)
 - Draws always award 50% of the respective win points
-- Key file: `src/utils/matchUtils.ts`
+- Key file: [matchUtils](src/utils/matchUtils.ts)
 
 ### Scheduling
 - Round-robin: each round = every team plays every other team once
 - Split into match days (no team plays twice same day)
 - Match days numbered continuously across rounds
 - Odd team count: bye system
-- Key file: `src/utils/scheduleUtils.ts`
+- Key file: [scheduleUtils](src/utils/scheduleUtils.ts)
 
 ### Absent Players
 - Score = average − 10
@@ -96,12 +106,35 @@ Organization
 
 ## Navigation & Routing
 
-No React Router — manual view state via `navigateTo(view, params)`.
+React Router v7 — `createBrowserRouter` in `src/router/index.tsx`, `RouterProvider` in `src/main.tsx`. All navigation state is in URL params.
 
 ```
-Admin: dashboard → players/leagues → league-detail → season-creator → season-detail → season-game → MatchView
-State: navigationState = { leagueId, seasonId, gameId }
+Admin routes (RequireAdmin guard):
+  /admin                              → AdminDashboard
+  /admin/players                      → PlayerRegistry
+  /admin/leagues                      → LeagueManagement
+  /admin/leagues/:leagueId            → LeagueDetail
+  /admin/leagues/:leagueId/seasons/new → SeasonCreator
+  /admin/seasons/:seasonId            → SeasonDetail
+  /admin/seasons/:seasonId/teams      → TeamManagement
+  /admin/games/:gameId/play           → SeasonGame
+  /admin/games/:gameId                → CompletedGameView
+  /admin/settings                     → Settings
+  /admin/users                        → UserManagement
+
+Player routes (RequirePlayer guard):
+  /player                             → PlayerDashboard
+  /player/games/:gameId               → CompletedGameView
+
+Public routes (no auth):
+  /board                              → BoardHome
+  /board/leagues/:leagueId            → BoardLeague
+  /board/seasons/:seasonId            → BoardSeason
+  /board/games/:gameId                → BoardGame
+  /score/:gameId                      → PlayerScoreEntry (score entry for players)
 ```
+
+All page components are lazy-loaded (`React.lazy` + `Suspense`). Use `useNavigate()` and `<Link>` for navigation.
 
 ## When Adding Features
 
@@ -109,14 +142,16 @@ State: navigationState = { leagueId, seasonId, gameId }
 |------|----------|
 | New API entity | `src/services/api/` — follow existing pattern |
 | New data model | `src/models/index.ts` |
-| New admin view | `src/components/admin/` + route in `src/App.tsx` |
+| New admin view | `src/components/admin/` + route in `src/router/index.tsx` |
 | New statistic | `src/utils/standingsUtils.ts` |
 | Scoring change | `src/utils/matchUtils.ts` — test thoroughly |
 | Schedule change | `src/utils/scheduleUtils.ts` |
 | Head-to-head stats | `src/utils/headToHeadUtils.ts` |
 | Player statistics | `src/utils/statsUtils.ts` |
 | Pagination | Use `src/components/common/Pagination.tsx` |
-| Demo data change | Update `src/utils/demoDataUtils.ts` **AND** `documentation/SEED_DEMO_DATA.md` |
+| Demo data change | Update `src/utils/demoDataUtils.ts` |
+| Public board feature | `src/components/board/` + `src/services/api/boardApi.ts` |
+| Player score entry | `src/components/score/` + `src/components/admin/game/PendingSubmissionPanel.tsx` |
 
 ## Testing Conventions
 

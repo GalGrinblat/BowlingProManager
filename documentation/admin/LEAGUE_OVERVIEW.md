@@ -1,4 +1,3 @@
-
 # League Overview
 
 This document provides a comprehensive overview of leagues in the Bowling League App, including their structure, configuration options, lifecycle, and management. League creation instructions are included as a subsection below.
@@ -140,4 +139,4 @@ When creating or editing a league, the following configuration options are avail
 - Players are assigned to teams during season setup, not at league creation.
 - All configuration options are validated for consistency and completeness.
 
-For more details, see the Admin Portal or contact your system administrator.
+See also: [Season Overview](SEASON_OVERVIEW.md) | [Player Registry](PLAYER_REGISTRY.md) | [Admin Dashboard](ADMIN_DASHBOARD.md)

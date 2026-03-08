@@ -109,14 +109,12 @@ You can verify your database setup in Supabase:
 
 ## Next Steps
 
-Once you've completed all the steps above, you're ready to continue with the implementation:
+Once you've completed all the steps above, you're ready to get started:
 
-✅ Supabase project created
-✅ Database schema deployed
-✅ Google OAuth configured
-✅ Environment variables set
-
-**Let me know when you've completed these steps, and we'll move on to implementing the authentication code!**
+- Supabase project created
+- Database schema deployed
+- Google OAuth configured
+- Environment variables set
 
 ## Troubleshooting
 

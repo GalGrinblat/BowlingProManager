@@ -1,83 +1,69 @@
 
 # Bowling Pro Manager
 
-A comprehensive bowling league management system built with React, Vite, and Tailwind CSS. This app supports multi-league organizations, season tracking, automated scheduling, configurable rules, and advanced scoring. For full details on features, rules, and workflows, see the documentation links below.
-
+A comprehensive bowling league management system built with React, Vite, Supabase, and Tailwind CSS. Supports multi-league organizations, season tracking, automated scheduling, configurable scoring rules, public scoreboards, and PWA installation.
 
 ## Documentation
 
-- [Admin Dashboard Features](documentation/ADMIN_DASHBOARD.md)
-- [Player Dashboard Features](documentation/PLAYER_DASHBOARD.md)
-- [League Overview & Configuration](documentation/LEAGUE_OVERVIEW.md)
-- [Season Overview & Management](documentation/SEASON_OVERVIEW.md)
-- [Player Registry](documentation/PLAYER_REGISTRY.md)
-- [Start of Day Routine](documentation/START_OF_DAY.md)
-- [Testing & Tester Guide](documentation/TESTER_GUIDE.md)
-- [Troubleshooting](documentation/TROUBLESHOOTING.md)
+### Admin
+- [Admin General & Flows](documentation/admin/GENERAL.md)
+- [Admin Dashboard](documentation/admin/ADMIN_DASHBOARD.md)
+- [League Overview & Configuration](documentation/admin/LEAGUE_OVERVIEW.md)
+- [Season Overview & Management](documentation/admin/SEASON_OVERVIEW.md)
+- [Player Registry](documentation/admin/PLAYER_REGISTRY.md)
+- [User Management](documentation/admin/USER_MANAGEMENT.md)
+- [Settings](documentation/admin/SETTINGS.md)
+- [Print Module](documentation/admin/PRINT_MODULE.md)
 
-For detailed rules, scoring, and configuration options, see the League and Season Overview docs above.
+### Player
+- [Player General & Flows](documentation/player/GENERAL.md)
+- [Player Dashboard](documentation/player/PLAYER_DASHBOARD.md)
 
+### Public (No Login Required)
+- [Public General & Flows](documentation/public/GENERAL.md)
+- [Public Scoreboard](documentation/public/PUBLIC_BOARD.md)
+- [Score Entry](documentation/public/SCORE_ENTRY.md)
 
-## Scoring & Rules
-
-See [League Overview](documentation/LEAGUE_OVERVIEW.md) and [Season Overview](documentation/SEASON_OVERVIEW.md) for full details on scoring, bonus rules, handicap, and configuration options.
-
+### Technical
+- [Routing](documentation/tech/ROUTING.md)
+- [PWA](documentation/tech/PWA.md)
+- [Testing](documentation/tech/TESTING.md)
+- [Supabase Setup](documentation/tech/SUPABASE_SETUP_GUIDE.md)
 
 ## Getting Started
 
-### Start of Day Routine
-See [START_OF_DAY.md](documentation/START_OF_DAY.md) for daily health checks and project setup tips.
+### Prerequisites
+- Node.js 18+
+- A Supabase project with Google OAuth configured — see [Supabase Setup Guide](documentation/tech/SUPABASE_SETUP_GUIDE.md)
 
 ### Development Setup
 ```bash
-# Install dependencies
 npm install
-
-# Start development server (http://localhost:5173)
-
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
+cp .env.example .env.local   # fill in Supabase URL and anon key
+npm run dev                  # http://localhost:5173
+npm run build                # production build → dist/
+npm test                     # Jest test suite
 ```
 
 ### First-Time Setup
 1. Start the dev server: `npm run dev`
-2. Open browser to `http://localhost:5173/`
-3. Login as admin (role: 'admin')
-4. Create players in Player Registry (see documentation/PLAYER_REGISTRY.md)
-5. Create a league (see documentation/LEAGUE_OVERVIEW.md)
-6. Create a season and assign teams (see documentation/SEASON_OVERVIEW.md)
-7. Generate schedule and start recording games
-### Technology Stack
-- **React 18** - UI framework
-- **Vite 4.5** - Build tool and dev server
-- **Tailwind CSS 3** - Utility-first styling
-- **PostCSS** - CSS processing
-- **localStorage** - Data persistence (easily replaceable)
+2. Sign in with Google — first user automatically becomes admin
+3. Go to **Settings** → load demo data, or start creating your organization
+4. See [Admin General](documentation/admin/GENERAL.md) for step-by-step flows
 
+## Technology Stack
 
-## Troubleshooting
-
-For common issues and solutions, see [TROUBLESHOOTING.md](documentation/TROUBLESHOOTING.md).
-
-
-## Contributing
-
-See [TESTER_GUIDE.md](documentation/TESTER_GUIDE.md) and [TESTING.md](documentation/TESTING.md) for testing and contribution guidelines.
-
+- **React 19** — UI framework
+- **Vite 7** — build tool and dev server
+- **Tailwind CSS 4** — utility-first styling
+- **Supabase** — PostgreSQL database + Google OAuth
+- **React Router v7** — URL-based routing
+- **vite-plugin-pwa** — installable PWA with service worker
 
 ## License
 
-MIT License - See LICENSE file for details
-
-## Support
-
-For issues, questions, or feature requests, please open an issue on GitHub.
+MIT License — see LICENSE file for details
 
 ---
 
-**Last Updated**: January 2026  
-**Version**: 2.0.0 - Multi-League System with Advanced Scheduling
+**Last Updated**: March 2026

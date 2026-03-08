@@ -1,16 +1,13 @@
-
 # Player Dashboard
 
 **Note:** The Player Dashboard is a read-only interface for players to view their league participation, performance, and game history. Players access this dashboard after logging in with their Google account (player role).
-
-The Player Dashboard in the Bowling League App provides players with a comprehensive overview of their league participation, performance, and upcoming activities. Below is a summary of the features currently available to players through the dashboard.
 
 ## Available Features
 
 1. **Player Home Overview**
    - Quick access to all leagues and seasons the player is participating in.
    - Personalized welcome and navigation.
-   - Sub-views: dashboard, stats, leagues, history.
+   - Sub-views: dashboard, stats.
 
 2. **View Standings**
    - Real-time team and player standings for all active seasons.
@@ -18,6 +15,7 @@ The Player Dashboard in the Bowling League App provides players with a comprehen
 
 3. **View Personal Statistics**
    - Season-by-season breakdown of averages, high games, high series, and total pins.
+   - **High Series by Count**: separate record-high for each series length (e.g., best 3-game total, best 4-game total). Displayed when different match-per-game counts exist across seasons.
    - Game-by-game history for all completed matches.
    - Points scored tracking.
 
@@ -34,6 +32,15 @@ The Player Dashboard in the Bowling League App provides players with a comprehen
    - List of all leagues the player is registered in.
    - Quick navigation to league details and season standings.
 
+## URL-Based Tab State
+
+The Player Dashboard uses React Router's `useSearchParams` to persist the active tab in the URL:
+
+- `?view=dashboard` — Home overview (default)
+- `?view=stats` — Personal statistics view
+
+This enables browser back/forward navigation to remember the selected tab, and allows direct linking to a specific view.
+
 ## Authentication
 
 - Players log in via **Google OAuth** (Supabase authentication).
@@ -43,7 +50,8 @@ The Player Dashboard in the Bowling League App provides players with a comprehen
 ## Component Architecture
 
 - **Component**: `src/components/player/PlayerDashboard.tsx`
-- **Navigation**: Players can navigate to game views via `onNavigate` callback
+- **Tab state**: `useSearchParams` from `react-router-dom` — `?view=dashboard` or `?view=stats`
+- **Navigation**: Uses `useNavigate()` and React Router links
 - **Data Loading**: Loads player data, teams, seasons, leagues, and recent games on mount
 
-For more details on each feature, see the [PlayerDashboard](../src/components/player/PlayerDashboard.tsx) component and related player components in the codebase.
+See also: [Player General](GENERAL.md)

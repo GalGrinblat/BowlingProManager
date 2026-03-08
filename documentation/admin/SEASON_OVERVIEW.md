@@ -110,4 +110,4 @@ interface Season {
 - Completed seasons are retained for historical records and player stats.
 - Initial player averages are captured at season start and used for handicap calculations throughout the season.
 
-For more details, see the Admin Portal or contact your system administrator.
+See also: [League Overview](LEAGUE_OVERVIEW.md) | [Admin Dashboard](ADMIN_DASHBOARD.md) | [Admin General](GENERAL.md)
