@@ -1,6 +1,6 @@
-import { ArrowLeft, CheckCircle } from '../../common/Icons';
+import { ArrowLeft, CheckCircle } from '../Icons';
 import { GameTeamStatsCard } from './GameTeamStatsCard';
-import { GameScoreTable } from '../../common/GameScoreTable';
+import { GameScoreTable } from '../GameScoreTable';
 import { useTranslation } from '../../../contexts/LanguageContext';
 
 import type { GameSummaryViewProps } from '../../../types/index';

@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Trophy } from '../common/Icons';
-import { useAuth } from '../../contexts/AuthContext';
-import { useTranslation } from '../../contexts/LanguageContext';
+import { Trophy } from '../../common/Icons';
+import { useAuth } from '../../../contexts/AuthContext';
+import { useTranslation } from '../../../contexts/LanguageContext';
 
 export const BoardHeader: React.FC = () => {
   const { currentUser, isAdmin } = useAuth();

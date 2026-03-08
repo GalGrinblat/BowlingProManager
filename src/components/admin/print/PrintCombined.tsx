@@ -4,8 +4,8 @@ import { calculateTeamStandings, calculatePlayerSeasonStats, calculateCurrentPla
 import { useTranslation } from '../../../contexts/LanguageContext';
 import { useDateFormat } from '../../../hooks/useDateFormat';
 import { getPlayerDisplayName } from '../../../utils/playerUtils';
-import { TeamStandingsTable } from '../shared/TeamStandingsTable';
-import { PlayerStandingsTable } from '../shared/PlayerStandingsTable';
+import { TeamStandingsTable } from '../config/TeamStandingsTable';
+import { PlayerStandingsTable } from '../config/PlayerStandingsTable';
 import { MatchDayReport } from './MatchDayReport';
 import type { TeamPlayerInfo } from './MatchDayReport';
 import './printStyles.css';

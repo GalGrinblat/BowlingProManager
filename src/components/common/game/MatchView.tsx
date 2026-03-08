@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, ArrowRight } from '../../common/Icons';
+import { ArrowLeft, ArrowRight } from '../Icons';
 import { PlayerScoreInput } from './PlayerScoreInput';
 import { useTranslation } from '../../../contexts/LanguageContext';
 import type { MatchViewProps, GamePlayer } from '../../../types/index';

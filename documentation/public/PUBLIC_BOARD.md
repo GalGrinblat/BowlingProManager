@@ -67,7 +67,7 @@ This means the board can display previously loaded standings even when offline o
 
 ## Key Files
 
-- `src/components/board/` — all board components (`BoardHome`, `BoardLeague`, `BoardSeason`, `BoardGame`, `BoardLayout`, `BoardHeader`)
+- `src/components/public/board/` — all board components (`BoardHome`, `BoardLeague`, `BoardSeason`, `BoardGame`, `BoardHeader`)
 - `src/services/api/boardApi.ts` — Supabase queries for public data
 
 ---

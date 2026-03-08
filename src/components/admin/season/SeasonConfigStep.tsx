@@ -1,10 +1,10 @@
 import React from 'react';
 import { useTranslation } from '../../../contexts/LanguageContext';
-import { HandicapConfigurationForm } from '../shared/HandicapConfigurationForm';
-import { PointsConfiguration } from '../shared/PointsConfiguration';
-import { GeneralConfiguration } from '../shared/GeneralConfiguration';
-import { BonusRulesConfiguration } from '../shared/BonusRulesConfiguration';
-import { PlayerMatchupConfiguration } from '../shared/PlayerMatchupConfiguration';
+import { HandicapConfigurationForm } from '../config/HandicapConfigurationForm';
+import { PointsConfiguration } from '../config/PointsConfiguration';
+import { GeneralConfiguration } from '../config/GeneralConfiguration';
+import { BonusRulesConfiguration } from '../config/BonusRulesConfiguration';
+import { PlayerMatchupConfiguration } from '../config/PlayerMatchupConfiguration';
 import type { BonusRule, LineupStrategy, LineupRule, League } from '../../../types/index';
 import {
   DEFAULT_NUMBER_OF_TEAMS, DEFAULT_PLAYERS_PER_TEAM, DEFAULT_NUMBER_OF_ROUNDS,

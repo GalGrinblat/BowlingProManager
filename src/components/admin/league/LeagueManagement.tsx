@@ -3,11 +3,11 @@ import { leaguesApi, seasonsApi } from '../../../services/api';
 import { createLeague, validateLeague } from '../../../models';
 import { useTranslation } from '../../../contexts/LanguageContext';
 import { DEFAULT_HANDICAP_BASIS, DEFAULT_HANDICAP_PERCENTAGE, DEFAULT_NUMBER_OF_TEAMS, DEFAULT_NUMBER_OF_ROUNDS, DEFAULT_PLAYERS_PER_TEAM, DEFAULT_MATCHES_PER_GAME, DEFAULT_PLAYER_MATCH_POINTS, DEFAULT_TEAM_MATCH_POINTS, DEFAULT_TEAM_GAME_POINTS, DEFAULT_USE_HANDICAP, DEFAULT_LINEUP_STRATEGY, DEFAULT_LINEUP_RULE } from '../../../constants/bowling';
-import { HandicapConfigurationForm } from '../shared/HandicapConfigurationForm';
-import { PlayerMatchupConfiguration } from '../shared/PlayerMatchupConfiguration';
-import { PointsConfiguration } from '../shared/PointsConfiguration';
-import { GeneralConfiguration } from '../shared/GeneralConfiguration';
-import { BonusRulesConfiguration } from '../shared/BonusRulesConfiguration';
+import { HandicapConfigurationForm } from '../config/HandicapConfigurationForm';
+import { PlayerMatchupConfiguration } from '../config/PlayerMatchupConfiguration';
+import { PointsConfiguration } from '../config/PointsConfiguration';
+import { GeneralConfiguration } from '../config/GeneralConfiguration';
+import { BonusRulesConfiguration } from '../config/BonusRulesConfiguration';
 
 import { useNavigate } from 'react-router-dom';
 import { useAdminData } from '../../../contexts/AdminDataContext';

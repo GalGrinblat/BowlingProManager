@@ -2,7 +2,7 @@ import React from 'react';
 /// <reference types="jest" />
 import { render, screen, waitFor } from '@testing-library/react';
 import { LanguageProvider } from '../../../src/contexts/LanguageContext';
-import { BoardHome } from '../../../src/components/board/BoardHome';
+import { BoardHome } from '../../../src/components/public/board/BoardHome';
 
 jest.mock('react-router-dom', () => ({
   Link: ({ children, to }: { children: React.ReactNode; to: string }) => (

@@ -3,7 +3,7 @@ import { seasonsApi, teamsApi, gamesApi, leaguesApi } from '../../../services/ap
 import { calculateTeamStandings } from '../../../utils/standingsUtils';
 import { useTranslation } from '../../../contexts/LanguageContext';
 import { useDateFormat } from '../../../hooks/useDateFormat';
-import { TeamStandingsTable } from '../shared/TeamStandingsTable';
+import { TeamStandingsTable } from '../config/TeamStandingsTable';
 
 import type { Game, League, Season, Team, TeamStanding } from '../../../types/index';
 

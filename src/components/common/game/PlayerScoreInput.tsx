@@ -1,5 +1,5 @@
 import React from 'react';
-import { Star } from '../../common/Icons';
+import { Star } from '../Icons';
 import { useTranslation } from '../../../contexts/LanguageContext';
 import { GamePlayer, MatchPlayer } from '../../../types';
 

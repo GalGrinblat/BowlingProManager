@@ -2,7 +2,7 @@ import React from 'react';
 /// <reference types="jest" />
 import { render, screen, waitFor } from '@testing-library/react';
 import { LanguageProvider } from '../../../src/contexts/LanguageContext';
-import { BoardSeason } from '../../../src/components/board/BoardSeason';
+import { BoardSeason } from '../../../src/components/public/board/BoardSeason';
 import type { Season, League, Team, Game } from '../../../src/types/index';
 
 jest.mock('react-router-dom', () => ({

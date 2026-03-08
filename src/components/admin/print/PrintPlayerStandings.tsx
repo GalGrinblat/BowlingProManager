@@ -3,7 +3,7 @@ import { seasonsApi, teamsApi, gamesApi, leaguesApi } from '../../../services/ap
 import { calculatePlayerSeasonStats } from '../../../utils/standingsUtils';
 import { useTranslation } from '../../../contexts/LanguageContext';
 import { useDateFormat } from '../../../hooks/useDateFormat';
-import { PlayerStandingsTable } from '../shared/PlayerStandingsTable';
+import { PlayerStandingsTable } from '../config/PlayerStandingsTable';
 
 import type { Game, League, PlayerStats, Season } from '../../../types/index';
 

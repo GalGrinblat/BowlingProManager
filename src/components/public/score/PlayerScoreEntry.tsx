@@ -1,17 +1,17 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { gamesApi } from '../../services/api';
-import { useTranslation } from '../../contexts/LanguageContext';
-import { PreMatchSetup } from '../admin/game/PreMatchSetup';
-import { MatchView } from '../admin/game/MatchView';
-import { applyLineupRule } from '../../utils/lineupUtils';
-import { sortPlayersByAverage } from '../../utils/lineupUtils';
-import { createEmptyMatch, calculateMatchResults, calculateBonusPoints, clampScore } from '../../utils/matchUtils';
-import { calculateGrandTotalPoints, calculateGameTotals, calculatePlayerStats } from '../../utils/statsUtils';
-import { buildGameTeamsFromIds } from '../../utils/gameInitUtils';
-import { recalculatePlayerAveragesAndHandicaps } from '../../hooks/usePlayerAverages';
-import { GameSummaryView } from '../admin/game/GameSummaryView';
-import type { Game, GamePlayer, GameMatch, PendingSubmission } from '../../types/index';
+import { gamesApi } from '../../../services/api';
+import { useTranslation } from '../../../contexts/LanguageContext';
+import { PreMatchSetup } from '../../common/game/PreMatchSetup';
+import { MatchView } from '../../common/game/MatchView';
+import { applyLineupRule } from '../../../utils/lineupUtils';
+import { sortPlayersByAverage } from '../../../utils/lineupUtils';
+import { createEmptyMatch, calculateMatchResults, calculateBonusPoints, clampScore } from '../../../utils/matchUtils';
+import { calculateGrandTotalPoints, calculateGameTotals, calculatePlayerStats } from '../../../utils/statsUtils';
+import { buildGameTeamsFromIds } from '../../../utils/gameInitUtils';
+import { recalculatePlayerAveragesAndHandicaps } from '../../../hooks/usePlayerAverages';
+import { GameSummaryView } from '../../common/game/GameSummaryView';
+import type { Game, GamePlayer, GameMatch, PendingSubmission } from '../../../types/index';
 
 // ─── Draft persistence ────────────────────────────────────────────────────────
 

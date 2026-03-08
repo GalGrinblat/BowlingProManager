@@ -4,8 +4,8 @@ The Score Entry page allows players or team representatives to submit game score
 
 - **Route**: `/score/:gameId` — public, no authentication required
 - **Key files**:
-  - `src/components/score/PlayerScoreEntry.tsx` — main score entry component
-  - `src/components/score/ScoreLayout.tsx` — page layout wrapper
+  - `src/components/public/score/PlayerScoreEntry.tsx` — main score entry component
+  - `src/components/public/score/ScoreLayout.tsx` — page layout wrapper
   - `src/components/admin/game/PendingSubmissionPanel.tsx` — admin review panel
 
 ---

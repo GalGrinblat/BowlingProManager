@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { boardApi } from '../../services/api/boardApi';
-import { useTranslation } from '../../contexts/LanguageContext';
-import { useDateFormat } from '../../hooks/useDateFormat';
-import type { League, Season, Game } from '../../types/index';
+import { boardApi } from '../../../services/api/boardApi';
+import { useTranslation } from '../../../contexts/LanguageContext';
+import { useDateFormat } from '../../../hooks/useDateFormat';
+import type { League, Season, Game } from '../../../types/index';
 
 export const BoardHome: React.FC = () => {
   const { t } = useTranslation();

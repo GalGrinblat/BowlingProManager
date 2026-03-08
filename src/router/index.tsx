@@ -1,15 +1,15 @@
 /* eslint-disable react-refresh/only-export-components */
 import { lazy, Suspense } from 'react';
 import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
-import ScoreLayout from '../components/score/ScoreLayout';
+import ScoreLayout from '../components/public/score/ScoreLayout';
 import { useAuth } from '../contexts/AuthContext';
 import { AdminDataProvider } from '../contexts/AdminDataContext';
 import { Header } from '../components/common/Header';
 import { LoginView } from '../components/common/LoginView';
-import { BoardHeader } from '../components/board/BoardHeader';
+import { BoardHeader } from '../components/public/board/BoardHeader';
 
 const AdminDashboard    = lazy(() => import('../components/admin/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
-const PlayerRegistry    = lazy(() => import('../components/admin/players').then(m => ({ default: m.PlayerRegistry })));
+const PlayerRegistry    = lazy(() => import('../components/admin/registry').then(m => ({ default: m.PlayerRegistry })));
 const LeagueManagement  = lazy(() => import('../components/admin/league').then(m => ({ default: m.LeagueManagement })));
 const LeagueDetail      = lazy(() => import('../components/admin/league').then(m => ({ default: m.LeagueDetail })));
 const SeasonCreator     = lazy(() => import('../components/admin/season').then(m => ({ default: m.SeasonCreator })));
@@ -20,11 +20,11 @@ const Settings          = lazy(() => import('../components/admin/Settings').then
 const UserManagement    = lazy(() => import('../components/admin/UserManagement').then(m => ({ default: m.UserManagement })));
 const PlayerDashboard   = lazy(() => import('../components/player/PlayerDashboard').then(m => ({ default: m.PlayerDashboard })));
 const CompletedGameView = lazy(() => import('../components/common/CompletedGameView').then(m => ({ default: m.CompletedGameView })));
-const BoardHome        = lazy(() => import('../components/board/BoardHome').then(m => ({ default: m.BoardHome })));
-const BoardLeague      = lazy(() => import('../components/board/BoardLeague').then(m => ({ default: m.BoardLeague })));
-const BoardSeason      = lazy(() => import('../components/board/BoardSeason').then(m => ({ default: m.BoardSeason })));
-const BoardGame        = lazy(() => import('../components/board/BoardGame').then(m => ({ default: m.BoardGame })));
-const PlayerScoreEntry = lazy(() => import('../components/score/PlayerScoreEntry').then(m => ({ default: m.PlayerScoreEntry })));
+const BoardHome        = lazy(() => import('../components/public/board/BoardHome').then(m => ({ default: m.BoardHome })));
+const BoardLeague      = lazy(() => import('../components/public/board/BoardLeague').then(m => ({ default: m.BoardLeague })));
+const BoardSeason      = lazy(() => import('../components/public/board/BoardSeason').then(m => ({ default: m.BoardSeason })));
+const BoardGame        = lazy(() => import('../components/public/board/BoardGame').then(m => ({ default: m.BoardGame })));
+const PlayerScoreEntry = lazy(() => import('../components/public/score/PlayerScoreEntry').then(m => ({ default: m.PlayerScoreEntry })));
 
 const BoardLayout = () => (
   <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 p-4 md:p-8">

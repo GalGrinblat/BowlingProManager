@@ -72,7 +72,7 @@ The Admin Dashboard provides administrators with centralized tools to manage all
 | Component | File | Purpose |
 |-----------|------|---------|
 | AdminDashboard | `src/components/admin/AdminDashboard.tsx` | Main admin hub |
-| PlayerRegistry | `src/components/admin/players/PlayerRegistry.tsx` | Player CRUD |
+| PlayerRegistry | `src/components/admin/registry/PlayerRegistry.tsx` | Player CRUD |
 | LeagueManagement | `src/components/admin/league/LeagueManagement.tsx` | League CRUD |
 | LeagueDetail | `src/components/admin/league/LeagueDetail.tsx` | League details and seasons |
 | SeasonCreator | `src/components/admin/season/SeasonCreator.tsx` | Season creation wizard |
@@ -84,17 +84,17 @@ The Admin Dashboard provides administrators with centralized tools to manage all
 | Settings | `src/components/admin/Settings.tsx` | Organization settings |
 | PrintCombined | `src/components/admin/print/PrintCombined.tsx` | Print orchestration |
 
-### Shared Admin Components
+### Shared Config Components (`admin/config/`)
 
 | Component | File | Purpose |
 |-----------|------|---------|
-| GeneralConfiguration | `src/components/admin/shared/GeneralConfiguration.tsx` | League config form |
-| HandicapConfigurationForm | `src/components/admin/shared/HandicapConfigurationForm.tsx` | Handicap settings |
-| PointsConfiguration | `src/components/admin/shared/PointsConfiguration.tsx` | Points per win |
-| PlayerMatchupConfiguration | `src/components/admin/shared/PlayerMatchupConfiguration.tsx` | Matchup rules |
-| BonusRulesConfiguration | `src/components/admin/shared/BonusRulesConfiguration.tsx` | Bonus point rules |
-| PlayerStandingsTable | `src/components/admin/shared/PlayerStandingsTable.tsx` | Player standings |
-| TeamStandingsTable | `src/components/admin/shared/TeamStandingsTable.tsx` | Team standings |
+| GeneralConfiguration | `src/components/admin/config/GeneralConfiguration.tsx` | League config form |
+| HandicapConfigurationForm | `src/components/admin/config/HandicapConfigurationForm.tsx` | Handicap settings |
+| PointsConfiguration | `src/components/admin/config/PointsConfiguration.tsx` | Points per win |
+| PlayerMatchupConfiguration | `src/components/admin/config/PlayerMatchupConfiguration.tsx` | Matchup rules |
+| BonusRulesConfiguration | `src/components/admin/config/BonusRulesConfiguration.tsx` | Bonus point rules |
+| PlayerStandingsTable | `src/components/admin/config/PlayerStandingsTable.tsx` | Player standings |
+| TeamStandingsTable | `src/components/admin/config/TeamStandingsTable.tsx` | Team standings |
 
 ---
 

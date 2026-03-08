@@ -10,8 +10,8 @@ import { exportSeason, downloadExportFile, readImportFile, importLeagueOrSeason 
 import { PrintMatchDayOptions } from '../print/PrintMatchDayOptions';
 import { PrintTeamStandings } from '../print/PrintTeamStandings';
 import { PrintPlayerStandings } from '../print/PrintPlayerStandings';
-import { TeamStandingsTable } from '../shared/TeamStandingsTable';
-import { PlayerStandingsTable } from '../shared/PlayerStandingsTable';
+import { TeamStandingsTable } from '../config/TeamStandingsTable';
+import { PlayerStandingsTable } from '../config/PlayerStandingsTable';
 import { SeasonHeader } from './SeasonHeader';
 import { ChampionBanner } from './ChampionBanner';
 import { SeasonProgressBar } from './SeasonProgressBar';

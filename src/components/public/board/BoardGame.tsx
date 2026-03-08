@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { boardApi } from '../../services/api/boardApi';
-import { useTranslation } from '../../contexts/LanguageContext';
-import { useDateFormat } from '../../hooks/useDateFormat';
-import { GameScoreTable } from '../common/GameScoreTable';
-import type { Game, GameMatch } from '../../types/index';
+import { boardApi } from '../../../services/api/boardApi';
+import { useTranslation } from '../../../contexts/LanguageContext';
+import { useDateFormat } from '../../../hooks/useDateFormat';
+import { GameScoreTable } from '../../common/GameScoreTable';
+import type { Game, GameMatch } from '../../../types/index';
 
 export const BoardGame: React.FC = () => {
   const navigate = useNavigate();

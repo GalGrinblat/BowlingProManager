@@ -1,19 +1,19 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { boardApi } from '../../services/api/boardApi';
-import { calculateTeamStandings, calculatePlayerSeasonStats } from '../../utils/standingsUtils';
-import { calculateSeasonRecords } from '../../utils/recordsUtils';
-import { useTranslation } from '../../contexts/LanguageContext';
-import { useDateFormat } from '../../hooks/useDateFormat';
-import { TeamStandingsTable } from '../admin/shared/TeamStandingsTable';
-import { PlayerStandingsTable } from '../admin/shared/PlayerStandingsTable';
-import { ChampionBanner } from '../admin/season/ChampionBanner';
-import { SeasonProgressBar } from '../admin/season/SeasonProgressBar';
-import { ViewTabs } from '../admin/season/ViewTabs';
-import { ScheduleView } from '../admin/season/ScheduleView';
-import { HeadToHeadView } from '../admin/season/HeadToHeadView';
-import { SeasonRecordsView } from '../admin/season/SeasonRecordsView';
-import type { Season, League, Team, Game, GameMatch } from '../../types/index';
+import { boardApi } from '../../../services/api/boardApi';
+import { calculateTeamStandings, calculatePlayerSeasonStats } from '../../../utils/standingsUtils';
+import { calculateSeasonRecords } from '../../../utils/recordsUtils';
+import { useTranslation } from '../../../contexts/LanguageContext';
+import { useDateFormat } from '../../../hooks/useDateFormat';
+import { TeamStandingsTable } from '../../admin/config/TeamStandingsTable';
+import { PlayerStandingsTable } from '../../admin/config/PlayerStandingsTable';
+import { ChampionBanner } from '../../admin/season/ChampionBanner';
+import { SeasonProgressBar } from '../../admin/season/SeasonProgressBar';
+import { ViewTabs } from '../../admin/season/ViewTabs';
+import { ScheduleView } from '../../admin/season/ScheduleView';
+import { HeadToHeadView } from '../../admin/season/HeadToHeadView';
+import { SeasonRecordsView } from '../../admin/season/SeasonRecordsView';
+import type { Season, League, Team, Game, GameMatch } from '../../../types/index';
 
 export const BoardSeason: React.FC = () => {
   const navigate = useNavigate();

@@ -19,7 +19,7 @@ jest.mock('../../../src/contexts/AdminDataContext', () => ({
   }),
 }));
 import { render, screen } from '@testing-library/react';
-import { PlayerRegistry } from '../../../src/components/admin/players/PlayerRegistry';
+import { PlayerRegistry } from '../../../src/components/admin/registry/PlayerRegistry';
 import { LanguageProvider } from '../../../src/contexts/LanguageContext';
 
 describe('PlayerRegistry', () => {
