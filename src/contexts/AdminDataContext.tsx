@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { organizationApi, leaguesApi, seasonsApi, gamesApi, playersApi, usersApi } from '../services/api';
 import type { DatabaseUser } from '../services/api';

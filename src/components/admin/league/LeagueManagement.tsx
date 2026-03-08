@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { leaguesApi, seasonsApi } from '../../../services/api';
 import { createLeague, validateLeague } from '../../../models';
 import { useTranslation } from '../../../contexts/LanguageContext';
@@ -11,7 +11,7 @@ import { BonusRulesConfiguration } from '../shared/BonusRulesConfiguration';
 
 import { useNavigate } from 'react-router-dom';
 import { useAdminData } from '../../../contexts/AdminDataContext';
-import type { League, SeasonConfigurations, LineupStrategy, LineupRule } from '../../../types/index';
+import type { League, Season, SeasonConfigurations, LineupStrategy, LineupRule } from '../../../types/index';
 
 function getDefaultSeasonConfigurations(): SeasonConfigurations {
   return {
@@ -48,7 +48,7 @@ export const LeagueManagement: React.FC = () => {
   const { loadDashboardData } = useAdminData();
   const { t } = useTranslation();
   const [leagues, setLeagues] = useState<League[]>([]);
-  const [seasonsMap, setSeasonsMap] = useState<Record<string, any[]>>({});
+  const [seasonsMap, setSeasonsMap] = useState<Record<string, Season[]>>({});
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<{
@@ -70,7 +70,7 @@ export const LeagueManagement: React.FC = () => {
       }
     }));
 
-  const loadLeagues = async () => {
+  const loadLeagues = useCallback(async () => {
     const data = await leaguesApi.getAll();
     setLeagues(data);
 
@@ -78,14 +78,15 @@ export const LeagueManagement: React.FC = () => {
     const seasonsResults = await Promise.all(
       data.map(league => seasonsApi.getByLeague(league.id))
     );
-    const seasonsData: Record<string, any[]> = {};
+    const seasonsData: Record<string, Season[]> = {};
     data.forEach((league, i) => { seasonsData[league.id] = seasonsResults[i] ?? []; });
     setSeasonsMap(seasonsData);
-  };
+  }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadLeagues();
-  }, []);
+  }, [loadLeagues]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

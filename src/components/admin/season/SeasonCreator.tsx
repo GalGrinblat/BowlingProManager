@@ -81,7 +81,7 @@ export const SeasonCreator: React.FC = () => {
       setAvailablePlayers(players);
     };
     fetchData();
-  }, [leagueId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [leagueId]);
 
   // Team assignment handlers
   const handleTeamNameChange = (teamIndex: number, name: string) => {

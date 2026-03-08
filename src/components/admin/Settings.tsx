@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { organizationApi, utilApi } from '../../services/api';
 import { useTranslation } from '../../contexts/LanguageContext';
@@ -22,18 +22,19 @@ export const Settings: React.FC = () => {
     language: 'en'
   });
 
-  const loadOrganization = async () => {
+  const loadOrganization = useCallback(async () => {
     const org = await organizationApi.get();
     setOrganization(org);
     setFormData({
       name: org.name,
       language: org.language || 'en'
     });
-  };
+  }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadOrganization();
-  }, []);
+  }, [loadOrganization]);
 
   const handleSave = async () => {
     await organizationApi.update({

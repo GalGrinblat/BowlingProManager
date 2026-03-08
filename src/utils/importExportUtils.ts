@@ -13,7 +13,7 @@ export interface ParseResult<T> {
  * @param data - Array of objects to export
  * @param filename - Name of the file (without extension)
  */
-export const exportToCSV = <T extends Record<string, any>>(
+export const exportToCSV = <T extends Record<string, unknown>>(
   data: T[],
   filename: string
 ): void => {
@@ -95,7 +95,7 @@ export const parseJSONImport = <T>(
 
     return { validData, errors };
   } catch (error) {
-    throw new Error(`Invalid JSON format: ${error}`);
+    throw new Error(`Invalid JSON format: ${error}`, { cause: error });
   }
 };
 
@@ -161,7 +161,7 @@ export const parseCSVImport = <T>(
 
     return { validData, errors };
   } catch (error) {
-    throw new Error(`Error parsing CSV: ${error}`);
+    throw new Error(`Error parsing CSV: ${error}`, { cause: error });
   }
 };
 

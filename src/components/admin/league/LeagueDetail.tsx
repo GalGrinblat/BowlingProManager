@@ -7,7 +7,7 @@ import { useDateFormat } from '../../../hooks/useDateFormat';
 import { exportLeague, downloadExportFile, readImportFile, importLeagueOrSeason } from '../../../utils/leagueImportExportUtils';
 import { useAdminData } from '../../../contexts/AdminDataContext';
 
-import type { League, Season, Team } from '../../../types/index';
+import type { League, Season, Team, TeamStanding, Game } from '../../../types/index';
 
 export const LeagueDetail: React.FC = () => {
   const navigate = useNavigate();
@@ -17,9 +17,9 @@ export const LeagueDetail: React.FC = () => {
   const { formatDate } = useDateFormat();
   const [league, setLeague] = useState<League | null>(null);
   const [seasons, setSeasons] = useState<Season[]>([]);
-  const [seasonStandings, setSeasonStandings] = useState<Record<string, any[]>>({});
+  const [seasonStandings, setSeasonStandings] = useState<Record<string, TeamStanding[]>>({});
   const [seasonTeams, setSeasonTeams] = useState<Record<string, Team[]>>({});
-  const [seasonGames, setSeasonGames] = useState<Record<string, any[]>>({});
+  const [seasonGames, setSeasonGames] = useState<Record<string, Game[]>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const loadLeagueData = async () => {
@@ -43,9 +43,9 @@ export const LeagueDetail: React.FC = () => {
       })
     );
 
-    const standingsData: Record<string, any[]> = {};
+    const standingsData: Record<string, TeamStanding[]> = {};
     const teamsData: Record<string, Team[]> = {};
-    const gamesData: Record<string, any[]> = {};
+    const gamesData: Record<string, Game[]> = {};
     for (const r of seasonResults) {
       standingsData[r.seasonId] = r.standings;
       teamsData[r.seasonId] = r.teams;

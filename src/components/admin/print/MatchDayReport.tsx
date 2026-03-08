@@ -8,6 +8,14 @@ import { ScoreSheet } from './ScoreSheet';
 import { SignatureBlock } from './SignatureBlock';
 import type { Game, Season, League, Team, TeamStanding, ScheduleMatchDay } from '../../../types/index';
 
+export interface TeamPlayerInfo {
+  id: string;
+  name: string;
+  average: number;
+  gamesPlayed: number;
+  handicap: number;
+}
+
 interface MatchDayReportProps {
   season: Season;
   league: League;
@@ -16,7 +24,7 @@ interface MatchDayReportProps {
   matchDayGames: Game[];
   matchDay: number;
   teamStandings: TeamStanding[];
-  teamPlayersMap: Record<string, any[]>;
+  teamPlayersMap: Record<string, TeamPlayerInfo[]>;
 }
 
 export const MatchDayReport: React.FC<MatchDayReportProps> = ({
