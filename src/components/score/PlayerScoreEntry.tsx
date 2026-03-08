@@ -326,11 +326,17 @@ export const PlayerScoreEntry: React.FC = () => {
     });
   }, []);
 
+  const submitRef = useRef<HTMLButtonElement>(null);
+
   const handleNavigate = useCallback((direction: string) => {
     if (!localGame?.matches) return;
     if (direction === 'next') {
-      if (currentMatch < localGame.matches.length) setCurrentMatch(m => m + 1);
-      // no "next" past last match — submit button handles that
+      if (currentMatch < localGame.matches.length) {
+        setCurrentMatch(m => m + 1);
+      } else {
+        // On last match — scroll submit button into view
+        submitRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
     } else {
       if (currentMatch > 1) setCurrentMatch(m => m - 1);
       else setStep(1);
@@ -392,7 +398,7 @@ export const PlayerScoreEntry: React.FC = () => {
     : team2Players;
 
   return (
-    <div className="min-h-screen bg-gray-900 pb-8">
+    <div className={`min-h-screen bg-gray-900 ${step === 2 && isLastMatch ? 'pb-24' : 'pb-8'}`}>
       {/* Header */}
       <div className="bg-gray-800 border-b border-gray-700 px-4 py-3 flex items-center justify-between">
         <div className="text-lg font-bold text-white">🎳 {t('score.title')}</div>
@@ -447,13 +453,14 @@ export const PlayerScoreEntry: React.FC = () => {
               onNavigate={handleNavigate}
               onCancel={() => setStep(1)}
             />
-            {/* Submit button on last match */}
+            {/* Submit button — sticky footer on last match so it's always visible on mobile */}
             {isLastMatch && (
-              <div className="flex justify-end mt-4">
+              <div className="fixed bottom-0 left-0 right-0 px-4 py-3 bg-gray-900 border-t border-gray-700 z-10">
                 <button
+                  ref={submitRef}
                   onClick={handleSubmit}
                   disabled={submitting}
-                  className="bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white px-8 py-3 rounded-lg font-bold text-lg transition-colors"
+                  className="w-full bg-green-600 hover:bg-green-700 active:bg-green-800 disabled:opacity-50 text-white px-8 py-4 rounded-lg font-bold text-lg transition-colors touch-manipulation"
                 >
                   {submitting ? t('score.submitting') : t('score.submitScores')}
                 </button>
