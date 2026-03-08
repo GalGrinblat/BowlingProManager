@@ -187,19 +187,16 @@ export const gamesApi = {
     }
   },
 
-  submitPending: async (id: string, submission: PendingSubmission): Promise<boolean> => {
-    try {
-      const { error } = await supabase.rpc('submit_pending_score', {
-        p_game_id: id,
-        p_submission: submission,
-        p_session_id: submission.sessionId,
-      });
-      if (error) throw error;
-      return true;
-    } catch (error) {
-      handleError(error, 'gamesApi.submitPending');
-      return false;
-    }
+  submitPending: async (id: string, submission: PendingSubmission): Promise<{ ok: boolean; errorMessage?: string }> => {
+    const { error } = await supabase.rpc('submit_pending_score', {
+      p_game_id: id,
+      p_submission: submission,
+      p_session_id: submission.sessionId,
+    });
+    if (!error) return { ok: true };
+    handleError(error, 'gamesApi.submitPending');
+    const msg = (error as { message?: string }).message ?? String(error);
+    return { ok: false, errorMessage: msg };
   },
 
   clearPending: async (id: string): Promise<void> => {

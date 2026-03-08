@@ -43,7 +43,8 @@ export const PendingSubmissionPanel: React.FC<Props> = ({ game, onApply, onDismi
         team1: {
           ...m.team1,
           players: m.team1.players.map((p, pi) => {
-            const pins = ms.team1Pins[pi] ?? p.pins;
+            const raw = ms.team1Pins[pi];
+            const pins = raw == null ? '' : String(raw);
             const player = updatedTeam1Players[pi];
             return {
               ...p,
@@ -57,7 +58,8 @@ export const PendingSubmissionPanel: React.FC<Props> = ({ game, onApply, onDismi
         team2: {
           ...m.team2,
           players: m.team2.players.map((p, pi) => {
-            const pins = ms.team2Pins[pi] ?? p.pins;
+            const raw = ms.team2Pins[pi];
+            const pins = raw == null ? '' : String(raw);
             const player = updatedTeam2Players[pi];
             return {
               ...p,
@@ -144,8 +146,8 @@ export const PendingSubmissionPanel: React.FC<Props> = ({ game, onApply, onDismi
                       {ms.team1Pins.map((pins, pi) => (
                         <div key={pi} className="flex justify-between text-sm py-0.5">
                           <span className="text-gray-300">{game.team1?.players[pi]?.name}</span>
-                          <span className={`font-mono font-bold ${pins === '' ? 'text-gray-500' : 'text-white'}`}>
-                            {pins === '' ? '-' : pins}
+                          <span className={`font-mono font-bold ${pins == null ? 'text-gray-500' : 'text-white'}`}>
+                            {pins == null ? '-' : pins}
                           </span>
                         </div>
                       ))}
@@ -155,8 +157,8 @@ export const PendingSubmissionPanel: React.FC<Props> = ({ game, onApply, onDismi
                       {ms.team2Pins.map((pins, pi) => (
                         <div key={pi} className="flex justify-between text-sm py-0.5">
                           <span className="text-gray-300">{game.team2?.players[pi]?.name}</span>
-                          <span className={`font-mono font-bold ${pins === '' ? 'text-gray-500' : 'text-white'}`}>
-                            {pins === '' ? '-' : pins}
+                          <span className={`font-mono font-bold ${pins == null ? 'text-gray-500' : 'text-white'}`}>
+                            {pins == null ? '-' : pins}
                           </span>
                         </div>
                       ))}

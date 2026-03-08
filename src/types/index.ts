@@ -137,7 +137,7 @@ export interface PendingSubmission {
   team2AbsentFlags: boolean[];
   team1PlayerOrder: string[]; // playerId order as the player set it up
   team2PlayerOrder: string[];
-  matchScores: Array<{ team1Pins: string[]; team2Pins: string[] }>;
+  matchScores: Array<{ team1Pins: (number | null)[]; team2Pins: (number | null)[] }>;
 }
 
 /** Game - Multi-match bowling game between two teams with scoring and status tracking */

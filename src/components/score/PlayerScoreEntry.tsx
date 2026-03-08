@@ -7,9 +7,10 @@ import { MatchView } from '../admin/game/MatchView';
 import { applyLineupRule } from '../../utils/lineupUtils';
 import { sortPlayersByAverage } from '../../utils/lineupUtils';
 import { createEmptyMatch, calculateMatchResults, calculateBonusPoints, clampScore } from '../../utils/matchUtils';
-import { calculateGrandTotalPoints } from '../../utils/statsUtils';
+import { calculateGrandTotalPoints, calculateGameTotals, calculatePlayerStats } from '../../utils/statsUtils';
 import { buildGameTeamsFromIds } from '../../utils/gameInitUtils';
 import { recalculatePlayerAveragesAndHandicaps } from '../../hooks/usePlayerAverages';
+import { GameSummaryView } from '../admin/game/GameSummaryView';
 import type { Game, GamePlayer, GameMatch, PendingSubmission } from '../../types/index';
 
 // ─── Draft persistence ────────────────────────────────────────────────────────
@@ -62,7 +63,7 @@ const ErrorScreen: React.FC<{ kind: ErrorKind; t: (k: string) => string }> = ({ 
 
 // ─── Step indicator ───────────────────────────────────────────────────────────
 
-const StepIndicator: React.FC<{ step: 1 | 2 | 3; t: (k: string) => string }> = ({ step, t }) => {
+const StepIndicator: React.FC<{ step: 1 | 2 | 3 | 4; t: (k: string) => string }> = ({ step, t }) => {
   const steps = [t('score.step1'), t('score.step2'), t('score.step3')];
   return (
     <div className="flex items-center justify-center gap-2 mb-6">
@@ -128,13 +129,12 @@ export const PlayerScoreEntry: React.FC = () => {
   const [loading, setLoading]       = useState(true);
   const [error, setError]           = useState<ErrorKind | null>(null);
   const [game, setGame]             = useState<Game | null>(null);
-  const [step, setStep]             = useState<1 | 2 | 3>(1);
+  const [step, setStep]             = useState<1 | 2 | 3 | 4>(1);
   const [team1Players, setTeam1Players] = useState<GamePlayer[]>([]);
   const [team2Players, setTeam2Players] = useState<GamePlayer[]>([]);
   const [localGame, setLocalGame]   = useState<Game | null>(null);
   const [currentMatch, setCurrentMatch] = useState(1);
-  const [submitting, setSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState(false);
+  const [submitError, setSubmitError] = useState<string | false>(false);
   const [hasPending, setHasPending] = useState(false);
   const [draftRestoredMsg, setDraftRestoredMsg] = useState(false);
 
@@ -142,7 +142,7 @@ export const PlayerScoreEntry: React.FC = () => {
 
   // beforeunload warning while entering data
   useEffect(() => {
-    if (step === 3 || loading || error) return;
+    if (step === 4 || loading || error) return;
     const handler = (e: BeforeUnloadEvent) => { e.preventDefault(); };
     window.addEventListener('beforeunload', handler);
     return () => window.removeEventListener('beforeunload', handler);
@@ -151,7 +151,7 @@ export const PlayerScoreEntry: React.FC = () => {
   // Auto-save draft (500ms debounce)
   const draftTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
-    if (!game || step === 3 || !localGame) return;
+    if (!game || step === 4 || !localGame) return;
     if (draftTimer.current) clearTimeout(draftTimer.current);
     draftTimer.current = setTimeout(() => {
       const draft: Draft = { step, team1Players, team2Players, matches: localGame.matches ?? [], currentMatch };
@@ -326,16 +326,14 @@ export const PlayerScoreEntry: React.FC = () => {
     });
   }, []);
 
-  const submitRef = useRef<HTMLButtonElement>(null);
-
   const handleNavigate = useCallback((direction: string) => {
     if (!localGame?.matches) return;
     if (direction === 'next') {
       if (currentMatch < localGame.matches.length) {
         setCurrentMatch(m => m + 1);
       } else {
-        // On last match — scroll submit button into view
-        submitRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // On last match — go to summary/review step
+        setStep(3);
       }
     } else {
       if (currentMatch > 1) setCurrentMatch(m => m - 1);
@@ -347,7 +345,6 @@ export const PlayerScoreEntry: React.FC = () => {
 
   const handleSubmit = useCallback(async () => {
     if (!localGame?.matches || !localGame.team1 || !localGame.team2) return;
-    setSubmitting(true);
     setSubmitError(false);
 
     const submission: PendingSubmission = {
@@ -358,19 +355,18 @@ export const PlayerScoreEntry: React.FC = () => {
       team1PlayerOrder: localGame.team1.players.map(p => p.playerId),
       team2PlayerOrder: localGame.team2.players.map(p => p.playerId),
       matchScores: localGame.matches.map(m => ({
-        team1Pins: m.team1.players.map(p => p.pins),
-        team2Pins: m.team2.players.map(p => p.pins),
+        team1Pins: m.team1.players.map(p => p.pins === '' ? null : parseInt(p.pins, 10)),
+        team2Pins: m.team2.players.map(p => p.pins === '' ? null : parseInt(p.pins, 10)),
       })),
     };
 
-    const ok = await gamesApi.submitPending(gameId!, submission);
-    if (ok) {
+    const result = await gamesApi.submitPending(gameId!, submission);
+    if (result.ok) {
       try { localStorage.removeItem(draftKey(gameId!)); } catch { /* ignore */ }
-      setStep(3);
+      setStep(4);
     } else {
-      setSubmitError(true);
+      setSubmitError(result.errorMessage ?? t('score.submitError'));
     }
-    setSubmitting(false);
   }, [localGame, sessionId, gameId]);
 
   // ── Render ─────────────────────────────────────────────────────────────────
@@ -385,9 +381,7 @@ export const PlayerScoreEntry: React.FC = () => {
 
   if (error) return <ErrorScreen kind={error} t={t} />;
   if (!game || !localGame) return <ErrorScreen kind="notFound" t={t} />;
-  if (step === 3) return <SubmittedScreen gameId={gameId!} t={t} />;
-
-  const isLastMatch = currentMatch === (localGame.matches?.length ?? 1);
+  if (step === 4) return <SubmittedScreen gameId={gameId!} t={t} />;
 
   // Pre-match setup uses team players from state (for absent + move)
   const displayTeam1 = game.lineupStrategy === 'rule-based'
@@ -398,7 +392,7 @@ export const PlayerScoreEntry: React.FC = () => {
     : team2Players;
 
   return (
-    <div className={`min-h-screen bg-gray-900 ${step === 2 && isLastMatch ? 'pb-24' : 'pb-8'}`}>
+    <div className="min-h-screen bg-gray-900 pb-8">
       {/* Header */}
       <div className="bg-gray-800 border-b border-gray-700 px-4 py-3 flex items-center justify-between">
         <div className="text-lg font-bold text-white">🎳 {t('score.title')}</div>
@@ -423,9 +417,14 @@ export const PlayerScoreEntry: React.FC = () => {
           </div>
         )}
         {submitError && (
-          <div className="mb-4 bg-red-900/40 border border-red-500 text-red-300 text-sm px-4 py-2 rounded-lg flex items-center justify-between">
-            <span>{t('score.submitError')}</span>
-            <button onClick={handleSubmit} className="text-red-300 hover:text-red-100 ml-4 underline">{t('score.retry')}</button>
+          <div className="mb-4 bg-red-900/40 border border-red-500 text-red-300 text-sm px-4 py-2 rounded-lg flex items-start justify-between gap-3">
+            <div>
+              <p className="font-semibold">{t('score.submitError')}</p>
+              {typeof submitError === 'string' && submitError !== t('score.submitError') && (
+                <p className="text-xs text-red-400 mt-1 break-all">{submitError}</p>
+              )}
+            </div>
+            <button onClick={handleSubmit} className="text-red-300 hover:text-red-100 underline shrink-0">{t('score.retry')}</button>
           </div>
         )}
 
@@ -444,29 +443,28 @@ export const PlayerScoreEntry: React.FC = () => {
 
         {/* Step 2: Match Score Entry */}
         {step === 2 && (
-          <>
-            <MatchView
-              matchNumber={currentMatch}
-              game={localGame}
-              onUpdateScore={handleUpdateScore}
-              onToggleAbsent={handleToggleAbsentInMatch}
-              onNavigate={handleNavigate}
-              onCancel={() => setStep(1)}
-            />
-            {/* Submit button — sticky footer on last match so it's always visible on mobile */}
-            {isLastMatch && (
-              <div className="fixed bottom-0 left-0 right-0 px-4 py-3 bg-gray-900 border-t border-gray-700 z-10">
-                <button
-                  ref={submitRef}
-                  onClick={handleSubmit}
-                  disabled={submitting}
-                  className="w-full bg-green-600 hover:bg-green-700 active:bg-green-800 disabled:opacity-50 text-white px-8 py-4 rounded-lg font-bold text-lg transition-colors touch-manipulation"
-                >
-                  {submitting ? t('score.submitting') : t('score.submitScores')}
-                </button>
-              </div>
-            )}
-          </>
+          <MatchView
+            matchNumber={currentMatch}
+            game={localGame}
+            onUpdateScore={handleUpdateScore}
+            onToggleAbsent={handleToggleAbsentInMatch}
+            onNavigate={handleNavigate}
+            onCancel={() => setStep(1)}
+          />
+        )}
+
+        {/* Step 3: Summary & Review */}
+        {step === 3 && (
+          <GameSummaryView
+            game={localGame}
+            totals={calculateGameTotals(localGame)}
+            playerStats={calculatePlayerStats(localGame)}
+            onBack={() => {
+              setCurrentMatch(localGame.matches?.length ?? 1);
+              setStep(2);
+            }}
+            onFinish={handleSubmit}
+          />
         )}
       </div>
     </div>
