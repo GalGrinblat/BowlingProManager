@@ -31,6 +31,7 @@ const initializePlayerStat = (
       average: 0,
       highGame: 0,
       highSeries: 0,
+      highSeriesByCount: {},
       pointsScored: 0,
       seriesCount: 0
     };
@@ -247,6 +248,7 @@ export const calculatePlayerSeasonStats = (teams: Team[], games: Game[]): Player
         average: 0,
         highGame: 0,
         highSeries: 0,
+        highSeriesByCount: {},
         seriesCount: 0,
         pointsScored: 0
       });

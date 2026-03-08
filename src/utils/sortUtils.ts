@@ -8,10 +8,15 @@ export interface SortOption<T> {
 export function sortByOption<T>(arr: T[], option: SortOption<T>) {
   return [...arr].sort((a, b) => {
     const key = option.key;
+    const aVal = a[key];
+    const bVal = b[key];
+    if (typeof aVal === 'number' && typeof bVal === 'number') {
+      return option.direction === 'asc' ? aVal - bVal : bVal - aVal;
+    }
     if (option.direction === 'asc') {
-      return String(a[key]).localeCompare(String(b[key]), undefined, { sensitivity: 'base' });
+      return String(aVal).localeCompare(String(bVal), undefined, { sensitivity: 'base' });
     } else {
-      return String(b[key]).localeCompare(String(a[key]), undefined, { sensitivity: 'base' });
+      return String(bVal).localeCompare(String(aVal), undefined, { sensitivity: 'base' });
     }
   });
 }

@@ -217,11 +217,11 @@ export const PlayerDashboard: React.FC = () => {
         }
 
         const seriesLength = game.matchesPerGame;
-        const existing = stats.highSeriesByCount![seriesLength];
+        const existing = stats.highSeriesByCount[seriesLength];
         if (!existing || seriesPins > existing.pins) {
           const season = seasonsById.get(game.seasonId);
           const league = season ? leaguesById.get(season.leagueId) : undefined;
-          stats.highSeriesByCount![seriesLength] = {
+          stats.highSeriesByCount[seriesLength] = {
             pins: seriesPins,
             context: {
               date: game.scheduledDate || game.completedAt || '',
@@ -455,7 +455,7 @@ export const PlayerDashboard: React.FC = () => {
               <div className="mt-6">
                 <h3 className="text-lg font-semibold text-gray-700 mb-3">{t('playerDashboard.highSeriesRecords')}</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                  {Object.entries(playerStats.highSeriesByCount!)
+                  {Object.entries(playerStats.highSeriesByCount)
                     .sort(([a], [b]) => Number(a) - Number(b))
                     .map(([count, record]) => (
                       <div key={count} className="p-4 bg-orange-50 rounded-lg">
