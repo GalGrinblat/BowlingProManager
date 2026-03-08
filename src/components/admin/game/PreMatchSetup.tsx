@@ -59,8 +59,8 @@ export const PreMatchSetup: React.FC<PreMatchSetupProps> = ({
                 <span>⚡</span>
                 <span>
                   {lineupRule === 'standard'
-                    ? 'Players will be automatically ordered by average (highest vs highest)'
-                    : 'Players will be automatically ordered by average (highest vs lowest)'}
+                    ? t('games.lineupRuleStandardDesc')
+                    : t('games.lineupRuleBalancedDesc')}
                 </span>
               </p>
             )}

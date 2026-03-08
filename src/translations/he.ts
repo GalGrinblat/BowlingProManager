@@ -482,6 +482,8 @@ const he: TranslationDictionary = {
     lineupStandard: 'חזק נגד חזק',
     lineupBalanced: 'מאוזן (חזק נגד חלש)',
     lineupLocked: 'סדר השחקנים נעול ולא ניתן לשינוי',
+    lineupRuleStandardDesc: 'השחקנים יסודרו אוטומטית לפי ממוצע (גבוה מול גבוה)',
+    lineupRuleBalancedDesc: 'השחקנים יסודרו אוטומטית לפי ממוצע (גבוה מול נמוך)',
     markAbsent: 'סמן כנעדר',
     markPresent: 'סמן כנוכח',
     willUse: 'ישתמש ב:',

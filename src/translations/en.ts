@@ -482,6 +482,8 @@ const en: TranslationDictionary = {
     lineupStandard: 'Top versus Top',
     lineupBalanced: 'Balanced (Top versus Bottom)',
     lineupLocked: 'Player order is locked and cannot be changed',
+    lineupRuleStandardDesc: 'Players will be automatically ordered by average (highest vs highest)',
+    lineupRuleBalancedDesc: 'Players will be automatically ordered by average (highest vs lowest)',
     markAbsent: 'Mark Absent',
     markPresent: 'Mark Present',
     willUse: 'Will use:',
