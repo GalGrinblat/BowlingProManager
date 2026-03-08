@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { gamesApi, teamsApi, playersApi } from '../../services/api';
+import { gamesApi } from '../../services/api';
 import { useTranslation } from '../../contexts/LanguageContext';
 import { PreMatchSetup } from '../admin/game/PreMatchSetup';
 import { MatchView } from '../admin/game/MatchView';
@@ -8,8 +8,9 @@ import { applyLineupRule } from '../../utils/lineupUtils';
 import { sortPlayersByAverage } from '../../utils/lineupUtils';
 import { createEmptyMatch, calculateMatchResults, calculateBonusPoints, clampScore } from '../../utils/matchUtils';
 import { calculateGrandTotalPoints } from '../../utils/statsUtils';
-import { getPlayerDisplayName } from '../../utils/playerUtils';
-import type { Game, GamePlayer, GameMatch, PendingSubmission, Team } from '../../types/index';
+import { buildGameTeamsFromIds } from '../../utils/gameInitUtils';
+import { recalculatePlayerAveragesAndHandicaps } from '../../hooks/usePlayerAverages';
+import type { Game, GamePlayer, GameMatch, PendingSubmission } from '../../types/index';
 
 // ─── Draft persistence ────────────────────────────────────────────────────────
 
@@ -174,33 +175,14 @@ export const PlayerScoreEntry: React.FC = () => {
 
         // Build roster from team IDs if not already in game (read-only — no DB write)
         if (!gameData.team1 || !gameData.team2) {
-          const [team1, team2] = await Promise.all([
-            teamsApi.getById(gameData.team1Id),
-            teamsApi.getById(gameData.team2Id),
-          ]);
-          if (!team1 || !team2) { setError('notFound'); return; }
-
-          const buildGameTeam = async (team: Team) => {
-            const playerObjects = await Promise.all(
-              team.playerIds.map(id => playersApi.getById(id))
-            );
-            return {
-              name: team.name,
-              players: playerObjects.map((p, idx) => ({
-                playerId: team.playerIds[idx]!,
-                name: p ? getPlayerDisplayName(p) : '',
-                average: 0,
-                handicap: 0,
-                rank: idx + 1,
-                absent: false,
-              })),
-            };
-          };
-
-          const [gt1, gt2] = await Promise.all([buildGameTeam(team1), buildGameTeam(team2)]);
-          gameData.team1 = gt1;
-          gameData.team2 = gt2;
+          const teams = await buildGameTeamsFromIds(gameData.team1Id, gameData.team2Id);
+          if (!teams) { setError('notFound'); return; }
+          gameData.team1 = teams.team1;
+          gameData.team2 = teams.team2;
         }
+
+        // Populate real averages & handicaps from season history (in-memory only, no DB write)
+        await recalculatePlayerAveragesAndHandicaps(gameData);
 
         // Initialize matches in memory if missing (no DB write)
         if (!gameData.matches || gameData.matches.length === 0) {
@@ -235,6 +217,9 @@ export const PlayerScoreEntry: React.FC = () => {
               restoredStep = draft.step;
               restoredMatch = draft.currentMatch;
               restored = true;
+              // Overlay fresh averages/handicaps so stale drafts don't carry zero values
+              t1 = t1.map((p, i) => ({ ...p, average: gameData.team1!.players[i]?.average ?? p.average, handicap: gameData.team1!.players[i]?.handicap ?? p.handicap }));
+              t2 = t2.map((p, i) => ({ ...p, average: gameData.team2!.players[i]?.average ?? p.average, handicap: gameData.team2!.players[i]?.handicap ?? p.handicap }));
             } else {
               localStorage.removeItem(draftKey(gameId));
             }

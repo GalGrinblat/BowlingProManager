@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { gamesApi, teamsApi, playersApi } from '../services/api';
-import { getPlayerDisplayName } from '../utils/playerUtils';
+import { gamesApi } from '../services/api';
 import { createEmptyMatch } from '../utils/matchUtils';
+import { buildGameTeamsFromIds } from '../utils/gameInitUtils';
 import { recalculatePlayerAveragesAndHandicaps } from './usePlayerAverages';
-import type { Game, GameTeam, GameMatch, MatchPlayer, GamePlayer, Team } from '../types/index';
+import type { Game, GameMatch, MatchPlayer, GamePlayer } from '../types/index';
 
 interface GameInitResult {
   game: Game | null;
@@ -16,32 +16,10 @@ interface GameInitResult {
 
 async function fetchAndAssignTeams(gameObj: Game) {
   if (!gameObj.team1Id || !gameObj.team2Id) return;
-
-  const [team1, team2] = await Promise.all([
-    teamsApi.getById(gameObj.team1Id),
-    teamsApi.getById(gameObj.team2Id),
-  ]);
-  if (!team1 || !team2) return;
-
-  const buildGameTeam = async (team: Team): Promise<GameTeam> => {
-    const playerObjects = await Promise.all(
-      (team.playerIds || []).map(playerId => playersApi.getById(playerId))
-    );
-    const players = playerObjects.map((player, idx) => ({
-      playerId: team.playerIds[idx]!,
-      name: player ? getPlayerDisplayName(player) : '',
-      average: 0,
-      handicap: 0,
-      rank: idx + 1,
-      absent: false,
-    }));
-    return { name: team.name, players };
-  };
-
-  [gameObj.team1, gameObj.team2] = await Promise.all([
-    buildGameTeam(team1),
-    buildGameTeam(team2),
-  ]);
+  const teams = await buildGameTeamsFromIds(gameObj.team1Id, gameObj.team2Id);
+  if (!teams) return;
+  gameObj.team1 = teams.team1;
+  gameObj.team2 = teams.team2;
 }
 
 export function useGameInitializer(gameId: string): GameInitResult & {
