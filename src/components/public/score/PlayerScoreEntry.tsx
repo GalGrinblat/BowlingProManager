@@ -20,7 +20,7 @@ import type { Game, GamePlayer, GameMatch, PendingSubmission } from '../../../ty
 const draftKey = (gameId: string) => `score_draft_${gameId}`;
 
 interface Draft {
-  step: 1 | 2;
+  step: 1 | 2 | 3;
   team1Players: GamePlayer[];
   team2Players: GamePlayer[];
   matches: GameMatch[];
@@ -200,7 +200,7 @@ export const PlayerScoreEntry: React.FC = () => {
         let t1 = [...gameData.team1.players];
         let t2 = [...gameData.team2.players];
         let matches = gameData.matches ? [...gameData.matches] : [];
-        let restoredStep: 1 | 2 = 1;
+        let restoredStep: 1 | 2 | 3 = 1;
         let restoredMatch = 1;
         let restored = false;
 
