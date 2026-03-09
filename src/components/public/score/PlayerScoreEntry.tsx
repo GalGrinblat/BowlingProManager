@@ -264,22 +264,30 @@ export const PlayerScoreEntry: React.FC = () => {
   const handleUpdateScore = useCallback((matchIndex: number, team: 'team1' | 'team2', playerIndex: number, pins: string) => {
     setLocalGame(prev => {
       if (!prev?.matches || !prev.team1 || !prev.team2) return prev;
-      const updated: Game = { ...prev, matches: prev.matches.map(m => ({ ...m, team1: { ...m.team1, players: [...m.team1.players] }, team2: { ...m.team2, players: [...m.team2.players] } })) };
-      const match = updated.matches![matchIndex];
-      if (!match) return prev;
 
       const parsed = parseInt(pins);
       const sanitized = pins === '' ? '' : isNaN(parsed) ? '' : String(clampScore(parsed));
+      const gamePlayer = prev[team]?.players?.[playerIndex];
+      if (!gamePlayer) return prev;
+      const bonusPoints = calculateBonusPoints(sanitized, gamePlayer.average, gamePlayer.absent, prev.bonusRules ?? []);
 
-      if (team === 'team1' && match.team1?.players?.[playerIndex] && updated.team1?.players?.[playerIndex]) {
-        match.team1.players[playerIndex].pins = sanitized;
-        const playerObj = updated.team1.players[playerIndex];
-        if (playerObj) match.team1.players[playerIndex].bonusPoints = calculateBonusPoints(sanitized, playerObj.average, playerObj.absent, prev.bonusRules ?? []);
-      } else if (team === 'team2' && match.team2?.players?.[playerIndex] && updated.team2?.players?.[playerIndex]) {
-        match.team2.players[playerIndex].pins = sanitized;
-        const playerObj = updated.team2.players[playerIndex];
-        if (playerObj) match.team2.players[playerIndex].bonusPoints = calculateBonusPoints(sanitized, playerObj.average, playerObj.absent, prev.bonusRules ?? []);
-      }
+      const updated: Game = {
+        ...prev,
+        matches: prev.matches.map((m, mi) => {
+          if (mi !== matchIndex) return m;
+          const updatedTeamSide = {
+            ...m[team],
+            players: m[team].players.map((p, pi) =>
+              pi === playerIndex ? { ...p, pins: sanitized, bonusPoints } : p
+            ),
+          };
+          return {
+            ...m,
+            [team]: updatedTeamSide,
+            playerMatches: m.playerMatches.map(pm => ({ ...pm })),
+          };
+        }),
+      };
 
       calculateMatchResults(updated, matchIndex);
       updated.grandTotalPoints = calculateGrandTotalPoints(updated);
