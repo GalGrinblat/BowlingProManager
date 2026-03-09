@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from '../../contexts/LanguageContext';
+import { ABSENT_PLAYER_PENALTY } from '../../constants/bowling';
 import type { Game, GameMatch, GamePlayer } from '../../types/index';
 
 interface GameScoreTableProps {
@@ -57,10 +58,14 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
             <tbody>
               {/* Team 1 Players */}
               {game.team1?.players.map((player: GamePlayer, playerIdx: number) => {
-                const playerTotalPins = matches.reduce((sum, match) => {
-                  const pins = match.team1?.players[playerIdx]?.pins;
-                  return sum + (pins !== '' ? parseInt(pins || '0') : 0);
-                }, 0);
+                const isAbsent = player.absent;
+                const absentScore = Math.floor(player.average - ABSENT_PLAYER_PENALTY);
+                const playerTotalPins = isAbsent
+                  ? absentScore * matches.length
+                  : matches.reduce((sum, match) => {
+                      const pins = match.team1?.players[playerIdx]?.pins;
+                      return sum + (pins !== '' ? parseInt(pins || '0') : 0);
+                    }, 0);
                 const playerTotalPoints = matches.reduce((sum, match) => {
                   const result = match.playerMatches?.[playerIdx];
                   return sum + (result?.team1Points || 0);
@@ -69,26 +74,33 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
                 return (
                   <tr key={player.playerId} className="border-b border-gray-100 hover:bg-orange-50">
                     <td className={`px-1 sm:px-2 py-1.5 text-xs font-semibold text-gray-800 ${isRTL ? 'text-right' : 'text-left'}`}>
-                      <div className="max-w-[72px] sm:max-w-none truncate">{playerIdx + 1}. {player.name}</div>
+                      <div className="max-w-[72px] sm:max-w-none truncate">
+                        {playerIdx + 1}. {player.name}
+                        {isAbsent && (
+                          <span className="ml-1 text-[10px] font-normal text-red-400 italic">({t('common.absent')})</span>
+                        )}
+                      </div>
                     </td>
                     {matches.map((match) => {
                       const matchPlayer = match.team1?.players[playerIdx];
-                      const pins = matchPlayer?.pins !== '' ? parseInt(matchPlayer?.pins || '0') : 0;
+                      const pins = isAbsent ? absentScore : (matchPlayer?.pins !== '' ? parseInt(matchPlayer?.pins || '0') : 0);
                       const playerMatch = match.playerMatches?.[playerIdx];
                       const result = playerMatch?.result;
                       const resultIcon = result === 'team1' ? '✅' : result === 'team2' ? '❌' : result === 'draw' ? '⚖️' : '';
-                      const hasBonus = (playerMatch?.team1Points || 0) > (result === 'team1' ? 1 : result === 'draw' ? 0.5 : 0);
+                      const hasBonus = !isAbsent && (playerMatch?.team1Points || 0) > (result === 'team1' ? 1 : result === 'draw' ? 0.5 : 0);
 
                       return (
                         <td key={`match-${match.matchNumber}`} className="px-1 py-1.5 text-center text-xs">
-                          <div className="font-semibold">
-                            {pins} {hasBonus && '⭐'}
+                          <div className={`font-semibold ${isAbsent ? 'text-gray-400 italic' : ''}`}>
+                            {isAbsent ? `(${pins})` : pins} {hasBonus && '⭐'}
                           </div>
                           <div className="text-[10px]">{resultIcon}</div>
                         </td>
                       );
                     })}
-                    <td className="px-1 py-1.5 text-center text-xs font-bold bg-gray-50">{playerTotalPins}</td>
+                    <td className={`px-1 py-1.5 text-center text-xs font-bold bg-gray-50 ${isAbsent ? 'text-gray-400 italic' : ''}`}>
+                      {isAbsent ? `(${playerTotalPins})` : playerTotalPins}
+                    </td>
                     <td className="px-1 py-1.5 text-center text-xs font-bold text-orange-600 bg-gray-50">{playerTotalPoints.toFixed(1)}</td>
                   </tr>
                 );
@@ -186,10 +198,14 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
             <tbody>
               {/* Team 2 Players */}
               {game.team2?.players.map((player: GamePlayer, playerIdx: number) => {
-                const playerTotalPins = matches.reduce((sum, match) => {
-                  const pins = match.team2?.players[playerIdx]?.pins;
-                  return sum + (pins !== '' ? parseInt(pins || '0') : 0);
-                }, 0);
+                const isAbsent = player.absent;
+                const absentScore = Math.floor(player.average - ABSENT_PLAYER_PENALTY);
+                const playerTotalPins = isAbsent
+                  ? absentScore * matches.length
+                  : matches.reduce((sum, match) => {
+                      const pins = match.team2?.players[playerIdx]?.pins;
+                      return sum + (pins !== '' ? parseInt(pins || '0') : 0);
+                    }, 0);
                 const playerTotalPoints = matches.reduce((sum, match) => {
                   const result = match.playerMatches?.[playerIdx];
                   return sum + (result?.team2Points || 0);
@@ -198,26 +214,33 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
                 return (
                   <tr key={player.playerId} className="border-b border-gray-100 hover:bg-blue-50">
                     <td className={`px-1 sm:px-2 py-1.5 text-xs font-semibold text-gray-800 ${isRTL ? 'text-right' : 'text-left'}`}>
-                      <div className="max-w-[72px] sm:max-w-none truncate">{playerIdx + 1}. {player.name}</div>
+                      <div className="max-w-[72px] sm:max-w-none truncate">
+                        {playerIdx + 1}. {player.name}
+                        {isAbsent && (
+                          <span className="ml-1 text-[10px] font-normal text-red-400 italic">({t('common.absent')})</span>
+                        )}
+                      </div>
                     </td>
                     {matches.map((match) => {
                       const matchPlayer = match.team2?.players[playerIdx];
-                      const pins = matchPlayer?.pins !== '' ? parseInt(matchPlayer?.pins || '0') : 0;
+                      const pins = isAbsent ? absentScore : (matchPlayer?.pins !== '' ? parseInt(matchPlayer?.pins || '0') : 0);
                       const playerMatch = match.playerMatches?.[playerIdx];
                       const result = playerMatch?.result;
                       const resultIcon = result === 'team2' ? '✅' : result === 'team1' ? '❌' : result === 'draw' ? '⚖️' : '';
-                      const hasBonus = (playerMatch?.team2Points || 0) > (result === 'team2' ? 1 : result === 'draw' ? 0.5 : 0);
+                      const hasBonus = !isAbsent && (playerMatch?.team2Points || 0) > (result === 'team2' ? 1 : result === 'draw' ? 0.5 : 0);
 
                       return (
                         <td key={`match-${match.matchNumber}`} className="px-1 py-1.5 text-center text-xs">
-                          <div className="font-semibold">
-                            {pins} {hasBonus && '⭐'}
+                          <div className={`font-semibold ${isAbsent ? 'text-gray-400 italic' : ''}`}>
+                            {isAbsent ? `(${pins})` : pins} {hasBonus && '⭐'}
                           </div>
                           <div className="text-[10px]">{resultIcon}</div>
                         </td>
                       );
                     })}
-                    <td className="px-1 py-1.5 text-center text-xs font-bold bg-gray-50">{playerTotalPins}</td>
+                    <td className={`px-1 py-1.5 text-center text-xs font-bold bg-gray-50 ${isAbsent ? 'text-gray-400 italic' : ''}`}>
+                      {isAbsent ? `(${playerTotalPins})` : playerTotalPins}
+                    </td>
                     <td className="px-1 py-1.5 text-center text-xs font-bold text-blue-600 bg-gray-50">{playerTotalPoints.toFixed(1)}</td>
                   </tr>
                 );
