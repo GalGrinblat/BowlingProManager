@@ -43,7 +43,7 @@ const PlayerRow: React.FC<PlayerRowProps> = ({
         <div className="text-sm text-gray-400 mt-1">
           {t('common.average')}: <span className="text-white font-medium">{typeof player.average === 'number' ? player.average.toFixed(1) : player.average}</span>
           {' • '}
-          {t('games.handicap')}: <span className="text-white font-medium">{player.handicap}</span>
+          {t('common.handicap')}: <span className="text-white font-medium">{player.handicap}</span>
         </div>
         {player.absent && (
           <div className="text-xs text-red-400 mt-1">

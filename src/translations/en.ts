@@ -11,7 +11,6 @@ const en: TranslationDictionary = {
   print: {
     vs: 'VS',
     scoreSheet: 'Score Sheet',
-    match: 'Match',
     teamCaptainSignature: 'Team Captain Signature',
     date: 'Date',
     printOptions: 'Print Options',
@@ -55,6 +54,7 @@ const en: TranslationDictionary = {
     total: 'Total',
     pts: 'Points',
     completed: 'Completed',
+    match: 'Match',
     matchDay: 'Match Day',
     round: 'Round',
     na: 'N/A',
@@ -81,7 +81,6 @@ const en: TranslationDictionary = {
   auth: {
     logout: 'Logout',
     admin: 'Admin',
-    player: 'Player',
     welcome: 'Welcome',
     subtitle: 'Sign in to access Bowling Pro Manager',
     signIn: 'Sign in with Google',
@@ -261,7 +260,6 @@ const en: TranslationDictionary = {
       condition: 'Condition',
       aboveAvg: 'Above Average',
       scoreVsAverage: 'Score versus Average',
-      score: 'Score',
       allPresentLabel: 'Award team bonus if all players are present',
       allPresentPoints: 'Bonus points',
     },
@@ -443,7 +441,6 @@ const en: TranslationDictionary = {
 
   // Game Scoring
   games: {
-    handicap: 'Handicap',
     absent: 'Absent',
     pending: 'Pending',
     inProgress: 'In Progress',
@@ -583,7 +580,6 @@ const en: TranslationDictionary = {
   // Game History View
   gameHistory: {
     title: 'Game History',
-    hdc: 'Handicap',
     withHandicap: 'Team Totals',
     teamTotal: 'Pins',
     championBanner: 'Game Winner',
@@ -591,7 +587,6 @@ const en: TranslationDictionary = {
 
   // Schedule
   schedule: {
-    match: 'Match',
   },
 
   // Days of week

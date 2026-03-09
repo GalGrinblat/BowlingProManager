@@ -44,7 +44,7 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
                 </th>
                 {matches.map((match, idx) => (
                   <th key={`match-${match.matchNumber}`} className="px-1 sm:px-2 py-1.5 text-center text-xs font-bold text-gray-700">
-                    <span className="hidden sm:inline">{t('gameHistory.match')} </span>{idx + 1}
+                    <span className="hidden sm:inline">{t('common.match')} </span>{idx + 1}
                   </th>
                 ))}
                 <th className="px-1 sm:px-2 py-1.5 text-center text-xs font-bold text-gray-700 bg-gray-100">
@@ -125,7 +125,7 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
               {/* Team 1 Handicap */}
               <tr className="bg-orange-50 font-semibold text-xs">
                 <td className={`px-1 sm:px-2 py-1.5 text-gray-600 ${isRTL ? 'text-right' : 'text-left'}`}>
-                  {t('gameHistory.hdc')}
+                  {t('common.handicap')}
                 </td>
                 {matches.map((match) => {
                   const hdc = (match.team1?.totalWithHandicap || 0) - (match.team1?.totalPins || 0);
@@ -184,7 +184,7 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
                 </th>
                 {matches.map((match, idx) => (
                   <th key={`match-${match.matchNumber}`} className="px-1 sm:px-2 py-1.5 text-center text-xs font-bold text-gray-700">
-                    <span className="hidden sm:inline">{t('gameHistory.match')} </span>{idx + 1}
+                    <span className="hidden sm:inline">{t('common.match')} </span>{idx + 1}
                   </th>
                 ))}
                 <th className="px-1 sm:px-2 py-1.5 text-center text-xs font-bold text-gray-700 bg-gray-100">
@@ -265,7 +265,7 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
               {/* Team 2 Handicap */}
               <tr className="bg-blue-50 font-semibold text-xs">
                 <td className={`px-1 sm:px-2 py-1.5 text-gray-600 ${isRTL ? 'text-right' : 'text-left'}`}>
-                  {t('gameHistory.hdc')}
+                  {t('common.handicap')}
                 </td>
                 {matches.map((match) => {
                   const hdc = (match.team2?.totalWithHandicap || 0) - (match.team2?.totalPins || 0);

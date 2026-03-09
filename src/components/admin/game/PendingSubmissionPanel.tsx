@@ -143,7 +143,7 @@ export const PendingSubmissionPanel: React.FC<Props> = ({ game, onApply, onDismi
               {sub.matchScores.map((ms, mi) => (
                 <div key={mi} className="bg-gray-800 rounded-lg p-3">
                   <div className="text-xs text-gray-400 mb-2 font-semibold">
-                    {t('print.match')} {mi + 1}
+                    {t('common.match')} {mi + 1}
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>

@@ -84,7 +84,7 @@ export const MatchDayReport: React.FC<MatchDayReportProps> = ({
             {/* Match Header */}
             <div className="bg-gray-800 text-white p-4 rounded-t-lg">
               <div className="flex justify-between items-center">
-                <h3 className="text-2xl font-bold">{t('schedule.match')} {index + 1}</h3>
+                <h3 className="text-2xl font-bold">{t('common.match')} {index + 1}</h3>
                 {game.status === 'completed' && (
                   <span className="px-3 py-1 bg-green-500 rounded text-sm font-semibold">{t('common.completed')}</span>
                 )}

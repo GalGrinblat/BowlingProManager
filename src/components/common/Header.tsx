@@ -42,10 +42,10 @@ export const Header: React.FC<HeaderProps> = ({ currentUser, onLogout }) => {
                 ) : playerData ? (
                   <>
                     <div className="text-sm font-semibold text-gray-800">{playerData.firstName} {playerData.lastName}</div>
-                    <div className="text-xs text-gray-500">{t('auth.player')}</div>
+                    <div className="text-xs text-gray-500">{t('common.player')}</div>
                   </>
                 ) : (
-                  <span className="text-sm text-gray-600">👤 {t('auth.player')}</span>
+                  <span className="text-sm text-gray-600">👤 {t('common.player')}</span>
                 )}
               </div>
               <button

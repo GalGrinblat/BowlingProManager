@@ -28,7 +28,7 @@ export const ScoreSheet: React.FC<ScoreSheetProps> = ({ teamName, players, match
       <table className="w-full border-2 border-gray-800">
         <thead>
           <tr className="bg-gray-200">
-            <th className="border border-gray-800 px-2 py-2 text-sm font-bold">{t('print.match')}</th>
+            <th className="border border-gray-800 px-2 py-2 text-sm font-bold">{t('common.match')}</th>
             {Array.from({ length: matchesPerGame }, (_, i) => (
               <th key={i + 1} className="border border-gray-800 px-2 py-2 text-sm font-bold">{i + 1}</th>
             ))}

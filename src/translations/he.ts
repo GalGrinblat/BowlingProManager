@@ -11,7 +11,6 @@ const he: TranslationDictionary = {
   print: {
     vs: 'נגד',
     scoreSheet: 'גיליון ניקוד',
-    match: 'משחק',
     teamCaptainSignature: 'חתימת קפטן הקבוצה',
     date: 'תאריך',
     printOptions: 'אפשרויות הדפסה',
@@ -55,6 +54,7 @@ const he: TranslationDictionary = {
     total: 'סה"כ',
     pts: 'נקודות',
     completed: 'הושלם',
+    match: 'משחק',
     matchDay: 'מחזור',
     round: 'סיבוב',
     na: 'לא זמין',
@@ -81,7 +81,6 @@ const he: TranslationDictionary = {
   auth: {
     logout: 'התנתק',
     admin: 'מנהל',
-    player: 'שחקן',
     welcome: 'ברוך הבא',
     subtitle: "התחבר כדי לגשת לבאולינג פרו מנג'ר",
     signIn: 'התחבר עם Google',
@@ -261,7 +260,6 @@ const he: TranslationDictionary = {
       condition: 'תנאי',
       aboveAvg: 'פינים מעל הממוצע',
       scoreVsAverage: 'ניקוד מול ממוצע',
-      score: 'ניקוד',
       allPresentLabel: 'הענק בונוס קבוצה אם כל השחקנים נוכחים',
       allPresentPoints: 'נקודות בונוס',
     },
@@ -443,7 +441,6 @@ const he: TranslationDictionary = {
 
   // ניקוד משחק
   games: {
-    handicap: 'הנדיקפ',
     absent: 'נעדר',
     pending: 'ממתין',
     inProgress: 'בתהליך',
@@ -583,7 +580,6 @@ const he: TranslationDictionary = {
   // תצוגת היסטוריית משחק
   gameHistory: {
     title: 'היסטוריית משחק',
-    hdc: 'הנדיקאפ',
     withHandicap: 'סה"כ קבוצה',
     teamTotal: 'פינים',
     championBanner: 'מנצח המשחק',
@@ -591,7 +587,6 @@ const he: TranslationDictionary = {
 
   // לוח משחקים
   schedule: {
-    match: 'משחק',
   },
 
   // ימים בשבוע

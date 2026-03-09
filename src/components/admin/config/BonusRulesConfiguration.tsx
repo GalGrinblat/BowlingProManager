@@ -150,12 +150,12 @@ export const BonusRulesConfiguration: React.FC<BonusRulesConfigurationProps> = (
                   {rule.type === 'player' && (
                     <option value="vs_average">{t('leagues.bonus.scoreVsAverage')}</option>
                   )}
-                  <option value="pure_score">{t('leagues.bonus.score')}</option>
+                  <option value="pure_score">{t('common.score')}</option>
                 </select>
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">
-                  {rule.condition === 'vs_average' ? t('leagues.bonus.aboveAvg') : t('leagues.bonus.score')}
+                  {rule.condition === 'vs_average' ? t('leagues.bonus.aboveAvg') : t('common.score')}
                 </label>
                 <input
                   type="number"
@@ -193,7 +193,7 @@ export const BonusRulesConfiguration: React.FC<BonusRulesConfigurationProps> = (
             <div className="mt-2 text-xs text-gray-600">
               {rule.type === 'player' ? `👤 ${t('common.player')}` : `👥 ${t('common.team')}`} {t('common.points')}: <strong className="ltr-content">+{rule.points}</strong> {rule.condition === 'vs_average' 
                 ? `(${rule.threshold}+ ${t('leagues.bonus.aboveAvg')})`
-                : `(${rule.threshold}+ ${t('leagues.bonus.score')})`
+                : `(${rule.threshold}+ ${t('common.score')})`
               }
             </div>
           </div>
