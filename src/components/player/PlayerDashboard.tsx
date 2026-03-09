@@ -270,16 +270,113 @@ export const PlayerDashboard: React.FC = () => {
     return stats;
   };
 
-  const enrichedGames = useMemo(() => recentCompletedGames.map(game => {
-    const details = gameDetailsMap[game.id];
-    if (!details) return null;
-    const { league, team1, team2 } = details;
-    const isTeam1 = team1?.playerIds.includes(playerId);
-    const team1TotalPoints = (game.matches?.reduce((sum: number, m: GameMatch) => sum + (m.team1?.points || 0), 0) ?? 0) + (game.grandTotalPoints?.team1 || 0);
-    const team2TotalPoints = (game.matches?.reduce((sum: number, m: GameMatch) => sum + (m.team2?.points || 0), 0) ?? 0) + (game.grandTotalPoints?.team2 || 0);
-    const playerWon = (isTeam1 && team1TotalPoints > team2TotalPoints) || (!isTeam1 && team2TotalPoints > team1TotalPoints);
-    return { game, league, team1, team2, isTeam1, team1TotalPoints, team2TotalPoints, playerWon };
-  }), [recentCompletedGames, gameDetailsMap, playerId]);
+  const enrichedGames = useMemo(() => {
+    // First pass: build pre-game averages by iterating chronologically (oldest first)
+    const chronologicalGames = [...recentCompletedGames].reverse();
+    const preGameAverages = new Map<string, number>();
+    let runningTotalPins = 0;
+    let runningMatchCount = 0;
+
+    for (const game of chronologicalGames) {
+      const details = gameDetailsMap[game.id];
+      if (!details) continue;
+      const { team1, team2 } = details;
+      const isOnTeam1 = team1?.playerIds.includes(playerId);
+      const playerIndex = (isOnTeam1 ? team1 : team2)?.playerIds.indexOf(playerId) ?? -1;
+
+      // Store pre-game average before processing this game
+      preGameAverages.set(game.id, runningMatchCount > 0 ? runningTotalPins / runningMatchCount : 0);
+
+      // Accumulate pins for running average
+      if (playerIndex !== -1 && game.matches) {
+        for (const match of game.matches) {
+          const teamMatch = isOnTeam1 ? match.team1 : match.team2;
+          const playerMatch = teamMatch?.players?.[playerIndex];
+          if (playerMatch && playerMatch.pins !== '') {
+            runningTotalPins += parseInt(playerMatch.pins) || 0;
+            runningMatchCount++;
+          }
+        }
+      }
+    }
+
+    // Second pass: build enriched game data (display order: most recent first)
+    return recentCompletedGames.map(game => {
+      const details = gameDetailsMap[game.id];
+      if (!details) return null;
+      const { league, team1, team2 } = details;
+      const isTeam1 = team1?.playerIds.includes(playerId);
+      const team1TotalPoints = (game.matches?.reduce((sum: number, m: GameMatch) => sum + (m.team1?.points || 0), 0) ?? 0) + (game.grandTotalPoints?.team1 || 0);
+      const team2TotalPoints = (game.matches?.reduce((sum: number, m: GameMatch) => sum + (m.team2?.points || 0), 0) ?? 0) + (game.grandTotalPoints?.team2 || 0);
+      const playerWon = (isTeam1 && team1TotalPoints > team2TotalPoints) || (!isTeam1 && team2TotalPoints > team1TotalPoints);
+
+      // Extract player-specific stats for this game
+      const playerIndex = (isTeam1 ? team1 : team2)?.playerIds.indexOf(playerId) ?? -1;
+      const teamSnapshot = isTeam1 ? game.team1 : game.team2;
+      const playerGameData = teamSnapshot?.players?.[playerIndex];
+      const wasAbsent = playerGameData?.absent ?? false;
+
+      // Get individual match pins and calculate stats
+      const matchPins: number[] = [];
+      let playerTotalPins = 0;
+      let playerMatchPoints = 0;
+      let matchWins = 0;
+      let matchLosses = 0;
+      let matchDraws = 0;
+
+      if (game.matches && playerIndex !== -1) {
+        game.matches.forEach((match: GameMatch) => {
+          const teamMatch = isTeam1 ? match.team1 : match.team2;
+          const playerMatch = teamMatch?.players?.[playerIndex];
+          const pins = parseInt(playerMatch?.pins || '0') || 0;
+          matchPins.push(pins);
+          playerTotalPins += pins;
+
+          // Get match points and determine result
+          if (match.playerMatches?.[playerIndex]) {
+            const t1Pts = match.playerMatches[playerIndex].team1Points;
+            const t2Pts = match.playerMatches[playerIndex].team2Points;
+            playerMatchPoints += isTeam1 ? t1Pts : t2Pts;
+
+            if (t1Pts === t2Pts) {
+              matchDraws++;
+            } else if ((isTeam1 && t1Pts > t2Pts) || (!isTeam1 && t2Pts > t1Pts)) {
+              matchWins++;
+            } else {
+              matchLosses++;
+            }
+          }
+        });
+      }
+
+      const matchCount = matchPins.length;
+      const gameAverage = matchCount > 0 ? playerTotalPins / matchCount : 0;
+      const preGameAverage = preGameAverages.get(game.id) ?? 0;
+      const highestPin = Math.max(...matchPins, 0);
+
+      return {
+        game,
+        league,
+        team1,
+        team2,
+        isTeam1,
+        team1TotalPoints,
+        team2TotalPoints,
+        playerWon,
+        // Player stats for this game
+        wasAbsent,
+        matchPins,
+        playerTotalPins,
+        gameAverage,
+        preGameAverage,
+        playerMatchPoints,
+        matchWins,
+        matchLosses,
+        matchDraws,
+        highestPin,
+      };
+    });
+  }, [recentCompletedGames, gameDetailsMap, playerId]);
 
   if (authIsLoading) return (
     <div className="flex items-center justify-center min-h-64">
@@ -340,7 +437,7 @@ export const PlayerDashboard: React.FC = () => {
                   href={`/board/leagues/${league.id}`}
                   className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline whitespace-nowrap"
                 >
-                  {t('playerDashboard.viewStandings')} →
+                  {t('playerDashboard.viewStandings')} {t('common.rightArrow')}
                 </a>
               </div>
             ))}
@@ -432,53 +529,142 @@ export const PlayerDashboard: React.FC = () => {
               <div className="space-y-3">
                 {enrichedGames.map(data => {
                   if (!data) return null;
-                  const { game, league, team1, team2, isTeam1, team1TotalPoints, team2TotalPoints, playerWon } = data;
+                  const { 
+                    game, league, team1, team2, isTeam1, team1TotalPoints, team2TotalPoints, playerWon,
+                    wasAbsent, matchPins, playerTotalPins, gameAverage, preGameAverage, playerMatchPoints,
+                    matchWins, matchLosses, matchDraws, highestPin
+                  } = data;
+                  
+                  const avgDiff = preGameAverage > 0 ? gameAverage - preGameAverage : null;
+                  
                   return (
                     <button
                       key={game.id}
                       type="button"
-                      className="w-full text-left flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                      className="w-full text-left p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                       onClick={() => navigate(`/player/games/${game.id}`, { state: { game } })}
                     >
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xs font-semibold text-purple-600 bg-purple-100 px-2 py-1 rounded">
-                            {league?.name}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            {t('common.round')} {game.round} • {t('common.matchDay')} {game.matchDay}
-                          </span>
-                          <span className="text-xs text-gray-400">
-                            {formatDate(game.completedAt || '')}
-                          </span>
-                        </div>
-                        <div className="flex items-center flex-wrap gap-x-4 gap-y-1">
-                          <span className={`font-semibold min-w-0 truncate ${isTeam1 ? 'text-blue-600' : 'text-gray-700'}`}>
+                      {/* Header row */}
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-xs font-semibold text-purple-600 bg-purple-100 px-2 py-1 rounded">
+                          {league?.name}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {t('common.round')} {game.round} • {t('common.matchDay')} {game.matchDay}
+                        </span>
+                        <span className="text-xs text-gray-400">
+                          {formatDate(game.completedAt || '')}
+                        </span>
+                      </div>
+                      
+                      {/* Main content: Teams + Stats + Result */}
+                      <div className="flex items-center justify-between gap-3">
+                        {/* Left: Team matchup */}
+                        <div className="flex items-center gap-2 min-w-0 shrink">
+                          <span className={`font-semibold truncate ${isTeam1 ? 'text-blue-600' : 'text-gray-700'}`}>
                             {game.team1?.name || team1?.name}
                           </span>
-                          <span className="text-gray-400 shrink-0">
-                            <span className="font-bold">{team1TotalPoints}</span> - <span className="font-bold">{team2TotalPoints}</span>
+                          <span className="text-gray-400 shrink-0 text-sm">
+                            <span className="font-bold">{team1TotalPoints}</span>-<span className="font-bold">{team2TotalPoints}</span>
                           </span>
-                          <span className={`font-semibold min-w-0 truncate ${!isTeam1 ? 'text-blue-600' : 'text-gray-700'}`}>
+                          <span className={`font-semibold truncate ${!isTeam1 ? 'text-blue-600' : 'text-gray-700'}`}>
                             {game.team2?.name || team2?.name}
                           </span>
                         </div>
+
+                        {/* Center: Player Stats (hidden on mobile) */}
+                        <div className="hidden md:flex items-center gap-2 text-xs shrink-0">
+                          {wasAbsent ? (
+                            <span className="bg-amber-100 text-amber-700 px-2 py-1 rounded font-medium">
+                              {t('games.absent')}
+                            </span>
+                          ) : (
+                            <>
+                              {/* Individual match pins */}
+                              <div className="flex items-center gap-0.5">
+                                {matchPins.map((pins, idx) => (
+                                  <span
+                                    key={idx}
+                                    className={`px-1.5 py-0.5 rounded font-mono text-xs ${
+                                      pins === highestPin && matchPins.length > 1
+                                        ? 'bg-purple-100 text-purple-700 font-bold'
+                                        : pins >= 200
+                                          ? 'bg-green-100 text-green-700 font-bold'
+                                          : 'text-gray-600'
+                                    }`}
+                                  >
+                                    {pins}
+                                  </span>
+                                ))}
+                              </div>
+                              
+                              <span className="text-gray-300">|</span>
+                              
+                              {/* Total & Average */}
+                              <span className="font-semibold text-gray-700">{playerTotalPins}</span>
+                              <span className={`${avgDiff !== null ? (avgDiff >= 0 ? 'text-green-600' : 'text-red-500') : 'text-gray-500'}`}>
+                                ({gameAverage.toFixed(0)}{avgDiff !== null && <span className="ml-0.5">{avgDiff >= 0 ? '▲' : '▼'}</span>})
+                              </span>
+
+                              <span className="text-gray-300">|</span>
+
+                              {/* Points & Record */}
+                              <span className="font-semibold text-blue-600">+{playerMatchPoints}</span>
+                              <span className="text-gray-500">{matchWins}W-{matchLosses}L{matchDraws > 0 ? `-${matchDraws}D` : ''}</span>
+                            </>
+                          )}
+                        </div>
+
+                        {/* Right: Result badge + View */}
+                        <div className="flex items-center gap-2 shrink-0">
+                          {playerWon ? (
+                            <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded font-semibold">
+                              {t('playerDashboard.won')}
+                            </span>
+                          ) : team1TotalPoints === team2TotalPoints ? (
+                            <span className="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded font-semibold">
+                              {t('playerDashboard.tie')}
+                            </span>
+                          ) : (
+                            <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded font-semibold">
+                              {t('playerDashboard.lost')}
+                            </span>
+                          )}
+                          <span className="text-purple-600 font-semibold hidden sm:inline">{t('common.view')} {t('common.rightArrow')}</span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        {playerWon ? (
-                          <span className="text-xs bg-green-100 text-green-700 px-3 py-1 rounded font-semibold">
-                            {t('playerDashboard.won')}
-                          </span>
-                        ) : team1TotalPoints === team2TotalPoints ? (
-                          <span className="text-xs bg-gray-200 text-gray-700 px-3 py-1 rounded font-semibold">
-                            {t('playerDashboard.tie')}
+
+                      {/* Mobile: Player stats row */}
+                      <div className="flex md:hidden items-center gap-1.5 mt-2 text-xs flex-wrap">
+                        {wasAbsent ? (
+                          <span className="bg-amber-100 text-amber-700 px-2 py-1 rounded font-medium">
+                            {t('games.absent')}
                           </span>
                         ) : (
-                          <span className="text-xs bg-red-100 text-red-700 px-3 py-1 rounded font-semibold">
-                            {t('playerDashboard.lost')}
-                          </span>
+                          <>
+                            {matchPins.map((pins, idx) => (
+                              <span
+                                key={idx}
+                                className={`px-1.5 py-0.5 rounded font-mono ${
+                                  pins === highestPin && matchPins.length > 1
+                                    ? 'bg-purple-100 text-purple-700 font-bold'
+                                    : pins >= 200
+                                      ? 'bg-green-100 text-green-700 font-bold'
+                                      : 'bg-gray-100 text-gray-600'
+                                }`}
+                              >
+                                {pins}
+                              </span>
+                            ))}
+                            <span className="text-gray-300">|</span>
+                            <span className="font-semibold">{playerTotalPins}</span>
+                            <span className={avgDiff !== null ? (avgDiff >= 0 ? 'text-green-600' : 'text-red-500') : 'text-gray-500'}>
+                              ({gameAverage.toFixed(0)}{avgDiff !== null && (avgDiff >= 0 ? '▲' : '▼')})
+                            </span>
+                            <span className="text-blue-600 font-semibold">+{playerMatchPoints}</span>
+                            <span className="text-gray-500">{matchWins}W-{matchLosses}L</span>
+                          </>
                         )}
-                        <span className="text-purple-600 font-semibold">{t('common.view')} {t('common.rightArrow')}</span>
                       </div>
                     </button>
                   );
