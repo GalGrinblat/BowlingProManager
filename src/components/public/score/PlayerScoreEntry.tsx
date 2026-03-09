@@ -345,7 +345,7 @@ export const PlayerScoreEntry: React.FC = () => {
     } else {
       setSubmitError(result.errorMessage ?? t('score.submitError'));
     }
-  }, [localGame, sessionId, gameId]);
+  }, [localGame, sessionId, gameId, playerData, t]);
 
   // ── Render ─────────────────────────────────────────────────────────────────
 
