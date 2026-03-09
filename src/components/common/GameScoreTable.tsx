@@ -77,7 +77,7 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
                       <div className="max-w-[72px] sm:max-w-none truncate">
                         {playerIdx + 1}. {player.name}
                         {isAbsent && (
-                          <span className="ml-1 text-[10px] font-normal text-red-400 italic">({t('common.absent')})</span>
+                          <span className="ml-1 text-[10px] font-normal text-red-400 italic">({t('games.absent')})</span>
                         )}
                       </div>
                     </td>
@@ -217,7 +217,7 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
                       <div className="max-w-[72px] sm:max-w-none truncate">
                         {playerIdx + 1}. {player.name}
                         {isAbsent && (
-                          <span className="ml-1 text-[10px] font-normal text-red-400 italic">({t('common.absent')})</span>
+                          <span className="ml-1 text-[10px] font-normal text-red-400 italic">({t('games.absent')})</span>
                         )}
                       </div>
                     </td>
