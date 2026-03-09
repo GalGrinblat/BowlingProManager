@@ -26,6 +26,8 @@ export const PlayerDashboard: React.FC = () => {
   const view = searchParams.get('view') ?? 'dashboard';
   const [playerStats, setPlayerStats] = useState<PlayerStats | null>(null);
   const [gameDetailsMap, setGameDetailsMap] = useState<Record<string, { season: Season | null, league: League | null, team1: Team | undefined, team2: Team | undefined }>>({});
+  const [nextGame, setNextGame] = useState<Game | null>(null);
+  const [nextGameDetails, setNextGameDetails] = useState<{ season: Season | null, league: League | null, team1: Team | undefined, team2: Team | undefined } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
@@ -99,6 +101,33 @@ export const PlayerDashboard: React.FC = () => {
         });
         const topGames = sortedCompletedGames.slice(0, 5);
         setRecentCompletedGames(topGames);
+
+        // Find the next upcoming/pending game for this player (earliest scheduled date)
+        const upcomingPlayerGames = allGames.filter(game => {
+          if (game.status === 'completed' || game.postponed) return false;
+          const team1 = teamsById.get(game.team1Id);
+          const team2 = teamsById.get(game.team2Id);
+          return team1?.playerIds.includes(playerId) || team2?.playerIds.includes(playerId);
+        }).sort((a, b) => {
+          const dateA = new Date(a.scheduledDate || 0).getTime();
+          const dateB = new Date(b.scheduledDate || 0).getTime();
+          return dateA - dateB;
+        });
+        const foundNextGame = upcomingPlayerGames[0] ?? null;
+        setNextGame(foundNextGame);
+
+        if (foundNextGame) {
+          const nextSeason = await seasonsApi.getById(foundNextGame.seasonId);
+          const nextLeague = nextSeason ? await leaguesApi.getById(nextSeason.leagueId) : null;
+          if (!cancelled) {
+            setNextGameDetails({
+              season: nextSeason ?? null,
+              league: nextLeague ?? null,
+              team1: teamsById.get(foundNextGame.team1Id),
+              team2: teamsById.get(foundNextGame.team2Id),
+            });
+          }
+        }
 
         // Preload game details for rendering — parallel fetches
         const detailEntries = await Promise.all(
@@ -346,6 +375,56 @@ export const PlayerDashboard: React.FC = () => {
       {/* Dashboard View */}
       {view === 'dashboard' && (
         <>
+          {/* Next Game */}
+          {nextGame && nextGameDetails && (() => {
+            const { league, team1, team2 } = nextGameDetails;
+            const isTeam1 = team1?.playerIds.includes(playerId);
+            const myTeam = isTeam1 ? team1 : team2;
+            const opponentTeam = isTeam1 ? team2 : team1;
+            const hasPending = !!nextGame.pendingSubmission;
+            return (
+              <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
+                <h2 className="text-xl font-bold text-gray-800 mb-3">{t('playerDashboard.nextGame')}</h2>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div>
+                    {league && (
+                      <span className="text-xs font-semibold text-purple-600 bg-purple-100 px-2 py-1 rounded">
+                        {league.name}
+                      </span>
+                    )}
+                    <div className="flex items-center gap-2 mt-2 text-sm text-gray-500">
+                      <span>{t('common.round')} {nextGame.round}</span>
+                      <span>·</span>
+                      <span>{t('common.matchDay')} {nextGame.matchDay}</span>
+                      {nextGame.scheduledDate && (
+                        <>
+                          <span>·</span>
+                          <span>{formatDate(nextGame.scheduledDate)}</span>
+                        </>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="font-semibold text-blue-600">{myTeam?.name}</span>
+                      <span className="text-gray-400 text-sm">{t('playerDashboard.vs')}</span>
+                      <span className="font-semibold text-gray-700">{opponentTeam?.name}</span>
+                    </div>
+                    {hasPending && (
+                      <p className="text-xs text-amber-600 mt-1 font-medium">
+                        {t('playerDashboard.scoresPendingReview')}
+                      </p>
+                    )}
+                  </div>
+                  <a
+                    href={`/score/${nextGame.id}`}
+                    className="inline-flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white font-bold px-5 py-2.5 rounded-lg transition-colors whitespace-nowrap text-sm"
+                  >
+                    🎳 {t('playerDashboard.enterScores')}
+                  </a>
+                </div>
+              </div>
+            );
+          })()}
+
           {/* Recent Completed Games */}
           {recentCompletedGames.length > 0 && (
             <div className="bg-white rounded-xl shadow-lg p-6">

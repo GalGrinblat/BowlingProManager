@@ -2,7 +2,7 @@
 
 The Score Entry page allows players or team representatives to submit game scores without logging in. It is designed for use on a phone or tablet at the bowling lane.
 
-- **Route**: `/score/:gameId` — public, no authentication required
+- **Route**: `/score/:gameId` — public, no authentication required (but works for logged-in players too)
 - **Key files**:
   - `src/components/public/score/PlayerScoreEntry.tsx` — main score entry component
   - `src/components/public/score/ScoreLayout.tsx` — page layout wrapper
@@ -13,6 +13,19 @@ The Score Entry page allows players or team representatives to submit game score
 ## Layout
 
 `ScoreLayout` uses a dark background with no header, optimized for focused data entry on a mobile device.
+
+---
+
+## Submitter Identity
+
+When a logged-in player (role: player) follows the score entry link from their dashboard, their identity is automatically captured in the submission:
+
+- `submitterId` — the player's registry ID
+- `submitterName` — the player's display name
+
+This information is displayed in the admin's **Pending Submission Panel** as "Submitted by: Name", making it easy to know which player entered the scores.
+
+If the link is opened by an unauthenticated user (e.g., a team captain scanning a QR code), the submission is still accepted — submitter fields are simply omitted.
 
 ---
 
@@ -109,6 +122,7 @@ After a successful submission, the confirmation screen displays:
 After a player submits scores, the admin game view (`/admin/games/:gameId/play`) shows a **Pending Submission Panel** (`src/components/admin/game/PendingSubmissionPanel.tsx`):
 
 - Displays the submitted pin scores and absent flags for each player.
+- Shows **who submitted** the scores (name) and when, if the submitter was logged in as a player.
 - **Apply**: writes the submitted scores to the live game record and recalculates bonus points and standings.
 - **Discard**: removes the pending submission without applying any changes.
 

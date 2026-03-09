@@ -133,6 +133,8 @@ export type SeasonStatus = 'setup' | 'active' | 'completed';
 export interface PendingSubmission {
   submittedAt: string;
   sessionId: string;
+  submitterId?: string;   // playerId of the logged-in player who submitted
+  submitterName?: string; // display name of the submitter
   team1AbsentFlags: boolean[];
   team2AbsentFlags: boolean[];
   team1PlayerOrder: string[]; // playerId order as the player set it up

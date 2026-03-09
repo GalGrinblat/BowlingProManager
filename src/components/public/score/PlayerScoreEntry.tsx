@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { useParams } from 'react-router-dom';
 import { gamesApi } from '../../../services/api';
 import { useTranslation } from '../../../contexts/LanguageContext';
+import { useAuth } from '../../../contexts/AuthContext';
+import { getPlayerDisplayName } from '../../../utils/playerUtils';
 import { PreMatchSetup } from '../../common/game/PreMatchSetup';
 import { MatchView } from '../../common/game/MatchView';
 import { applyLineupRule } from '../../../utils/lineupUtils';
@@ -125,6 +127,7 @@ const SubmittedScreen: React.FC<{ gameId: string; t: (k: string) => string }> = 
 export const PlayerScoreEntry: React.FC = () => {
   const { gameId } = useParams<{ gameId: string }>();
   const { t } = useTranslation();
+  const { playerData } = useAuth();
 
   const [loading, setLoading]       = useState(true);
   const [error, setError]           = useState<ErrorKind | null>(null);
@@ -350,6 +353,10 @@ export const PlayerScoreEntry: React.FC = () => {
     const submission: PendingSubmission = {
       submittedAt: new Date().toISOString(),
       sessionId,
+      ...(playerData && {
+        submitterId: playerData.id,
+        submitterName: getPlayerDisplayName(playerData),
+      }),
       team1AbsentFlags: localGame.team1.players.map(p => p.absent),
       team2AbsentFlags: localGame.team2.players.map(p => p.absent),
       team1PlayerOrder: localGame.team1.players.map(p => p.playerId),

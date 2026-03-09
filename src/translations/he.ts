@@ -134,6 +134,7 @@ const he: TranslationDictionary = {
   pending: {
     title: 'הגשת שחקן ממתינה לאישור',
     submittedAt: 'נשלח בתאריך',
+    submittedBy: 'נשלח על ידי',
     absences: 'היעדרויות שדווחו',
     scores: 'תוצאות שהוגשו',
     noAbsences: 'לא דווחו היעדרויות',
@@ -614,6 +615,10 @@ const he: TranslationDictionary = {
     yourTeam: 'הקבוצה שלך',
     record: 'רקורד',
     completedOn: 'הושלם',
+    nextGame: 'המשחק הבא',
+    vs: 'נגד',
+    enterScores: 'הזן תוצאות',
+    scoresPendingReview: 'תוצאות הוגשו — ממתין לאישור מנהל',
   },
 
   // תצוגת היסטוריית משחק

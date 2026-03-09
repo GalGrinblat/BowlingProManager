@@ -102,6 +102,11 @@ export const PendingSubmissionPanel: React.FC<Props> = ({ game, onApply, onDismi
               <p className="text-sm text-yellow-400/70 mt-1">
                 {t('pending.submittedAt')}: {submittedDate}
               </p>
+              {sub.submitterName && (
+                <p className="text-sm text-yellow-300/80 mt-0.5">
+                  {t('pending.submittedBy')}: <span className="font-semibold">{sub.submitterName}</span>
+                </p>
+              )}
             </div>
             <span className="text-3xl">📋</span>
           </div>

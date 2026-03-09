@@ -19,9 +19,11 @@
    - Game-by-game history for all completed matches.
    - Points scored tracking.
 
-4. **Upcoming Games**
-   - List of scheduled games, including date and opponent.
-   - Highlight of next match day and team assignments.
+4. **Next Game**
+   - The player's nearest upcoming (non-postponed, non-completed) game is displayed prominently at the top of the dashboard view.
+   - Shows league name, round, match day, scheduled date, and opponent team.
+   - Includes a direct **Enter Scores** button that links to `/score/:gameId` for immediate score entry.
+   - If scores have already been submitted and are awaiting admin review, a notice is shown in place of (or alongside) the button.
 
 5. **Game History**
    - Access to all completed games with detailed results and statistics.

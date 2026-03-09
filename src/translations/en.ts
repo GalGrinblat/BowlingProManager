@@ -134,6 +134,7 @@ const en: TranslationDictionary = {
   pending: {
     title: 'Player Submission Pending',
     submittedAt: 'Submitted at',
+    submittedBy: 'Submitted by',
     absences: 'Reported Absences',
     scores: 'Submitted Scores',
     noAbsences: 'No absences reported',
@@ -614,6 +615,10 @@ const en: TranslationDictionary = {
     yourTeam: 'Your Team',
     record: 'Record',
     completedOn: 'Completed',
+    nextGame: 'Next Game',
+    vs: 'vs',
+    enterScores: 'Enter Scores',
+    scoresPendingReview: 'Scores submitted — awaiting admin review',
   },
 
   // Game History View
