@@ -34,7 +34,11 @@
       "Bash(node -e \"require\\(''sharp''\\)\")",
       "Bash(where convert)",
       "Bash(magick --version)",
-      "Bash(node -e \"require\\(''vite''\\)\")"
+      "Bash(node -e \"require\\(''vite''\\)\")",
+      "Bash(sed \"s|/c/Code/BowlingProManager/||\")",
+      "Read(//tmp/**)",
+      "Bash(done)",
+      "Bash(bash /tmp/get_translations.sh)"
     ]
   }
 }

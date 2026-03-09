@@ -526,8 +526,8 @@ The Player Registry uses Supabase PostgreSQL as its backend:
 - Indexed search for faster filtering
 
 ## Related Documentation
-- [TESTING.md](./TESTING.md) - Test suite including validation tests
-- [SUPABASE_SETUP_GUIDE.md](./SUPABASE_SETUP_GUIDE.md) - Database setup
+- [TESTING.md](../tech/TESTING.md) - Test suite including validation tests
+- [SUPABASE_SETUP_GUIDE.md](../tech/SUPABASE_SETUP_GUIDE.md) - Database setup
 - [ADMIN_DASHBOARD.md](./ADMIN_DASHBOARD.md) - Admin portal overview
 
 ## Summary

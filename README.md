@@ -6,35 +6,35 @@ A comprehensive bowling league management system built with React, Vite, Supabas
 ## Documentation
 
 ### Admin
-- [Admin General & Flows](documentation/admin/GENERAL.md)
-- [Admin Dashboard](documentation/admin/ADMIN_DASHBOARD.md)
-- [League Overview & Configuration](documentation/admin/LEAGUE_OVERVIEW.md)
-- [Season Overview & Management](documentation/admin/SEASON_OVERVIEW.md)
-- [Player Registry](documentation/admin/PLAYER_REGISTRY.md)
-- [User Management](documentation/admin/USER_MANAGEMENT.md)
-- [Settings](documentation/admin/SETTINGS.md)
-- [Print Module](documentation/admin/PRINT_MODULE.md)
+- [Admin General & Flows](docs/admin/GENERAL.md)
+- [Admin Dashboard](docs/admin/ADMIN_DASHBOARD.md)
+- [League Overview & Configuration](docs/admin/LEAGUE_OVERVIEW.md)
+- [Season Overview & Management](docs/admin/SEASON_OVERVIEW.md)
+- [Player Registry](docs/admin/PLAYER_REGISTRY.md)
+- [User Management](docs/admin/USER_MANAGEMENT.md)
+- [Settings](docs/admin/SETTINGS.md)
+- [Print Module](docs/admin/PRINT_MODULE.md)
 
 ### Player
-- [Player General & Flows](documentation/player/GENERAL.md)
-- [Player Dashboard](documentation/player/PLAYER_DASHBOARD.md)
+- [Player General & Flows](docs/player/GENERAL.md)
+- [Player Dashboard](docs/player/PLAYER_DASHBOARD.md)
 
 ### Public (No Login Required)
-- [Public General & Flows](documentation/public/GENERAL.md)
-- [Public Scoreboard](documentation/public/PUBLIC_BOARD.md)
-- [Score Entry](documentation/public/SCORE_ENTRY.md)
+- [Public General & Flows](docs/public/GENERAL.md)
+- [Public Scoreboard](docs/public/PUBLIC_BOARD.md)
+- [Score Entry](docs/public/SCORE_ENTRY.md)
 
 ### Technical
-- [Routing](documentation/tech/ROUTING.md)
-- [PWA](documentation/tech/PWA.md)
-- [Testing](documentation/tech/TESTING.md)
-- [Supabase Setup](documentation/tech/SUPABASE_SETUP_GUIDE.md)
+- [Routing](docs/tech/ROUTING.md)
+- [PWA](docs/tech/PWA.md)
+- [Testing](docs/tech/TESTING.md)
+- [Supabase Setup](docs/tech/SUPABASE_SETUP_GUIDE.md)
 
 ## Getting Started
 
 ### Prerequisites
 - Node.js 18+
-- A Supabase project with Google OAuth configured — see [Supabase Setup Guide](documentation/tech/SUPABASE_SETUP_GUIDE.md)
+- A Supabase project with Google OAuth configured — see [Supabase Setup Guide](docs/tech/SUPABASE_SETUP_GUIDE.md)
 
 ### Development Setup
 ```bash
@@ -49,7 +49,7 @@ npm test                     # Jest test suite
 1. Start the dev server: `npm run dev`
 2. Sign in with Google — first user automatically becomes admin
 3. Go to **Settings** → load demo data, or start creating your organization
-4. See [Admin General](documentation/admin/GENERAL.md) for step-by-step flows
+4. See [Admin General](docs/admin/GENERAL.md) for step-by-step flows
 
 ## Technology Stack
 

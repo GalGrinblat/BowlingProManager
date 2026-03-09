@@ -54,7 +54,7 @@ tests/
   unit/           # Utils and API layer
   component/      # React component tests
   integration/    # Full flow tests (scoringFlow, seasonFlow)
-documentation/
+docs/
   admin/          # Admin-facing feature docs (GENERAL, leagues, seasons, print, users, settings)
   player/         # Player-facing feature docs (GENERAL, dashboard)
   public/         # Public feature docs (GENERAL, board, score entry)
