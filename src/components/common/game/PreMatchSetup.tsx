@@ -1,26 +1,26 @@
-import React, { useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTranslation } from '../../../contexts/LanguageContext';
 import { GameTeamPanel } from './GameTeamPanel';
-import { sortPlayersByAverage } from '../../../utils/lineupUtils';
+import { sortPlayersByAverage, applyLineupRule } from '../../../utils/lineupUtils';
 import type { Game, GamePlayer } from '../../../types/index';
 
 interface PreMatchSetupProps {
   game: Game;
-  team1Players: GamePlayer[];
-  team2Players: GamePlayer[];
-  onToggleAbsent: (team: 'team1' | 'team2', playerIndex: number) => void;
-  onMovePlayer: (team: 'team1' | 'team2', index: number, direction: 'up' | 'down') => void;
-  onContinue: () => void;
+  initialTeam1Players: GamePlayer[];
+  initialTeam2Players: GamePlayer[];
+  onContinue: (team1: GamePlayer[], team2: GamePlayer[]) => void;
   onBack: () => void;
 }
 
 export const PreMatchSetup: React.FC<PreMatchSetupProps> = ({
-  game, team1Players, team2Players,
-  onToggleAbsent, onMovePlayer, onContinue, onBack
+  game, initialTeam1Players, initialTeam2Players, onContinue, onBack
 }) => {
   const { t } = useTranslation();
   const lineupStrategy = game.lineupStrategy;
   const lineupRule = game.lineupRule;
+
+  const [team1Players, setTeam1Players] = useState<GamePlayer[]>(initialTeam1Players);
+  const [team2Players, setTeam2Players] = useState<GamePlayer[]>(initialTeam2Players);
 
   const displayTeam1Players = useMemo(() =>
     lineupStrategy === 'rule-based' ? sortPlayersByAverage(team1Players) : team1Players,
@@ -30,6 +30,38 @@ export const PreMatchSetup: React.FC<PreMatchSetupProps> = ({
     lineupStrategy === 'rule-based' ? sortPlayersByAverage(team2Players) : team2Players,
     [lineupStrategy, team2Players]
   );
+
+  const handleToggleAbsent = (team: 'team1' | 'team2', playerId: string) => {
+    if (team === 'team1') {
+      setTeam1Players(prev => prev.map(p => p.playerId === playerId ? { ...p, absent: !p.absent } : p));
+    } else {
+      setTeam2Players(prev => prev.map(p => p.playerId === playerId ? { ...p, absent: !p.absent } : p));
+    }
+  };
+
+  const handleMovePlayer = (team: 'team1' | 'team2', index: number, direction: 'up' | 'down') => {
+    const setter = team === 'team1' ? setTeam1Players : setTeam2Players;
+    setter(prev => {
+      const updated = [...prev];
+      const swapIdx = direction === 'up' ? index - 1 : index + 1;
+      if (swapIdx < 0 || swapIdx >= updated.length || !updated[index] || !updated[swapIdx]) return prev;
+      const temp = updated[index] as GamePlayer;
+      updated[index] = updated[swapIdx] as GamePlayer;
+      updated[swapIdx] = temp;
+      return updated;
+    });
+  };
+
+  const handleContinue = () => {
+    let final1 = team1Players;
+    let final2 = team2Players;
+    if (lineupStrategy === 'rule-based' && lineupRule) {
+      const ordered = applyLineupRule(team1Players, team2Players, lineupRule);
+      final1 = ordered.team1;
+      final2 = ordered.team2;
+    }
+    onContinue(final1, final2);
+  };
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6">
@@ -79,8 +111,8 @@ export const PreMatchSetup: React.FC<PreMatchSetupProps> = ({
             players={displayTeam1Players}
             team="team1"
             lineupStrategy={lineupStrategy}
-            toggleAbsent={onToggleAbsent}
-            movePlayer={onMovePlayer}
+            toggleAbsent={handleToggleAbsent}
+            movePlayer={handleMovePlayer}
             t={t}
           />
           <GameTeamPanel
@@ -89,15 +121,15 @@ export const PreMatchSetup: React.FC<PreMatchSetupProps> = ({
             players={displayTeam2Players}
             team="team2"
             lineupStrategy={lineupStrategy}
-            toggleAbsent={onToggleAbsent}
-            movePlayer={onMovePlayer}
+            toggleAbsent={handleToggleAbsent}
+            movePlayer={handleMovePlayer}
             t={t}
           />
         </div>
 
         <div className="flex justify-end">
           <button
-            onClick={onContinue}
+            onClick={handleContinue}
             className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-bold text-lg transition-colors"
           >
             {t('games.continueToMatch')} {t('common.rightArrow')}

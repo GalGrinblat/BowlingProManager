@@ -6,7 +6,7 @@ interface PlayerRowProps {
   idx: number;
   team: 'team1' | 'team2';
   lineupStrategy?: string;
-  toggleAbsent: (team: 'team1' | 'team2', idx: number) => void;
+  toggleAbsent: (team: 'team1' | 'team2', playerId: string) => void;
   movePlayer: (team: 'team1' | 'team2', idx: number, direction: 'up' | 'down') => void;
   t: (key: string) => string;
   totalPlayers: number;
@@ -54,7 +54,7 @@ const PlayerRow: React.FC<PlayerRowProps> = ({
       <div className="flex flex-col items-end ml-2">
         <div className="flex flex-row items-center gap-2">
           <button
-            onClick={() => toggleAbsent(team, idx)}
+            onClick={() => toggleAbsent(team, player.playerId)}
             className={`px-4 py-2 rounded font-medium transition-colors ${
               player.absent ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-red-600 hover:bg-red-700 text-white'
             }`}
@@ -93,7 +93,7 @@ interface GameTeamPanelProps {
   players: GamePlayer[];
   team: 'team1' | 'team2';
   lineupStrategy?: string;
-  toggleAbsent: (team: 'team1' | 'team2', idx: number) => void;
+  toggleAbsent: (team: 'team1' | 'team2', playerId: string) => void;
   movePlayer: (team: 'team1' | 'team2', idx: number, direction: 'up' | 'down') => void;
   t: (key: string) => string;
 }

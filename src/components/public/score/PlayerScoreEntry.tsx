@@ -6,8 +6,6 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { getPlayerDisplayName } from '../../../utils/playerUtils';
 import { PreMatchSetup } from '../../common/game/PreMatchSetup';
 import { MatchView } from '../../common/game/MatchView';
-import { applyLineupRule } from '../../../utils/lineupUtils';
-import { sortPlayersByAverage } from '../../../utils/lineupUtils';
 import { createEmptyMatch, calculateMatchResults, calculateBonusPoints, clampScore } from '../../../utils/matchUtils';
 import { calculateGrandTotalPoints, calculateGameTotals, calculatePlayerStats } from '../../../utils/statsUtils';
 import { buildGameTeamsFromIds } from '../../../utils/gameInitUtils';
@@ -250,43 +248,16 @@ export const PlayerScoreEntry: React.FC = () => {
 
   // ── PreMatchSetup handlers ─────────────────────────────────────────────────
 
-  const toggleAbsent = useCallback((team: 'team1' | 'team2', playerIndex: number) => {
-    if (team === 'team1') {
-      setTeam1Players(prev => prev.map((p, i) => i === playerIndex ? { ...p, absent: !p.absent } : p));
-    } else {
-      setTeam2Players(prev => prev.map((p, i) => i === playerIndex ? { ...p, absent: !p.absent } : p));
-    }
-  }, []);
-
-  const movePlayer = useCallback((team: 'team1' | 'team2', index: number, direction: 'up' | 'down') => {
-    const setter = team === 'team1' ? setTeam1Players : setTeam2Players;
-    setter(prev => {
-      const updated = [...prev];
-      const swapIdx = direction === 'up' ? index - 1 : index + 1;
-      if (swapIdx < 0 || swapIdx >= updated.length || !updated[index] || !updated[swapIdx]) return prev;
-      const temp = updated[index] as GamePlayer;
-      updated[index] = updated[swapIdx] as GamePlayer;
-      updated[swapIdx] = temp;
-      return updated;
-    });
-  }, []);
-
-  const handleContinueToScoring = useCallback(() => {
-    if (!game) return;
-    let final1 = team1Players;
-    let final2 = team2Players;
-    if (game.lineupStrategy === 'rule-based' && game.lineupRule) {
-      const ordered = applyLineupRule(team1Players, team2Players, game.lineupRule);
-      final1 = ordered.team1;
-      final2 = ordered.team2;
-    }
+  const handleContinueToScoring = useCallback((team1: GamePlayer[], team2: GamePlayer[]) => {
+    setTeam1Players(team1);
+    setTeam2Players(team2);
     setLocalGame(prev => prev ? {
       ...prev,
-      team1: { ...prev.team1!, players: final1 },
-      team2: { ...prev.team2!, players: final2 },
+      team1: { ...prev.team1!, players: team1 },
+      team2: { ...prev.team2!, players: team2 },
     } : prev);
     setStep(2);
-  }, [game, team1Players, team2Players]);
+  }, []);
 
   // ── MatchView score handlers (local state only — no DB write) ──────────────
 
@@ -390,14 +361,6 @@ export const PlayerScoreEntry: React.FC = () => {
   if (!game || !localGame) return <ErrorScreen kind="notFound" t={t} />;
   if (step === 4) return <SubmittedScreen gameId={gameId!} t={t} />;
 
-  // Pre-match setup uses team players from state (for absent + move)
-  const displayTeam1 = game.lineupStrategy === 'rule-based'
-    ? sortPlayersByAverage(team1Players)
-    : team1Players;
-  const displayTeam2 = game.lineupStrategy === 'rule-based'
-    ? sortPlayersByAverage(team2Players)
-    : team2Players;
-
   return (
     <div className="min-h-screen bg-gray-900 pb-8">
       {/* Header */}
@@ -438,11 +401,9 @@ export const PlayerScoreEntry: React.FC = () => {
         {/* Step 1: Pre-Match Setup */}
         {step === 1 && (
           <PreMatchSetup
-            game={{ ...game, team1: { ...game.team1!, players: displayTeam1 }, team2: { ...game.team2!, players: displayTeam2 } }}
-            team1Players={displayTeam1}
-            team2Players={displayTeam2}
-            onToggleAbsent={toggleAbsent}
-            onMovePlayer={movePlayer}
+            game={game}
+            initialTeam1Players={team1Players}
+            initialTeam2Players={team2Players}
             onContinue={handleContinueToScoring}
             onBack={() => window.history.back()}
           />

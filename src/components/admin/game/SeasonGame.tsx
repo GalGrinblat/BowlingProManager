@@ -6,7 +6,6 @@ import { MatchView } from '../../common/game/MatchView';
 import { GameSummaryView } from '../../common/game/GameSummaryView';
 import { calculateMatchResults, calculateBonusPoints, clampScore } from '../../../utils/matchUtils';
 import { calculatePlayerStats, calculateGameTotals, calculateGrandTotalPoints } from '../../../utils/statsUtils';
-import { applyLineupRule } from '../../../utils/lineupUtils';
 import { PreMatchSetup } from '../../common/game/PreMatchSetup';
 import { PendingSubmissionPanel } from './PendingSubmissionPanel';
 import { useGameInitializer } from '../../../hooks/useGameInitializer';
@@ -23,19 +22,12 @@ export const SeasonGame: React.FC = () => {
     currentMatch, setCurrentMatch,
     showSummary, setShowSummary,
     showPreMatch, setShowPreMatch,
-    team1Players, setTeam1Players,
-    team2Players, setTeam2Players,
+    team1Players,
+    team2Players,
   } = useGameInitializer(gameId!);
 
-  const handlePreMatchContinue = async () => {
+  const handlePreMatchContinue = async (finalTeam1Players: GamePlayer[], finalTeam2Players: GamePlayer[]) => {
     if (!game || !game.team1 || !game.team2) return;
-    let finalTeam1Players = team1Players;
-    let finalTeam2Players = team2Players;
-    if (game.lineupStrategy === 'rule-based' && game.lineupRule) {
-      const orderedPlayers = applyLineupRule(team1Players, team2Players, game.lineupRule);
-      finalTeam1Players = orderedPlayers.team1;
-      finalTeam2Players = orderedPlayers.team2;
-    }
     const defaultGrandTotalPoints = { team1: 0, team2: 0 };
     const updatedGame: Game = {
       ...game,
@@ -61,34 +53,6 @@ export const SeasonGame: React.FC = () => {
     setGame(updatedGame);
     setShowPreMatch(false);
     setCurrentMatch(1);
-  };
-
-  const toggleAbsent = (team: 'team1' | 'team2', playerIndex: number) => {
-    if (team === 'team1') {
-      const updated = [...team1Players];
-      if (updated[playerIndex]) {
-        updated[playerIndex] = { ...updated[playerIndex], absent: !updated[playerIndex].absent };
-        setTeam1Players(updated);
-      }
-    } else {
-      const updated = [...team2Players];
-      if (updated[playerIndex]) {
-        updated[playerIndex] = { ...updated[playerIndex], absent: !updated[playerIndex].absent };
-        setTeam2Players(updated);
-      }
-    }
-  };
-
-  const movePlayer = (team: 'team1' | 'team2', index: number, direction: 'up' | 'down') => {
-    const setter = team === 'team1' ? setTeam1Players : setTeam2Players;
-    const players = team === 'team1' ? team1Players : team2Players;
-    const updated = [...players];
-    const swapIdx = direction === 'up' ? index - 1 : index + 1;
-    if (swapIdx < 0 || swapIdx >= updated.length || !updated[index] || !updated[swapIdx]) return;
-    const temp = updated[index] as GamePlayer;
-    updated[index] = updated[swapIdx] as GamePlayer;
-    updated[swapIdx] = temp;
-    setter(updated);
   };
 
   const updateMatchScore = async (
@@ -301,10 +265,8 @@ export const SeasonGame: React.FC = () => {
     return (
       <PreMatchSetup
         game={game}
-        team1Players={team1Players}
-        team2Players={team2Players}
-        onToggleAbsent={toggleAbsent}
-        onMovePlayer={movePlayer}
+        initialTeam1Players={team1Players}
+        initialTeam2Players={team2Players}
         onContinue={handlePreMatchContinue}
         onBack={() => navigate(-1)}
       />
