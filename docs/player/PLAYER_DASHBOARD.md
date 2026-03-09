@@ -25,12 +25,24 @@
    - Includes a direct **Enter Scores** button that links to `/score/:gameId` for immediate score entry.
    - If scores have already been submitted and are awaiting admin review, a notice is shown in place of (or alongside) the button.
 
-5. **Game History**
+5. **Recent Completed Games**
+   - Displays the 5 most recently completed games with detailed per-game stats.
+   - **Individual Match Pins**: Shows each match score in order (e.g., `78 92 64`).
+   - **Visual Highlights**:
+     - **Purple background**: Highest game in the series (when series has >1 match).
+     - **Green background**: Any game scoring 200 or higher.
+   - **Running Average Comparison**: Game average displayed with ▲ (green) or ▼ (red) indicator comparing to the player's average before that game.
+   - **Points & Match Record**: Shows points earned (e.g., `+3`) and individual match record (e.g., `2W-1L`).
+   - **Absent Indicator**: Amber "Absent" badge shown instead of stats when player was marked absent.
+   - **Responsive Layout**: Stats appear inline on desktop; as a second row on mobile.
+   - Click any game to view full details.
+
+6. **Game History**
    - Access to all completed games with detailed results and statistics.
    - Ability to review past performance and compare with team members.
    - Drill into individual game details (season, league, teams).
 
-6. **League Participation**
+7. **League Participation**
    - List of all leagues the player is registered in.
    - Quick navigation to league details and season standings.
 
