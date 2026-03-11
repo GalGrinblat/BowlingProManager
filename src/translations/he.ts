@@ -575,6 +575,10 @@ const he: TranslationDictionary = {
     vs: 'נגד',
     enterScores: 'הזן תוצאות',
     scoresPendingReview: 'תוצאות הוגשו — ממתין לאישור מנהל',
+    playerStatistics: 'סטטיסטיקת שחקן',
+    totalPoints: 'סה"כ נקודות',
+    gameAverage: 'ממוצע',
+    oneVone: 'מפגשים ישירים',
   },
 
   // תצוגת היסטוריית משחק

@@ -575,6 +575,10 @@ const en: TranslationDictionary = {
     vs: 'vs',
     enterScores: 'Enter Scores',
     scoresPendingReview: 'Scores submitted — awaiting admin review',
+    playerStatistics: 'Player Statistics',
+    totalPoints: 'Total Points',
+    gameAverage: 'Game Avg',
+    oneVone: '1v1 Score',
   },
 
   // Game History View

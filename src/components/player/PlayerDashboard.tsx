@@ -531,11 +531,9 @@ export const PlayerDashboard: React.FC = () => {
                   if (!data) return null;
                   const { 
                     game, league, team1, team2, isTeam1, team1TotalPoints, team2TotalPoints, playerWon,
-                    wasAbsent, matchPins, playerTotalPins, gameAverage, preGameAverage, playerMatchPoints,
+                    wasAbsent, matchPins, playerTotalPins, gameAverage, playerMatchPoints,
                     matchWins, matchLosses, matchDraws, highestPin
                   } = data;
-                  
-                  const avgDiff = preGameAverage > 0 ? gameAverage - preGameAverage : null;
                   
                   return (
                     <button
@@ -556,66 +554,25 @@ export const PlayerDashboard: React.FC = () => {
                           {formatDate(game.completedAt || '')}
                         </span>
                       </div>
-                      
-                      {/* Main content: Teams + Stats + Result */}
-                      <div className="flex items-center justify-between gap-3">
-                        {/* Left: Team matchup */}
+
+                      {/* Team matchup + result */}
+                      <div className="flex items-center justify-between gap-3 mb-3">
                         <div className="flex items-center gap-2 min-w-0 shrink">
                           <span className={`font-semibold truncate ${isTeam1 ? 'text-blue-600' : 'text-gray-700'}`}>
                             {game.team1?.name || team1?.name}
                           </span>
-                          <span className="text-gray-400 shrink-0 text-sm">
-                            <span className="font-bold">{team1TotalPoints}</span>-<span className="font-bold">{team2TotalPoints}</span>
-                          </span>
+                          <div className="text-center shrink-0">
+                            <div className="text-xs text-gray-400 leading-none mb-0.5">{t('playerDashboard.totalPoints')}</div>
+                            <span className="text-sm text-gray-500">
+                              <span className="font-bold text-gray-700">{team1TotalPoints}</span>
+                              <span className="mx-0.5">-</span>
+                              <span className="font-bold text-gray-700">{team2TotalPoints}</span>
+                            </span>
+                          </div>
                           <span className={`font-semibold truncate ${!isTeam1 ? 'text-blue-600' : 'text-gray-700'}`}>
                             {game.team2?.name || team2?.name}
                           </span>
                         </div>
-
-                        {/* Center: Player Stats (hidden on mobile) */}
-                        <div className="hidden md:flex items-center gap-2 text-xs shrink-0">
-                          {wasAbsent ? (
-                            <span className="bg-amber-100 text-amber-700 px-2 py-1 rounded font-medium">
-                              {t('games.absent')}
-                            </span>
-                          ) : (
-                            <>
-                              {/* Individual match pins */}
-                              <div className="flex items-center gap-0.5">
-                                {matchPins.map((pins, idx) => (
-                                  <span
-                                    key={idx}
-                                    className={`px-1.5 py-0.5 rounded font-mono text-xs ${
-                                      pins === highestPin && matchPins.length > 1
-                                        ? 'bg-purple-100 text-purple-700 font-bold'
-                                        : pins >= 200
-                                          ? 'bg-green-100 text-green-700 font-bold'
-                                          : 'text-gray-600'
-                                    }`}
-                                  >
-                                    {pins}
-                                  </span>
-                                ))}
-                              </div>
-                              
-                              <span className="text-gray-300">|</span>
-                              
-                              {/* Total & Average */}
-                              <span className="font-semibold text-gray-700">{playerTotalPins}</span>
-                              <span className={`${avgDiff !== null ? (avgDiff >= 0 ? 'text-green-600' : 'text-red-500') : 'text-gray-500'}`}>
-                                ({gameAverage.toFixed(0)}{avgDiff !== null && <span className="ml-0.5">{avgDiff >= 0 ? '▲' : '▼'}</span>})
-                              </span>
-
-                              <span className="text-gray-300">|</span>
-
-                              {/* Points & Record */}
-                              <span className="font-semibold text-blue-600">+{playerMatchPoints}</span>
-                              <span className="text-gray-500">{matchWins}W-{matchLosses}L{matchDraws > 0 ? `-${matchDraws}D` : ''}</span>
-                            </>
-                          )}
-                        </div>
-
-                        {/* Right: Result badge + View */}
                         <div className="flex items-center gap-2 shrink-0">
                           {playerWon ? (
                             <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded font-semibold">
@@ -634,35 +591,130 @@ export const PlayerDashboard: React.FC = () => {
                         </div>
                       </div>
 
-                      {/* Mobile: Player stats row */}
-                      <div className="flex md:hidden items-center gap-1.5 mt-2 text-xs flex-wrap">
+                      {/* Player Statistics (desktop) */}
+                      <div className="hidden md:block">
+                        <div className="flex items-center gap-1 mb-1.5">
+                          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{t('playerDashboard.playerStatistics')}</span>
+                          <div className="flex-1 h-px bg-gray-200" />
+                        </div>
                         {wasAbsent ? (
-                          <span className="bg-amber-100 text-amber-700 px-2 py-1 rounded font-medium">
+                          <span className="bg-amber-100 text-amber-700 px-2 py-1 rounded font-medium text-xs">
+                            {t('games.absent')}
+                          </span>
+                        ) : (
+                          <div className="flex items-start gap-0 text-xs">
+                            {/* Match pins with M1/M2/M3 headers */}
+                            <div className="flex flex-col items-start">
+                              <div className="flex gap-0.5 mb-1">
+                                {matchPins.map((_, idx) => (
+                                  <span key={idx} className="px-1.5 text-gray-400 font-medium w-10 text-center">M{idx + 1}</span>
+                                ))}
+                              </div>
+                              <div className="flex gap-0.5">
+                                {matchPins.map((pins, idx) => (
+                                  <span
+                                    key={idx}
+                                    className={`px-1.5 py-0.5 rounded font-mono w-10 text-center ${
+                                      pins === highestPin && matchPins.length > 1
+                                        ? 'bg-purple-100 text-purple-700 font-bold'
+                                        : pins >= 200
+                                          ? 'bg-green-100 text-green-700 font-bold'
+                                          : 'bg-gray-100 text-gray-600'
+                                    }`}
+                                  >
+                                    {pins}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+
+                            <div className="self-stretch w-px bg-gray-200 mx-3" />
+
+                            {/* Total Pins */}
+                            <div className="flex flex-col items-center min-w-[60px]">
+                              <span className="text-gray-400 font-medium mb-1">{t('common.totalPins')}</span>
+                              <span className="font-bold text-gray-700 text-sm">{playerTotalPins}</span>
+                            </div>
+
+                            <div className="self-stretch w-px bg-gray-200 mx-3" />
+
+                            {/* Game Average */}
+                            <div className="flex flex-col items-center min-w-[55px]">
+                              <span className="text-gray-400 font-medium mb-1">{t('playerDashboard.gameAverage')}</span>
+                              <span className="font-bold text-gray-700 text-sm">{gameAverage.toFixed(0)}</span>
+                            </div>
+
+                            <div className="self-stretch w-px bg-gray-200 mx-3" />
+
+                            {/* 1v1 Score */}
+                            <div className="flex flex-col items-center min-w-[60px]">
+                              <span className="text-gray-400 font-medium mb-1">{t('playerDashboard.oneVone')}</span>
+                              <span className="font-bold text-blue-600 text-sm">+{playerMatchPoints}</span>
+                              <span className="text-gray-500 mt-0.5">{matchWins}W · {matchLosses}L{matchDraws > 0 ? ` · ${matchDraws}D` : ''}</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Player Statistics (mobile) */}
+                      <div className="md:hidden">
+                        <div className="flex items-center gap-1 mb-1.5">
+                          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">{t('playerDashboard.playerStatistics')}</span>
+                          <div className="flex-1 h-px bg-gray-200" />
+                        </div>
+                        {wasAbsent ? (
+                          <span className="bg-amber-100 text-amber-700 px-2 py-1 rounded font-medium text-xs">
                             {t('games.absent')}
                           </span>
                         ) : (
                           <>
-                            {matchPins.map((pins, idx) => (
-                              <span
-                                key={idx}
-                                className={`px-1.5 py-0.5 rounded font-mono ${
-                                  pins === highestPin && matchPins.length > 1
-                                    ? 'bg-purple-100 text-purple-700 font-bold'
-                                    : pins >= 200
-                                      ? 'bg-green-100 text-green-700 font-bold'
-                                      : 'bg-gray-100 text-gray-600'
-                                }`}
-                              >
-                                {pins}
-                              </span>
-                            ))}
-                            <span className="text-gray-300">|</span>
-                            <span className="font-semibold">{playerTotalPins}</span>
-                            <span className={avgDiff !== null ? (avgDiff >= 0 ? 'text-green-600' : 'text-red-500') : 'text-gray-500'}>
-                              ({gameAverage.toFixed(0)}{avgDiff !== null && (avgDiff >= 0 ? '▲' : '▼')})
-                            </span>
-                            <span className="text-blue-600 font-semibold">+{playerMatchPoints}</span>
-                            <span className="text-gray-500">{matchWins}W-{matchLosses}L</span>
+                            <div className="flex items-start gap-0 text-xs mb-1">
+                              {/* Match pins with M1/M2/M3 headers */}
+                              <div className="flex flex-col items-start">
+                                <div className="flex gap-0.5 mb-1">
+                                  {matchPins.map((_, idx) => (
+                                    <span key={idx} className="px-1 text-gray-400 font-medium w-9 text-center">M{idx + 1}</span>
+                                  ))}
+                                </div>
+                                <div className="flex gap-0.5">
+                                  {matchPins.map((pins, idx) => (
+                                    <span
+                                      key={idx}
+                                      className={`px-1 py-0.5 rounded font-mono w-9 text-center ${
+                                        pins === highestPin && matchPins.length > 1
+                                          ? 'bg-purple-100 text-purple-700 font-bold'
+                                          : pins >= 200
+                                            ? 'bg-green-100 text-green-700 font-bold'
+                                            : 'bg-gray-100 text-gray-600'
+                                      }`}
+                                    >
+                                      {pins}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+
+                              <div className="self-stretch w-px bg-gray-200 mx-2" />
+
+                              {/* Total Pins */}
+                              <div className="flex flex-col items-center min-w-[48px]">
+                                <span className="text-gray-400 font-medium mb-1">{t('common.totalPins')}</span>
+                                <span className="font-bold text-gray-700">{playerTotalPins}</span>
+                              </div>
+
+                              <div className="self-stretch w-px bg-gray-200 mx-2" />
+
+                              {/* Game Average */}
+                              <div className="flex flex-col items-center min-w-[40px]">
+                                <span className="text-gray-400 font-medium mb-1">{t('playerDashboard.gameAverage')}</span>
+                                <span className="font-bold text-gray-700">{gameAverage.toFixed(0)}</span>
+                              </div>
+                            </div>
+                            <div className="text-xs text-gray-500 mt-1">
+                              <span className="font-semibold text-blue-600">+{playerMatchPoints}</span>
+                              <span className="mx-1">·</span>
+                              <span>{matchWins}W · {matchLosses}L{matchDraws > 0 ? ` · ${matchDraws}D` : ''}</span>
+                            </div>
                           </>
                         )}
                       </div>
