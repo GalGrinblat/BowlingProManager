@@ -149,7 +149,6 @@ All page components are lazy-loaded (`React.lazy` + `Suspense`). Use `useNavigat
 | Head-to-head stats | `src/utils/headToHeadUtils.ts` |
 | Player statistics | `src/utils/statsUtils.ts` |
 | Pagination | Use `src/components/common/Pagination.tsx` |
-| Demo data change | Update `src/utils/demoDataUtils.ts` |
 | Public board feature | `src/components/public/board/` + `src/services/api/boardApi.ts` |
 | Player score entry | `src/components/public/score/` + `src/components/admin/game/PendingSubmissionPanel.tsx` |
 
