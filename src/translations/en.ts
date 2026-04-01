@@ -193,6 +193,10 @@ const en: TranslationDictionary = {
   // Sort options (shared)
   sort: {
     by: 'Sort by',
+    lastNameAsc: 'Last Name (A→Z)',
+    lastNameDesc: 'Last Name (Z→A)',
+    firstNameAsc: 'First Name (A→Z)',
+    firstNameDesc: 'First Name (Z→A)',
   },
 
   // Configuration (shared between leagues and seasons)
