@@ -289,7 +289,7 @@ export const PlayerRegistry: React.FC = () => {
             <div className="flex flex-wrap gap-3">
               <div className="flex gap-2">
                 <button
-                  onClick={() => exportToCSV(players as unknown as Record<string, unknown>[], 'players')}
+                  onClick={() => exportToCSV(players, 'players')}
                   className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold flex items-center gap-2"
                 >
                   📥 {t('players.exportCSV')}

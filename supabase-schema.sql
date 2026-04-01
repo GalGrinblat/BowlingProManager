@@ -139,6 +139,8 @@ CREATE TABLE public.games (
   team_match_points_per_win INTEGER NOT NULL,
   team_game_points_per_win INTEGER NOT NULL,
   grand_total_points JSONB,
+  pending_submission JSONB,
+  pending_submission_session_id TEXT,
   scheduled_date TIMESTAMPTZ,
   postponed BOOLEAN NOT NULL DEFAULT FALSE,
   original_date TIMESTAMPTZ,
@@ -433,6 +435,56 @@ CREATE POLICY "Anon read games" ON public.games
 
 CREATE POLICY "Anon read players" ON public.players
   FOR SELECT USING (auth.role() = 'anon');
+
+-- ============================================================================
+-- PUBLIC SCORE ENTRY: submit_pending_score RPC
+-- ============================================================================
+-- Called by unauthenticated players on /score/:gameId.
+-- Uses SECURITY DEFINER so it can UPDATE games despite the anon role having
+-- no UPDATE permission. Validates the game is in-progress before storing.
+
+CREATE OR REPLACE FUNCTION public.submit_pending_score(
+  p_game_id UUID,
+  p_submission JSONB,
+  p_session_id TEXT
+)
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_status game_status;
+BEGIN
+  -- Verify game exists and is in-progress
+  SELECT status INTO v_status
+  FROM public.games
+  WHERE id = p_game_id;
+
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Game not found';
+  END IF;
+
+  IF v_status = 'completed' THEN
+    RAISE EXCEPTION 'Game is already completed';
+  END IF;
+
+  IF v_status = 'pending' THEN
+    RAISE EXCEPTION 'Game has not started yet';
+  END IF;
+
+  -- Store the pending submission (overwrites any prior submission from this session)
+  UPDATE public.games
+  SET
+    pending_submission            = p_submission,
+    pending_submission_session_id = p_session_id,
+    updated_at                    = NOW()
+  WHERE id = p_game_id;
+END;
+$$;
+
+-- Allow anyone (including anon) to call this function
+GRANT EXECUTE ON FUNCTION public.submit_pending_score(UUID, JSONB, TEXT) TO anon, authenticated;
 
 -- ============================================================================
 -- SCHEMA COMPLETE

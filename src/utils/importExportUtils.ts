@@ -13,7 +13,7 @@ export interface ParseResult<T> {
  * @param data - Array of objects to export
  * @param filename - Name of the file (without extension)
  */
-export const exportToCSV = <T extends Record<string, unknown>>(
+export const exportToCSV = <T extends object>(
   data: T[],
   filename: string
 ): void => {
@@ -25,12 +25,12 @@ export const exportToCSV = <T extends Record<string, unknown>>(
   // Get all unique keys from data (for future-proofing)
   const allKeys = Array.from(new Set(data.flatMap(item => Object.keys(item))));
   const headers = allKeys.join(',');
-  
+
   const csvContent = [
     headers,
-    ...data.map(item => 
+    ...data.map(item =>
       allKeys.map(key => {
-        const value = item[key];
+        const value = (item as Record<string, unknown>)[key];
         // Handle values that might contain commas or quotes
         if (value === null || value === undefined) return '';
         const stringValue = String(value);

@@ -11,7 +11,7 @@
  * add the SDK call inside `logger.error` here — no other file needs to change.
  */
 
-const isDev = process.env.NODE_ENV !== 'production';
+const isDev = import.meta.env.MODE !== 'production';
 
 export const logger = {
   error: (message: string, ...args: unknown[]): void => {

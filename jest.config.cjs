@@ -22,4 +22,15 @@ module.exports = {
     '!src/**/*.d.ts',
     '!src/**/index.{js,ts,tsx}'
   ],
+  coverageThreshold: {
+    global: {
+      branches: 50,
+      functions: 50,
+      lines: 50,
+      statements: 50,
+    },
+    './src/utils/matchUtils.ts': { branches: 90, functions: 90, lines: 90, statements: 90 },
+    './src/utils/standingsUtils.ts': { branches: 90, functions: 90, lines: 90, statements: 90 },
+    './src/utils/scheduleUtils.ts': { branches: 90, functions: 90, lines: 90, statements: 90 },
+  },
 };
