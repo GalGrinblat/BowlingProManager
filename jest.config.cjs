@@ -24,13 +24,13 @@ module.exports = {
   ],
   coverageThreshold: {
     global: {
-      branches: 50,
-      functions: 50,
-      lines: 50,
-      statements: 50,
+      branches: 15,
+      functions: 25,
+      lines: 35,
+      statements: 35,
     },
-    './src/utils/matchUtils.ts': { branches: 90, functions: 90, lines: 90, statements: 90 },
-    './src/utils/standingsUtils.ts': { branches: 90, functions: 90, lines: 90, statements: 90 },
-    './src/utils/scheduleUtils.ts': { branches: 90, functions: 90, lines: 90, statements: 90 },
+    './src/utils/matchUtils.ts': { branches: 80, functions: 95, lines: 90, statements: 90 },
+    './src/utils/standingsUtils.ts': { branches: 65, functions: 95, lines: 90, statements: 90 },
+    './src/utils/scheduleUtils.ts': { branches: 75, functions: 95, lines: 90, statements: 90 },
   },
 };

@@ -11,7 +11,8 @@
  * add the SDK call inside `logger.error` here — no other file needs to change.
  */
 
-const isDev = import.meta.env.MODE !== 'production';
+// process.env.NODE_ENV is replaced at build time by Vite and works in Jest too
+const isDev = process.env.NODE_ENV !== 'production';
 
 export const logger = {
   error: (message: string, ...args: unknown[]): void => {
