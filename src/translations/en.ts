@@ -606,6 +606,13 @@ const en: TranslationDictionary = {
     thursday: 'Thursday',
     friday: 'Friday',
     saturday: 'Saturday',
+    sundayPlural: 'Sundays',
+    mondayPlural: 'Mondays',
+    tuesdayPlural: 'Tuesdays',
+    wednesdayPlural: 'Wednesdays',
+    thursdayPlural: 'Thursdays',
+    fridayPlural: 'Fridays',
+    saturdayPlural: 'Saturdays',
   },
 
   // Game Summary

@@ -106,7 +106,7 @@ export const PreMatchSetup: React.FC<PreMatchSetupProps> = ({
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           <GameTeamPanel
-            teamName={game.team1?.name || t('games.team1')}
+            teamName={game.team1?.name || t('games.team1Default')}
             teamColor="text-blue-400"
             players={displayTeam1Players}
             team="team1"
@@ -116,7 +116,7 @@ export const PreMatchSetup: React.FC<PreMatchSetupProps> = ({
             t={t}
           />
           <GameTeamPanel
-            teamName={game.team2?.name || t('games.team2')}
+            teamName={game.team2?.name || t('games.team2Default')}
             teamColor="text-green-400"
             players={displayTeam2Players}
             team="team2"

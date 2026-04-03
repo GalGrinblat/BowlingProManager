@@ -43,7 +43,8 @@
       "Bash(__NEW_LINE_e3ac13f535f35c27__ echo:*)",
       "Read(//c/Code/BowlingProManager/**)",
       "Bash(__NEW_LINE_ba1010322efb9b55__ echo:*)",
-      "Bash(npm list:*)"
+      "Bash(npm list:*)",
+      "Bash({ grep:*)"
     ]
   }
 }

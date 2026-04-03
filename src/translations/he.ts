@@ -606,6 +606,13 @@ const he: TranslationDictionary = {
     thursday: 'חמישי',
     friday: 'שישי',
     saturday: 'שבת',
+    sundayPlural: 'ימי ראשון',
+    mondayPlural: 'ימי שני',
+    tuesdayPlural: 'ימי שלישי',
+    wednesdayPlural: 'ימי רביעי',
+    thursdayPlural: 'ימי חמישי',
+    fridayPlural: 'ימי שישי',
+    saturdayPlural: 'ימי שבת',
   },
 
   // סיכום משחק
