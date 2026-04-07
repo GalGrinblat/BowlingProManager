@@ -206,6 +206,13 @@ export const calculateMatchResults = (game: Game, matchIndex: number): void => {
   }
 };
 
+export const calcGamePoints = (game: Game): { team1: number; team2: number; winner: 'team1' | 'team2' | 'tie' } => {
+  const matches = game.matches ?? [];
+  const team1 = matches.reduce((s, m) => s + (m.team1?.points || 0), 0) + (game.grandTotalPoints?.team1 || 0);
+  const team2 = matches.reduce((s, m) => s + (m.team2?.points || 0), 0) + (game.grandTotalPoints?.team2 || 0);
+  return { team1, team2, winner: team1 > team2 ? 'team1' : team2 > team1 ? 'team2' : 'tie' };
+};
+
 const isPinsInRange = (pins: string): boolean => {
   if (pins === '') return false;
   const value = parseInt(pins);

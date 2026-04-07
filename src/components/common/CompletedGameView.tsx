@@ -2,16 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { gamesApi } from '../../services/api/games';
 import { useTranslation } from '../../contexts/LanguageContext';
-import { useDateFormat } from '../../hooks/useDateFormat';
-import { GameScoreTable } from './GameScoreTable';
-import type { Game, GameMatch } from '../../types/index';
+import { GameViewLayout } from './game/GameViewLayout';
+import type { Game } from '../../types/index';
 
 export const CompletedGameView: React.FC = () => {
   const navigate = useNavigate();
   const { gameId } = useParams<{ gameId: string }>();
   const location = useLocation();
-  const { t, direction, isRTL } = useTranslation();
-  const { formatDate } = useDateFormat();
+  const { t } = useTranslation();
   const [game, setGame] = useState<Game | undefined>(location.state?.game);
 
   useEffect(() => {
@@ -24,56 +22,5 @@ export const CompletedGameView: React.FC = () => {
 
   if (!game) return <div>{t('common.loading')}</div>;
 
-  const matches = game.matches ?? [];
-  const team1TotalPoints = matches.reduce((sum: number, m: GameMatch) => sum + (m.team1?.points || 0), 0) + (game.grandTotalPoints?.team1 || 0);
-  const team2TotalPoints = matches.reduce((sum: number, m: GameMatch) => sum + (m.team2?.points || 0), 0) + (game.grandTotalPoints?.team2 || 0);
-
-  const winner = team1TotalPoints > team2TotalPoints ? 'team1' :
-                 team2TotalPoints > team1TotalPoints ? 'team2' : 'tie';
-
-  return (
-    <div className="space-y-6" dir={direction}>
-      {/* Header */}
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="min-w-0">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">{t('gameHistory.title')}</h1>
-            <p className="text-sm text-gray-500 mt-1">
-              {t('common.round')} {game.round} • {t('common.matchDay')} {game.matchDay} • {t('playerDashboard.completedOn')} {formatDate(game.completedAt ?? '')}
-            </p>
-          </div>
-          <button
-            onClick={() => navigate(-1)}
-            className="shrink-0 text-gray-600 hover:text-gray-800"
-          >
-            {isRTL ? t('common.rightArrow') : t('common.leftArrow')} {t('common.back')}
-          </button>
-        </div>
-      </div>
-
-      {/* Winner Banner */}
-      {winner !== 'tie' && (
-        <div className="bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl shadow-lg p-4">
-          <div className="text-center">
-            <span className="text-2xl font-bold text-gray-900">
-              🏆 {t('gameHistory.championBanner')} {winner === 'team1' ? game.team1?.name : game.team2?.name} 🏆
-            </span>
-          </div>
-        </div>
-      )}
-
-      {/* Game Summary Table */}
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-        <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-3">
-          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-white font-bold text-lg text-center">
-            <span className="text-orange-300 min-w-0 truncate max-w-[35%]">{game.team1?.name}</span>
-            <span className="shrink-0">{team1TotalPoints} 🆚 {team2TotalPoints}</span>
-            <span className="text-blue-300 min-w-0 truncate max-w-[35%]">{game.team2?.name}</span>
-          </div>
-        </div>
-
-        <GameScoreTable game={game} />
-      </div>
-    </div>
-  );
+  return <GameViewLayout game={game} onBack={() => navigate(-1)} />;
 };
