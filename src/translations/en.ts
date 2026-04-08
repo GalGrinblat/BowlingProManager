@@ -66,6 +66,7 @@ const en: TranslationDictionary = {
     of: 'of',
     results: 'results',
     score: 'Score',
+    pins: 'Pins',
     gamesPlayed: 'Games Played',
     highGame: 'High Game',
     highSeries: 'High Series',

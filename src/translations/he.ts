@@ -66,6 +66,7 @@ const he: TranslationDictionary = {
     of: 'מתוך',
     results: 'תוצאות',
     score: 'ניקוד',
+    pins: 'פינים',
     gamesPlayed: 'משחקים ששוחקו',
     highGame: 'משחק גבוה',
     highSeries: 'סדרה גבוהה',
