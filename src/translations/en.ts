@@ -589,8 +589,9 @@ const en: TranslationDictionary = {
   // Game History View
   gameHistory: {
     title: 'Game History',
-    withHandicap: 'Team Totals',
-    teamTotal: 'Pins',
+    withHandicap: 'Team Total',
+    teamTotal: 'Team Scratch',
+    totalPoints: 'Total Points',
     championBanner: 'Game Winner',
   },
 

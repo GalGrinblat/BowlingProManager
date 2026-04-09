@@ -21,6 +21,10 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
     team2TotalWithHandicap: matches.reduce((sum: number, m: GameMatch) => sum + (m.team2?.totalWithHandicap || 0), 0),
     team1MatchWinnerPoints: matches.reduce((sum: number, m: GameMatch) => sum + (m.team1?.points || 0), 0),
     team2MatchWinnerPoints: matches.reduce((sum: number, m: GameMatch) => sum + (m.team2?.points || 0), 0),
+    team1AllPlayerPoints: matches.reduce((sum: number, m: GameMatch) =>
+      sum + (m.playerMatches || []).reduce((s, pm) => s + (pm.team1Points || 0), 0), 0),
+    team2AllPlayerPoints: matches.reduce((sum: number, m: GameMatch) =>
+      sum + (m.playerMatches || []).reduce((s, pm) => s + (pm.team2Points || 0), 0), 0),
   }), [matches, game.grandTotalPoints]);
 
   const winner = useMemo(() =>
@@ -189,7 +193,7 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
               <td className={`px-1 py-1.5 ${handicapBg}`} />
             </tr>
 
-            {/* With Handicap row */}
+            {/* Team Total (with handicap) row */}
             <tr className={`${withHandicapBg} border-t font-semibold text-xs`}>
               <td className={`px-1 sm:px-2 py-1.5 text-gray-700 ${isRTL ? 'text-right' : 'text-left'}`}>
                 {t('gameHistory.withHandicap')}
@@ -220,6 +224,33 @@ export const GameScoreTable: React.FC<GameScoreTableProps> = ({ game }) => {
               </td>
               <td className={`px-1 py-1.5 text-center font-bold ${isTeam1 ? 'text-orange-700' : 'text-blue-700'}`}>
                 {formatTotalPoints(matchWinnerPts, grandTotalPts)}
+              </td>
+            </tr>
+
+            {/* Total Points row */}
+            <tr className="bg-gray-800 text-white border-t-2 border-gray-700 font-bold text-xs">
+              <td className={`px-1 sm:px-2 py-1.5 ${isRTL ? 'text-right' : 'text-left'}`}>
+                {t('gameHistory.totalPoints')}
+              </td>
+              {matches.map((match) => {
+                const matchPlayerPts = (match.playerMatches || []).reduce((s, pm) =>
+                  s + (isTeam1 ? (pm.team1Points || 0) : (pm.team2Points || 0)), 0);
+                const matchTeamPts = match[teamKey]?.points || 0;
+                return (
+                  <React.Fragment key={`tpt-${match.matchNumber}`}>
+                    <td className="px-1 py-1.5" />
+                    <td className="px-1 py-1.5 text-center">
+                      {(matchPlayerPts + matchTeamPts).toFixed(1)}
+                    </td>
+                  </React.Fragment>
+                );
+              })}
+              <td className="px-1 py-1.5" />
+              <td className="px-1 py-1.5 text-center">
+                {(isTeam1
+                  ? totals.team1AllPlayerPoints + totals.team1TotalPoints
+                  : totals.team2AllPlayerPoints + totals.team2TotalPoints
+                ).toFixed(1)}
               </td>
             </tr>
           </tbody>

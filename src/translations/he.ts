@@ -590,7 +590,8 @@ const he: TranslationDictionary = {
   gameHistory: {
     title: 'היסטוריית משחק',
     withHandicap: 'סה"כ קבוצה',
-    teamTotal: 'פינים',
+    teamTotal: 'חלף קבוצה',
+    totalPoints: 'סה"כ נקודות',
     championBanner: 'מנצח המשחק',
   },
 
