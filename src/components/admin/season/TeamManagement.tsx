@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { teamsApi, playersApi, seasonsApi } from '../../../services/api';
 import { useTranslation } from '../../../contexts/LanguageContext';
+import { NavButton } from '../../common/nav/NavButton';
 import { useDateFormat } from '../../../hooks/useDateFormat';
 import { getPlayerDisplayName } from '../../../utils/playerUtils';
 
@@ -95,12 +96,7 @@ export const TeamManagement: React.FC = () => {
             <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('teams.title')}</h1>
             <p className="text-gray-600">{season.name}</p>
           </div>
-          <button
-            onClick={() => navigate(`/admin/seasons/${seasonId}`)}
-            className="text-gray-600 hover:text-gray-800"
-          >
-            {t('common.leftArrow')} {t('teams.backToSeason')}
-          </button>
+          <NavButton direction="back" label={t('teams.backToSeason')} onClick={() => navigate(`/admin/seasons/${seasonId}`)} />
         </div>
       </div>
 

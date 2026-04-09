@@ -3,6 +3,7 @@ import { playersApi, teamsApi, seasonsApi } from '../../../services/api';
 import { createPlayer, validatePlayer } from '../../../models';
 import { Pagination, usePagination } from '../../common/Pagination';
 import { useTranslation } from '../../../contexts/LanguageContext';
+import { NavButton } from '../../common/nav/NavButton';
 import {
   exportToCSV,
   exportToJSON,
@@ -244,9 +245,7 @@ export const PlayerRegistry: React.FC = () => {
               <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('players.title')}</h1>
               <p className="text-gray-600">Loading players...</p>
             </div>
-            <button onClick={() => navigate('/admin')} className="text-gray-600 hover:text-gray-800">
-              {t('common.leftArrow')} {t('common.backToDashboard')}
-            </button>
+            <NavButton direction="back" label={t('common.backToDashboard')} onClick={() => navigate('/admin')} />
           </div>
         </div>
         <div className="bg-white rounded-xl shadow-lg p-12 text-center">

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from '../../../contexts/LanguageContext';
+import { NavButton } from '../../common/nav/NavButton';
 import { HandicapConfigurationForm } from '../config/HandicapConfigurationForm';
 import { PointsConfiguration } from '../config/PointsConfiguration';
 import { GeneralConfiguration } from '../config/GeneralConfiguration';
@@ -85,9 +86,7 @@ export const SeasonConfigStep: React.FC<SeasonConfigStepProps> = ({
             <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('seasons.createSeason')}</h1>
             <p className="text-gray-600">{league.name}</p>
           </div>
-          <button onClick={onBack} className="text-gray-600 hover:text-gray-800">
-            {t('common.leftArrow')} {t('common.backToLeague')}
-          </button>
+          <NavButton direction="back" label={t('common.backToLeague')} onClick={onBack} />
         </div>
       </div>
       <div className="bg-white rounded-xl shadow-lg p-6">

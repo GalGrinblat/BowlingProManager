@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from '../../../contexts/LanguageContext';
+import { NavButton } from '../nav/NavButton';
 import { GameTeamPanel } from './GameTeamPanel';
 import { sortPlayersByAverage, applyLineupRule } from '../../../utils/lineupUtils';
 import type { Game, GamePlayer } from '../../../types/index';
@@ -67,9 +68,7 @@ export const PreMatchSetup: React.FC<PreMatchSetupProps> = ({
     <div className="min-h-screen bg-gray-900 text-white p-6">
       <div className="max-w-6xl mx-auto">
         <div className="mb-6">
-          <button onClick={onBack} className="text-blue-400 hover:text-blue-300 mb-4 flex items-center gap-2">
-            {t('common.leftArrow')} {t('common.back')}
-          </button>
+          <NavButton direction="back" label={t('common.back')} onClick={onBack} className="text-blue-400 hover:text-blue-300 mb-4 flex items-center gap-2" />
           <h1 className="text-3xl font-bold mb-2">{t('games.preGameSetup')}</h1>
           <p className="text-gray-400">
             {t('common.round')} {game.round}, {t('common.matchDay')} {game.matchDay}
@@ -128,12 +127,7 @@ export const PreMatchSetup: React.FC<PreMatchSetupProps> = ({
         </div>
 
         <div className="flex justify-end">
-          <button
-            onClick={handleContinue}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-bold text-lg transition-colors"
-          >
-            {t('games.continueToMatch')} {t('common.rightArrow')}
-          </button>
+          <NavButton direction="forward" label={t('games.continueToMatch')} onClick={handleContinue} className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-bold text-lg transition-colors" />
         </div>
       </div>
     </div>

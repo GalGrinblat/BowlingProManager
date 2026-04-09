@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { boardApi } from '../../../services/api/boardApi';
 import { useTranslation } from '../../../contexts/LanguageContext';
 import { useDateFormat } from '../../../hooks/useDateFormat';
+import { NavLink } from '../../common/nav/NavLink';
 import type { League, Season } from '../../../types/index';
 
 export const BoardLeague: React.FC = () => {
@@ -87,9 +88,7 @@ export const BoardLeague: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Back link */}
-      <Link to="/board" className="text-blue-600 hover:text-blue-700 text-sm font-semibold">
-        {t('common.leftArrow')} {t('board.allLeagues')}
-      </Link>
+      <NavLink direction="back" label={t('board.allLeagues')} to="/board" className="text-blue-600 hover:text-blue-700 text-sm font-semibold" />
 
       {/* League header */}
       <div className="bg-white rounded-xl shadow-lg p-6">

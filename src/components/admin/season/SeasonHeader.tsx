@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { useTranslation } from '../../../contexts/LanguageContext';
+import { NavButton } from '../../common/nav/NavButton';
 import type { Season, League, Team } from '../../../types/index';
 
 interface SeasonHeaderProps {
@@ -44,12 +45,7 @@ export const SeasonHeader: React.FC<SeasonHeaderProps> = ({
           </div>
         </div>
         <div className="flex flex-col items-end gap-2">
-          <button
-            onClick={onBack}
-            className="text-gray-600 hover:text-gray-800"
-          >
-            {t('common.leftArrow')} {t('common.backToLeague')}
-          </button>
+          <NavButton direction="back" label={t('common.backToLeague')} onClick={onBack} />
           {season.status === 'active' && (
             <div className="flex gap-2">
               {onManageTeams && (

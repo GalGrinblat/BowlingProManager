@@ -3,11 +3,13 @@ import { Link } from 'react-router-dom';
 import { boardApi } from '../../../services/api/boardApi';
 import { useTranslation } from '../../../contexts/LanguageContext';
 import { useDateFormat } from '../../../hooks/useDateFormat';
+import { useNavLabel } from '../../../hooks/useNavLabel';
 import type { League, Season, Game } from '../../../types/index';
 
 export const BoardHome: React.FC = () => {
   const { t } = useTranslation();
   const { formatDate } = useDateFormat();
+  const { forward } = useNavLabel();
   const [leagues, setLeagues] = useState<League[]>([]);
   const [seasonsByLeague, setSeasonsByLeague] = useState<Record<string, Season[]>>({});
   const [recentGames, setRecentGames] = useState<Game[]>([]);
@@ -153,7 +155,7 @@ export const BoardHome: React.FC = () => {
                   </div>
                   <div className="shrink-0 flex items-center gap-2 text-xs text-gray-400 ml-2">
                     {game.completedAt && <span>{formatDate(game.completedAt)}</span>}
-                    <span className="text-blue-600 font-semibold">{t('board.viewFullGame')} {t('common.rightArrow')}</span>
+                    <span className="text-blue-600 font-semibold">{forward(t('board.viewFullGame'))}</span>
                   </div>
                 </Link>
               );

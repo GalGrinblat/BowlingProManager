@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from '../../../contexts/LanguageContext';
+import { NavButton } from '../../common/nav/NavButton';
 import { getPlayerDisplayName } from '../../../utils/playerUtils';
 import type { Player } from '../../../types/index';
 
@@ -41,7 +42,7 @@ export const TeamAssignmentStep: React.FC<TeamAssignmentStepProps> = ({
             <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('seasons.assignPlayers')}</h1>
             <p className="text-gray-600">{t('seasons.assignPlayersDesc').replace('{{count}}', String(playersPerTeam))}</p>
           </div>
-          <button onClick={onBack} className="text-gray-600 hover:text-gray-800">{t('common.leftArrow')} {t('common.back')}</button>
+          <NavButton direction="back" label={t('common.back')} onClick={onBack} />
         </div>
       </div>
       <div className="bg-white rounded-xl shadow-lg p-6">

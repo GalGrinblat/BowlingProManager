@@ -3,6 +3,7 @@ import { useTranslation } from '../../../contexts/LanguageContext';
 import { useDateFormat } from '../../../hooks/useDateFormat';
 import { calcGamePoints } from '../../../utils/matchUtils';
 import { GameScoreTable } from '../GameScoreTable';
+import { NavButton } from '../nav/NavButton';
 import type { Game } from '../../../types/index';
 
 interface GameViewLayoutProps {
@@ -11,7 +12,7 @@ interface GameViewLayoutProps {
 }
 
 export const GameViewLayout: React.FC<GameViewLayoutProps> = ({ game, onBack }) => {
-  const { t, direction, isRTL } = useTranslation();
+  const { t, direction } = useTranslation();
   const { formatDate } = useDateFormat();
   const { team1: team1Points, team2: team2Points, winner } = calcGamePoints(game);
 
@@ -27,12 +28,7 @@ export const GameViewLayout: React.FC<GameViewLayoutProps> = ({ game, onBack }) 
               {game.completedAt && ` • ${t('playerDashboard.completedOn')} ${formatDate(game.completedAt)}`}
             </p>
           </div>
-          <button
-            onClick={onBack}
-            className="shrink-0 text-gray-600 hover:text-gray-800"
-          >
-            {isRTL ? t('common.rightArrow') : t('common.leftArrow')} {t('common.back')}
-          </button>
+          <NavButton direction="back" label={t('common.back')} onClick={onBack} className="shrink-0 text-gray-600 hover:text-gray-800" />
         </div>
       </div>
 

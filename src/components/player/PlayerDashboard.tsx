@@ -8,6 +8,8 @@ import { gamesApi } from '../../services/api/games';
 import { logger } from '../../utils/logger';
 import { useTranslation } from '../../contexts/LanguageContext';
 import { useDateFormat } from '../../hooks/useDateFormat';
+import { useNavLabel } from '../../hooks/useNavLabel';
+import { NavLink } from '../common/nav/NavLink';
 import { getPlayerDisplayName } from '../../utils/playerUtils';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -19,6 +21,7 @@ export const PlayerDashboard: React.FC = () => {
   const playerId = playerData?.id ?? '';
   const { t } = useTranslation();
   const { formatDate } = useDateFormat();
+  const { forward } = useNavLabel();
   const [player, setPlayer] = useState<Player | null>(null);
   const [playerLeagues, setPlayerLeagues] = useState<League[]>([]);
   const [recentCompletedGames, setRecentCompletedGames] = useState<Game[]>([]);
@@ -433,12 +436,12 @@ export const PlayerDashboard: React.FC = () => {
             {playerLeagues.map(league => (
               <div key={league.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <p className="font-semibold text-gray-800">{league.name}</p>
-                <a
-                  href={`/board/leagues/${league.id}`}
+                <NavLink
+                  direction="forward"
+                  label={t('playerDashboard.viewStandings')}
+                  to={`/board/leagues/${league.id}`}
                   className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline whitespace-nowrap"
-                >
-                  {t('playerDashboard.viewStandings')} {t('common.rightArrow')}
-                </a>
+                />
               </div>
             ))}
           </div>
@@ -587,7 +590,7 @@ export const PlayerDashboard: React.FC = () => {
                               {t('playerDashboard.lost')}
                             </span>
                           )}
-                          <span className="text-purple-600 font-semibold hidden sm:inline">{t('common.view')} {t('common.rightArrow')}</span>
+                          <span className="text-purple-600 font-semibold hidden sm:inline">{forward(t('common.view'))}</span>
                         </div>
                       </div>
 

@@ -6,6 +6,7 @@ import { useTranslation } from '../../../contexts/LanguageContext';
 import { useDateFormat } from '../../../hooks/useDateFormat';
 import { exportLeague, downloadExportFile, readImportFile, importLeagueOrSeason } from '../../../utils/leagueImportExportUtils';
 import { useAdminData } from '../../../contexts/AdminDataContext';
+import { NavButton } from '../../common/nav/NavButton';
 
 import type { League, Season, Team, TeamStanding, Game } from '../../../types/index';
 
@@ -106,12 +107,7 @@ export const LeagueDetail: React.FC = () => {
     return (
       <div className="bg-white rounded-lg shadow-md p-6">
         <div className="flex items-center gap-4 mb-6">
-          <button
-            onClick={() => navigate('/admin/leagues')}
-            className="text-gray-600 hover:text-gray-800"
-          >
-            {t('common.leftArrow')} {t('leagues.backToLeagues')}
-          </button>
+          <NavButton direction="back" label={t('leagues.backToLeagues')} onClick={() => navigate('/admin/leagues')} />
         </div>
         <div className="text-center py-12">
           <p className="text-gray-500">{t('leagues.leagueNotFound')}</p>
@@ -132,12 +128,7 @@ export const LeagueDetail: React.FC = () => {
             )}
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <button
-              onClick={() => navigate('/admin/leagues')}
-              className="text-gray-600 hover:text-gray-800 whitespace-nowrap"
-            >
-              {t('common.leftArrow')} {t('leagues.backToLeagues')}
-            </button>
+            <NavButton direction="back" label={t('leagues.backToLeagues')} onClick={() => navigate('/admin/leagues')} className="text-gray-600 hover:text-gray-800 whitespace-nowrap" />
             <button
               onClick={() => navigate(`/admin/leagues/${leagueId}/seasons/new`)}
               className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold text-sm whitespace-nowrap"
@@ -188,12 +179,7 @@ export const LeagueDetail: React.FC = () => {
                 <span>👥 <span className="ltr-content">{activeSeason.seasonConfigurations.playersPerTeam}</span> {t('common.playersPerTeam')}</span>
               </div>
             </div>
-            <button
-              onClick={() => navigate(`/admin/seasons/${activeSeason.id}`)}
-              className="px-4 py-2 bg-white text-green-600 rounded-lg hover:bg-green-50 font-semibold"
-            >
-              {t('seasons.viewSeason')} {t('common.rightArrow')}
-            </button>
+            <NavButton direction="forward" label={t('seasons.viewSeason')} onClick={() => navigate(`/admin/seasons/${activeSeason.id}`)} className="px-4 py-2 bg-white text-green-600 rounded-lg hover:bg-green-50 font-semibold" />
           </div>
         </div>
       )}
